@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  background: #eff7f6;
+}
+
+main {
+  max-width: 1280px;
+  margin: 0 auto 0;
+  padding: 2.5rem 0;
+  margin-top: 10rem;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 10rem;
+  background: #fff;
+  // box-shadow: 0 1px 0 0 #eee;
+
+  &-inside {
+    height: inherit;
+    display: flex;
+    align-items: center;
+    width: 1280px;
+    margin: 0 auto;
+  }
+
+  &-nav {
+    display: flex;
+
+    a {
+      display: block;
+      margin-right: 1rem;
+    }
+  }
+}
