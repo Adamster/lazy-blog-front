@@ -3,10 +3,10 @@ import Navbar from "./navbar";
 
 export default function Layout({ children }: any) {
   return (
-    <div className="min-h-full">
+    <div className="layout">
       <Navbar />
-      <main>
-        <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">{children}</div>
+      <main className="mt-16 py-6 w-full max-w-screen-lg m-auto">
+        {children}
       </main>
     </div>
   );
