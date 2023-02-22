@@ -1,40 +1,55 @@
-export default function Home() {
-  const products = [
-    {
-      id: 1,
-      name: "Earthen Bottle",
-      href: "#",
-      price: "$48",
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg",
-      imageAlt:
-        "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-    },
-  ];
+interface Props {
+  initialData: Data[];
+}
+
+interface Data {
+  id: string;
+  title: string;
+  summary: string;
+  body: string;
+  createAtUtc: string;
+}
+
+// const apiUrl = process.env.API_URL;
+const apiUrl = process.env.NEXT_PUBLIC_API;
+
+async function fetchData<Data>(url: string): Promise<Data> {
+  const response = await fetch(url);
+  const data = await response.json();
+  return data;
+}
+
+const fetcher = (url: string): Promise<Data[]> =>
+  fetch(url).then((res) => res.json());
+
+export async function getServerSideProps(): Promise<{ props: Props }> {
+  const initialData = await fetcher(`${apiUrl}/posts`);
+  return { props: { initialData } };
+}
+
+export default function Home({ initialData }: Props) {
+  // const { data, error } = useSWR<Data>(`${apiUrl}/posts`, fetchData);
+
+  // const { data, error } = useSWR<Data>(`${apiUrl}/posts`, fetcher, {
+  //   fallbackData: initialData,
+  // });
+
+  // useEffect(() => {
+  //   console.log(data);
+  // }, []);
+
+  // if (error) return <div>Error</div>;
+  // if (!data) return <div>Loading...</div>;
 
   return (
     <div className="">
-      <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8 ">
-        {products.map((product) => (
-          <a
-            key={product.id}
-            href={product.href}
-            className="group bg-white p-6 rounded-md"
-          >
-            <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-w-7 xl:aspect-h-8">
-              <img
-                src={product.imageSrc}
-                alt={product.imageAlt}
-                className="h-full w-full object-cover object-center group-hover:opacity-75"
-              />
-            </div>
-            <h3 className="mt-4 text-sm text-gray-700">{product.name}</h3>
-            <p className="mt-1 text-lg font-medium text-gray-900">
-              {product.price}
-            </p>
-          </a>
+      {initialData &&
+        initialData.map((blog: Data) => (
+          <div key={blog.id} className="border p-4 rounded-md bg-white mb-2">
+            <h2 className="text-lg font-medium">{blog.title}</h2>
+            <p className="text-gray-500">{blog.summary}</p>
+          </div>
         ))}
-      </div>
     </div>
   );
 }
