@@ -45,9 +45,10 @@ export default function Home({ initialData }: Props) {
     <div className="">
       {initialData &&
         initialData.map((blog: Data) => (
-          <div key={blog.id} className="border p-4 rounded-md bg-white mb-2">
-            <h2 className="text-lg font-medium">{blog.title}</h2>
+          <div key={blog.id} className="border p-4 rounded-md bg-white mb-2 shadow-lg">
+            <h2 className="text-3xl font-medium">{blog.title}</h2>
             <p className="text-gray-500">{blog.summary}</p>
+            <p className="text-xl font-normal antialiased  text-justify">{blog.body}</p>
           </div>
         ))}
     </div>
