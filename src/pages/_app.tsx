@@ -1,7 +1,7 @@
 import Layout from "@/layout/layout";
 import { AppProps } from "next/app";
 
-import "../assets/styles/layout.scss";
+import "../assets/styles/styles.scss";
 
 function App({ Component, pageProps }: AppProps) {
   return (

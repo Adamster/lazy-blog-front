@@ -42,15 +42,38 @@ export default function Home({ initialData }: Props) {
   // if (!data) return <div>Loading...</div>;
 
   return (
-    <div className="">
+    <>
       {initialData &&
         initialData.map((blog: Data) => (
-          <div key={blog.id} className="border p-4 rounded-md bg-white mb-2 shadow-lg">
-            <h2 className="text-3xl font-medium">{blog.title}</h2>
-            <p className="text-gray-500">{blog.summary}</p>
-            <p className="text-xl font-normal antialiased  text-justify">{blog.body}</p>
+          <div key={blog.id} className="rounded-md bg-white mb-4 ">
+            <div className="bg-neutral-200 h-64 rounded-md"></div>
+            <div className="p-4">
+              <h2 className="text-xl font-medium mb-1">{blog.title}</h2>
+              <p className="text-gray-800">{blog.summary}</p>
+              {/* <p className=" font-normal antialiased  text-justify">
+              {blog.body}
+            </p> */}
+            </div>
           </div>
         ))}
-    </div>
+
+      <div className="flex flex-wrap -mx-2">
+        {initialData &&
+          initialData.map((blog: Data) => (
+            <div key={blog.id} className="w-1/2 px-2 mb-4 ">
+              <div className="bg-white rounded-md">
+                <div className="bg-neutral-200 h-64 rounded-md"></div>
+                <div className="p-4">
+                  <h2 className="text-xl font-medium mb-2">{blog.title}</h2>
+                  <p className="text-gray-800">{blog.summary}</p>
+                  {/* <p className=" font-normal antialiased  text-justify">
+              {blog.body}
+            </p> */}
+                </div>
+              </div>
+            </div>
+          ))}
+      </div>
+    </>
   );
 }

@@ -1,0 +1,57 @@
+.main {
+  @apply w-full max-w-screen-md m-auto;
+  margin-top: 5rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+}
+
+// header
+
+.header {
+  @apply fixed top-4 w-full px-4;
+}
+
+.headerContainer {
+  @apply flex items-center justify-between h-16 w-full max-w-screen-md  bg-white mx-auto rounded-md p-4;
+  box-shadow: 0 0 0 1rem theme("colors.neutral.100");
+}
+
+.link {
+  @apply text-neutral-800 font-medium;
+
+  position: relative;
+
+  &:after {
+    position: absolute;
+    display: block;
+    content: "";
+    left: 0;
+    top: calc(100% + 4px);
+    height: 0.1rem;
+    background: #f7b641;
+    width: 0;
+    transition: all 0.3s ease;
+  }
+}
+
+.linkActive {
+  color: #f7b641;
+
+  &:after {
+    width: 100%;
+  }
+}
+
+.search {
+  position: relative;
+}
+
+.searchInput {
+  @apply bg-neutral-100 rounded-md border-neutral-100  py-1 px-4;
+  width: 15rem;
+  transition: width 0.3s ease;
+
+  &:focus {
+    width: 20rem;
+  }
+}
