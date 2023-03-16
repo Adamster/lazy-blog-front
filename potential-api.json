@@ -1,0 +1,45 @@
+{
+  "userDTO": {
+    "name": "",
+    "slug": "",
+    "avatar": "",
+    "ifYouFollowAuthor": ""
+  },
+  "posts": [
+    {
+      "slug": "",
+      "title": "",
+      "image": "",
+      "description": "",
+      "date": "",
+      "author": "{userDTO}",
+      "categories": [{ "name": "", "slug": "" }],
+      "tags": [""],
+      "comments": [
+        { "counter": "", "date": "", "author": "{userDTO}", "body": "" }
+      ],
+      "likesCounter": "",
+      "viewsCounter": "",
+      "ifPostInYourBookmarks": ""
+    }
+  ],
+  "post": {
+    "everything from {posts}": "",
+    "body": [{ "sections": "" }]
+  },
+  "category": {
+    "name": "",
+    "slug": "",
+    "posts": ["{posts}"]
+  },
+  "user": {
+    "name": "",
+    "avatar": "",
+    "info": "",
+    "followersCounter": "",
+    "followers": ["{userDTO}"],
+    "dateOfRegistration": "",
+    "posts": ["{posts}"]
+  },
+  "onSearch": ["{posts}"]
+}
