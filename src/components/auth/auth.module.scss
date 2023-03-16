@@ -1,0 +1,56 @@
+.form {
+  @apply rounded-md bg-white p-6;
+  overflow: hidden;
+}
+
+.title {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.signUp {
+  position: absolute;
+  right: -3.8rem;
+  top: 0;
+
+  transition: right 0.3s ease;
+  cursor: pointer;
+
+  width: 5rem;
+  height: 2.25rem;
+
+  &:hover {
+    right: -2.7rem;
+
+    &:after {
+      opacity: 1;
+    }
+  }
+
+  &:before {
+    display: block;
+    content: "";
+    position: absolute;
+    background: url("/images/logo.png") no-repeat;
+    background-size: contain;
+    width: 3rem;
+    height: 2.25rem;
+    right: 0;
+  }
+
+  &:after {
+    position: absolute;
+    display: block;
+    content: "Псс, рега нужна? ...";
+    left: -6.5rem;
+    border-radius: var(--b-r);
+    top: 0;
+    width: 8rem;
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 0.1rem 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+}
