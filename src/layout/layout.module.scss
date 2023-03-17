@@ -18,6 +18,21 @@
   box-shadow: 0 0 0 1.5rem var(--color-gray-light);
 }
 
+.logo {
+  height: 2.5rem;
+  width: 2.5rem;
+  min-width: 2.5rem;
+  object-fit: contain;
+}
+
+.navLinks {
+  @apply flex;
+
+  // @media (max-width: 720px) {
+  //   display: none;
+  // }
+}
+
 .link {
   display: block;
   color: var(--color-text);
@@ -40,10 +55,12 @@
   position: relative;
   margin-right: 1.5rem;
   max-width: 15rem;
+  width: 100%;
 }
 
 .user {
   width: 2rem;
+  min-width: 2rem;
   height: 2rem;
   border-radius: 50%;
   background: var(--color-gray-light);

@@ -3,7 +3,7 @@
 }
 
 .image {
-  @apply bg-neutral-200 h-52 rounded-md;
+  @apply bg-neutral-200 h-12 rounded-md;
   background: url("https://www.toptal.com/designers/subtlepatterns/uploads/y-so-serious-white.png")
     repeat;
 }
@@ -23,12 +23,12 @@
   padding: 0.15rem 0.75rem;
 }
 
-.category {
-  @extend .floating;
-  background: var(--color-primary);
-  color: #fff;
-  left: 1.5rem;
-}
+// .category {
+//   @extend .floating;
+//   background: var(--color-primary);
+//   color: #fff;
+//   left: 1.5rem;
+// }
 
 .date {
   @extend .floating;
@@ -54,13 +54,15 @@
 }
 
 .author {
-  @apply text-neutral-400 text-sm;
+  // @apply text-neutral-400 text-sm;
+  color: var(--color-gray);
   display: flex;
   align-items: center;
   cursor: pointer;
 }
 
 .stats {
+  color: var(--color-gray);
   display: flex;
   align-items: center;
 }

@@ -16,9 +16,9 @@ export default function Header() {
   return (
     <header className={s.header}>
       <div className={s.headerContainer}>
-        <nav className="flex items-center ">
+        <nav className="flex items-center">
           <Link className="mr-6" href="/">
-            <img className="h-9" src="/images/logo.png" alt="" />
+            <img className={s.logo} src="/images/logo.png" alt="" />
           </Link>
           <ul className="flex">
             {navigation.map((item) => (

@@ -9,11 +9,8 @@ interface IProps {
 export const PostFull = ({ post }: IProps) => {
   return (
     <>
-      {/* <div className="mb-6">
-        <div className={s.image}></div>
-      </div> */}
-
       <div className={s.post}>
+        <div className={s.image}></div>
         <div className={s.info}>
           <div className="mb-6">
             <h2 className={s.title}>{post.title}</h2>
