@@ -1,11 +1,10 @@
-import { useRouter } from "next/router";
 import { IPostFull } from "types";
 
 interface IProps {
   data: IPostFull;
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API;
+// const apiUrl = process.env.NEXT_PUBLIC_API;
 
 // export async function getServerSideProps(
 //   context: GetServerSidePropsContext
@@ -29,11 +28,11 @@ const apiUrl = process.env.NEXT_PUBLIC_API;
 // Component
 
 const Post = ({ data }: IProps) => {
-  const router = useRouter();
-  const { slug } = router.query;
+  // const router = useRouter();
+  // const { slug } = router.query;
 
   // return <PostFull post={data} />;
-  return <>hopa</>;
+  return <>slug</>;
 };
 
 export default Post;
