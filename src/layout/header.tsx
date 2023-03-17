@@ -7,7 +7,7 @@ import s from "./layout.module.scss";
 
 const navigation = [
   { name: "Посты", href: "/" },
-  { name: "Категории", href: "/about" },
+  // { name: "Категории", href: "/about" },
 ];
 
 export default function Header() {

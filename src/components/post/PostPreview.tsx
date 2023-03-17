@@ -9,7 +9,7 @@ interface IProps {
   post: IPost;
 }
 
-export const Post = ({ post }: IProps) => {
+export const PostPreview = ({ post }: IProps) => {
   return (
     <div key={post.id} className={s.post}>
       <div className={s.image}></div>

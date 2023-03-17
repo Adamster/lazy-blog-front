@@ -1,3 +1,3 @@
-import { Post } from "./Post";
+import { PostPreview } from "./PostPreview";
 
-export default Post;
+export default PostPreview;

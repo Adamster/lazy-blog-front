@@ -1,3 +1,4 @@
+import PostPreview from "@/components/post";
 import { IPost } from "types";
 
 interface IProps {
@@ -13,13 +14,13 @@ const apiUrl = process.env.NEXT_PUBLIC_API;
 //   return data;
 // }
 
-// const fetcher = (url: string): Promise<IPost[]> =>
-//   fetch(url).then((res) => res.json());
+const fetcher = (url: string): Promise<IPost[]> =>
+  fetch(url).then((res) => res.json());
 
-// export async function getServerSideProps(): Promise<{ props: IProps }> {
-//   const initialData = await fetcher(`${apiUrl}/posts`);
-//   return { props: { initialData } };
-// }
+export async function getServerSideProps(): Promise<{ props: IProps }> {
+  const initialData = await fetcher(`${apiUrl}/posts`);
+  return { props: { initialData } };
+}
 
 // Component
 
@@ -39,11 +40,10 @@ export default function Home({ initialData }: IProps) {
 
   return (
     <>
-      home page
-      {/* {initialData &&
+      {initialData &&
         initialData.map((post: IPost) => (
           <PostPreview key={post.id} post={post}></PostPreview>
-        ))} */}
+        ))}
     </>
   );
 }
