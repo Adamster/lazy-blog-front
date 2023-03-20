@@ -1,4 +1,4 @@
-import { IPostFull } from "types";
+import { IPostFull } from "@/types";
 
 import s from "./post.module.scss";
 

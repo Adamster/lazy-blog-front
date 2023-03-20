@@ -1,7 +1,7 @@
 import { PostFull } from "@/components/post/PostFull";
+import { IPostFull } from "@/types";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import { IPostFull } from "types";
 
 interface IProps {
   data: IPostFull;

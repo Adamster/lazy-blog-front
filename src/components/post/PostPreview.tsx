@@ -1,7 +1,7 @@
 import { formatDate } from "@/helpers";
+import { IPost } from "@/types";
 import { ChatBubbleLeftEllipsisIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
-import { IPost } from "types";
 
 import s from "./post.module.scss";
 
