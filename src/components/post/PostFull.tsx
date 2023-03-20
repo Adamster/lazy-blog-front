@@ -12,7 +12,7 @@ export const PostFull = ({ post }: IProps) => {
       <div className={s.post}>
         <div className={s.image}></div>
         <div className={s.info}>
-          <div className="mb-6">
+          <div className="mb-4">
             <h2 className={s.title}>{post.title}</h2>
           </div>
 

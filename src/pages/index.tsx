@@ -1,18 +1,13 @@
 import PostPreview from "@/components/post";
+import Head from "next/head";
+import useSWR from "swr";
 import { IPost } from "types";
 
 interface IProps {
   initialData: IPost[];
 }
 
-// const apiUrl = process.env.API_URL;
 const apiUrl = process.env.NEXT_PUBLIC_API;
-
-// async function fetchData<Data>(url: string): Promise<Data> {
-//   const response = await fetch(url);
-//   const data = await response.json();
-//   return data;
-// }
 
 const fetcher = (url: string): Promise<IPost[]> =>
   fetch(url).then((res) => res.json());
@@ -25,21 +20,17 @@ export async function getServerSideProps(): Promise<{ props: IProps }> {
 // Component
 
 export default function Home({ initialData }: IProps) {
-  // const { data, error } = useSWR<Data>(`${apiUrl}/posts`, fetchData);
+  const { data, error } = useSWR(`${apiUrl}/posts`, fetcher);
 
-  // const { data, error } = useSWR<Data>(`${apiUrl}/posts`, fetcher, {
-  //   fallbackData: initialData,
-  // });
-
-  // useEffect(() => {
-  //   console.log(data);
-  // }, []);
-
-  // if (error) return <div>Error</div>;
-  // if (!data) return <div>Loading...</div>;
+  if (error) return <div>Failed to load</div>;
+  if (!data) return <div>Loading...</div>;
 
   return (
     <>
+      <Head>
+        <title>Посты | NotLazy Blog</title>
+      </Head>
+
       {initialData &&
         initialData.map((post: IPost) => (
           <PostPreview key={post.id} post={post}></PostPreview>
