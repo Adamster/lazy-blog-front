@@ -17,7 +17,7 @@ export const PostFull = ({ post }: IProps) => {
           </div>
 
           {/* <span className={s.category}>Категория</span> */}
-          {/* <span className={s.date}>{formatDate(post.createAtUtc)}</span> */}
+          {/* <span className={s.date}>{formatDate(post.createdAtUtc)}</span> */}
 
           <p className={s.summary}>{post.body}</p>
 

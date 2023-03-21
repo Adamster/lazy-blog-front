@@ -11,7 +11,7 @@ export interface IPost {
   slug: string;
   summary: string;
   author: IUser;
-  createAtUtc: string;
+  createdAtUtc: string;
 }
 
 export interface IPostFull extends IPost {

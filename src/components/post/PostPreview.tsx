@@ -15,7 +15,7 @@ export const PostPreview = ({ post }: IProps) => {
       <div className={s.image}></div>
       <div className={s.info}>
         {/* <span className={s.category}>Категория</span> */}
-        <span className={s.date}>{formatDate(post.createAtUtc)}</span>
+        <span className={s.date}>{formatDate(post.createdAtUtc)}</span>
 
         <Link className="block mb-4" href={`/post/${post.slug}`}>
           <h2 className={s.title}>{post.title}</h2>
