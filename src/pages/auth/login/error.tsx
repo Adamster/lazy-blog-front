@@ -1,6 +1,6 @@
 // import { SignIn, SignUp } from "@/components/auth";
 
-const errors = {
+const errors: { [key: string]: string } = {
   // Signin: "Try signing with a different account.",
   // OAuthSignin: "Try signing with a different account.",
   // OAuthCallback: "Try signing with a different account.",
@@ -16,10 +16,11 @@ const errors = {
 };
 
 interface IProps {
-  error?: string | string[];
+  error: string | string[];
 }
 
 export default function ErrorMessage({ error }: IProps) {
-  const errorMessage = error && (errors[error] ?? errors.default);
+  const errorKey = Array.isArray(error) ? error[0] : error;
+  const errorMessage = error && (errors[errorKey] ?? errors.default);
   return <p className="text-red-500">{errorMessage}</p>;
 }
