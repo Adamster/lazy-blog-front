@@ -60,6 +60,13 @@ export const authOptions: NextAuthOptions = {
       session.token = token;
       return session;
     },
+    // async redirect({ url, baseUrl }) {
+    //   // Allows relative callback URLs
+    //   if (url.startsWith("/")) return `${baseUrl}${url}`;
+    //   // Allows callback URLs on the same origin
+    //   else if (new URL(url).origin === baseUrl) return url;
+    //   return baseUrl;
+    // },
   },
   pages: {
     signIn: "/auth",
