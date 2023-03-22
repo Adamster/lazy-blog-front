@@ -54,7 +54,7 @@ export const getServerSideProps: GetServerSideProps<IProps> = async ({
   if (!session) {
     return {
       redirect: {
-        destination: "/auth",
+        destination: "/auth/login",
         permanent: false,
       },
     };

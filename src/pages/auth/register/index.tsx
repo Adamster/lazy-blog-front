@@ -1,10 +1,10 @@
-import { Dispatch, SetStateAction } from "react";
+import Link from "next/link";
 
 interface Props {
-  setSignUpView: Dispatch<SetStateAction<boolean>>;
+  // setSignUpView: Dispatch<SetStateAction<boolean>>;
 }
 
-export const SignUp = ({ setSignUpView }: Props) => {
+export default function Register({}: Props) {
   return (
     <form className="rounded-md bg-white p-6" method="POST">
       <div className="mb-6">
@@ -67,16 +67,10 @@ export const SignUp = ({ setSignUpView }: Props) => {
         <button className="btn btn--primary mr-4" type="submit">
           Поехали
         </button>
-        <button
-          className="btn"
-          onClick={(event) => {
-            event.preventDefault();
-            setSignUpView(false);
-          }}
-        >
+        <Link href="/auth/login" className="btn">
           Передумал
-        </button>
+        </Link>
       </div>
     </form>
   );
-};
+}

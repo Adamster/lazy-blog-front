@@ -4,7 +4,6 @@ import { IPost } from "@/types";
 import { GetServerSideProps } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
-import { useEffect } from "react";
 import useSWR from "swr";
 
 interface IProps {
@@ -17,10 +16,6 @@ interface IProps {
 
 export default function Home({ fallbackData }: IProps) {
   const { data: session } = useSession();
-
-  useEffect(() => {
-    console.log(session);
-  }, []);
 
   const { data, error } = useSWR<IPost[]>(`${API_URL}/posts`, fetcher, {
     fallbackData: fallbackData,

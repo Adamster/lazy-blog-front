@@ -16,19 +16,15 @@ const providers = [
       password: { label: "Password", type: "password" },
     },
     async authorize(credentials, req) {
-      // You need to provide your own logic here that takes the credentials
-      // submitted and returns either a object representing a user or value
-      // that is false/null if the credentials are invalid.
-      // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
-      // You can also use the `req` object to obtain additional parameters
-      // (i.e., the request IP address)
       try {
         const res = await fetch(`${API_URL}/users/login`, {
           method: "POST",
           body: JSON.stringify(credentials),
           headers: { "Content-Type": "application/json" },
         });
+
         const user = await res.json();
+
         // If no error and we have user data, return it
         if (res.ok && user) {
           return user;
@@ -36,6 +32,7 @@ const providers = [
       } catch (e) {
         return e;
       }
+
       // Return null if user data could not be retrieved
       return null;
     },
@@ -57,21 +54,30 @@ export const authOptions: NextAuthOptions = {
       return false;
     },
     async session({ session, token }: { session: any; token: any }) {
-      session.token = token;
+      // session.token = token;
+      console.log("session:", session);
+      console.log("token:", token);
       return session;
     },
-    // async redirect({ url, baseUrl }) {
-    //   // Allows relative callback URLs
-    //   if (url.startsWith("/")) return `${baseUrl}${url}`;
-    //   // Allows callback URLs on the same origin
-    //   else if (new URL(url).origin === baseUrl) return url;
-    //   return baseUrl;
+    // async jwt({ token, user, account, profile, isNewUser }) {
+    //   console.log("user:", user);
+    //   console.log("account:", account);
+    //   // token.email = "her";
+    //   return token;
+    // },
+    // async jwt(token, user) {
+    //   if (user) {
+    //     token.id = user.id;
+    //     token.email = user.email;
+    //     token.accessToken = user.token;
+    //   }
+    //   return token;
     // },
   },
   pages: {
-    signIn: "/auth",
+    signIn: "/auth/login",
+    // error: "/auth/login", // Error code passed in query string as ?error=
     // signOut: "/auth/signout",
-    // error: '/auth/error', // Error code passed in query string as ?error=
     // verifyRequest: '/auth/verify-request', // (used for check email message)
     // newUser: '/auth/new-user' // New users will be directed here on first sign in (leave the property out if not of interest)
   },

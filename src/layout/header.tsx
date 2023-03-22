@@ -15,6 +15,8 @@ export default function Header() {
   const router = useRouter();
   const { data: session } = useSession();
 
+  console.log("session:", session);
+
   return (
     <header className={s.header}>
       <div className={s.headerContainer}>
@@ -39,15 +41,18 @@ export default function Header() {
           </ul>
         </nav>
         <div className={s.actions}>
-          <div className={s.search}>
+          {/* <div className={s.search}>
             <input type="text" className="input" placeholder="Поиск" />
-          </div>
+          </div> */}
           {session ? (
-            <button className={s.user} onClick={() => signOut()}>
-              <ArrowRightOnRectangleIcon />
-            </button>
+            <div className="flex items-center">
+              <span className="mr-4">{session.user?.name}</span>
+              <button className={s.user} onClick={() => signOut()}>
+                <ArrowRightOnRectangleIcon />
+              </button>
+            </div>
           ) : (
-            <Link className={s.user} href="/auth">
+            <Link className={s.user} href="/auth/login">
               <UserIcon />
             </Link>
           )}

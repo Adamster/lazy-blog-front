@@ -38,6 +38,7 @@
     background: var(--color-gray-light);
     border-radius: var(--b-r);
     transition: opacity 0.3s ease;
+    display: inline-block;
 
     &:hover {
       opacity: 0.7;

@@ -25,11 +25,16 @@ import type {
   InferGetServerSidePropsType,
 } from "next";
 import { getCsrfToken } from "next-auth/react";
-import s from "./auth.module.scss";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import s from "../auth.module.scss";
+import ErrorMessage from "./error";
 
-export default function SignIn({
+export default function Login({
   csrfToken,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const { error } = useRouter().query;
+
   return (
     <form
       method="post"
@@ -38,50 +43,43 @@ export default function SignIn({
     >
       <div className={s.title}>
         <h3 className="text-2xl font-bold">Логинься давай</h3>
-        <div className={s.signUp}></div>
+        <Link href="/auth/register" className={s.register}></Link>
       </div>
 
       <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
 
       <div className="flex -mx-3">
-        <div className="w-1/2 px-3">
-          <div className="mb-6">
-            <input
-              className="input"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              placeholder="Почта"
-            />
-          </div>
+        <div className="w-1/2 px-3 mb-6">
+          <input
+            className="input"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            placeholder="Почта"
+          />
         </div>
 
-        <div className="w-1/2 px-3">
-          <div className="mb-6">
-            <input
-              className="input"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              placeholder="Пароль"
-            />
-          </div>
+        <div className="w-1/2 px-3 mb-6">
+          <input
+            className="input"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            required
+            placeholder="Пароль"
+          />
         </div>
       </div>
 
+      {error && (
+        <div className="mb-4">
+          <ErrorMessage error={error} />
+        </div>
+      )}
+
       <div>
-        <button
-          className="btn btn--primary"
-          type="submit"
-          // onClick={() => {
-          //   signIn("credentials", {
-          //     username: "adam.serghei@gmail.com",
-          //     password: "Password1!",
-          //   });
-          // }}
-        >
+        <button className="btn btn--primary" type="submit">
           Войти
         </button>
       </div>
@@ -92,7 +90,7 @@ export default function SignIn({
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
-      csrfToken: (await getCsrfToken(context)) || "",
+      csrfToken: await getCsrfToken(context),
     },
   };
 }
