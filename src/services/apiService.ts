@@ -1,6 +1,6 @@
 import { IPost } from "@/types";
 
-const apiUrl = process.env.NEXT_PUBLIC_API;
+export const API_URL = process.env.NEXT_PUBLIC_API;
 
 export const fetcher = async <T>(url: string): Promise<T> => {
   const response = await fetch(url);
@@ -17,4 +17,4 @@ export const fetcher = async <T>(url: string): Promise<T> => {
 // Posts
 
 export const getPosts = (): Promise<IPost[]> =>
-  fetcher<IPost[]>(`${apiUrl}/posts`);
+  fetcher<IPost[]>(`${API_URL}/posts`);

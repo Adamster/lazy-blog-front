@@ -1,37 +1,35 @@
-// interface Props {
-//   setSignUpView: Dispatch<SetStateAction<boolean>>;
+// import { SignIn, SignUp } from "@/components/auth";
+// import Head from "next/head";
+// import { useState } from "react";
+
+// export default function Login() {
+//   const [signUpView, setSignUpView] = useState(false);
+//   return (
+//     <>
+//       <Head>
+//         <title>Вход | Not Lazy Blog</title>
+//       </Head>
+
+//       {/* {signUpView ? (
+//         <SignUp setSignUpView={setSignUpView} />
+//       ) : (
+//         <SignIn setSignUpView={setSignUpView} />
+//       )} */}
+
+//     </>
+//   );
 // }
 
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
 } from "next";
-import { getCsrfToken, signIn } from "next-auth/react";
-
-// export default function SignIn({
-//   csrfToken,
-// }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-//   return (
-//     <form method="post" action="/api/auth/callback/credentials">
-//       <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
-//       <label>
-//         Username
-//         <input name="username" type="text" />
-//       </label>
-//       <label>
-//         Password
-//         <input name="password" type="password" />
-//       </label>
-//       <button type="submit">Sign in</button>
-//     </form>
-//   );
-// }
-
+import { getCsrfToken } from "next-auth/react";
 import s from "./auth.module.scss";
 
-export const SignIn = ({
+export default function SignIn({
   csrfToken,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
     <form
       method="post"
@@ -76,24 +74,25 @@ export const SignIn = ({
       <div>
         <button
           className="btn btn--primary"
-          onClick={() => {
-            signIn("credentials", {
-              username: "adam.serghei@gmail.com",
-              password: "Password1!",
-            });
-          }}
+          type="submit"
+          // onClick={() => {
+          //   signIn("credentials", {
+          //     username: "adam.serghei@gmail.com",
+          //     password: "Password1!",
+          //   });
+          // }}
         >
           Войти
         </button>
       </div>
     </form>
   );
-};
+}
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
-      csrfToken: await getCsrfToken(context),
+      csrfToken: (await getCsrfToken(context)) || "",
     },
   };
 }

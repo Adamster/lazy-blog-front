@@ -1,5 +1,6 @@
-import { UserIcon } from "@heroicons/react/20/solid";
+import { ArrowRightOnRectangleIcon, UserIcon } from "@heroicons/react/20/solid";
 import classNames from "classnames";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -7,11 +8,12 @@ import s from "./layout.module.scss";
 
 const navigation = [
   { name: "Посты", href: "/" },
-  // { name: "Категории", href: "/about" },
+  { name: "абОут", href: "/about" },
 ];
 
 export default function Header() {
   const router = useRouter();
+  const { data: session } = useSession();
 
   return (
     <header className={s.header}>
@@ -40,9 +42,15 @@ export default function Header() {
           <div className={s.search}>
             <input type="text" className="input" placeholder="Поиск" />
           </div>
-          <Link className={s.user} href="/auth">
-            <UserIcon />
-          </Link>
+          {session ? (
+            <button className={s.user} onClick={() => signOut()}>
+              <ArrowRightOnRectangleIcon />
+            </button>
+          ) : (
+            <Link className={s.user} href="/auth">
+              <UserIcon />
+            </Link>
+          )}
         </div>
       </div>
     </header>

@@ -1,25 +1,28 @@
 import PostPreview from "@/components/post";
-import { fetcher, getPosts } from "@/services/apiService";
+import { API_URL, fetcher, getPosts } from "@/services/apiService";
 import { IPost } from "@/types";
 import { GetServerSideProps } from "next";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
+import { useEffect } from "react";
 import useSWR from "swr";
 
 interface IProps {
   fallbackData: IPost[];
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API;
-
-export const getServerSideProps: GetServerSideProps<IProps> = async () => {
-  const fallbackData = await getPosts();
-  return { props: { fallbackData } };
-};
+// const apiUrl = process.env.NEXT_PUBLIC_API;
 
 // Component
 
 export default function Home({ fallbackData }: IProps) {
-  const { data, error } = useSWR<IPost[]>(`${apiUrl}/posts`, fetcher, {
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    console.log(session);
+  }, []);
+
+  const { data, error } = useSWR<IPost[]>(`${API_URL}/posts`, fetcher, {
     fallbackData: fallbackData,
   });
 
@@ -39,3 +42,8 @@ export default function Home({ fallbackData }: IProps) {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<IProps> = async () => {
+  const fallbackData = await getPosts();
+  return { props: { fallbackData } };
+};
