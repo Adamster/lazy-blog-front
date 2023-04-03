@@ -1,74 +1,114 @@
+.post:not(:last-of-type) {
+  margin-bottom: 1rem;
+}
+
 .post {
-  @apply rounded-md bg-white mb-6;
-}
-
-.image {
-  @apply bg-neutral-200 h-12 rounded-md;
-  background: url("https://www.toptal.com/designers/subtlepatterns/uploads/y-so-serious-white.png")
-    repeat;
-}
-
-.info {
-  @apply p-6;
-  position: relative;
-}
-
-.floating {
-  @apply text-sm;
-  border-radius: var(--b-r);
-  // border-radius: 1.5rem;
-  box-shadow: 0 0 0 0.25rem white;
-  position: absolute;
-  top: -0.75rem;
-  padding: 0.15rem 0.75rem;
-}
-
-// .category {
-//   @extend .floating;
-//   background: var(--color-primary);
-//   color: #fff;
-//   left: 1.5rem;
-// }
-
-.date {
-  @extend .floating;
-  background: var(--color-gray-light);
-  color: var(--color-text);
-  right: 1.5rem;
-}
-
-.title {
-  @apply text-2xl;
-  font-weight: 700;
-}
-
-.summary {
-  @apply text-gray-800;
-}
-
-.footer {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 1rem;
+  flex-direction: row;
+  width: 100%;
+
+  &Content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    background: #fff;
+    position: relative;
+    padding: 2rem;
+    border-radius: var(--b-r);
+  }
+
+  // &Image {
+  //   height: 9rem;
+  //   width: 13rem;
+  //   border-radius: var(--b-r);
+  //   background: #eee;
+  // }
+
+  &Title {
+    font-size: large;
+    font-weight: 600;
+    @extend .hideOverflow;
+  }
+
+  &Summary {
+    color: var(--color-gray);
+    @extend .hideOverflow;
+  }
 }
 
 .author {
-  // @apply text-neutral-400 text-sm;
-  color: var(--color-gray);
+  @apply text-sm;
+  color: var(--color-text);
   display: flex;
   align-items: center;
-  cursor: pointer;
+
+  &Ava {
+    background: #5a4a42;
+    height: 1.5rem;
+    width: 1.5rem;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+  }
+
+  &Name {
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    margin-right: 1.5rem;
+  }
 }
 
-.stats {
+.date {
+  font-size: 0.8rem;
   color: var(--color-gray);
-  display: flex;
-  align-items: center;
+  position: relative;
+
+  &:after {
+    position: absolute;
+    content: "";
+    left: -0.75rem;
+    top: 50%;
+    margin-top: -1px;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: var(--color-gray);
+  }
+}
+
+.hideOverflow {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .icon {
   color: var(--color-gray);
   width: 1rem;
   margin-right: 0.25rem;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  // margin-top: 1rem;
+
+  &Stat {
+    display: flex;
+    align-items: center;
+
+    background: #eee;
+    border-radius: 5rem;
+    padding: 0.25rem 0.75rem;
+
+    &:not(:last-of-type) {
+      margin-right: 1rem;
+    }
+  }
+
+  &Num {
+    font-size: 0.9rem;
+    font-family: Arial, Helvetica, sans-serif;
+  }
 }

@@ -27,7 +27,10 @@ const providers = [
 
         // If no error and we have user data, return it
         if (res.ok && user) {
-          return user;
+          return {
+            ...user,
+            name: `${user.user.firstName}`,
+          };
         }
       } catch (e) {
         return e;

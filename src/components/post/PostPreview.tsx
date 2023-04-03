@@ -1,6 +1,6 @@
 import { formatDate } from "@/helpers";
 import { IPost } from "@/types";
-import { ChatBubbleLeftEllipsisIcon } from "@heroicons/react/20/solid";
+import classNames from "classnames";
 import Link from "next/link";
 
 import s from "./post.module.scss";
@@ -12,26 +12,40 @@ interface IProps {
 export const PostPreview = ({ post }: IProps) => {
   return (
     <div key={post.id} className={s.post}>
-      <div className={s.image}></div>
-      <div className={s.info}>
-        {/* <span className={s.category}>Категория</span> */}
-        <span className={s.date}>{formatDate(post.createdAtUtc)}</span>
+      <div className={s.postContent}>
+        <div className={classNames(s.author, "mb-4")}>
+          <Link href="/" className={s.authorName}>
+            <div className={s.authorAva}></div>
+            {post.author.firstName}{" "}
+            {post.author.lastName && post.author.lastName}
+          </Link>
 
-        <Link className="block mb-4" href={`/post/${post.slug}`}>
-          <h2 className={s.title}>{post.title}</h2>
-        </Link>
-        <p className={s.summary}>{post.summary}</p>
-
-        <div className={s.footer}>
-          <div className={s.author}>
-            {post.author.firstName} {post.author.lastName}
-          </div>
-          <div className={s.stats}>
-            <ChatBubbleLeftEllipsisIcon className={s.icon} />
-            <span>0</span>
+          <div className={s.date}>
+            <span>{formatDate(post.createdAtUtc)}</span>
           </div>
         </div>
+
+        <Link className="block mb-0" href={`/post/${post.slug}`}>
+          <h2 className={"text-lg font-bold"}>{post.title}</h2>
+          {post.summary && <p className={s.postSummary}>{post.summary}</p>}
+        </Link>
+
+        {/* <div className={s.stats}>
+          <div className={s.statsStat}>
+            <HeartIcon className={s.icon}></HeartIcon>
+            <span className={s.statsNum}>34</span>
+          </div>
+
+          <div className={s.statsStat}>
+            <ChatBubbleBottomCenterIcon
+              className={s.icon}
+            ></ChatBubbleBottomCenterIcon>
+            <span className={s.statsNum}>34</span>
+          </div>
+        </div> */}
       </div>
+
+      <Link href={`/post/${post.slug}`} className={s.postImage}></Link>
     </div>
   );
 };

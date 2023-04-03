@@ -6,7 +6,7 @@ interface Props {
 
 export default function Register({}: Props) {
   return (
-    <form className="rounded-md bg-white p-6" method="POST">
+    <form className="rounded-md bg-white p-8" method="POST">
       <div className="mb-6">
         <h3 className="text-2xl font-bold">Регся давай</h3>
       </div>

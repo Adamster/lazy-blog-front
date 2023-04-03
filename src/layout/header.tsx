@@ -1,5 +1,5 @@
 import { ArrowRightOnRectangleIcon, UserIcon } from "@heroicons/react/20/solid";
-import classNames from "classnames";
+import cn from "classnames";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -8,14 +8,14 @@ import s from "./layout.module.scss";
 
 const navigation = [
   { name: "Посты", href: "/" },
-  { name: "абОут", href: "/about" },
+  { name: "Создать", href: "/about", authRequired: true },
 ];
 
 export default function Header() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: authSession } = useSession();
 
-  console.log("session:", session);
+  // console.log("session:", session);
 
   return (
     <header className={s.header}>
@@ -25,28 +25,28 @@ export default function Header() {
             <img className={s.logo} src="/images/logo.png" alt="" />
           </Link>
           <ul className="flex">
-            {navigation.map((item) => (
-              <li key={item.name} className="mr-4">
-                <Link
-                  className={classNames(
-                    s.link,
-                    router.pathname === item.href ? s.linkActive : ""
-                  )}
-                  href={item.href}
-                >
-                  {item.name}
-                </Link>
-              </li>
-            ))}
+            {navigation.map(
+              (item) =>
+                ((item.authRequired && authSession) || !item.authRequired) && (
+                  <li key={item.name} className="mr-4">
+                    <Link
+                      className={cn(
+                        s.link,
+                        router.pathname === item.href ? s.linkActive : ""
+                      )}
+                      href={item.href}
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                )
+            )}
           </ul>
         </nav>
         <div className={s.actions}>
-          {/* <div className={s.search}>
-            <input type="text" className="input" placeholder="Поиск" />
-          </div> */}
-          {session ? (
+          {authSession ? (
             <div className="flex items-center">
-              <span className="mr-4">{session.user?.name}</span>
+              <span className={s.userName}>{authSession.user?.name}</span>
               <button className={s.user} onClick={() => signOut()}>
                 <ArrowRightOnRectangleIcon />
               </button>

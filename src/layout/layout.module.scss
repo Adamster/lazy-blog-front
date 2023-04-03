@@ -1,21 +1,30 @@
 .main {
-  @apply max-w-screen-md m-auto;
+  max-width: var(--max-width);
+  margin: 0 auto;
   margin-top: 5rem;
-  margin-bottom: 2rem;
-  padding: 1.5rem;
+  padding: 2rem;
 }
 
 // header
 
 .header {
-  @apply fixed top-4 px-4;
-  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 9999;
+  background: #fff;
+  height: 5rem;
 }
 
 .headerContainer {
-  @apply flex items-center justify-between h-16 w-full max-w-screen-md  bg-white mx-auto rounded-md px-6;
-  box-shadow: 0 0 0 1.5rem var(--color-gray-light);
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  max-width: var(--max-width);
 }
 
 .logo {
@@ -27,10 +36,6 @@
 
 .navLinks {
   @apply flex;
-
-  // @media (max-width: 720px) {
-  //   display: none;
-  // }
 }
 
 .link {
@@ -66,6 +71,10 @@
   background: var(--color-gray-light);
   padding: 0.35rem;
   transition: background 0.3s ease, color 0.3s ease;
+
+  &Name {
+    margin-right: 1rem;
+  }
 
   &:hover {
     background: var(--color-primary);

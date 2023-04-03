@@ -1,5 +1,5 @@
 .form {
-  @apply rounded-md bg-white p-6;
+  @apply rounded-md bg-white p-8;
   overflow: hidden;
 }
 
@@ -42,10 +42,10 @@
     position: absolute;
     display: block;
     content: "Псс, рега нужна? ...";
-    left: -6.5rem;
+    left: -7.5rem;
     border-radius: var(--b-r);
     top: 0;
-    width: 8rem;
+    width: 9rem;
     background: var(--color-primary);
     color: #fff;
     font-size: 0.75rem;

@@ -1,0 +1,120 @@
+// .post:not(:last-of-type) {
+//   margin-bottom: 1.5rem;
+// }
+
+.post {
+  width: 100%;
+  background: #fff;
+  padding: 2rem;
+  border-radius: var(--b-r);
+
+  &TitleContainer {
+    margin-bottom: 1rem;
+  }
+
+  &Title {
+    // font-weight: 600;
+    // font-size: x-large;
+  }
+
+  &Body {
+    color: var(--color-gray);
+  }
+}
+
+.image {
+  width: 100%;
+  height: 9rem;
+  margin-bottom: 1.5rem;
+  background: #eee;
+}
+
+.header {
+  background: #fff;
+  padding: 2rem;
+  border-radius: var(--b-r);
+
+  &Top {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+// .author {
+//   @apply text-sm;
+//   color: var(--color-text);
+//   right: 1.5rem;
+//   display: flex;
+//   align-items: center;
+//   margin-bottom: 1rem;
+
+//   &Ava {
+//     background: #5a4a42;
+//     height: 1.5rem;
+//     width: 1.5rem;
+//     border-radius: 50%;
+//     margin-right: 0.75rem;
+//   }
+
+//   &Name {
+//     font-size: 0.8rem;
+//     display: flex;
+//     align-items: center;
+//     font-weight: 600;
+//     margin-right: 1.5rem;
+//   }
+// }
+
+// .date {
+//   font-size: 0.8rem;
+//   color: var(--color-gray);
+//   position: relative;
+
+//   &:after {
+//     position: absolute;
+//     content: "";
+//     left: -0.75rem;
+//     top: 50%;
+//     margin-top: -1px;
+//     width: 2px;
+//     height: 2px;
+//     border-radius: 50%;
+//     background: var(--color-gray);
+//   }
+// }
+
+// .hideOverflow {
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+// }
+
+// .icon {
+//   color: var(--color-gray);
+//   width: 1rem;
+//   margin-right: 0.25rem;
+// }
+
+// .stats {
+//   display: flex;
+//   align-items: center;
+//   margin-top: 1rem;
+
+//   &Stat {
+//     display: flex;
+//     align-items: center;
+
+//     background: var(--color-gray-light);
+//     border-radius: 5rem;
+//     padding: 0.25rem 0.75rem;
+
+//     margin-right: 1rem;
+//   }
+
+//   &Num {
+//     font-size: 0.9rem;
+//     font-family: Arial, Helvetica, sans-serif;
+//   }
+// }

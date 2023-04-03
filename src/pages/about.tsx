@@ -1,10 +1,9 @@
-import { API_URL, fetcher, getPosts } from "@/services/apiService";
+import { getPosts } from "@/services/apiService";
 import { IPost } from "@/types";
 import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth/next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
-import useSWR from "swr";
 import { authOptions } from "./api/auth/[...nextauth]";
 
 interface IProps {
@@ -15,17 +14,6 @@ interface IProps {
 
 export default function Home({ fallbackData }: IProps) {
   const { data: session } = useSession();
-
-  // useEffect(() => {
-  //   console.log(session);
-  // }, []);
-
-  const { data, error } = useSWR<IPost[]>(`${API_URL}/posts`, fetcher, {
-    fallbackData: fallbackData,
-  });
-
-  if (error) return <div>Failed to load</div>;
-  if (!data) return <div>Loading...</div>;
 
   return (
     <>
