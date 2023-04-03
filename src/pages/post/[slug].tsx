@@ -1,4 +1,5 @@
 import { PostFull } from "@/components/post/PostFull";
+import { API_URL } from "@/services/apiService";
 import { IPostFull } from "@/types";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
@@ -7,14 +8,22 @@ interface IProps {
   data: IPostFull;
 }
 
-const apiUrl = process.env.NEXT_PUBLIC_API;
+// Component
+
+const Post = ({ data }: IProps) => {
+  const router = useRouter();
+  const { slug } = router.query;
+  return <PostFull post={data} />;
+};
+
+export default Post;
 
 export async function getServerSideProps(
   context: GetServerSidePropsContext
 ): Promise<{ props: IProps | null }> {
   try {
     const slug = context.params?.slug;
-    const res = await fetch(`${apiUrl}/posts/${slug}`);
+    const res = await fetch(`${API_URL}/posts/${slug}`);
 
     if (!res.ok) {
       throw new Error(`Failed to fetch data for slug: ${slug}`);
@@ -27,14 +36,3 @@ export async function getServerSideProps(
     return { props: null };
   }
 }
-
-// Component
-
-const Post = ({ data }: IProps) => {
-  const router = useRouter();
-  const { slug } = router.query;
-
-  return <PostFull post={data} />;
-};
-
-export default Post;
