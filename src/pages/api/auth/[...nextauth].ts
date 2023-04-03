@@ -29,7 +29,7 @@ const providers = [
         if (res.ok && user) {
           return {
             ...user,
-            name: `${user.user.firstName}`,
+            // name: `${user.user.firstName}`,
           };
         }
       } catch (e) {
@@ -57,25 +57,20 @@ export const authOptions: NextAuthOptions = {
       return false;
     },
     async session({ session, token }: { session: any; token: any }) {
-      // session.token = token;
-      console.log("session:", session);
-      console.log("token:", token);
+      if (token) {
+        session.user.id = token.id;
+        session.user.token = token.token;
+      }
       return session;
     },
-    // async jwt({ token, user, account, profile, isNewUser }) {
-    //   console.log("user:", user);
-    //   console.log("account:", account);
-    //   // token.email = "her";
-    //   return token;
-    // },
-    // async jwt(token, user) {
-    //   if (user) {
-    //     token.id = user.id;
-    //     token.email = user.email;
-    //     token.accessToken = user.token;
-    //   }
-    //   return token;
-    // },
+    async jwt({ token, user }: any) {
+      if (user) {
+        token.id = user.user.id;
+        token.name = user.user.firstName;
+        token.token = user.token;
+      }
+      return token;
+    },
   },
   pages: {
     signIn: "/auth/login",

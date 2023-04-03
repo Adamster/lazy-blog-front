@@ -1,8 +1,16 @@
-.post:not(:last-of-type) {
+.hide-overflow {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// PREVIEW
+
+.preview:not(:last-of-type) {
   margin-bottom: 1rem;
 }
 
-.post {
+.preview {
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -15,32 +23,32 @@
     position: relative;
     padding: 2rem;
     border-radius: var(--b-r);
+    max-width: calc(100%);
   }
 
   // &Image {
-  //   height: 9rem;
-  //   width: 13rem;
+  //   display: flex;
+  //   width: 12rem;
+  //   min-width: 12rem;
   //   border-radius: var(--b-r);
   //   background: #eee;
   // }
 
   &Title {
-    font-size: large;
-    font-weight: 600;
-    @extend .hideOverflow;
+    @extend .hide-overflow;
   }
 
   &Summary {
+    @extend .hide-overflow;
     color: var(--color-gray);
-    @extend .hideOverflow;
   }
 }
 
 .author {
-  @apply text-sm;
   color: var(--color-text);
   display: flex;
   align-items: center;
+  font-size: small;
 
   &Ava {
     background: #5a4a42;
@@ -59,7 +67,7 @@
   }
 }
 
-.date {
+.publishDate {
   font-size: 0.8rem;
   color: var(--color-gray);
   position: relative;
@@ -77,38 +85,41 @@
   }
 }
 
-.hideOverflow {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+// FULL
+
+.full {
+  width: 100%;
+  background: #fff;
+  padding: 2rem;
+  border-radius: var(--b-r);
 }
 
-.icon {
-  color: var(--color-gray);
-  width: 1rem;
-  margin-right: 0.25rem;
-}
+// .icon {
+//   color: var(--color-gray);
+//   width: 1rem;
+//   margin-right: 0.25rem;
+// }
 
-.stats {
-  display: flex;
-  align-items: center;
-  // margin-top: 1rem;
+// .stats {
+//   display: flex;
+//   align-items: center;
 
-  &Stat {
-    display: flex;
-    align-items: center;
+//   &Stat {
+//     display: flex;
+//     align-items: center;
 
-    background: #eee;
-    border-radius: 5rem;
-    padding: 0.25rem 0.75rem;
+//     background: #eee;
+//     border-radius: 5rem;
+//     padding: 0 0.75rem;
+//     height: 1.5rem;
 
-    &:not(:last-of-type) {
-      margin-right: 1rem;
-    }
-  }
+//     &:not(:last-of-type) {
+//       margin-right: 1rem;
+//     }
+//   }
 
-  &Num {
-    font-size: 0.9rem;
-    font-family: Arial, Helvetica, sans-serif;
-  }
-}
+//   &Num {
+//     font-size: small;
+//     font-family: Arial, Helvetica, sans-serif;
+//   }
+// }

@@ -20,7 +20,7 @@ export default function Home({ fallbackData }: IProps) {
   return (
     <>
       <Head>
-        <title>Посты | NotLazy Blog</title>
+        <title>Посты | Not Lazy Blog</title>
       </Head>
 
       {data &&

@@ -7,13 +7,13 @@ interface Props {
 export default function Register({}: Props) {
   return (
     <form className="rounded-md bg-white p-8" method="POST">
-      <div className="mb-6">
+      <div className="mb-4">
         <h3 className="text-2xl font-bold">Регся давай</h3>
       </div>
 
-      <div className="flex -mx-3">
-        <div className="w-1/2 px-3">
-          <div className="mb-6">
+      <div className="flex -mx-2">
+        <div className="w-1/2 px-2">
+          <div className="mb-4">
             <input
               className="input"
               name="name"
@@ -24,8 +24,8 @@ export default function Register({}: Props) {
           </div>
         </div>
 
-        <div className="w-1/2 px-3">
-          <div className="mb-6">
+        <div className="w-1/2 px-2">
+          <div className="mb-4">
             <input
               className="input"
               name="surname"
@@ -37,9 +37,9 @@ export default function Register({}: Props) {
         </div>
       </div>
 
-      <div className="flex -mx-3">
-        <div className="w-1/2 px-3">
-          <div className="mb-6">
+      <div className="flex -mx-2">
+        <div className="w-1/2 px-2">
+          <div className="mb-8">
             <input
               className="input"
               name="email"
@@ -50,8 +50,8 @@ export default function Register({}: Props) {
           </div>
         </div>
 
-        <div className="w-1/2 px-3">
-          <div className="mb-6">
+        <div className="w-1/2 px-2">
+          <div className="mb-8">
             <input
               className="input"
               name="password"

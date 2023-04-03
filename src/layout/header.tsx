@@ -8,14 +8,12 @@ import s from "./layout.module.scss";
 
 const navigation = [
   { name: "Посты", href: "/" },
-  { name: "Создать", href: "/about", authRequired: true },
+  { name: "Создать", href: "/create", authRequired: true },
 ];
 
 export default function Header() {
   const router = useRouter();
   const { data: authSession } = useSession();
-
-  // console.log("session:", session);
 
   return (
     <header className={s.header}>
@@ -47,6 +45,7 @@ export default function Header() {
           {authSession ? (
             <div className="flex items-center">
               <span className={s.userName}>{authSession.user?.name}</span>
+              {/* <div className={s.userAva}></div> */}
               <button className={s.user} onClick={() => signOut()}>
                 <ArrowRightOnRectangleIcon />
               </button>

@@ -1,7 +1,7 @@
 .main {
   max-width: var(--max-width);
   margin: 0 auto;
-  margin-top: 5rem;
+  margin-top: 4rem;
   padding: 2rem;
 }
 
@@ -14,7 +14,7 @@
   right: 0;
   z-index: 9999;
   background: #fff;
-  height: 5rem;
+  height: 4rem;
 }
 
 .headerContainer {
@@ -71,6 +71,14 @@
   background: var(--color-gray-light);
   padding: 0.35rem;
   transition: background 0.3s ease, color 0.3s ease;
+
+  &Ava {
+    background: #5a4a42;
+    height: 2rem;
+    width: 2rem;
+    border-radius: 50%;
+    // margin-right: 0.75rem;
+  }
 
   &Name {
     margin-right: 1rem;

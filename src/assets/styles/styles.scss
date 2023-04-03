@@ -2,11 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "./utilities.scss";
+
 :root {
   --color-primary: #f7b641;
   --color-text: #404040;
-  --color-gray: #999999;
-  --color-gray-light: #f8f8f8;
+  --color-gray: #8b8b8b;
+  --color-gray-light: #eee;
 
   --color-background: #f8f8f8;
   --max-width: 800px;
@@ -34,6 +36,11 @@
     width: 100%;
   }
 
+  .textarea {
+    @extend .input;
+    @apply py-2 px-4;
+  }
+
   .btn {
     @apply py-1 px-4;
     border-color: var(--color-gray-light);
@@ -52,10 +59,4 @@
     background: var(--color-primary);
     color: white;
   }
-}
-
-// Utilities
-
-.color-primary {
-  color: var(--color-primary);
 }

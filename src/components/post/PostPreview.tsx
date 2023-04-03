@@ -11,8 +11,10 @@ interface IProps {
 
 export const PostPreview = ({ post }: IProps) => {
   return (
-    <div key={post.id} className={s.post}>
-      <div className={s.postContent}>
+    <div key={post.id} className={s.preview}>
+      {/* <Link href={`/post/${post.slug}`} className={s.previewImage}></Link> */}
+      {/*  */}
+      <div className={s.previewContent}>
         <div className={classNames(s.author, "mb-4")}>
           <Link href="/" className={s.authorName}>
             <div className={s.authorAva}></div>
@@ -20,14 +22,16 @@ export const PostPreview = ({ post }: IProps) => {
             {post.author.lastName && post.author.lastName}
           </Link>
 
-          <div className={s.date}>
+          <div className={s.publishDate}>
             <span>{formatDate(post.createdAtUtc)}</span>
           </div>
         </div>
 
         <Link className="block mb-0" href={`/post/${post.slug}`}>
-          <h2 className={"text-lg font-bold"}>{post.title}</h2>
-          {post.summary && <p className={s.postSummary}>{post.summary}</p>}
+          <h2 className={classNames(s.previewTitle, "text-lg font-bold")}>
+            {post.title}
+          </h2>
+          {post.summary && <p className={s.previewSummary}>{post.summary}</p>}
         </Link>
 
         {/* <div className={s.stats}>
@@ -44,8 +48,6 @@ export const PostPreview = ({ post }: IProps) => {
           </div>
         </div> */}
       </div>
-
-      <Link href={`/post/${post.slug}`} className={s.postImage}></Link>
     </div>
   );
 };
