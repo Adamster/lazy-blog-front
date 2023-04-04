@@ -13,13 +13,19 @@ export default function Home() {
   );
 
   if (error || data?.code) return <ErrorMessage code={data?.code && ""} />;
-  if (isLoading) return <Loading />;
 
   return (
     <>
       <Head>
         <title>Посты | Not Lazy Blog</title>
+        <meta
+          key="og:title"
+          property="og:title"
+          content="Посты | Not Lazy Blog"
+        />
       </Head>
+
+      {isLoading && <Loading />}
 
       {data &&
         data.map((post: IPost) => (
