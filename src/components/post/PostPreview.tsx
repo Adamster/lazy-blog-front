@@ -1,9 +1,9 @@
-import { formatDate } from "@/helpers";
-import { IPost } from "@/types";
-import classNames from "classnames";
-import Link from "next/link";
+import { formatDate } from '@/helpers';
+import { IPost } from '@/types';
+import classNames from 'classnames';
+import Link from 'next/link';
 
-import s from "./post.module.scss";
+import s from './post.module.scss';
 
 interface IProps {
   post: IPost;
@@ -15,10 +15,10 @@ export const PostPreview = ({ post }: IProps) => {
       {/* <Link href={`/post/${post.slug}`} className={s.previewImage}></Link> */}
       {/*  */}
       <div className={s.previewContent}>
-        <div className={classNames(s.author, "mb-4")}>
-          <Link href="/" className={s.authorName}>
+        <div className={classNames(s.author, 'mb-4')}>
+          <Link href={`user/${post.author.userName}`} className={s.authorName}>
             <div className={s.authorAva}></div>
-            {post.author.firstName}{" "}
+            {post.author.firstName}{' '}
             {post.author.lastName && post.author.lastName}
           </Link>
 
@@ -28,7 +28,7 @@ export const PostPreview = ({ post }: IProps) => {
         </div>
 
         <Link className="block mb-0" href={`/post/${post.slug}`}>
-          <h2 className={classNames(s.previewTitle, "text-lg font-bold")}>
+          <h2 className={classNames(s.previewTitle, 'text-lg font-bold')}>
             {post.title}
           </h2>
           {post.summary && <p className={s.previewSummary}>{post.summary}</p>}
