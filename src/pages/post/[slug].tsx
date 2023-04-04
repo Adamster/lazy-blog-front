@@ -20,8 +20,8 @@ const Post = ({ fallback }: IProps) => {
   
   if (!data) return <div>Loading...</div>;
 
-  if (data.code && data.message) {
-    return <ErrorMessage message={data.message}></ErrorMessage>
+  if (data.code) {
+    return <ErrorMessage code={data.code}></ErrorMessage>
   }
 
   return <PostFull post={data} />;
