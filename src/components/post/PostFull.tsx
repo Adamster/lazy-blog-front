@@ -1,12 +1,12 @@
 import { formatDate } from "@/helpers";
-import { IPostFull } from "@/types";
+import { IPost } from "@/types";
 import classNames from "classnames";
 import Link from "next/link";
 
 import s from "./post.module.scss";
 
 interface IProps {
-  post: IPostFull;
+  post: IPost;
 }
 
 export const PostFull = ({ post }: IProps) => {

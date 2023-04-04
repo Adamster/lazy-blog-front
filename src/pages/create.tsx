@@ -1,6 +1,6 @@
 // import MDEditor from "@uiw/react-md-editor";
-import { API_URL } from "@/services/apiService";
 import { IСreatePost } from "@/types";
+import { API_URL } from "@/utils/fetcher";
 import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth/next";
 import { useSession } from "next-auth/react";
@@ -17,10 +17,6 @@ import { authOptions } from "./api/auth/[...nextauth]";
 // import "@uiw/react-md-editor/markdown-editor.css";
 
 // const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
-
-interface IProps {
-  // fallbackData?: IPost[];
-}
 
 // Component
 
@@ -147,10 +143,7 @@ export default function Home() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<IProps> = async ({
-  req,
-  res,
-}) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session = await getServerSession(req, res, authOptions);
 
   if (!session) {

@@ -1,13 +1,16 @@
-export default function ErrorMessage({code}: {code: string}) {
+interface IProps {
+  code?: string;
+}
 
+export default function ErrorMessage({ code = "" }: IProps) {
   const message = (): string => {
-    switch(code) {
-      case 'Post.NotFound': 
-        return 'К нашему величайшему сожалению - пост не найден, попробуйте еще раз.';
+    switch (code) {
+      case "Post.NotFound":
+        return "К нашему величайшему сожалению - пост не найден, попробуйте еще раз.";
       default:
-        return 'Где-то, чё-то не работает.' 
+        return "Где-то, что-то не работает.";
     }
-  }
+  };
 
   return (
     <div className="bg-white rounded-md p-8">
@@ -16,4 +19,3 @@ export default function ErrorMessage({code}: {code: string}) {
     </div>
   );
 }
-

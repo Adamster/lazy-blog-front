@@ -1,7 +1,7 @@
-import { API_URL } from "@/services/apiService";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+import { API_URL } from "@/utils/fetcher";
 import type { NextAuthOptions } from "next-auth";
 
 const providers = [

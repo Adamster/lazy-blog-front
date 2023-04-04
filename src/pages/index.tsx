@@ -1,18 +1,19 @@
+import ErrorMessage from "@/components/errorMessage";
+import Loading from "@/components/loading";
 import PostPreview from "@/components/post";
-import { API_URL, fetcher } from "@/services/apiService";
-import { IPost } from "@/types";
+import { IPost, IPosts } from "@/types";
+import { API_URL, fetcher } from "@/utils/fetcher";
 import Head from "next/head";
 import useSWR from "swr";
 
-interface IProps {
-  fallbackData: IPost[];
-}
+export default function Home() {
+  const { data, error, isLoading } = useSWR<IPosts>(
+    `${API_URL}/posts`,
+    fetcher
+  );
 
-export default function Home({ fallbackData }: IProps) {
-  const { data, error } = useSWR<IPost[]>(`${API_URL}/posts`, fetcher);
-
-  if (error) return <div>Failed to load</div>;
-  if (!data) return <div>Loading...</div>;
+  if (error || data?.code) return <ErrorMessage code={data?.code && ""} />;
+  if (isLoading) return <Loading />;
 
   return (
     <>
@@ -27,8 +28,3 @@ export default function Home({ fallbackData }: IProps) {
     </>
   );
 }
-
-// export const getServerSideProps: GetServerSideProps<IProps> = async () => {
-//   const fallbackData = await getPosts();
-//   return { props: { fallbackData } };
-// };
