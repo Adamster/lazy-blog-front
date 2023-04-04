@@ -27,7 +27,6 @@ const User = ({ fallback }: IProps) => {
   );
 
   if (error || data?.code) return <ErrorMessage code={data?.code && ''} />;
-  if (isLoading) return <Loading />;
 
   return (
     <>
@@ -37,6 +36,7 @@ const User = ({ fallback }: IProps) => {
         <meta name="description" content={data?.user.email} />
       </Head>
 
+      {isLoading && <Loading />}
       {data && data.user && (
         <UserDetails key={data.user.id} user={data.user}></UserDetails>
       )}
