@@ -19,7 +19,7 @@ interface IProps {
   error: string | string[];
 }
 
-export default function ErrorMessage({ error }: IProps) {
+export default function AuthErrorMessage({ error }: IProps) {
   const errorKey = Array.isArray(error) ? error[0] : error;
   const errorMessage = error && (errors[errorKey] ?? errors.default);
   return <p className="text-red-500">{errorMessage}</p>;

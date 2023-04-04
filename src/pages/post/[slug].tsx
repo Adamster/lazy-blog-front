@@ -1,38 +1,49 @@
+import ErrorMessage from "@/components/errorMessage";
 import { PostFull } from "@/components/post/PostFull";
-import { API_URL } from "@/services/apiService";
+import { API_URL, fetcher } from "@/services/apiService";
 import { IPostFull } from "@/types";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
+import useSWR from 'swr';
 
 interface IProps {
-  data: IPostFull;
+  fallback: IPostFull;
 }
 
 // Component
 
-const Post = ({ data }: IProps) => {
+const Post = ({ fallback }: IProps) => {
   const router = useRouter();
   const { slug } = router.query;
+
+  const { data } = useSWR<IPostFull>(`${API_URL}/posts/${slug}`, fetcher, {fallbackData: fallback,});
+  
+  if (!data) return <div>Loading...</div>;
+
+  if (data.code && data.message) {
+    return <ErrorMessage message={data.message}></ErrorMessage>
+  }
+
   return <PostFull post={data} />;
 };
 
 export default Post;
 
-export async function getServerSideProps(
-  context: GetServerSidePropsContext
-): Promise<{ props: IProps | null }> {
-  try {
-    const slug = context.params?.slug;
-    const res = await fetch(`${API_URL}/posts/${slug}`);
+export async function getServerSideProps(context: GetServerSidePropsContext) {
 
-    if (!res.ok) {
-      throw new Error(`Failed to fetch data for slug: ${slug}`);
-    }
+  const slug = context.params?.slug;
+  const res = await fetch(`${API_URL}/posts/${slug}`);
 
-    const data = await res.json();
-    return { props: { data } };
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    return { props: null };
-  }
+  // if(!res.ok) {
+  //   return {
+  //     redirect: {
+  //       destination: "/not-found",
+  //       permanent: false,
+  //     },
+  //   };
+  // }
+
+  const fallback = await res.json();
+  return { props: { fallback } };
+
 }

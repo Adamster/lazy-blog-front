@@ -1,4 +1,3 @@
-import PostPreview from "@/components/post";
 import { API_URL, fetcher } from "@/services/apiService";
 import { IPost } from "@/types";
 import Head from "next/head";
@@ -25,13 +24,17 @@ export default function Home({ fallbackData }: IProps) {
   return (
     <>
       <Head>
-        <title>Посты | Not Lazy Blog</title>
+        <title>Юзверь | Not Lazy Blog</title>
       </Head>
 
-      {data &&
+      <div>
+        Тут будет инфа по юзеру
+      </div>
+
+      {/* {data &&
         data.map((post: IPost) => (
           <PostPreview key={post.id} post={post}></PostPreview>
-        ))}
+        ))} */}
     </>
   );
 }

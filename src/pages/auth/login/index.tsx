@@ -22,13 +22,13 @@
 
 import type {
   GetServerSidePropsContext,
-  InferGetServerSidePropsType,
+  InferGetServerSidePropsType
 } from "next";
 import { getCsrfToken } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import s from "../auth.module.scss";
-import ErrorMessage from "./error";
+import AuthErrorMessage from "./error";
 
 export default function Login({
   csrfToken,
@@ -74,7 +74,7 @@ export default function Login({
 
       {error && (
         <div className="mb-4">
-          <ErrorMessage error={error} />
+          <AuthErrorMessage error={error} />
         </div>
       )}
 

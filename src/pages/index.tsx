@@ -1,7 +1,6 @@
 import PostPreview from "@/components/post";
-import { API_URL, fetcher, getPosts } from "@/services/apiService";
+import { API_URL, fetcher } from "@/services/apiService";
 import { IPost } from "@/types";
-import { GetServerSideProps } from "next";
 import Head from "next/head";
 import useSWR from "swr";
 
@@ -10,9 +9,7 @@ interface IProps {
 }
 
 export default function Home({ fallbackData }: IProps) {
-  const { data, error } = useSWR<IPost[]>(`${API_URL}/posts`, fetcher, {
-    fallbackData: fallbackData,
-  });
+  const { data, error } = useSWR<IPost[]>(`${API_URL}/posts`, fetcher);
 
   if (error) return <div>Failed to load</div>;
   if (!data) return <div>Loading...</div>;
@@ -31,7 +28,7 @@ export default function Home({ fallbackData }: IProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<IProps> = async () => {
-  const fallbackData = await getPosts();
-  return { props: { fallbackData } };
-};
+// export const getServerSideProps: GetServerSideProps<IProps> = async () => {
+//   const fallbackData = await getPosts();
+//   return { props: { fallbackData } };
+// };

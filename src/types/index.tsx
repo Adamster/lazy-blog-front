@@ -16,6 +16,9 @@ export interface IPost {
 
 export interface IPostFull extends IPost {
   body: string;
+
+  code?: string;
+  message?: string;
 }
 export interface IСreatePost {
   userId: string;
