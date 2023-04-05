@@ -22,9 +22,7 @@ export const PostFull = ({ post }: IProps) => {
     <>
       <div className={classNames("mb-2")}>
         <div className={s.postTitleContainer}>
-          <h1 className={classNames(s.previewTitle, "text-3xl font-bold")}>
-            {post.title}
-          </h1>
+          <h1 className="text-3xl font-bold">{post.title}</h1>
           {/* {post.summary && <p className={s.previewSummary}>{post.summary}</p>} */}
         </div>
       </div>
