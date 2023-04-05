@@ -3,8 +3,6 @@ import { formatDate } from "@/utils/format-date";
 import classNames from "classnames";
 import Link from "next/link";
 
-import "@uiw/react-markdown-preview/markdown.css";
-import "@uiw/react-md-editor/markdown-editor.css";
 import dynamic from "next/dynamic";
 
 const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
@@ -20,11 +18,9 @@ interface IProps {
 export const PostFull = ({ post }: IProps) => {
   return (
     <>
-      <div className={classNames("mb-2")}>
-        <div className={s.postTitleContainer}>
-          <h1 className="text-3xl font-bold">{post.title}</h1>
-          {/* {post.summary && <p className={s.previewSummary}>{post.summary}</p>} */}
-        </div>
+      <div className={classNames("mb-1")}>
+        <h1 className="text-3xl font-bold">{post.title}</h1>
+        {/* {post.summary && <p className={s.previewSummary}>{post.summary}</p>} */}
       </div>
 
       <div className={classNames(s.author, "mb-4")}>

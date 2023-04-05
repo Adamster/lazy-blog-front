@@ -7,7 +7,6 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import { authOptions } from "./api/auth/[...nextauth]";
 
-import "@uiw/react-markdown-preview/markdown.css";
 import "@uiw/react-md-editor/markdown-editor.css";
 import dynamic from "next/dynamic";
 

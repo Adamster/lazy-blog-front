@@ -97,18 +97,6 @@
   background: #fff;
   padding: 2rem;
   border-radius: var(--b-r);
-
-  > div {
-    * {
-      max-width: 100%;
-    }
-
-    img,
-    iframe {
-      display: block;
-      margin: 0 auto;
-    }
-  }
 }
 
 // .icon {

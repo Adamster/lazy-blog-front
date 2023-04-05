@@ -1,0 +1,46 @@
+@import "@uiw/react-markdown-preview/markdown.css";
+
+.wmde-markdown {
+  line-height: inherit;
+  font-family: inherit;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    border-bottom: none;
+    margin-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 1rem;
+    font-weight: 700;
+  }
+
+  h1 {
+    font-size: 1.875rem;
+  }
+
+  img {
+    display: block;
+    margin: 0 auto;
+  }
+
+  iframe {
+    max-width: 100%;
+    display: block;
+    margin: 0 auto;
+  }
+
+  hr {
+    margin: 1rem auto;
+  }
+
+  table th {
+    text-align: left;
+  }
+
+  .contains-task-list {
+    list-style: none;
+  }
+}
