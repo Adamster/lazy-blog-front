@@ -1,39 +1,26 @@
-// import { SignIn, SignUp } from "@/components/auth";
-// import Head from "next/head";
-// import { useState } from "react";
-
-// export default function Login() {
-//   const [signUpView, setSignUpView] = useState(false);
-//   return (
-//     <>
-//       <Head>
-//         <title>Вход | Not Lazy Blog</title>
-//       </Head>
-
-//       {/* {signUpView ? (
-//         <SignUp setSignUpView={setSignUpView} />
-//       ) : (
-//         <SignIn setSignUpView={setSignUpView} />
-//       )} */}
-
-//     </>
-//   );
-// }
-
 import type {
   GetServerSidePropsContext,
-  InferGetServerSidePropsType
+  InferGetServerSidePropsType,
 } from "next";
-import { getCsrfToken } from "next-auth/react";
+import { getCsrfToken, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import s from "../auth.module.scss";
 import AuthErrorMessage from "./error";
 
 export default function Login({
   csrfToken,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const { data: authSession } = useSession();
+  const router = useRouter();
   const { error } = useRouter().query;
+
+  useEffect(() => {
+    if (authSession) {
+      router.push("/");
+    }
+  }, [authSession]);
 
   return (
     <form
@@ -46,10 +33,16 @@ export default function Login({
         <Link href="/auth/register" className={s.register}></Link>
       </div>
 
+      {error && (
+        <div className="mb-4">
+          <AuthErrorMessage error={error} />
+        </div>
+      )}
+
       <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
 
-      <div className="flex -mx-2">
-        <div className="w-1/2 px-2 mb-8">
+      <div className="flex -mx-2 mb-8">
+        <div className="w-1/2 px-2">
           <input
             className="input"
             name="email"
@@ -60,7 +53,7 @@ export default function Login({
           />
         </div>
 
-        <div className="w-1/2 px-2 mb-8">
+        <div className="w-1/2 px-2 ">
           <input
             className="input"
             name="password"
@@ -71,12 +64,6 @@ export default function Login({
           />
         </div>
       </div>
-
-      {error && (
-        <div className="mb-4">
-          <AuthErrorMessage error={error} />
-        </div>
-      )}
 
       <div>
         <button className="btn btn--primary" type="submit">

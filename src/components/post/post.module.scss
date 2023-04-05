@@ -23,15 +23,14 @@
     position: relative;
     padding: 2rem;
     border-radius: var(--b-r);
-    max-width: calc(100%);
+    // max-width: calc(100% - 12rem);
   }
 
   // &Image {
   //   display: flex;
-  //   width: 12rem;
   //   min-width: 12rem;
   //   border-radius: var(--b-r);
-  //   background: #eee;
+  //   background: rgba(0, 0, 0, 0.02);
   // }
 
   &Title {
@@ -40,7 +39,7 @@
 
   &Summary {
     @extend .hide-overflow;
-    color: var(--color-gray);
+    // color: var(--color-gray);
   }
 }
 
@@ -64,6 +63,7 @@
     align-items: center;
     font-weight: 600;
     margin-right: 1.5rem;
+    color: var(--color-gray);
   }
 }
 

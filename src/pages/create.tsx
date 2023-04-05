@@ -1,5 +1,4 @@
 // import MDEditor from "@uiw/react-md-editor";
-import { IСreatePost } from "@/types";
 import { API_URL } from "@/utils/fetcher";
 import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth/next";
@@ -8,27 +7,24 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import { authOptions } from "./api/auth/[...nextauth]";
 
-// import "@uiw/react-markdown-preview/markdown.css";
-// import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
+import "@uiw/react-md-editor/markdown-editor.css";
+import dynamic from "next/dynamic";
 
-// import dynamic from "next/dynamic";
-
-// import "@uiw/react-markdown-preview/markdown.css";
-// import "@uiw/react-md-editor/markdown-editor.css";
-
-// const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
+const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 
 // Component
 
 export default function Home() {
   const { data: session }: any = useSession();
 
-  const [form, setForm] = useState<IСreatePost>({
+  const [form, setForm] = useState({
     userId: "",
     title: "",
     summary: "",
-    body: "",
   });
+
+  const [body, setBody] = useState<string | undefined>("");
 
   useEffect(() => {
     setForm((values) => ({ ...values, userId: session?.user.id }));
@@ -46,7 +42,7 @@ export default function Home() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const { title, summary, body, userId } = form;
+    const { title, summary, userId } = form;
 
     fetch(`${API_URL}/posts`, {
       method: "POST",
@@ -58,20 +54,21 @@ export default function Home() {
     })
       .then((response) => {
         if (response.ok) {
+          setBody("");
           setForm({
             ...form,
             title: "",
             summary: "",
-            body: "",
           });
-          alert("Post created successfully");
+          alert("Успешно");
         } else {
+          alert("Ошибкен");
           throw new Error("Error creating post");
         }
       })
       .catch((error) => {
+        alert("Ошибкен");
         console.error(error);
-        alert("Error creating post");
       });
   };
 
@@ -90,47 +87,32 @@ export default function Home() {
           <h3 className="text-2xl font-bold">Го, cоздавай контент </h3>
         </div>
 
-        <div className="flex -mx-3">
-          <div className="w-full px-3">
-            <div className="mb-4">
-              <input
-                className="input"
-                name="title"
-                type="text"
-                required
-                value={form.title}
-                onChange={handleChange}
-                placeholder="Тайтл"
-              />
-            </div>
-
-            <div className="mb-4">
-              <input
-                className="input"
-                name="summary"
-                type="text"
-                required
-                value={form.summary}
-                onChange={handleChange}
-                placeholder="Короткое описание"
-              />
-            </div>
-          </div>
+        <div className="mb-4">
+          <input
+            className="input"
+            name="title"
+            type="text"
+            required
+            value={form.title}
+            onChange={handleChange}
+            placeholder="Тайтл"
+          />
         </div>
 
-        <div className="flex -mx-3">
-          <div className="w-full px-3">
-            <div className="mb-6">
-              <textarea
-                name="body"
-                className="textarea"
-                required
-                placeholder="Многа букав тут"
-                value={form.body}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
+        <div className="mb-4">
+          <input
+            className="input"
+            name="summary"
+            type="text"
+            required
+            value={form.summary}
+            onChange={handleChange}
+            placeholder="Короткое описание"
+          />
+        </div>
+
+        <div className="mb-6">
+          <MDEditor value={body} onChange={setBody} />
         </div>
 
         <div>

@@ -3,14 +3,16 @@
 @tailwind utilities;
 
 @import "./utilities.scss";
+@import "./dialog.scss";
 
 :root {
   --color-primary: #f7b641;
   --color-text: #404040;
-  --color-gray: #8b8b8b;
-  --color-gray-light: #eee;
+  --color-gray: #818181;
+  --color-gray-light: #eff0f3;
 
-  --color-background: #f8f8f8;
+  // --color-background: #f8f8f8;
+  --color-background: #f7f8fa;
   --max-width: 800px;
   --b-r: 0.3rem;
 }

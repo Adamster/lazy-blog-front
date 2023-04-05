@@ -1,76 +1,160 @@
+import Loading from "@/components/loading";
+import { API_URL } from "@/utils/fetcher";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
-interface Props {
-  // setSignUpView: Dispatch<SetStateAction<boolean>>;
-}
+export default function Register() {
+  const { data: authSession } = useSession();
+  const router = useRouter();
 
-export default function Register({}: Props) {
+  //states
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  useEffect(() => {
+    if (authSession) {
+      router.push("/");
+    }
+  }, [authSession]);
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+
+    if (form.password !== form.confirmPassword) {
+      setError("Пароли не совпадают");
+      return;
+    } else {
+      setError(null);
+    }
+
+    setLoading(true);
+    const { firstName, lastName, email, password } = form;
+
+    fetch(`${API_URL}/users/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ firstName, lastName, email, password }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          setLoading(false);
+          alert("Успешно");
+          router.push("/auth/login");
+        } else {
+          setLoading(false);
+          alert("Ошибкен");
+          throw new Error("Ошибка регистрации");
+        }
+      })
+      .catch((error) => {
+        alert("Ошибкен");
+        console.error(error);
+      });
+  };
+
   return (
-    <form className="rounded-md bg-white p-8" method="POST">
-      <div className="mb-4">
-        <h3 className="text-2xl font-bold">Регся давай</h3>
-      </div>
+    <>
+      {loading && <Loading />}
 
-      <div className="flex -mx-2">
-        <div className="w-1/2 px-2">
-          <div className="mb-4">
+      <form
+        className="rounded-md bg-white p-8"
+        method="POST"
+        onSubmit={handleSubmit}
+      >
+        <div className="mb-4">
+          <h3 className="text-2xl font-bold">Регся давай</h3>
+        </div>
+
+        {error && <p className="mb-4 color-error">{error}</p>}
+
+        <div className="flex -mx-2 mb-4">
+          <div className="w-1/2 px-2">
             <input
               className="input"
               name="name"
               type="text"
-              required
               placeholder="Имя"
+              required
+              value={form.firstName}
+              onChange={(e) => setForm({ ...form, firstName: e.target.value })}
             />
           </div>
-        </div>
 
-        <div className="w-1/2 px-2">
-          <div className="mb-4">
+          <div className="w-1/2 px-2">
             <input
               className="input"
               name="surname"
               type="text"
               required
               placeholder="Фамилия"
+              value={form.lastName}
+              onChange={(e) => setForm({ ...form, lastName: e.target.value })}
             />
           </div>
         </div>
-      </div>
 
-      <div className="flex -mx-2">
-        <div className="w-1/2 px-2">
-          <div className="mb-8">
+        <div className="flex -mx-2 mb-4">
+          <div className="w-1/2 px-2">
             <input
               className="input"
               name="email"
               type="email"
-              required
               placeholder="Почта"
+              required
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
             />
           </div>
         </div>
 
-        <div className="w-1/2 px-2">
-          <div className="mb-8">
+        <div className="flex flex-wrap -mx-2 mb-8">
+          <div className="w-1/2 px-2">
             <input
               className="input"
               name="password"
               type="password"
               required
               placeholder="Пароль"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
+          </div>
+
+          <div className="w-1/2 px-2">
+            <input
+              className="input"
+              name="confirm-password"
+              type="password"
+              required
+              placeholder="Все еще помнишь пароль?"
+              value={form.confirmPassword}
+              onChange={(e) =>
+                setForm({ ...form, confirmPassword: e.target.value })
+              }
             />
           </div>
         </div>
-      </div>
 
-      <div>
-        <button className="btn btn--primary mr-4" type="submit">
-          Поехали
-        </button>
-        <Link href="/auth/login" className="btn">
-          Передумал
-        </Link>
-      </div>
-    </form>
+        <div>
+          <button className="btn btn--primary mr-4" type="submit">
+            Поехали
+          </button>
+          <Link href="/auth/login" className="btn">
+            Передумал
+          </Link>
+        </div>
+      </form>
+    </>
   );
 }
