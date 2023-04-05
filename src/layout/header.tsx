@@ -8,7 +8,7 @@ import s from "./layout.module.scss";
 
 const navigation = [
   { name: "Посты", href: "/" },
-  { name: "Создать", href: "/create", authRequired: true },
+  { name: "+", href: "/create", authRequired: true },
 ];
 
 export default function Header() {
