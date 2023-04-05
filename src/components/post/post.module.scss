@@ -23,6 +23,7 @@
     position: relative;
     padding: 2rem;
     border-radius: var(--b-r);
+    max-width: 100%;
     // max-width: calc(100% - 12rem);
   }
 
@@ -92,6 +93,10 @@
   background: #fff;
   padding: 2rem;
   border-radius: var(--b-r);
+
+  > div > * {
+    max-width: 100%;
+  }
 }
 
 // .icon {

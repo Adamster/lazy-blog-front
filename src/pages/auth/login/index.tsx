@@ -20,7 +20,7 @@ export default function Login({
     if (authSession) {
       router.push("/");
     }
-  }, [authSession]);
+  }, [authSession, router]);
 
   return (
     <form

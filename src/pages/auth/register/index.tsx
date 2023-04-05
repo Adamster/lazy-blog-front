@@ -24,7 +24,7 @@ export default function Register() {
     if (authSession) {
       router.push("/");
     }
-  }, [authSession]);
+  }, [authSession, router]);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
