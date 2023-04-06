@@ -78,8 +78,32 @@ export default function Register() {
 
         {error && <p className="mb-4 color-error">{error}</p>}
 
-        <div className="flex -mx-2 mb-4">
-          <div className="w-1/2 px-2">
+        <div className="flex flex-wrap -mx-2 mb-4">
+          <div className="w-full sm:w-1/2 px-2 mb-4 sm:mb-0">
+            <input
+              className="input"
+              name="username"
+              type="text"
+              placeholder="Username"
+              required
+              disabled
+            />
+          </div>
+          <div className="w-full sm:w-1/2 px-2">
+            <input
+              className="input"
+              name="email"
+              type="email"
+              placeholder="Email"
+              required
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-wrap -mx-2 mb-4">
+          <div className="w-full sm:w-1/2 px-2 mb-4 sm:mb-0">
             <input
               className="input"
               name="name"
@@ -91,7 +115,7 @@ export default function Register() {
             />
           </div>
 
-          <div className="w-1/2 px-2">
+          <div className="w-full sm:w-1/2 px-2">
             <input
               className="input"
               name="surname"
@@ -104,22 +128,8 @@ export default function Register() {
           </div>
         </div>
 
-        <div className="flex -mx-2 mb-4">
-          <div className="w-1/2 px-2">
-            <input
-              className="input"
-              name="email"
-              type="email"
-              placeholder="Почта"
-              required
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-            />
-          </div>
-        </div>
-
         <div className="flex flex-wrap -mx-2 mb-8">
-          <div className="w-1/2 px-2">
+          <div className="w-full sm:w-1/2 px-2 mb-4 sm:mb-0">
             <input
               className="input"
               name="password"
@@ -131,7 +141,7 @@ export default function Register() {
             />
           </div>
 
-          <div className="w-1/2 px-2">
+          <div className="w-full sm:w-1/2 px-2">
             <input
               className="input"
               name="confirm-password"

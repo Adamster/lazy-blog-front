@@ -41,8 +41,8 @@ export default function Login({
 
       <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
 
-      <div className="flex -mx-2 mb-8">
-        <div className="w-1/2 px-2">
+      <div className="flex flex-wrap -mx-2 mb-8">
+        <div className="w-full sm:w-1/2 px-2 mb-4 sm:mb-0">
           <input
             className="input"
             name="email"
@@ -53,7 +53,7 @@ export default function Login({
           />
         </div>
 
-        <div className="w-1/2 px-2 ">
+        <div className="w-full sm:w-1/2 px-2">
           <input
             className="input"
             name="password"

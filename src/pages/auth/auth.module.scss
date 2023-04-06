@@ -25,7 +25,7 @@
     &:after {
       opacity: 1;
       width: 9rem;
-      background: var(--color-primary);
+
       content: "Псс, рега нужна? ...";
     }
   }
@@ -50,10 +50,10 @@
     top: 0;
     width: auto;
     background: var(--color-gray-light);
+    background: var(--color-primary);
     color: #fff;
     font-size: 0.75rem;
     padding: 0.1rem 0.5rem;
-    // opacity: 0.15;
-    transition: opacity 0.3s ease, background 0.3s ease;
+    transition: opacity 0.3s ease;
   }
 }

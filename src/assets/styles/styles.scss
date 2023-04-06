@@ -12,7 +12,6 @@
   --color-gray: #818181;
   --color-gray-light: #eff0f3;
 
-  // --color-background: #f8f8f8;
   --color-background: #f7f8fa;
   --max-width: 800px;
   --b-r: 0.3rem;
@@ -37,6 +36,11 @@
     background: var(--color-gray-light);
     border-radius: var(--b-r);
     width: 100%;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
   }
 
   .textarea {
