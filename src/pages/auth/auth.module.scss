@@ -24,6 +24,9 @@
 
     &:after {
       opacity: 1;
+      width: 9rem;
+      background: var(--color-primary);
+      content: "Псс, рега нужна? ...";
     }
   }
 
@@ -41,16 +44,16 @@
   &:after {
     position: absolute;
     display: block;
-    content: "Псс, рега нужна? ...";
-    left: -7.5rem;
+    content: "...";
+    right: 3.8rem;
     border-radius: var(--b-r);
     top: 0;
-    width: 9rem;
-    background: var(--color-primary);
+    width: auto;
+    background: var(--color-gray-light);
     color: #fff;
     font-size: 0.75rem;
     padding: 0.1rem 0.5rem;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    // opacity: 0.15;
+    transition: opacity 0.3s ease, background 0.3s ease;
   }
 }
