@@ -10,33 +10,33 @@
 
 // PREVIEW
 
-.preview:not(:last-of-type) {
-  margin-bottom: 1rem;
-}
-
 .preview {
   display: flex;
   flex-direction: row;
   width: 100%;
 
-  &Content {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    background: #fff;
-    position: relative;
-    padding: 2rem;
-    border-radius: var(--b-r);
-    max-width: 100%;
-    // max-width: calc(100% - 12rem);
+  &:not(:last-of-type) {
+    margin-bottom: 2rem;
   }
 
-  // &Image {
-  //   display: flex;
-  //   min-width: 12rem;
-  //   border-radius: var(--b-r);
-  //   background: rgba(0, 0, 0, 0.02);
-  // }
+  &Content {
+    background: #fff;
+    position: relative;
+    padding: 1.5rem 1.5rem 1rem;
+    border-radius: var(--b-r);
+    width: 100%;
+    max-width: 100%;
+  }
+
+  &Image {
+    display: block;
+    height: 5rem;
+    border-radius: var(--b-r);
+    background: rgba(0, 0, 0, 0.1);
+    background: url("https://www.toptal.com/designers/subtlepatterns/uploads/45degreee_fabric.png");
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+  }
 
   &Title {
     @extend .hide-overflow;
@@ -44,49 +44,92 @@
 
   &Summary {
     @extend .hide-overflow;
-    // color: var(--color-gray);
   }
 }
 
 .author {
   color: var(--color-text);
   display: flex;
-  align-items: center;
-  font-size: small;
+  flex-direction: column;
+
+  @media (min-width: 640px) {
+    align-items: center;
+    flex-direction: row;
+  }
 
   &Ava {
-    background: #5a4a42;
-    height: 1.5rem;
-    width: 1.5rem;
-    border-radius: 50%;
-    margin-right: 0.75rem;
+    // background: #ccc;
+    // background: url("https://www.toptal.com/designers/subtlepatterns/uploads/restaurant.png");
+    height: 1.3rem;
+    width: 1.3rem;
+    border-radius: var(--b-r);
+    margin-right: 0.7rem;
   }
 
   &Name {
-    font-size: 0.8rem;
     display: flex;
     align-items: center;
     font-weight: 600;
-    margin-right: 1.5rem;
-    color: var(--color-gray);
   }
 }
 
-.publishDate {
+.stats {
   font-size: 0.8rem;
   color: var(--color-gray);
   position: relative;
+  margin-left: 2rem;
+  display: flex;
+  align-items: center;
 
-  &:after {
-    position: absolute;
-    content: "";
-    left: -0.75rem;
-    top: 50%;
-    margin-top: -1px;
-    width: 2px;
-    height: 2px;
-    border-radius: 50%;
-    background: var(--color-gray);
+  svg {
+    width: 0.8rem;
+    height: 0.8rem;
+    // margin-left: 0.3rem;
+  }
+
+  @media (min-width: 640px) {
+    &:after {
+      position: absolute;
+      content: "";
+      left: -1rem;
+      top: 50%;
+      margin-top: -1px;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: var(--color-gray);
+    }
+  }
+}
+
+// PREVIEW FOOTER
+
+.footer {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+
+  &Stats {
+    display: flex;
+    align-items: center;
+    border-radius: 5rem;
+    height: 1.5rem;
+
+    &:not(:last-of-type) {
+      margin-right: 1rem;
+    }
+  }
+
+  &StatsIcon {
+    color: var(--color-gray);
+    width: 1rem;
+    margin-right: 0.5rem;
+  }
+
+  &StatsNum {
+    font-size: small;
+    font-weight: 600;
+    color: var(--color-gray);
   }
 }
 
@@ -98,33 +141,3 @@
   padding: 2rem;
   border-radius: var(--b-r);
 }
-
-// .icon {
-//   color: var(--color-gray);
-//   width: 1rem;
-//   margin-right: 0.25rem;
-// }
-
-// .stats {
-//   display: flex;
-//   align-items: center;
-
-//   &Stat {
-//     display: flex;
-//     align-items: center;
-
-//     background: #eee;
-//     border-radius: 5rem;
-//     padding: 0 0.75rem;
-//     height: 1.5rem;
-
-//     &:not(:last-of-type) {
-//       margin-right: 1rem;
-//     }
-//   }
-
-//   &Num {
-//     font-size: small;
-//     font-family: Arial, Helvetica, sans-serif;
-//   }
-// }

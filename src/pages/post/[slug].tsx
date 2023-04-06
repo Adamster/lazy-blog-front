@@ -44,6 +44,7 @@ export default function Post({ fallback }: IProps) {
       </Head>
 
       {isLoading && <Loading />}
+
       {data && <PostFull post={data} />}
     </>
   );
@@ -53,6 +54,5 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const slug = context.params?.slug;
   const res = await fetch(`${API_URL}/posts/${slug}`);
   const fallback = await res.json();
-
   return { props: { fallback } };
 }
