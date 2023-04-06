@@ -27,10 +27,7 @@ const providers = [
 
         // If no error and we have user data, return it
         if (res.ok && user) {
-          return {
-            ...user,
-            // name: `${user.user.firstName}`,
-          };
+          return user;
         }
       } catch (e) {
         return e;
@@ -46,8 +43,7 @@ export const authOptions: NextAuthOptions = {
   providers,
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-    updateAge: 24 * 60 * 60, // 24 hours
+    maxAge: 7 * 24 * 60 * 60, // 7 days
   },
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
@@ -74,15 +70,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/auth/login",
-    // error: "/auth/login", // Error code passed in query string as ?error=
-    // signOut: "/auth/signout",
-    // verifyRequest: '/auth/verify-request', // (used for check email message)
-    // newUser: '/auth/new-user' // New users will be directed here on first sign in (leave the property out if not of interest)
   },
 };
-
-// export default async function auth(req: any, res: any) {
-// return await NextAuth(req, res, authOptions);
-// }
 
 export default NextAuth(authOptions);
