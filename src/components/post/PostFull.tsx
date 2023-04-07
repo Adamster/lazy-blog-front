@@ -18,7 +18,7 @@ export const PostFull = ({ post }: IProps) => {
   return (
     <>
       <div className={classNames(s.author, "mb-4")}>
-        <Link href="/" className={s.authorName}>
+        <Link href="#" className={s.authorName}>
           <div
             className={s.authorAva}
             style={{

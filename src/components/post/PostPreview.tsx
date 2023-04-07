@@ -15,7 +15,8 @@ export const PostPreview = ({ post }: IProps) => {
     <div key={post.id} className={s.preview}>
       <div className={s.previewContent}>
         <div className={classNames(s.author, "mb-4")}>
-          <Link href={`u/${post.author.userName}`} className={s.authorName}>
+          <Link href="#" className={s.authorName}>
+            {/* <Link href={`u/${post.author.userName}`} className={s.authorName}> */}
             <div
               className={s.authorAva}
               style={{
