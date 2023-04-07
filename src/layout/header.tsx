@@ -1,4 +1,8 @@
-import { ArrowRightOnRectangleIcon, UserIcon } from "@heroicons/react/20/solid";
+import { generateColor } from "@/utils/generate-color";
+import {
+  ArrowRightOnRectangleIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
 import cn from "classnames";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
@@ -13,7 +17,7 @@ const navigation = [
 
 export default function Header() {
   const router = useRouter();
-  const { data: authSession } = useSession();
+  const { data: authSession }: any = useSession();
 
   return (
     <header className={s.header}>
@@ -44,8 +48,17 @@ export default function Header() {
         <div className={s.actions}>
           {authSession ? (
             <div className="flex items-center">
-              <span className={s.userName}>{authSession.user?.name}</span>
-              {/* <div className={s.userAva}></div> */}
+              <div
+                className={s.userAva}
+                style={{
+                  backgroundColor: generateColor(
+                    authSession.user?.userName ?? ""
+                  ),
+                }}
+              ></div>
+              <span className={s.userName}>
+                {`${authSession.user?.firstName} ${authSession.user?.lastName}`}
+              </span>
               <button className={s.user} onClick={() => signOut()}>
                 <ArrowRightOnRectangleIcon />
               </button>

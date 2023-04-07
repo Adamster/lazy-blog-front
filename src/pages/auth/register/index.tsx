@@ -15,6 +15,7 @@ export default function Register() {
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
+    userName: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -37,14 +38,14 @@ export default function Register() {
     }
 
     setLoading(true);
-    const { firstName, lastName, email, password } = form;
+    const { email, firstName, lastName, userName, password } = form;
 
     fetch(`${API_URL}/users/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ firstName, lastName, email, password }),
+      body: JSON.stringify({ email, firstName, lastName, userName, password }),
     })
       .then((response) => {
         if (response.ok) {
@@ -86,7 +87,8 @@ export default function Register() {
               type="text"
               placeholder="Username"
               required
-              disabled
+              value={form.userName}
+              onChange={(e) => setForm({ ...form, userName: e.target.value })}
             />
           </div>
           <div className="w-full sm:w-1/2 px-2">

@@ -2,7 +2,7 @@
   max-width: var(--max-width);
   margin: 0 auto;
   margin-top: 4rem;
-  padding: 2rem;
+  padding: 2rem 1rem;
 }
 
 // header
@@ -23,7 +23,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
+  padding: 0 1rem;
   max-width: var(--max-width);
 }
 
@@ -71,17 +71,30 @@
   background: var(--color-gray-light);
   padding: 0.35rem;
   transition: background 0.3s ease, color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 1rem;
+  }
 
   &Ava {
-    background: #5a4a42;
-    height: 2rem;
-    width: 2rem;
-    border-radius: 50%;
-    // margin-right: 0.75rem;
+    height: 1rem;
+    width: 1rem;
+    border-radius: var(--b-r);
+    margin-right: 0.7rem;
   }
 
   &Name {
     margin-right: 1rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: none;
+
+    @media (min-width: 640px) {
+      display: block;
+    }
   }
 
   &:hover {

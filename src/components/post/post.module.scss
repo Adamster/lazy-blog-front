@@ -30,12 +30,13 @@
 
   &Image {
     display: block;
-    height: 5rem;
+    height: 8rem;
     border-radius: var(--b-r);
     background: rgba(0, 0, 0, 0.1);
     background: url("https://www.toptal.com/designers/subtlepatterns/uploads/45degreee_fabric.png");
     margin-left: -1.5rem;
     margin-right: -1.5rem;
+    opacity: 0.5;
   }
 
   &Title {
@@ -58,8 +59,6 @@
   }
 
   &Ava {
-    // background: #ccc;
-    // background: url("https://www.toptal.com/designers/subtlepatterns/uploads/restaurant.png");
     height: 1rem;
     width: 1rem;
     border-radius: var(--b-r);
@@ -81,6 +80,7 @@
   margin-left: 2rem;
   display: flex;
   align-items: center;
+  margin-left: 1.7rem;
 
   svg {
     width: 0.8rem;
@@ -89,6 +89,8 @@
   }
 
   @media (min-width: 640px) {
+    margin-left: 2rem;
+
     &:after {
       position: absolute;
       content: "";

@@ -1,4 +1,4 @@
-import ErrorMessage from "@/components/errorMessage";
+import ErrorMessage from "@/components/error-message";
 import Loading from "@/components/loading";
 import PostPreview from "@/components/post";
 import { IPost, IPosts } from "@/types";

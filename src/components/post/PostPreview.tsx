@@ -1,7 +1,10 @@
 import { IPost } from "@/types";
 import { formatDate } from "@/utils/format-date";
 import { generateColor } from "@/utils/generate-color";
-import { ChatBubbleLeftEllipsisIcon, EyeIcon } from "@heroicons/react/20/solid";
+import {
+  ChatBubbleBottomCenterTextIcon,
+  EyeIcon,
+} from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import Link from "next/link";
 import s from "./post.module.scss";
@@ -48,9 +51,9 @@ export const PostPreview = ({ post }: IProps) => {
           </div>
 
           <div className={s.footerStats}>
-            <ChatBubbleLeftEllipsisIcon
+            <ChatBubbleBottomCenterTextIcon
               className={s.footerStatsIcon}
-            ></ChatBubbleLeftEllipsisIcon>
+            ></ChatBubbleBottomCenterTextIcon>
             <span className={s.footerStatsNum}>0</span>
           </div>
         </div>

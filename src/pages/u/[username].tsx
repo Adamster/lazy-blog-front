@@ -1,13 +1,13 @@
-import ErrorMessage from '@/components/errorMessage';
-import Loading from '@/components/loading';
-import { PostItem } from '@/components/post/PostItem';
-import { UserDetails } from '@/components/user/UserDetails';
-import { IPostItem, IUser, IUserPostDetails } from '@/types';
-import { API_URL, fetcher } from '@/utils/fetcher';
-import { GetServerSidePropsContext } from 'next';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import useSWR from 'swr';
+import ErrorMessage from "@/components/error-message";
+import Loading from "@/components/loading";
+import { PostItem } from "@/components/post/PostItem";
+import { UserDetails } from "@/components/user/UserDetails";
+import { IPostItem, IUserPostDetails } from "@/types";
+import { API_URL, fetcher } from "@/utils/fetcher";
+import { GetServerSidePropsContext } from "next";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import useSWR from "swr";
 
 interface IProps {
   fallback: IUserPostDetails;
@@ -26,7 +26,7 @@ const User = ({ fallback }: IProps) => {
     }
   );
 
-  if (error || data?.code) return <ErrorMessage code={data?.code && ''} />;
+  if (error || data?.code) return <ErrorMessage code={data?.code && ""} />;
 
   return (
     <>
