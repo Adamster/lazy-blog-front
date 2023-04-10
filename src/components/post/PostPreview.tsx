@@ -42,7 +42,11 @@ export const PostPreview = ({ post }: IProps) => {
           {post.summary && <p className={s.previewSummary}>{post.summary}</p>}
         </Link>
 
-        <Link href={`/post/${post.slug}`} className={s.previewImage}></Link>
+        {post.coverUrl &&  
+         <img src={post.coverUrl} alt={post.slug} width={700} height={100} sizes="50vw"/> }
+
+        {post.coverUrl == "" && 
+         <Link href={`/post/${post.slug}`} className={s.previewImage}></Link>}
 
         <div className={s.footer}>
           <div className={s.footerStats}>

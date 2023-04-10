@@ -20,6 +20,7 @@ export default function Home() {
   const [form, setForm] = useState({
     userId: "",
     title: "",
+    coverUrl: "",
     summary: "",
   });
 
@@ -41,7 +42,7 @@ export default function Home() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const { title, summary, userId } = form;
+    const { title, coverUrl, summary, userId } = form;
 
     fetch(`${API_URL}/posts`, {
       method: "POST",
@@ -49,7 +50,7 @@ export default function Home() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.user.token}`,
       },
-      body: JSON.stringify({ userId, title, summary, body }),
+      body: JSON.stringify({ userId, title, coverUrl, summary, body }),
     })
       .then((response) => {
         if (response.ok) {
@@ -95,6 +96,18 @@ export default function Home() {
             value={form.title}
             onChange={handleChange}
             placeholder="Тайтл"
+          />
+        </div>
+
+        <div className="mb-4">
+          <input
+            className="input"
+            name="coverUrl"
+            type="text"
+            required
+            value={form.coverUrl}
+            onChange={handleChange}
+            placeholder="Картиночка"
           />
         </div>
 

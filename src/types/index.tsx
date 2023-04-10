@@ -29,6 +29,7 @@ export interface IPost extends IRequest {
   id: string;
   title: string;
   slug: string;
+  coverUrl?: string;
   summary: string;
   author: IUser;
   createdAtUtc: string;
