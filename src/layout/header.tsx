@@ -1,6 +1,11 @@
+/* eslint-disable @next/next/no-img-element */
+import { useTheme } from "@/contexts/theme-context";
 import { generateColor } from "@/utils/generate-color";
+import { Menu } from "@headlessui/react";
 import {
   ArrowRightOnRectangleIcon,
+  MoonIcon,
+  UserCircleIcon,
   UserIcon,
 } from "@heroicons/react/24/outline";
 import cn from "classnames";
@@ -12,7 +17,7 @@ import s from "./layout.module.scss";
 
 const navigation = [
   { name: "Посты", href: "/" },
-  { name: "+", href: "/create", authRequired: true },
+  { name: "Создать", href: "/create", authRequired: true },
 ];
 
 export default function Header() {
@@ -47,22 +52,7 @@ export default function Header() {
         </nav>
         <div className={s.actions}>
           {authSession ? (
-            <div className="flex items-center">
-              <div
-                className={s.userAva}
-                style={{
-                  backgroundColor: generateColor(
-                    authSession.user?.userName ?? ""
-                  ),
-                }}
-              ></div>
-              <span className={s.userName}>
-                {`${authSession.user?.firstName} ${authSession.user?.lastName}`}
-              </span>
-              <button className={s.user} onClick={() => signOut()}>
-                <ArrowRightOnRectangleIcon />
-              </button>
-            </div>
+            <UserMenu authSession={authSession} />
           ) : (
             <Link className={s.user} href="/auth/login">
               <UserIcon />
@@ -71,5 +61,57 @@ export default function Header() {
         </div>
       </div>
     </header>
+  );
+}
+
+function UserMenu({ authSession }: any) {
+  const { darkTheme, toggleTheme } = useTheme();
+
+  return (
+    <Menu>
+      <Menu.Button>
+        <div className="flex items-center">
+          <div
+            className={s.userAva}
+            style={{
+              backgroundColor: generateColor(authSession.user?.userName ?? ""),
+            }}
+          ></div>
+          <span className={s.userName}>
+            {`${authSession.user?.firstName} ${authSession.user?.lastName}`}
+          </span>
+        </div>
+      </Menu.Button>
+      <Menu.Items className={s.userMenu}>
+        <Menu.Item>
+          <Link
+            href={`/u/${authSession.user?.userName}`}
+            className={s.userMenuItem}
+          >
+            <UserCircleIcon width={"1rem"} className="mr-3" />
+            Профиль
+          </Link>
+        </Menu.Item>
+
+        <Menu.Item>
+          <div className={s.userMenuItem} onClick={toggleTheme}>
+            <MoonIcon width={"1rem"} className="mr-3" />
+            {darkTheme ? "Light side" : "Dark side"}
+          </div>
+        </Menu.Item>
+
+        <Menu.Item>
+          <div
+            className={s.userMenuItem}
+            onClick={() => {
+              signOut();
+            }}
+          >
+            <ArrowRightOnRectangleIcon width={"1rem"} className="mr-3" />
+            <span>Выход тут</span>
+          </div>
+        </Menu.Item>
+      </Menu.Items>
+    </Menu>
   );
 }

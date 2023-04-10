@@ -7,15 +7,18 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import { authOptions } from "./api/auth/[...nextauth]";
 
+import { useTheme } from "@/contexts/theme-context";
 import "@uiw/react-md-editor/markdown-editor.css";
 import dynamic from "next/dynamic";
+import rehypeSanitize from "rehype-sanitize";
 
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 
 // Component
 
-export default function Home() {
+export default function Create() {
   const { data: session }: any = useSession();
+  const { darkTheme } = useTheme();
 
   const [form, setForm] = useState({
     userId: "",
@@ -79,12 +82,12 @@ export default function Home() {
       </Head>
 
       <form
-        className="rounded-md bg-white p-8"
+        className="rounded-md background-white p-8"
         method="POST"
         onSubmit={handleSubmit}
       >
         <div className="mb-6">
-          <h3 className="text-2xl font-bold">Го, cоздавай контент </h3>
+          <h3 className="text-2xl font-bold">Действуй, cоздавай контент </h3>
         </div>
 
         <div className="mb-4">
@@ -123,8 +126,13 @@ export default function Home() {
           />
         </div>
 
-        <div className="mb-6">
-          <MDEditor value={body} onChange={setBody} />
+        <div className="mb-6" data-color-mode="dark">
+          <div className="wmde-markdown-var"> </div>
+          <MDEditor
+            previewOptions={{ rehypePlugins: [[rehypeSanitize]] }}
+            value={body}
+            onChange={setBody}
+          />
         </div>
 
         <div>

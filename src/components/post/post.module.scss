@@ -20,7 +20,7 @@
   }
 
   &Content {
-    background: #fff;
+    background: var(--color-foreground);
     position: relative;
     padding: 1.5rem 1.5rem 1rem;
     border-radius: var(--b-r);
@@ -32,8 +32,6 @@
     display: block;
     border-radius: var(--b-r);
     background: var(--color-gray-light);
-    margin-left: -1.5rem;
-    margin-right: -1.5rem;
 
     img {
       border-radius: var(--b-r);
@@ -80,7 +78,6 @@
   svg {
     width: 0.8rem;
     height: 0.8rem;
-    // margin-left: 0.3rem;
   }
 
   @media (min-width: 640px) {
@@ -135,7 +132,7 @@
 
 .full {
   width: 100%;
-  background: #fff;
+  background: var(--color-foreground);
   padding: 2rem;
   border-radius: var(--b-r);
 }

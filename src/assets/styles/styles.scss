@@ -8,13 +8,28 @@
 
 :root {
   --color-primary: #f7b641;
-  --color-text: #404040;
-  --color-gray: #818181;
-  --color-gray-light: #eff0f3;
 
   --color-background: #f7f8fa;
+  --color-foreground: #fff;
+  --color-text: #404040;
+
+  --color-gray: #7a8086;
+  --color-gray-light: #eff0f3;
+  --color-opacity: rgba(0, 0, 0, 0.05);
+
   --max-width: 800px;
   --b-r: 0.3rem;
+}
+
+body.dark {
+  --color-primary: #49a175;
+
+  --color-background: #202226;
+  --color-foreground: #25272b;
+  --color-text: #eff0f3;
+
+  --color-gray-light: #2e3035;
+  --color-opacity: rgba(255, 255, 255, 0.05);
 }
 
 @layer base {

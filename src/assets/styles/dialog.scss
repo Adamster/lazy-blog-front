@@ -15,7 +15,7 @@
   &-panel {
     width: 500px;
     height: auto;
-    background: #fff;
+    background: var(--color-foreground);
     padding: 2rem;
     border-radius: var(--b-r);
   }

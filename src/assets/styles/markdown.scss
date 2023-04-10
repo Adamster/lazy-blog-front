@@ -4,6 +4,10 @@
   line-height: inherit;
   font-family: inherit;
 
+  a {
+    color: var(--color-primary);
+  }
+
   h1,
   h2,
   h3,
@@ -42,5 +46,11 @@
 
   .contains-task-list {
     list-style: none;
+  }
+}
+
+body.dark {
+  .wmde-markdown pre {
+    background: rgba(246, 248, 250, 0.05);
   }
 }
