@@ -12,7 +12,7 @@ export default function Home() {
     fetcher
   );
 
-  if (error || data?.code) return <ErrorMessage code={data?.code && ""} />;
+  if (error || data?.code) return <ErrorMessage code={data?.code || ""} />;
 
   return (
     <>

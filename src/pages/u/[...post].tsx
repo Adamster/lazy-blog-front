@@ -14,17 +14,17 @@ interface IProps {
 
 export default function Post({ fallback }: IProps) {
   const router = useRouter();
-  const { slug } = router.query;
+  const { post } = router.query;
 
   const { data, error, isLoading } = useSWR<IPost>(
-    `${API_URL}/posts/${slug}`,
+    `${API_URL}/posts/${post![1]}`,
     fetcher,
     {
       fallbackData: fallback,
     }
   );
 
-  if (error || data?.code) return <ErrorMessage code={data?.code && ""} />;
+  if (error || data?.code) return <ErrorMessage code={data?.code || ""} />;
 
   return (
     <>
@@ -41,12 +41,7 @@ export default function Post({ fallback }: IProps) {
           property="og:description"
           content={fallback.summary || fallback.body.substring(0, 20)}
         />
-        <meta 
-         key="og:image"
-         property="og:image"
-         content={fallback.coverUrl}
-         />
-        
+        <meta key="og:image" property="og:image" content={fallback.coverUrl} />
       </Head>
 
       {isLoading && <Loading />}
@@ -57,8 +52,8 @@ export default function Post({ fallback }: IProps) {
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const slug = context.params?.slug;
-  const res = await fetch(`${API_URL}/posts/${slug}`);
+  const post = context.params?.post;
+  const res = await fetch(`${API_URL}/posts/${post![1]}`);
   const fallback = await res.json();
   return { props: { fallback } };
 }

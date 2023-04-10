@@ -1,12 +1,12 @@
-.hide-overflow {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+// .hide-overflow {
+//   display: -webkit-box;
+//   -webkit-line-clamp: 2;
+//   -webkit-box-orient: vertical;
 
-  // white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+//   // white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+// }
 
 // PREVIEW
 
@@ -30,26 +30,21 @@
 
   &Image {
     display: block;
-    height: 8rem;
     border-radius: var(--b-r);
-    background: rgba(0, 0, 0, 0.1);
-    background: url("https://www.toptal.com/designers/subtlepatterns/uploads/45degreee_fabric.png");
+    background: var(--color-gray-light);
     margin-left: -1.5rem;
     margin-right: -1.5rem;
-    opacity: 0.5;
-  }
 
-  &Title {
-    @extend .hide-overflow;
-  }
-
-  &Summary {
-    @extend .hide-overflow;
+    img {
+      border-radius: var(--b-r);
+      max-width: 100%;
+      margin: 0 auto;
+    }
   }
 }
 
 .author {
-  color: var(--color-text);
+  // color: var(--color-text);
   display: flex;
   flex-direction: column;
 

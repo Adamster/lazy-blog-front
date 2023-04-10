@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { IPost } from "@/types";
 import { formatDate } from "@/utils/format-date";
 import { generateColor } from "@/utils/generate-color";
@@ -18,8 +19,7 @@ export const PostPreview = ({ post }: IProps) => {
     <div key={post.id} className={s.preview}>
       <div className={s.previewContent}>
         <div className={classNames(s.author, "mb-4")}>
-          <Link href="#" className={s.authorName}>
-            {/* <Link href={`u/${post.author.userName}`} className={s.authorName}> */}
+          <Link href={`/u/${post.author.userName}`} className={s.authorName}>
             <div
               className={s.authorAva}
               style={{
@@ -35,30 +35,36 @@ export const PostPreview = ({ post }: IProps) => {
           </div>
         </div>
 
-        <Link className="block mb-4" href={`/post/${post.slug}`}>
+        <Link
+          className="block mb-4"
+          href={`/u/${post.author.userName}/${post.slug}`}
+        >
           <h2 className={classNames(s.previewTitle, "text-xl font-bold")}>
             {post.title}
           </h2>
           {post.summary && <p className={s.previewSummary}>{post.summary}</p>}
         </Link>
 
-        {post.coverUrl &&  
-         <img src={post.coverUrl} alt={post.slug} width={700} height={100} sizes="50vw"/> }
-
-        {post.coverUrl == "" && 
-         <Link href={`/post/${post.slug}`} className={s.previewImage}></Link>}
+        {post?.coverUrl && (
+          <Link
+            href={`/u/${post.author.userName}/${post.slug}`}
+            className={s.previewImage}
+          >
+            <img src={post.coverUrl} alt={post.title} />
+          </Link>
+        )}
 
         <div className={s.footer}>
           <div className={s.footerStats}>
             <EyeIcon className={s.footerStatsIcon}></EyeIcon>
-            <span className={s.footerStatsNum}>0</span>
+            <span className={s.footerStatsNum}>{post.views}</span>
           </div>
 
           <div className={s.footerStats}>
             <ChatBubbleBottomCenterTextIcon
               className={s.footerStatsIcon}
             ></ChatBubbleBottomCenterTextIcon>
-            <span className={s.footerStatsNum}>0</span>
+            <span className={s.footerStatsNum}>{post.comments}</span>
           </div>
         </div>
       </div>

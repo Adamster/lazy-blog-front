@@ -4,6 +4,7 @@ import { generateColor } from "@/utils/generate-color";
 import classNames from "classnames";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { Comments } from "../comments/Comments";
 import s from "./post.module.scss";
 
 const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
@@ -18,7 +19,7 @@ export const PostFull = ({ post }: IProps) => {
   return (
     <>
       <div className={classNames(s.author, "mb-4")}>
-        <Link href="#" className={s.authorName}>
+        <Link href={`/u/${post.author.userName}`} className={s.authorName}>
           <div
             className={s.authorAva}
             style={{
@@ -33,12 +34,14 @@ export const PostFull = ({ post }: IProps) => {
 
       <div className={classNames("mb-4")}>
         <h1 className="text-3xl font-bold">{post.title}</h1>
-        {post.summary && <p className={s.previewSummary}>{post.summary}</p>}
+        {post.summary && <p>{post.summary}</p>}
       </div>
 
-      <div className={s.full}>
+      <div className={classNames(s.full, "mb-6")}>
         <MDPreview source={post.body} />
       </div>
+
+      <Comments id="" />
     </>
   );
 };

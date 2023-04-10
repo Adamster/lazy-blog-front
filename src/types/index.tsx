@@ -6,18 +6,9 @@ export interface IUser extends IRequest {
   userName: string;
 }
 
-export interface IUserPostDetails extends IRequest {
+export interface IUser extends IRequest {
   user: IUser;
-  postItems: Array<IPostItem>;
-}
-
-export interface IPostItem {
-  title: string;
-  summary: string;
-  slug: string;
-  postId: string;
-  isPublished: boolean;
-  createdAtUtc: Date;
+  postItems: Array<IPost>;
 }
 
 export interface IRequest {
@@ -34,6 +25,8 @@ export interface IPost extends IRequest {
   author: IUser;
   createdAtUtc: string;
   body: string;
+  views: number;
+  comments: number;
 }
 
 export interface IPosts extends Array<IPost>, IRequest {}
