@@ -41,6 +41,12 @@ export default function Post({ fallback }: IProps) {
           property="og:description"
           content={fallback.summary || fallback.body.substring(0, 20)}
         />
+        <meta 
+         key="og:image"
+         property="og:image"
+         content={fallback.coverUrl}
+         />
+        
       </Head>
 
       {isLoading && <Loading />}
