@@ -6,6 +6,7 @@ import { API_URL, fetcher } from "@/utils/fetcher";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/dist/client/router";
 import Head from "next/head";
+import { useEffect } from "react";
 import useSWR from "swr";
 
 interface IProps {
@@ -23,6 +24,27 @@ export default function Post({ fallback }: IProps) {
       fallbackData: fallback,
     }
   );
+
+
+  const delay = (seconds: number) => new Promise(
+    resolve => setTimeout(resolve, seconds * 1000)
+  );
+
+  useEffect(() => {
+    async function CountView() {
+
+      await delay(10);
+      
+      fetch(`${API_URL}/posts/${fallback.id}/count-view`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+    }
+
+    CountView();
+  }, []);
 
   if (error || data?.code) return <ErrorMessage code={data?.code || ""} />;
 
