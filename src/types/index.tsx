@@ -1,3 +1,8 @@
+export interface IRequest {
+  code?: string;
+  message?: string;
+}
+
 export interface IUser extends IRequest {
   id: string;
   email: string;
@@ -6,14 +11,9 @@ export interface IUser extends IRequest {
   userName: string;
 }
 
-export interface IUser extends IRequest {
+export interface IUserDetails extends IRequest {
   user: IUser;
-  postItems: Array<IPost>;
-}
-
-export interface IRequest {
-  code?: string;
-  message?: string;
+  posts: Array<IPost>;
 }
 
 export interface IPost extends IRequest {
