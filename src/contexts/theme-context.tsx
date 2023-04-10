@@ -24,7 +24,12 @@ export const ThemeProvider = ({ children }: any) => {
 
   useEffect(() => {
     document.body.className = darkTheme ? "dark" : "";
-    window.localStorage.setItem("darkTheme", "true");
+
+    if (darkTheme) {
+      window.localStorage.setItem("darkTheme", "");
+    } else {
+      window.localStorage.removeItem("darkTheme");
+    }
   }, [darkTheme]);
 
   const toggleTheme = () => {

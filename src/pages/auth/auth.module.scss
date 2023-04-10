@@ -1,7 +1,8 @@
 .form {
-  @apply rounded-md p-8;
+  @apply rounded-md;
   overflow: hidden;
   background: var(--color-foreground);
+  padding: var(--space-in);
 }
 
 .title {
@@ -11,7 +12,12 @@
 
 .register {
   position: absolute;
-  right: -3.8rem;
+  right: -2.8rem;
+
+  @media (min-width: 640px) {
+    right: -3.8rem;
+  }
+
   top: 0;
 
   transition: right 0.3s ease;

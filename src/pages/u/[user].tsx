@@ -1,6 +1,7 @@
 import ErrorMessage from "@/components/error-message";
 import Loading from "@/components/loading";
-import { IUserDetails } from "@/types";
+import PostPreview from "@/components/post";
+import { IPost, IUserDetails } from "@/types";
 import { API_URL, fetcher } from "@/utils/fetcher";
 import classNames from "classnames";
 import Head from "next/head";
@@ -24,7 +25,8 @@ const User = ({ fallback }: IProps) => {
     // }
   );
 
-  if (error || data?.code) return <ErrorMessage code={data?.code || ""} />;
+  if (error || data?.code)
+    return <ErrorMessage code={error?.response?.data?.code} />;
 
   return (
     <>
@@ -38,14 +40,18 @@ const User = ({ fallback }: IProps) => {
       {data?.user && (
         <div className={classNames("mb-4")}>
           <h1 className="text-3xl font-bold">{`${data?.user.firstName} ${data?.user.lastName}`}</h1>
-          <p>страница еще в разработке</p>
+          <p>Лучшие статьи</p>
         </div>
       )}
 
-      {/* {data?.posts &&
-        data.posts.map((post: IPost) => (
-          <PostPreview key={post.id} post={post}></PostPreview>
-        ))} */}
+      {data?.postItems &&
+        data.postItems.map((post: IPost) => (
+          <PostPreview
+            key={post.id}
+            post={post}
+            author={data.user}
+          ></PostPreview>
+        ))}
     </>
   );
 };

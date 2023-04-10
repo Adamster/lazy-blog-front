@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { IPost } from "@/types";
+import { IPost, IUser } from "@/types";
 import { formatDate } from "@/utils/format-date";
 import { generateColor } from "@/utils/generate-color";
 import {
@@ -12,23 +12,27 @@ import s from "./post.module.scss";
 
 interface IProps {
   post: IPost;
+  author: IUser;
 }
 
-export const PostPreview = ({ post }: IProps) => {
+export const PostPreview = ({ post, author }: IProps) => {
   return (
     <div key={post.id} className={s.preview}>
       <div className={s.previewContent}>
         <div className={classNames(s.author, "mb-4")}>
-          <Link href={`/u/${post.author.userName}`} className={s.authorName}>
-            <div
-              className={s.authorAva}
-              style={{
-                backgroundColor: generateColor(post.author.userName),
-              }}
-            ></div>
-            {post.author.firstName}{" "}
-            {post.author.lastName && post.author.lastName}
-          </Link>
+          {author ? (
+            <Link href={`/u/${author.userName}`} className={s.authorName}>
+              <div
+                className={s.authorAva}
+                style={{
+                  backgroundColor: generateColor(author.userName),
+                }}
+              ></div>
+              {author.firstName} {author.lastName && author.lastName}
+            </Link>
+          ) : (
+            <></>
+          )}
 
           <div className={s.stats}>
             <span>{formatDate(post.createdAtUtc)}</span>
@@ -37,7 +41,7 @@ export const PostPreview = ({ post }: IProps) => {
 
         <Link
           className="block mb-4"
-          href={`/u/${post.author.userName}/${post.slug}`}
+          href={`/u/${author.userName}/${post.slug}`}
         >
           <h2 className={classNames(s.previewTitle, "text-xl font-bold")}>
             {post.title}
@@ -47,7 +51,7 @@ export const PostPreview = ({ post }: IProps) => {
 
         {post?.coverUrl && (
           <Link
-            href={`/u/${post.author.userName}/${post.slug}`}
+            href={`/u/${author.userName}/${post.slug}`}
             className={s.previewImage}
           >
             <img src={post.coverUrl} alt={post.title} />

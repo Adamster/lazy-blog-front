@@ -24,7 +24,8 @@ export default function Post({ fallback }: IProps) {
     }
   );
 
-  if (error || data?.code) return <ErrorMessage code={data?.code || ""} />;
+  if (error || data?.code)
+    return <ErrorMessage code={error?.response?.data?.code} />;
 
   return (
     <>

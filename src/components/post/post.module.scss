@@ -22,7 +22,7 @@
   &Content {
     background: var(--color-foreground);
     position: relative;
-    padding: 1.5rem 1.5rem 1rem;
+    padding: var(--space-in) var(--space-in) 1rem;
     border-radius: var(--b-r);
     width: 100%;
     max-width: 100%;
@@ -42,14 +42,9 @@
 }
 
 .author {
-  // color: var(--color-text);
   display: flex;
-  flex-direction: column;
-
-  @media (min-width: 640px) {
-    align-items: center;
-    flex-direction: row;
-  }
+  align-items: center;
+  flex-direction: row;
 
   &Ava {
     height: 1rem;
@@ -133,6 +128,6 @@
 .full {
   width: 100%;
   background: var(--color-foreground);
-  padding: 2rem;
   border-radius: var(--b-r);
+  padding: var(--space-in);
 }

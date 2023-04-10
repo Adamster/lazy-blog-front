@@ -13,7 +13,7 @@ export interface IUser extends IRequest {
 
 export interface IUserDetails extends IRequest {
   user: IUser;
-  posts: Array<IPost>;
+  postItems: Array<IPost>;
 }
 
 export interface IPost extends IRequest {

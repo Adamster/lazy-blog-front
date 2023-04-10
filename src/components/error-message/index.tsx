@@ -15,7 +15,7 @@ export default function ErrorMessage({ code = "" }: IProps) {
   };
 
   return (
-    <div className="bg-white rounded-md p-8">
+    <div className="background-white rounded-md p-in">
       <h2 className="text-2xl font-bold mb-4">
         К нашему величайшему сожалению
       </h2>

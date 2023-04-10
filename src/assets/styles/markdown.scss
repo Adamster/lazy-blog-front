@@ -3,6 +3,12 @@
 .wmde-markdown {
   line-height: inherit;
   font-family: inherit;
+  background: transparent !important;
+
+  ul {
+    list-style: initial;
+    padding-left: 1.2rem !important;
+  }
 
   a {
     color: var(--color-primary);
@@ -22,11 +28,19 @@
   }
 
   h1 {
-    font-size: 1.875rem;
+    font-size: x-large;
+  }
+
+  h2 {
+    font-size: large;
+  }
+
+  h3 {
+    font-size: medium;
   }
 
   img {
-    display: block;
+    display: block !important;
     margin: 0 auto;
   }
 
@@ -47,10 +61,24 @@
   .contains-task-list {
     list-style: none;
   }
+
+  > blockquote,
+  > blockquote blockquote {
+    color: var(--color-gray);
+  }
 }
 
-body.dark {
-  .wmde-markdown pre {
-    background: rgba(246, 248, 250, 0.05);
+.md-editor {
+  background: transparent;
+  line-height: inherit !important;
+  font-family: inherit !important;
+  min-height: 200px;
+  box-shadow: none !important;
+  background-color: var;
+
+  --color-canvas-subtle: var(--color-gray-light) !important;
+
+  a {
+    color: var(--color-primary) !important;
   }
 }

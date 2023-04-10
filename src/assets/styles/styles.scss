@@ -19,6 +19,14 @@
 
   --max-width: 800px;
   --b-r: 0.3rem;
+
+  --space-in: 1rem;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --space-in: 2rem;
+  }
 }
 
 body.dark {

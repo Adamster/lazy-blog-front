@@ -29,7 +29,11 @@ export default function Home() {
 
       {data &&
         data.map((post: IPost) => (
-          <PostPreview key={post.id} post={post}></PostPreview>
+          <PostPreview
+            key={post.id}
+            post={post}
+            author={post.author}
+          ></PostPreview>
         ))}
     </>
   );

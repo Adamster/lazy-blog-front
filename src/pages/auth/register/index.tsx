@@ -69,7 +69,7 @@ export default function Register() {
       {loading && <Loading />}
 
       <form
-        className="rounded-md background-white p-8"
+        className="rounded-md background-white p-in"
         method="POST"
         onSubmit={handleSubmit}
       >
