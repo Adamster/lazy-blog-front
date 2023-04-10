@@ -26,7 +26,7 @@ export const ThemeProvider = ({ children }: any) => {
     document.body.className = darkTheme ? "dark" : "";
 
     if (darkTheme) {
-      window.localStorage.setItem("darkTheme", "");
+      window.localStorage.setItem("darkTheme", "true");
     } else {
       window.localStorage.removeItem("darkTheme");
     }
