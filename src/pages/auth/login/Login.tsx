@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import AuthErrorMessage from "../../../components/ErrorMessages/AuthErrorMessage";
 import s from "../auth.module.scss";
 
-export const Login = () => {
+export default function Login() {
   const router = useRouter();
   const { error } = useRouter().query;
   const { data: auth } = useSession();
@@ -84,4 +84,4 @@ export const Login = () => {
       </form>
     </>
   );
-};
+}
