@@ -8,18 +8,18 @@ const providers = [
   CredentialsProvider({
     name: "credentials",
     credentials: {
-      email: {
-        label: "Email",
-        type: "text",
-        placeholder: "Enter your email",
-      },
+      email: { label: "Email", type: "email" },
       password: { label: "Password", type: "password" },
     },
     async authorize(credentials, req) {
+      const { email, password } = credentials as any;
+
+      console.log("auth", JSON.stringify({ email, password }));
+
       try {
         const res = await fetch(`${API_URL}/users/login`, {
           method: "POST",
-          body: JSON.stringify(credentials),
+          body: JSON.stringify({ email, password }),
           headers: { "Content-Type": "application/json" },
         });
 
@@ -46,13 +46,7 @@ export const authOptions: NextAuthOptions = {
     maxAge: 7 * 24 * 60 * 60, // 7 days
   },
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
-      if (user) {
-        return true;
-      }
-      return false;
-    },
-    async session({ session, token }: { session: any; token: any }) {
+    async session({ session, token }: any) {
       if (token) {
         session.user.id = token.id;
         session.user.firstName = token.firstName;

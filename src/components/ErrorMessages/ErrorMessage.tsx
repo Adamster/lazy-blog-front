@@ -9,6 +9,8 @@ export default function ErrorMessage({ code = "" }: IProps) {
         return "Пост не найден, попробуйте еще раз.";
       case "User.NotFound":
         return "Данного юзера не существует, но, вы все еще можете его создать.";
+      case "User.EmailAlreadyInUse":
+        return "Оный email уже занят.";
       default:
         return "Где-то, что-то не работает.";
     }

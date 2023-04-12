@@ -1,4 +1,4 @@
-import { ThemeProvider } from "@/contexts/theme-context";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import Layout from "@/layout";
 import { SessionProvider } from "next-auth/react";
 import { AppProps } from "next/app";

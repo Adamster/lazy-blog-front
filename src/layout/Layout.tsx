@@ -1,4 +1,4 @@
-import { useTheme } from "@/contexts/theme-context";
+import { useTheme } from "@/contexts/ThemeContext";
 import Head from "next/head";
 import Header from "./header";
 import s from "./layout.module.scss";

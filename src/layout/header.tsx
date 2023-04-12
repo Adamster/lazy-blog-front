@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { useTheme } from "@/contexts/theme-context";
+import { useTheme } from "@/contexts/ThemeContext";
 import { generateColor } from "@/utils/generate-color";
 import { Menu } from "@headlessui/react";
 import {
@@ -22,7 +22,7 @@ const navigation = [
 
 export default function Header() {
   const router = useRouter();
-  const { data: authSession }: any = useSession();
+  const { data: auth }: any = useSession();
 
   return (
     <header className={s.header}>
@@ -34,7 +34,7 @@ export default function Header() {
           <ul className="flex">
             {navigation.map(
               (item) =>
-                ((item.authRequired && authSession) || !item.authRequired) && (
+                ((item.authRequired && auth) || !item.authRequired) && (
                   <li key={item.name} className="mr-4">
                     <Link
                       className={cn(
@@ -51,8 +51,8 @@ export default function Header() {
           </ul>
         </nav>
         <div className={s.actions}>
-          {authSession ? (
-            <UserMenu authSession={authSession} />
+          {auth ? (
+            <UserMenu authSession={auth} />
           ) : (
             <Link className={s.user} href="/auth/login">
               <UserIcon />
