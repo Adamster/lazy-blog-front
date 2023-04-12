@@ -5,6 +5,7 @@ import { generateColor } from "@/utils/generate-color";
 import {
   ChatBubbleBottomCenterTextIcon,
   EyeIcon,
+  PaintBrushIcon,
 } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import Link from "next/link";
@@ -13,9 +14,10 @@ import s from "./post.module.scss";
 interface IProps {
   post: IPost;
   author: IUser;
+  authUserId?: string | undefined;
 }
 
-export const PostPreview = ({ post, author }: IProps) => {
+export default function PostPreview({ post, author, authUserId }: IProps) {
   return (
     <div key={post.id} className={s.preview}>
       <div className={s.previewContent}>
@@ -72,6 +74,15 @@ export const PostPreview = ({ post, author }: IProps) => {
           </div>
         </div>
       </div>
+
+      {author.id === authUserId && (
+        <Link
+          href={`/u/${author.userName}/${post.slug}/edit`}
+          className="btn btn--edit"
+        >
+          <PaintBrushIcon width={"1rem"} />
+        </Link>
+      )}
     </div>
   );
-};
+}

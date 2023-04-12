@@ -16,10 +16,10 @@ interface IProps {
   post: IPost;
 }
 
-export const PostFull = ({ post }: IProps) => {
+export default function PostFull({ post }: IProps) {
   return (
     <>
-      <div className={classNames(s.full, "mb-6")}>
+      <div className={classNames(s.full)}>
         <div className={classNames(s.author, "mb-4")}>
           <Link href={`/u/${post.author.userName}`} className={s.authorName}>
             <div
@@ -54,4 +54,4 @@ export const PostFull = ({ post }: IProps) => {
       <Comments id="" />
     </>
   );
-};
+}

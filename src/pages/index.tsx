@@ -1,6 +1,6 @@
 import ErrorMessage from "@/components/ErrorMessages/ErrorMessage";
 import Loading from "@/components/loading";
-import PostPreview from "@/components/post";
+import PostPreview from "@/components/post/PostPreview";
 import { IPost, IPosts } from "@/types";
 import { API_URL, fetcher } from "@/utils/fetcher";
 import Head from "next/head";

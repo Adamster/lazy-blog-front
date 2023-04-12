@@ -17,13 +17,13 @@ import { useRouter } from "next/router";
 
 export default function Create() {
   const router = useRouter();
-  const { data: session }: any = useSession();
+  const { data: auth }: any = useSession();
 
   useEffect(() => {
-    if (session === null) {
+    if (auth === null) {
       router.push("/auth/login");
     }
-  }, [session, router]);
+  }, [auth, router]);
 
   const [form, setForm] = useState({
     userId: "",
@@ -35,8 +35,8 @@ export default function Create() {
   const [body, setBody] = useState<string | undefined>("");
 
   useEffect(() => {
-    setForm((values) => ({ ...values, userId: session?.user.id }));
-  }, [session]);
+    setForm((values) => ({ ...values, userId: auth?.user.id }));
+  }, [auth]);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -56,7 +56,7 @@ export default function Create() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.user.token}`,
+        Authorization: `Bearer ${auth.user.token}`,
       },
       body: JSON.stringify({ userId, title, coverUrl, summary, body }),
     })
@@ -86,7 +86,7 @@ export default function Create() {
         <title>Создаем Пост | Not Lazy Blog</title>
       </Head>
 
-      {session ? (
+      {auth ? (
         <form
           className="rounded-md background-white p-in"
           method="POST"

@@ -1,6 +1,6 @@
 import ErrorMessage from "@/components/ErrorMessages/ErrorMessage";
 import Loading from "@/components/loading";
-import { PostFull } from "@/components/post/PostFull";
+import PostFull from "@/components/post/PostFull";
 import { IPost } from "@/types";
 import { API_URL, fetcher } from "@/utils/fetcher";
 import { GetServerSidePropsContext } from "next";
@@ -18,7 +18,7 @@ export default function Post({ fallback }: IProps) {
   const { post } = router.query;
 
   const { data, error, isLoading } = useSWR<IPost>(
-    `${API_URL}/posts/${post![1]}`,
+    `${API_URL}/posts/${post}`,
     fetcher,
     {
       fallbackData: fallback,
@@ -26,7 +26,7 @@ export default function Post({ fallback }: IProps) {
   );
 
   const delay = (seconds: number) =>
-    new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+    new Promise((resolve) => setTimeout(resolve, seconds * 3000));
 
   useEffect(() => {
     async function CountView() {
@@ -73,7 +73,7 @@ export default function Post({ fallback }: IProps) {
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const post = context.params?.post;
-  const res = await fetch(`${API_URL}/posts/${post![1]}`);
+  const res = await fetch(`${API_URL}/posts/${post}`);
   const fallback = await res.json();
   return { props: { fallback } };
 }

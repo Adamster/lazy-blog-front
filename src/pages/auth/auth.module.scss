@@ -2,7 +2,7 @@
   @apply rounded-md;
   overflow: hidden;
   background: var(--color-foreground);
-  padding: var(--space-in);
+  padding: var(--space);
 }
 
 .title {
@@ -14,7 +14,7 @@
   position: absolute;
   right: -3.8rem;
 
-  top: 0;
+  top: 0.2rem;
 
   transition: right 0.3s ease;
   cursor: pointer;

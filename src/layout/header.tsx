@@ -15,14 +15,14 @@ import { useRouter } from "next/router";
 
 import s from "./layout.module.scss";
 
-const navigation = [
-  { name: "Посты", href: "/" },
-  { name: "Создать", href: "/create", authRequired: true },
-];
-
 export default function Header() {
   const router = useRouter();
   const { data: auth }: any = useSession();
+
+  const navigation = [
+    { name: "Посты", href: "/" },
+    { name: "Создать", href: "/create", authRequired: true },
+  ];
 
   return (
     <header className={s.header}>
