@@ -72,6 +72,10 @@
   > blockquote blockquote {
     color: var(--color-gray);
   }
+
+  iframe {
+    margin-bottom: 1rem;
+  }
 }
 
 .md-editor {
