@@ -76,10 +76,7 @@ export default function PostPreview({ post, author, authUserId }: IProps) {
       </div>
 
       {author.id === authUserId && (
-        <Link
-          href={`/u/${author.userName}/${post.slug}/edit`}
-          className="btn btn--edit"
-        >
+        <Link href={`/p/edit/${post.id}`} className="btn btn--edit">
           <PaintBrushIcon width={"1rem"} />
         </Link>
       )}

@@ -1,8 +1,6 @@
-@import "@uiw/react-markdown-preview/markdown.css";
-
 .wmde-markdown {
-  line-height: inherit;
-  font-family: inherit;
+  line-height: inherit !important;
+  font-family: inherit !important;
   background: transparent !important;
 
   ul,
@@ -83,6 +81,7 @@
   min-height: 200px;
   box-shadow: none !important;
   background-color: var;
+  border-radius: var(--b-r) !important;
 
   --color-canvas-subtle: var(--color-gray-light) !important;
 

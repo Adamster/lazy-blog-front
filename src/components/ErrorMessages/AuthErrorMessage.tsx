@@ -11,5 +11,5 @@ interface IProps {
 export default function AuthErrorMessage({ error }: IProps) {
   const errorKey = Array.isArray(error) ? error[0] : error;
   const errorMessage = error && (errors[errorKey] ?? error);
-  return <p className="color-error">{errorMessage}</p>;
+  return <p className="color-danger">{errorMessage}</p>;
 }

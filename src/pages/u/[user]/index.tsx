@@ -13,7 +13,6 @@ interface IProps {
   fallback: IUserDetails;
 }
 
-//Component
 export default function User() {
   const router = useRouter();
   const { user } = router.query;
@@ -54,11 +53,3 @@ export default function User() {
     </>
   );
 }
-
-// export async function getServerSideProps(context: GetServerSidePropsContext) {
-//   const user = context.params?.username;
-//   const res = await fetch(`${API_URL}/posts/${user}/posts`);
-//   const fallback = await res.json();
-
-//   return { props: { fallback } };
-// }

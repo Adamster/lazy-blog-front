@@ -2,11 +2,9 @@ import { IUser } from "@/types";
 import { generateColor } from "@/utils/generate-color";
 import {
   CalendarDaysIcon,
-  PaintBrushIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 import classNames from "classnames";
-import Link from "next/link";
 
 import s from "./user.module.scss";
 
@@ -37,16 +35,17 @@ export const UserDetails = ({ user, authUserId, postsNum }: IProps) => {
               </div>
               <div className="flex flex-nowrap content-center text-gray-500">
                 <PencilSquareIcon className="mr-2" width={"1rem"} />
-                <small className="whitespace-nowrap">{postsNum} posts</small>
+                <small className="whitespace-nowrap">{postsNum} постов</small>
               </div>
             </div>
           </div>
 
-          {user.id === authUserId && (
+          {/* TODO: USER EDIT BUTTON */}
+          {/* {user.id === authUserId && (
             <Link href="/u/edit" className="btn btn--edit">
               <PaintBrushIcon width={"1rem"} />
             </Link>
-          )}
+          )} */}
         </div>
       )}
     </div>

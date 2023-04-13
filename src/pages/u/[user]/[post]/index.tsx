@@ -1,9 +1,12 @@
 import ErrorMessage from "@/components/ErrorMessages/ErrorMessage";
 import Loading from "@/components/loading";
-import PostFull from "@/components/post/PostFull";
+import { PostFull } from "@/components/post/PostFull";
 import { IPost } from "@/types";
 import { API_URL, fetcher } from "@/utils/fetcher";
+import { delay } from "@/utils/utils";
+import axios from "axios";
 import { GetServerSidePropsContext } from "next";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/dist/client/router";
 import Head from "next/head";
 import { useEffect } from "react";
@@ -14,6 +17,7 @@ interface IProps {
 }
 
 export default function Post({ fallback }: IProps) {
+  const { data: auth }: any = useSession();
   const router = useRouter();
   const { post } = router.query;
 
@@ -25,23 +29,17 @@ export default function Post({ fallback }: IProps) {
     }
   );
 
-  const delay = (seconds: number) =>
-    new Promise((resolve) => setTimeout(resolve, seconds * 3000));
+  const postCounter = async () => {
+    await delay(10);
+
+    if (data?.author.id != auth?.user.id) {
+      await axios.put(`${API_URL}/posts/${fallback.id}/count-view`);
+    }
+  };
 
   useEffect(() => {
-    async function CountView() {
-      await delay(10);
-
-      fetch(`${API_URL}/posts/${fallback.id}/count-view`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-    }
-
-    CountView();
-  }, [fallback.id]);
+    postCounter();
+  }, [data?.id]);
 
   if (error || data?.code)
     return <ErrorMessage code={error?.response?.data?.code} />;
@@ -75,5 +73,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const post = context.params?.post;
   const res = await fetch(`${API_URL}/posts/${post}`);
   const fallback = await res.json();
+
   return { props: { fallback } };
 }
