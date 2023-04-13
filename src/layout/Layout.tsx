@@ -1,6 +1,6 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import Head from "next/head";
-import { Header } from "./Header";
+import { Header } from "./header";
 import s from "./layout.module.scss";
 
 export const Layout = ({ children, className }: any) => {
