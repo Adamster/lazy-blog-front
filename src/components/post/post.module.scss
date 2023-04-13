@@ -14,15 +14,16 @@
   display: flex;
   flex-direction: row;
   width: 100%;
+  position: relative;
 
   &:not(:last-of-type) {
-    margin-bottom: 2rem;
+    margin-bottom: var(--space);
   }
 
   &Content {
     background: var(--color-foreground);
     position: relative;
-    padding: var(--space-in) var(--space-in) 1rem;
+    padding: var(--space) var(--space) 1rem;
     border-radius: var(--b-r);
     width: 100%;
     max-width: 100%;
@@ -129,5 +130,6 @@
   width: 100%;
   background: var(--color-foreground);
   border-radius: var(--b-r);
-  padding: var(--space-in);
+  padding: var(--space);
+  margin-bottom: var(--space);
 }

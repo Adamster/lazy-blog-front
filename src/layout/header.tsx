@@ -15,14 +15,14 @@ import { useRouter } from "next/router";
 
 import s from "./layout.module.scss";
 
-const navigation = [
-  { name: "Посты", href: "/" },
-  { name: "Создать", href: "/create", authRequired: true },
-];
-
-export default function Header() {
+export const Header = () => {
   const router = useRouter();
   const { data: auth }: any = useSession();
+
+  const navigation = [
+    { name: "Посты", href: "/" },
+    { name: "Создать", href: "/p/create", authRequired: true },
+  ];
 
   return (
     <header className={s.header}>
@@ -62,7 +62,7 @@ export default function Header() {
       </div>
     </header>
   );
-}
+};
 
 function UserMenu({ authSession }: any) {
   const { darkTheme, toggleTheme } = useTheme();

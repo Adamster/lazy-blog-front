@@ -1,6 +1,22 @@
+import { Session } from "next-auth";
+
 export interface IRequest {
   code?: string;
   message?: string;
+}
+
+export interface IAuthSession extends Session {
+  user?: {
+    name: string | null;
+    email?: string | null;
+    image?: string | null;
+
+    id: string;
+    userName: string;
+    firstName: string;
+    lastName: string;
+    token: string;
+  };
 }
 
 export interface IUser extends IRequest {

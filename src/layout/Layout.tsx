@@ -1,13 +1,13 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import Head from "next/head";
-import Header from "./header";
+import { Header } from "./Header";
 import s from "./layout.module.scss";
 
-export default function Layout({ children }: any) {
+export const Layout = ({ children, className }: any) => {
   const { darkTheme } = useTheme();
 
   return (
-    <>
+    <div className={className}>
       <Head>
         <meta
           key="description"
@@ -26,6 +26,6 @@ export default function Layout({ children }: any) {
       <main className={s.main} data-color-mode={darkTheme ? "dark" : "light"}>
         {children}
       </main>
-    </>
+    </div>
   );
-}
+};

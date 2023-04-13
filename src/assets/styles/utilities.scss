@@ -8,8 +8,8 @@
   color: var(--color-gray);
 }
 
-.color-error {
-  color: rgb(239 68 68);
+.color-danger {
+  color: var(--color-danger);
 }
 
 .background-white {
@@ -17,5 +17,17 @@
 }
 
 .p-in {
-  padding: var(--space-in);
+  padding: var(--space);
+}
+
+.page-bg {
+  background: var(--color-foreground);
+  padding: var(--space);
+  border-radius: var(--b-r);
+}
+
+.page-title {
+  font-size: x-large;
+  font-weight: 700;
+  margin-bottom: 1rem;
 }
