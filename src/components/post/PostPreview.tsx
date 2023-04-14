@@ -51,16 +51,17 @@ export default function PostPreview({ post, author, authUserId }: IProps) {
           {post.summary && <p className={s.previewSummary}>{post.summary}</p>}
         </Link>
 
-        {post?.coverUrl && post?.coverUrl.includes("<iframe") ? (
-          <div dangerouslySetInnerHTML={{ __html: post?.coverUrl }}></div>
-        ) : (
-          <Link
-            href={`/u/${author.userName}/${post.slug}`}
-            className={s.previewImage}
-          >
-            <img src={post.coverUrl} alt={post.title} />
-          </Link>
-        )}
+        {post?.coverUrl &&
+          (post?.coverUrl.includes("<iframe") ? (
+            <div dangerouslySetInnerHTML={{ __html: post?.coverUrl }}></div>
+          ) : (
+            <Link
+              href={`/u/${author.userName}/${post.slug}`}
+              className={s.previewImage}
+            >
+              <img src={post.coverUrl} alt={post.title} />
+            </Link>
+          ))}
 
         <div className={s.footer}>
           <div className={s.footerStats}>
