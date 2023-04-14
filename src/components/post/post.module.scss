@@ -69,27 +69,24 @@
   margin-left: 2rem;
   display: flex;
   align-items: center;
-  margin-left: 1.7rem;
 
   svg {
     width: 0.8rem;
     height: 0.8rem;
   }
 
-  @media (min-width: 640px) {
-    margin-left: 2rem;
+  margin-left: 2rem;
 
-    &:after {
-      position: absolute;
-      content: "";
-      left: -1rem;
-      top: 50%;
-      margin-top: -1px;
-      width: 2px;
-      height: 2px;
-      border-radius: 50%;
-      background: var(--color-gray);
-    }
+  &:after {
+    position: absolute;
+    content: "";
+    left: -1rem;
+    top: 50%;
+    margin-top: -1px;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: var(--color-gray);
   }
 }
 

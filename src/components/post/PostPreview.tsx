@@ -51,7 +51,9 @@ export default function PostPreview({ post, author, authUserId }: IProps) {
           {post.summary && <p className={s.previewSummary}>{post.summary}</p>}
         </Link>
 
-        {post?.coverUrl && (
+        {post?.coverUrl && post?.coverUrl.includes("<iframe") ? (
+          <div dangerouslySetInnerHTML={{ __html: post?.coverUrl }}></div>
+        ) : (
           <Link
             href={`/u/${author.userName}/${post.slug}`}
             className={s.previewImage}

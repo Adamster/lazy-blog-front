@@ -43,7 +43,11 @@ export const PostFull = ({ post }: IProps) => {
 
         {post?.coverUrl ? (
           <div className={classNames(s.previewImage, "mb-6")}>
-            <img src={post.coverUrl} alt={post.title} />
+            {post?.coverUrl && post?.coverUrl.includes("<iframe") ? (
+              <div dangerouslySetInnerHTML={{ __html: post?.coverUrl }}></div>
+            ) : (
+              <img src={post.coverUrl} alt={post.title} />
+            )}
           </div>
         ) : (
           <div className="mb-6"></div>
