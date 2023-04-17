@@ -46,7 +46,7 @@ const AddEditComment = ({ postId, auth, setRequesting, mutate }: IProps) => {
     <form onSubmit={handleSubmit} className={s.addComment}>
       <input
         className="input"
-        placeholder="Добавить коммент"
+        placeholder="Есть что сказать?"
         required
         value={body}
         onChange={(e: any) => setBody(e.target.value)}
