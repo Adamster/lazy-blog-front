@@ -11,7 +11,7 @@ export const Layout = ({ children, className }: any) => {
   const { data: auth }: any = useSession();
 
   useEffect(() => {
-    if (auth && new Date() > new Date(auth?.expires)) {
+    if (auth && new Date() >= new Date(auth?.expires)) {
       signOut();
     }
   }, [auth]);

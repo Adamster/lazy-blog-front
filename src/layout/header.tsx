@@ -101,8 +101,7 @@ function UserMenu({ authSession }: any) {
         </Menu.Item>
 
         <Menu.Item>
-          <div
-            role="button"
+          <button
             className={s.userMenuItem}
             onClick={() => {
               signOut();
@@ -110,7 +109,7 @@ function UserMenu({ authSession }: any) {
           >
             <ArrowRightOnRectangleIcon width={"1rem"} className="mr-3" />
             <span>Выход тут</span>
-          </div>
+          </button>
         </Menu.Item>
       </Menu.Items>
     </Menu>
