@@ -21,44 +21,42 @@ export default function PostPreview({ post, author, authUserId }: IProps) {
   return (
     <div key={post.id} className={s.preview}>
       <div className={s.previewContent}>
-        <div className={classNames(s.author, "mb-4")}>
-          {author ? (
-            <Link href={`/u/${author.userName}`} className={s.authorName}>
-              <div
-                className={s.authorAva}
-                style={{
-                  backgroundColor: generateColor(author.userName),
-                }}
-              ></div>
-              {author.firstName} {author.lastName && author.lastName}
-            </Link>
-          ) : (
-            <></>
-          )}
+        <div className={classNames("author", "mb-4")}>
+          <Link href={`/u/${author.userName}`} className="authorName">
+            <div
+              className="authorAva"
+              style={{
+                backgroundColor: generateColor(author.userName),
+              }}
+            ></div>
+            {author.firstName} {author.lastName && author.lastName}
+          </Link>
 
-          <div className={s.stats}>
+          <div className="authorDate">
             <span>{formatDate(post.createdAtUtc)}</span>
           </div>
         </div>
 
-        <Link
-          className="block mb-4"
-          href={`/u/${author.userName}/${post.slug}`}
-        >
-          <h2 className={classNames(s.previewTitle, "text-xl font-bold")}>
-            {post.title}
-          </h2>
-          {post.summary && <p className={s.previewSummary}>{post.summary}</p>}
-        </Link>
-
-        {post?.coverUrl && (
+        <div className={s.previewToggle}>
           <Link
+            className={classNames("block mb-4", s.previewTitle)}
             href={`/u/${author.userName}/${post.slug}`}
-            className={s.previewImage}
           >
-            <img src={post.coverUrl} alt={post.title} />
+            <h2 className={classNames(s.previewTitle, "text-xl font-bold")}>
+              {post.title}
+            </h2>
+            {post.summary && <p className={s.previewSummary}>{post.summary}</p>}
           </Link>
-        )}
+
+          {post?.coverUrl && (
+            <Link
+              href={`/u/${author.userName}/${post.slug}`}
+              className={s.previewImage}
+            >
+              <img src={post.coverUrl} alt={post.title} />
+            </Link>
+          )}
+        </div>
 
         <div className={s.footer}>
           <div className={s.footerStats}>

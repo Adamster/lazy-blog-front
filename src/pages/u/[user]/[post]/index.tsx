@@ -32,7 +32,7 @@ export default function Post({ fallback }: IProps) {
   const postCounter = async () => {
     await delay(10);
 
-    if (data?.author.id != auth?.user.id) {
+    if (data?.author?.id != auth?.user.id) {
       await axios.put(`${API_URL}/posts/${fallback.id}/count-view`);
     }
   };

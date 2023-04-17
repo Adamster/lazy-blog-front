@@ -53,3 +53,10 @@ export interface IСreatePost extends IRequest {
   summary: string;
   body: string;
 }
+
+export interface IComment {
+  id: string;
+  user: IUser;
+  body: string;
+  createdAtUtc: string;
+}

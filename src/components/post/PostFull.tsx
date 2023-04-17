@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 
 import "@uiw/react-markdown-preview/markdown.css";
+import { Comments } from "../comments/Comments";
 import s from "./post.module.scss";
 
 const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
@@ -21,10 +22,10 @@ export const PostFull = ({ post }: IProps) => {
   return (
     <>
       <div className={classNames(s.full)}>
-        <div className={classNames(s.author, "mb-4")}>
-          <Link href={`/u/${post.author.userName}`} className={s.authorName}>
+        <div className={classNames("author", "mb-4")}>
+          <Link href={`/u/${post.author.userName}`} className="authorName">
             <div
-              className={s.authorAva}
+              className="authorAva"
               style={{
                 backgroundColor: generateColor(post.author.userName),
               }}
@@ -33,7 +34,7 @@ export const PostFull = ({ post }: IProps) => {
             {post.author.lastName && post.author.lastName}
           </Link>
 
-          <div className={s.stats}>{formatDate(post.createdAtUtc)}</div>
+          <div className="authorDate">{formatDate(post.createdAtUtc)}</div>
         </div>
 
         <div className={classNames("mb-4")}>
@@ -52,7 +53,7 @@ export const PostFull = ({ post }: IProps) => {
         <MDPreview source={post.body} />
       </div>
 
-      {/* <Comments id="" /> */}
+      <Comments postId={post.id} />
     </>
   );
 };
