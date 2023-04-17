@@ -46,7 +46,9 @@ export function Comments({ postId }: IProps) {
             />
           ))}
 
-          {data?.length === 0 && <p>Нет комментариев</p>}
+          {data?.length === 0 && (
+            <p>Даже намёка нет на наличие комментариев :(</p>
+          )}
         </div>
       </div>
     </>
