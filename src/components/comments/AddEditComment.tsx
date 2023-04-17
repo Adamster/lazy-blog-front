@@ -7,10 +7,11 @@ import s from "./comments.module.scss";
 interface IProps {
   postId: string;
   auth: IAuthSession;
+  mutate: any;
   setRequesting: any;
 }
 
-const AddEditComment = ({ postId, auth, setRequesting }: IProps) => {
+const AddEditComment = ({ postId, auth, setRequesting, mutate }: IProps) => {
   const [body, setBody] = useState("");
 
   const handleSubmit = async (e: any) => {
@@ -29,8 +30,9 @@ const AddEditComment = ({ postId, auth, setRequesting }: IProps) => {
           },
         }
       )
-      .then((response) => {
+      .then(async (response) => {
         setBody("");
+        mutate();
       })
       .catch(({ error }) => {
         console.log(error);

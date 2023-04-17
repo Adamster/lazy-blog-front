@@ -16,7 +16,7 @@ export function Comments({ postId }: IProps) {
   const { data: auth }: any = useSession();
   const [requesting, setRequesting] = useState(false);
 
-  const { data, error, isLoading } = useSWR<IComment[]>(
+  const { data, mutate, error, isLoading } = useSWR<IComment[]>(
     postId ? `${API_URL}/posts/${postId}/comments` : null,
     fetcher
   );
@@ -32,6 +32,7 @@ export function Comments({ postId }: IProps) {
           <AddEditComment
             auth={auth}
             postId={postId}
+            mutate={mutate}
             setRequesting={setRequesting}
           />
         )}
