@@ -39,7 +39,7 @@ const Create = () => {
         }
       )
       .then((response) => {
-        // alert("Успешно");
+        alert("Успешно");
         reset();
       })
       .catch((error) => {
