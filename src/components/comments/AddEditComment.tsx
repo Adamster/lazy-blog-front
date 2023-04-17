@@ -30,11 +30,10 @@ const AddEditComment = ({ postId, auth, setRequesting }: IProps) => {
         }
       )
       .then((response) => {
-        alert("Успешно");
         setBody("");
       })
-      .catch(({ response }) => {
-        alert("Ошибкен");
+      .catch(({ error }) => {
+        console.log(error);
       })
       .finally(() => {
         setRequesting(false);

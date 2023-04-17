@@ -39,11 +39,12 @@ const Create = () => {
         }
       )
       .then((response) => {
-        alert("Успешно");
+        // alert("Успешно");
         reset();
       })
-      .catch(() => {
-        alert("Ошибкен");
+      .catch((error) => {
+        console.log(error);
+        // alert("Ошибкен");
       })
       .finally(() => {
         setRequesting(false);
