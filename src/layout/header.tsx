@@ -102,6 +102,7 @@ function UserMenu({ authSession }: any) {
 
         <Menu.Item>
           <div
+            role="button"
             className={s.userMenuItem}
             onClick={() => {
               signOut();
