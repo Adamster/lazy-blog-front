@@ -1,5 +1,6 @@
 import { IComment } from "@/types";
 import { API_URL, fetcher } from "@/utils/fetcher";
+import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import useSWR from "swr";
@@ -20,6 +21,30 @@ export function Comments({ postId }: IProps) {
     postId ? `${API_URL}/posts/${postId}/comments` : null,
     fetcher
   );
+
+  const handleDelete = async (id: string) => {
+    if (confirm("Ты точно хочешь удолить этот коммент?")) {
+      setRequesting(true);
+
+      await axios
+        .delete(`${API_URL}/comments/${id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth?.user?.token}`,
+          },
+        })
+        .then(() => {
+          mutate();
+        })
+        .catch(({ error }) => {
+          console.log(error);
+          alert("Ошибкен");
+        })
+        .finally(() => {
+          setRequesting(false);
+        });
+    }
+  };
 
   return (
     <>
@@ -43,7 +68,7 @@ export function Comments({ postId }: IProps) {
               key={comment.id}
               comment={comment}
               auth={auth}
-              setRequesting={setRequesting}
+              handleDelete={handleDelete}
             />
           ))}
 

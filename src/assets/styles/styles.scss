@@ -99,9 +99,23 @@ body.dark {
   }
 
   .btn--edit {
+    @apply py-1 px-2;
     position: absolute;
     right: -0.5rem;
     top: var(--space);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:hover {
+      border-color: var(--color-primary);
+      background: var(--color-primary);
+      opacity: 1;
+    }
+  }
+
+  .btn--action {
+    @apply py-1 px-2;
     display: flex;
     justify-content: center;
     align-items: center;

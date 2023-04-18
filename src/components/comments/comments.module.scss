@@ -22,9 +22,13 @@
 
 .addComment {
   display: flex;
-  // margin-bottom: var(--space);
 
   input {
     margin-right: 1rem;
   }
+}
+
+.delete {
+  position: absolute;
+  right: 0;
 }
