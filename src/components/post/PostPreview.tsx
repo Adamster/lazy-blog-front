@@ -64,12 +64,16 @@ export default function PostPreview({ post, author, authUserId }: IProps) {
             <span className={s.footerStatsNum}>{post.views}</span>
           </div>
 
-          <div className={s.footerStats}>
+          <Link
+            href={`/u/${author.userName}/${post.slug}#comments`}
+            scroll={false}
+            className={s.footerStats}
+          >
             <ChatBubbleBottomCenterTextIcon
               className={s.footerStatsIcon}
             ></ChatBubbleBottomCenterTextIcon>
             <span className={s.footerStatsNum}>{post.comments}</span>
-          </div>
+          </Link>
         </div>
       </div>
 

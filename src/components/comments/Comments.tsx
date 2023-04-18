@@ -50,7 +50,7 @@ export function Comments({ postId }: IProps) {
     <>
       {(isLoading || requesting) && <Loading />}
 
-      <div className={s.mainContainer}>
+      <div id="comments" className={s.mainContainer}>
         <h3 className="text-xl font-bold mb-4">Комменты</h3>
 
         {auth && (

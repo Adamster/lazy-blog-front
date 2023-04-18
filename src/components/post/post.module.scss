@@ -71,7 +71,7 @@
     border-radius: 5rem;
     height: 1.5rem;
 
-    &:not(:last-of-type) {
+    &:not(:last-child) {
       margin-right: 1rem;
     }
   }
