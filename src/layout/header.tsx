@@ -104,7 +104,7 @@ function UserMenu({ authSession }: any) {
           <button
             className={s.userMenuItem}
             onClick={() => {
-              signOut({ redirect: false });
+              signOut();
             }}
           >
             <ArrowRightOnRectangleIcon width={"1rem"} className="mr-3" />

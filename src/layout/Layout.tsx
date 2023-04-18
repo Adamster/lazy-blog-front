@@ -1,5 +1,5 @@
 import { useTheme } from "@/contexts/ThemeContext";
-import { signOut, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { useEffect } from "react";
 import { Header } from "./header";
@@ -13,6 +13,11 @@ export const Layout = ({ children, className }: any) => {
   useEffect(() => {
     if (auth && new Date() >= new Date(auth?.expires)) {
       signOut();
+    }
+
+    if (auth?.error) {
+      console.log(auth?.error);
+      signIn();
     }
   }, [auth]);
 
