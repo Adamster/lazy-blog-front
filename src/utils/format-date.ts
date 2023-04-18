@@ -1,12 +1,26 @@
-export function formatDate(date: string) {
-  const formatter = new Intl.DateTimeFormat("ru-RU", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-  });
+import moment from "moment";
 
-  const formattedDate = formatter.format(new Date(date));
-  return formattedDate.replace(/\u202F/g, " ");
+// moment.updateLocale("en", {
+//   relativeTime: {
+//     future: "в %s",
+//     past: "%s назад",
+//     s: "несколько секунд",
+//     ss: "%d секунд",
+//     m: "минуту",
+//     mm: "%d минут",
+//     h: "час",
+//     hh: "%d часов",
+//     d: "день",
+//     dd: "%d дней",
+//     w: "неделю",
+//     ww: "%d недель",
+//     M: "месяц",
+//     MM: "%d месяцев",
+//     y: "год",
+//     yy: "%d лет",
+//   },
+// });
+
+export function formatDate(date: string) {
+  return moment.parseZone(date).utcOffset(date).fromNow();
 }
