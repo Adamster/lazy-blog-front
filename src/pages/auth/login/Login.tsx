@@ -61,7 +61,7 @@ export default function Login() {
               name="email"
               type="email"
               required
-              placeholder="Почта"
+              placeholder="Email"
               onChange={(e: any) => (email.current = e.target.value)}
             />
           </div>
