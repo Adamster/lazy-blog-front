@@ -3,7 +3,9 @@ import { API_URL, fetcher } from "@/utils/fetcher";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import useSWR from "swr";
+import IsAuth from "../guards/IsAuth";
 import Loading from "../loading";
 import AddEditComment from "./AddEditComment";
 import Comment from "./Comment";
@@ -38,7 +40,7 @@ export function Comments({ postId }: IProps) {
         })
         .catch(({ error }) => {
           console.log(error);
-          alert("Ошибкен");
+          toast.error("Чё-то ошибка");
         })
         .finally(() => {
           setRequesting(false);
@@ -51,16 +53,23 @@ export function Comments({ postId }: IProps) {
       {(isLoading || requesting) && <Loading />}
 
       <div id="comments" className={s.mainContainer}>
-        <h3 className="text-xl font-bold mb-4">Комменты</h3>
+        <h3 className="text-xl font-bold mb-4 flex items-center">
+          Комментарии
+          {data?.length && data?.length > 0 ? (
+            <span className={s.badge}>{data?.length}</span>
+          ) : (
+            <></>
+          )}
+        </h3>
 
-        {auth && (
+        <IsAuth>
           <AddEditComment
             auth={auth}
             postId={postId}
             mutate={mutate}
             setRequesting={setRequesting}
           />
-        )}
+        </IsAuth>
 
         <div className={s.commentsList}>
           {data?.map((comment: IComment) => (

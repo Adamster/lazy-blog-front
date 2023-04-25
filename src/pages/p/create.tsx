@@ -9,6 +9,7 @@ import { API_URL } from "@/utils/fetcher";
 import axios from "axios";
 import { useRouter } from "next/dist/client/router";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 
 // Component
 
@@ -39,12 +40,12 @@ const Create = () => {
         }
       )
       .then((response) => {
-        alert("Успешно");
+        toast.success("Это успех!");
         reset();
       })
       .catch((error) => {
+        toast.error("Чё-то ошибка");
         console.log(error);
-        // alert("Ошибкен");
       })
       .finally(() => {
         setRequesting(false);

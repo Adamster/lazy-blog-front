@@ -53,7 +53,10 @@
     img {
       border-radius: var(--b-r);
       max-width: 100%;
+      width: 100%;
       margin: 0 auto;
+      max-height: 25rem;
+      object-fit: cover;
     }
   }
 }
@@ -64,6 +67,16 @@
   display: flex;
   align-items: center;
   margin-top: 1rem;
+
+  &Full {
+    display: flex;
+    align-items: center;
+
+    background: var(--color-foreground);
+    padding: 1rem var(--space);
+    margin-bottom: var(--space);
+    border-radius: var(--b-r);
+  }
 
   &Stats {
     display: flex;
@@ -92,9 +105,14 @@
 // FULL
 
 .full {
+  position: relative;
   width: 100%;
   background: var(--color-foreground);
   border-radius: var(--b-r);
   padding: var(--space);
-  margin-bottom: var(--space);
+  margin-bottom: .2rem; //var(--space);
+
+  .previewImage img {
+    max-height: initial !important;
+  }
 }

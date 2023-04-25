@@ -1,0 +1,61 @@
+// Common
+
+.page-bg {
+  background: var(--color-foreground);
+  padding: var(--space);
+  border-radius: var(--b-r);
+}
+
+.page-title {
+  font-size: x-large;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+
+// Author
+
+.author {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+
+  &Ava {
+    height: 1rem;
+    width: 1rem;
+    min-width: 1rem;
+    border-radius: var(--b-r);
+    margin-right: 0.7rem;
+  }
+
+  &Name {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  &Date {
+    font-size: 0.8rem;
+    color: var(--color-gray);
+    position: relative;
+    margin-left: 2rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    // white-space: nowrap;
+
+    &:after {
+      position: absolute;
+      content: "";
+      left: -1rem;
+      top: 50%;
+      margin-top: -1px;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: var(--color-gray);
+    }
+  }
+}

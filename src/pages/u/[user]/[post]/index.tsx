@@ -21,15 +21,13 @@ function Post({ fallback }: IProps) {
   const router = useRouter();
   const { post } = router.query;
 
-  const { data, error, isLoading } = useSWR<IPost>(
+  const { data, error, isLoading, mutate } = useSWR<IPost>(
     post ? `${API_URL}/posts/${post}` : "",
     fetcher,
     {
       fallbackData: fallback,
     }
   );
-
-  // console.log(data);
 
   const postViewCounter = async () => {
     await delay(10);
@@ -67,7 +65,7 @@ function Post({ fallback }: IProps) {
 
       {isLoading && <Loading />}
 
-      {data?.id && <PostFull post={data} />}
+      {data?.id && <PostFull post={data} mutate={mutate} />}
     </>
   );
 }

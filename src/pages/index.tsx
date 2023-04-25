@@ -10,7 +10,7 @@ import useSWR from "swr";
 export default function Home() {
   const { data: auth }: any = useSession();
 
-  const { data, error, isLoading } = useSWR<IPosts>(
+  const { data, error, isLoading, mutate } = useSWR<IPosts>(
     `${API_URL}/posts`,
     fetcher
   );
@@ -37,6 +37,7 @@ export default function Home() {
             post={post}
             author={post.author}
             authUserId={auth?.user.id}
+            mutate={mutate}
           ></PostPreview>
         ))}
     </>

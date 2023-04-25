@@ -6,9 +6,13 @@ import classNames from "classnames";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
+import { EyeIcon, PaintBrushIcon } from "@heroicons/react/24/outline";
 import "@uiw/react-markdown-preview/markdown.css";
 import { Comments } from "../comments/Comments";
+import IsAuth from "../guards/IsAuth";
+import IsAuthor from "../guards/IsAuthor";
 import s from "./post.module.scss";
+import { PostVote } from "./PostVote";
 
 const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
   ssr: false,
@@ -16,9 +20,10 @@ const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
 
 interface IProps {
   post: IPost;
+  mutate: () => void;
 }
 
-export const PostFull = ({ post }: IProps) => {
+export const PostFull = ({ post, mutate }: IProps) => {
   return (
     <>
       <div className={classNames(s.full)}>
@@ -51,6 +56,25 @@ export const PostFull = ({ post }: IProps) => {
         )}
 
         <MDPreview source={post.body} />
+
+        <IsAuthor userId={post.author.id}>
+          <Link href={`/p/edit/${post.id}`} className="btn btn--edit">
+            <PaintBrushIcon width={"1rem"} />
+          </Link>
+        </IsAuthor>
+      </div>
+
+      <div className={s.footerFull}>
+        <div className={s.footerStats}>
+          <EyeIcon className={s.footerStatsIcon}></EyeIcon>
+          <span className={s.footerStatsNum}>{post.views}</span>
+        </div>
+
+        <IsAuth>
+          <div className={classNames(s.footerStats, "ml-auto")}>
+            <PostVote rating={post.rating} postId={post.id} mutate={mutate} />
+          </div>
+        </IsAuth>
       </div>
 
       <Comments postId={post.id} />

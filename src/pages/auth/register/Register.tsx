@@ -7,6 +7,7 @@ import Head from "next/dist/shared/lib/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "react-hot-toast";
 import s from "../auth.module.scss";
 
 export default function Register() {
@@ -57,7 +58,7 @@ export default function Register() {
         }
       )
       .then(() => {
-        alert("Успешно");
+        toast.success("Это успех!");
         router.push("/auth/login");
       })
       .catch(({ response }) => {
