@@ -3,13 +3,10 @@ import Loading from "@/components/loading";
 import PostPreview from "@/components/post/PostPreview";
 import { IPost, IPosts } from "@/types";
 import { API_URL, fetcher } from "@/utils/fetcher";
-import { useSession } from "next-auth/react";
 import Head from "next/head";
 import useSWR from "swr";
 
 export default function Home() {
-  const { data: auth }: any = useSession();
-
   const { data, error, isLoading, mutate } = useSWR<IPosts>(
     `${API_URL}/posts`,
     fetcher
@@ -36,7 +33,6 @@ export default function Home() {
             key={post.id}
             post={post}
             author={post.author}
-            authUserId={auth?.user.id}
             mutate={mutate}
           ></PostPreview>
         ))}

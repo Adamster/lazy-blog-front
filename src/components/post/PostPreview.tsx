@@ -16,11 +16,10 @@ import s from "./post.module.scss";
 interface IProps {
   post: IPost;
   author: IUser;
-  authUserId?: string | undefined;
   mutate: () => void;
 }
 
-export default function PostPreview({ post, author, authUserId }: IProps) {
+export default function PostPreview({ post, author }: IProps) {
   return (
     <div key={post.id} className={s.preview}>
       <div className={s.previewContent}>

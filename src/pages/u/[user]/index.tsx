@@ -18,7 +18,7 @@ export default function User() {
   const { user } = router.query;
   const { data: auth }: any = useSession();
 
-  const { data, error, isLoading } = useSWR<IUserDetails>(
+  const { data, error, isLoading, mutate } = useSWR<IUserDetails>(
     user ? `${API_URL}/posts/${user}/posts` : null,
     fetcher
   );
@@ -47,7 +47,7 @@ export default function User() {
             key={post.id}
             post={post}
             author={data.user}
-            authUserId={auth?.user.id}
+            mutate={mutate}
           ></PostPreview>
         ))}
     </>
