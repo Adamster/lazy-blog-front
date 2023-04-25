@@ -32,3 +32,14 @@
   position: absolute;
   right: 0;
 }
+
+.badge {
+  margin-left: .5rem;
+  background: var(--color-gray-light);
+  font-size: small;
+  width: 1.5rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  text-align: center;
+  border-radius: var(--b-r);
+}

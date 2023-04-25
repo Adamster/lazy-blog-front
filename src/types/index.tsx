@@ -1,4 +1,4 @@
-import { Session } from "next-auth";
+import { Session } from 'next-auth';
 
 export interface IRequest {
   code?: string;
@@ -42,6 +42,8 @@ export interface IPost extends IRequest {
   createdAtUtc: string;
   body: string;
   views: number;
+  rating: number;
+  voteDirection: string;
   comments: number;
 }
 

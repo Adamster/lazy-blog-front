@@ -6,15 +6,18 @@ import {
   ChatBubbleBottomCenterTextIcon,
   EyeIcon,
   PaintBrushIcon,
+  StarIcon,
 } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import Link from "next/link";
+import IsAuthor from "../guards/IsAuthor";
 import s from "./post.module.scss";
 
 interface IProps {
   post: IPost;
   author: IUser;
   authUserId?: string | undefined;
+  mutate: () => void;
 }
 
 export default function PostPreview({ post, author, authUserId }: IProps) {
@@ -60,6 +63,21 @@ export default function PostPreview({ post, author, authUserId }: IProps) {
 
         <div className={s.footer}>
           <div className={s.footerStats}>
+            <StarIcon
+              className={s.footerStatsIcon}
+              style={{
+                color:
+                  post.rating > 0
+                    ? "var(--color-primary)"
+                    : post.rating < 0
+                    ? "var(--color-danger)"
+                    : "",
+              }}
+            ></StarIcon>
+            <span className={s.footerStatsNum}>{post.rating}</span>
+          </div>
+
+          <div className={s.footerStats}>
             <EyeIcon className={s.footerStatsIcon}></EyeIcon>
             <span className={s.footerStatsNum}>{post.views}</span>
           </div>
@@ -74,14 +92,16 @@ export default function PostPreview({ post, author, authUserId }: IProps) {
             ></ChatBubbleBottomCenterTextIcon>
             <span className={s.footerStatsNum}>{post.comments}</span>
           </Link>
+
+          <div className={classNames(s.footerStats, "ml-auto")}></div>
         </div>
       </div>
 
-      {author.id === authUserId && (
+      <IsAuthor userId={author.id}>
         <Link href={`/p/edit/${post.id}`} className="btn btn--edit">
           <PaintBrushIcon width={"1rem"} />
         </Link>
-      )}
+      </IsAuthor>
     </div>
   );
 }

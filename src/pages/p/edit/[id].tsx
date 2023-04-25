@@ -9,6 +9,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import useSWR from "swr";
 
 const PostEdit = () => {
@@ -39,10 +40,11 @@ const PostEdit = () => {
         },
       })
       .then((response) => {
-        alert("Успешно");
+        toast.success("Это успех!");
       })
       .catch(({ response }) => {
-        alert("Ошибкен");
+        toast.error("Чё-то ошибка");
+        console.log(error);
       })
       .finally(() => {
         setRequesting(false);
@@ -60,11 +62,11 @@ const PostEdit = () => {
         },
       })
       .then((response) => {
-        alert("Успешно");
+        toast.success("Это успех!");
         router.back();
       })
       .catch(({ response }) => {
-        alert("Ошибкен");
+        toast.error("Чё-то ошибка");
       })
       .finally(() => {
         setRequesting(false);

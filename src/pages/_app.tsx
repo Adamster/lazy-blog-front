@@ -4,11 +4,13 @@ import { Analytics } from "@vercel/analytics/react";
 import { SessionProvider } from "next-auth/react";
 import { AppProps } from "next/app";
 import { Montserrat } from "next/font/google";
+import { Toaster } from "react-hot-toast";
+
 import "../assets/styles/styles.scss";
 
 const montserrat = Montserrat({
   weight: ["300", "400", "600", "700"],
-  preload: false,
+  subsets: ["latin"],
 });
 
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
@@ -22,6 +24,7 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
         </ThemeProvider>
       </SessionProvider>
 
+      <Toaster position="top-right" />
       <Analytics />
     </>
   );
