@@ -33,12 +33,16 @@ const PostEdit = () => {
     setRequesting(true);
 
     await axios
-      .put(`${API_URL}/posts/${initialData?.id}`, data, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${auth.user.token}`,
-        },
-      })
+      .put(
+        `${API_URL}/posts/${initialData?.id}`,
+        { ...data, isPublished: true },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth.user.token}`,
+          },
+        }
+      )
       .then((response) => {
         toast.success("Это успех!");
       })
