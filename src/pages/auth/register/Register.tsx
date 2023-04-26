@@ -1,4 +1,4 @@
-import AuthErrorMessage from "@/components/errorMessages/AuthErrorMessage";
+import AuthErrorMessage from "@/components/eerrorMessages/AuthErrorMessage";
 import Loading from "@/components/loading";
 import { API_URL } from "@/utils/fetcher";
 import axios from "axios";
