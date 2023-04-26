@@ -61,6 +61,8 @@ function Post({ fallback }: IProps) {
           content={data?.summary || data?.body?.substring(0, 20)}
         />
         <meta key="og:image" property="og:image" content={data?.coverUrl} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={data?.coverUrl} />
       </Head>
 
       {isLoading && <Loading />}
