@@ -4,7 +4,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import AuthErrorMessage from "../../../components/ErrorMessages/AuthErrorMessage";
+import AuthErrorMessage from "../../../components/errorMessages/AuthErrorMessage";
 import s from "../auth.module.scss";
 
 export default function Login() {
