@@ -14,8 +14,6 @@ const providers = [
     async authorize(credentials, req) {
       const { email, password } = credentials as any;
 
-      console.log("auth", JSON.stringify({ email, password }));
-
       try {
         const res = await fetch(`${API_URL}/users/login`, {
           method: "POST",
