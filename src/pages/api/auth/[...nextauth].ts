@@ -39,8 +39,14 @@ const providers = [
   }),
 ];
 
+// const useSecureCookies = !!process.env.VERCEL_URL;
+const useSecureCookies = process.env.NODE_ENV === "production";
+
 export const authOptions: NextAuthOptions = {
   providers,
+  pages: {
+    signIn: "/auth/login",
+  },
   session: {
     strategy: "jwt",
     maxAge: 24 * 60 * 60,
@@ -70,8 +76,17 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
   },
-  pages: {
-    signIn: "/auth/login",
+  cookies: {
+    sessionToken: {
+      name: `${useSecureCookies ? "__Secure-" : ""}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        domain: `${useSecureCookies ? ".notlazy.blog" : "localhost"}`,
+        secure: useSecureCookies,
+      },
+    },
   },
 };
 
