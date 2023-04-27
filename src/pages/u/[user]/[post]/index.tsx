@@ -3,7 +3,6 @@ import Loading from "@/components/loading";
 import { PostFull } from "@/components/post/PostFull";
 import { IPost } from "@/types";
 import { API_URL, fetcher } from "@/utils/fetcher";
-import { delay } from "@/utils/utils";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/dist/client/router";
@@ -29,18 +28,21 @@ function Post({ fallback }: IProps) {
     }
   );
 
-  const postViewCounter = async () => {
-    await delay(10);
-
-    if (data?.author?.id != auth?.user.id) {
-      await axios.put(`${API_URL}/posts/${data?.id}/count-view`);
-    }
-  };
-
   useEffect(() => {
-    if (data?.id) {
-      postViewCounter();
-    }
+    const postViewCounter = async () => {
+      await axios.put(`${API_URL}/posts/${data?.id}/count-view`);
+    };
+
+    const timeout = setTimeout(() => {
+      if (data?.id && data?.author?.id != auth?.user.id) {
+        console.log("req");
+        postViewCounter();
+      }
+    }, 10000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [data?.id]);
 
   if (data?.code) return <ErrorMessage code={data.code} />;

@@ -1,6 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
-// "use client";
+"use client";
 
+import IsAuthor from "@/components/guards/IsAuthor";
 import { IPost, IUser } from "@/types";
 import { formatDate } from "@/utils/format-date";
 import { generateColor } from "@/utils/generate-color";
@@ -12,7 +12,6 @@ import {
 } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import Link from "next/link";
-import IsAuthor from "../guards/IsAuthor";
 import s from "./post.module.scss";
 
 interface IProps {
@@ -44,7 +43,8 @@ export default function PostPreview({ post, author }: IProps) {
         <div className={s.previewToggle}>
           <Link
             className={classNames("block mb-4", s.previewTitle)}
-            href={`/u/${author.userName}/${post.slug}`}
+            href={`/home/${post.slug}`}
+            scroll={false}
           >
             <h2 className={classNames(s.previewTitle, "text-xl font-bold")}>
               {post.title}
@@ -54,10 +54,11 @@ export default function PostPreview({ post, author }: IProps) {
 
           {post?.coverUrl && (
             <Link
-              href={`/u/${author.userName}/${post.slug}`}
+              href={`/home/${post.slug}`}
               className={s.previewImage}
+              scroll={false}
             >
-              <img src={post.coverUrl} alt={post.title} loading="lazy" />
+              <img src={post.coverUrl} alt={post.title} />
             </Link>
           )}
         </div>
@@ -99,11 +100,7 @@ export default function PostPreview({ post, author }: IProps) {
       </div>
 
       <IsAuthor userId={author.id}>
-        <Link
-          href={`/p/edit/${post.id}`}
-          className="btn btn--edit"
-          scroll={false}
-        >
+        <Link href={`/p/edit/${post.id}`} className="btn btn--edit">
           <PaintBrushIcon width={"1rem"} />
         </Link>
       </IsAuthor>

@@ -1,4 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
+"use client";
+
 import { useTheme } from "@/contexts/ThemeContext";
 import { generateColor } from "@/utils/generate-color";
 import { Menu } from "@headlessui/react";

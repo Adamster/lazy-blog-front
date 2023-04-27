@@ -1,3 +1,5 @@
+"use client";
+
 import { IComment } from "@/types";
 import { API_URL, fetcher } from "@/utils/fetcher";
 import axios from "axios";

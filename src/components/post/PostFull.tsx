@@ -1,4 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
+"use client";
+
 import { IPost } from "@/types";
 import { formatDate } from "@/utils/format-date";
 import { generateColor } from "@/utils/generate-color";
@@ -8,6 +10,7 @@ import Link from "next/link";
 
 import { EyeIcon, PaintBrushIcon } from "@heroicons/react/24/outline";
 import "@uiw/react-markdown-preview/markdown.css";
+import { useEffect, useRef } from "react";
 import { Comments } from "../comments/Comments";
 import IsAuth from "../guards/IsAuth";
 import IsAuthor from "../guards/IsAuthor";
@@ -24,6 +27,22 @@ interface IProps {
 }
 
 export const PostFull = ({ post, mutate }: IProps) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+
+    const timeout = setTimeout(() => {
+      if (hash) {
+        ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 1000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, []);
+
   return (
     <>
       <div className={classNames(s.full)}>
@@ -49,7 +68,7 @@ export const PostFull = ({ post, mutate }: IProps) => {
 
         {post?.coverUrl ? (
           <div className={classNames(s.previewImage, "mb-6")}>
-            <img src={post.coverUrl} alt={post.title} />
+            <img src={post.coverUrl} alt={post.title} loading="lazy" />
           </div>
         ) : (
           <div className="mb-6"></div>
@@ -77,7 +96,9 @@ export const PostFull = ({ post, mutate }: IProps) => {
         </IsAuth>
       </div>
 
-      <Comments postId={post.id} />
+      <div ref={ref}>
+        <Comments postId={post.id} />
+      </div>
     </>
   );
 };
