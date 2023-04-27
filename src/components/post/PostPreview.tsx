@@ -83,16 +83,12 @@ export default function PostPreview({ post, author }: IProps) {
             <span className={s.footerStatsNum}>{post.views}</span>
           </div>
 
-          <Link
-            href={`/u/${author.userName}/${post.slug}#comments`}
-            scroll={false}
-            className={s.footerStats}
-          >
+          <div className={s.footerStats}>
             <ChatBubbleBottomCenterTextIcon
               className={s.footerStatsIcon}
             ></ChatBubbleBottomCenterTextIcon>
             <span className={s.footerStatsNum}>{post.comments}</span>
-          </Link>
+          </div>
 
           <div className={classNames(s.footerStats, "ml-auto")}></div>
         </div>
