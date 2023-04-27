@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-// "use client";
 
 import { IPost, IUser } from "@/types";
 import { formatDate } from "@/utils/format-date";
