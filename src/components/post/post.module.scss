@@ -49,13 +49,18 @@
     display: block;
     border-radius: var(--b-r);
     background: var(--color-gray-light);
+    height: 15rem;
+
+    @media (min-width: 640px) {
+      height: 20rem;
+    }
 
     img {
       border-radius: var(--b-r);
+      height: inherit;
       max-width: 100%;
       width: 100%;
       margin: 0 auto;
-      max-height: 25rem;
       object-fit: cover;
     }
   }
@@ -112,7 +117,7 @@
   padding: var(--space);
   margin-bottom: .2rem; //var(--space);
 
-  .previewImage img {
-    max-height: initial !important;
+  .previewImage {
+    height: auto !important;
   }
 }
