@@ -35,8 +35,8 @@ function Post({ fallback }: IProps) {
 
     const timeout = setTimeout(() => {
       if (data?.id && data?.author?.id != auth?.user.id) {
-        console.log("req");
-        postViewCounter();
+        console.log("req", data?.author?.id, auth?.user.id);
+        // postViewCounter();
       }
     }, 10000);
 
