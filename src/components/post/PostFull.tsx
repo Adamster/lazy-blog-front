@@ -48,23 +48,21 @@ export const PostFull = ({ post, mutate }: IProps) => {
           {post.summary && <p>{post.summary}</p>}
         </div>
 
-        {post?.coverUrl ? (
+        {post?.coverUrl && (
           <div className={classNames(s.previewImage, "mt-4")}>
             <img src={post.coverUrl} alt={post.title} loading="lazy" />
           </div>
-        ) : (
-          ""
         )}
-      </div>
-
-      <div className={classNames(s.full)}>
-        <MDPreview source={post.body} />
 
         <IsAuthor userId={post.author.id}>
           <Link href={`/p/edit/${post.id}`} className="btn btn--edit">
             <PaintBrushIcon width={"1rem"} />
           </Link>
         </IsAuthor>
+      </div>
+
+      <div className={classNames(s.full)}>
+        <MDPreview source={post.body} />
       </div>
 
       <div className={s.footerFull}>
