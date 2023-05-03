@@ -15,10 +15,15 @@ interface IProps {
   form: UseFormReturn<FieldValues, any>;
   onSubmit: (data: any) => void;
   onDelete?: () => void;
-  edit: boolean;
+  edit?: boolean;
 }
 
-export const CreateEdit = ({ form, onSubmit, onDelete, edit }: IProps) => {
+export const CreateEdit = ({
+  form,
+  onSubmit,
+  onDelete,
+  edit = false,
+}: IProps) => {
   const {
     register,
     handleSubmit,
