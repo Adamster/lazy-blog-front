@@ -13,17 +13,12 @@ const MarkdownEditor = dynamic(
 
 interface IProps {
   form: UseFormReturn<FieldValues, any>;
-  initialData?: any;
   onSubmit: (data: any) => void;
   onDelete?: () => void;
+  edit: boolean;
 }
 
-export const CreateEdit = ({
-  form,
-  initialData,
-  onSubmit,
-  onDelete,
-}: IProps) => {
+export const CreateEdit = ({ form, onSubmit, onDelete, edit }: IProps) => {
   const {
     register,
     handleSubmit,
@@ -39,27 +34,20 @@ export const CreateEdit = ({
         )}
         <input
           placeholder="Тайтл"
-          defaultValue={initialData?.title}
           className={classNames("input", errors.title && "input--error")}
           {...register("title", { required: true })}
         />
       </div>
 
-      {initialData && (
+      {edit && (
         <div className="mb-4">
-          <input
-            className="input"
-            defaultValue={initialData.slug}
-            {...register("slug")}
-            placeholder="Slug"
-          />
+          <input className="input" {...register("slug")} placeholder="Slug" />
         </div>
       )}
 
       <div className="mb-4">
         <input
           className="input"
-          defaultValue={initialData?.summary}
           {...register("summary")}
           placeholder="Короткое описание"
         />
@@ -68,7 +56,6 @@ export const CreateEdit = ({
       <div className="mb-4">
         <input
           className="input"
-          defaultValue={initialData?.coverUrl}
           {...register("coverUrl")}
           placeholder="Картиночка (url)"
         />
@@ -82,7 +69,6 @@ export const CreateEdit = ({
           name="body"
           control={control}
           rules={{ required: true }}
-          defaultValue={initialData?.body}
           render={({ field }) => (
             <div className={classNames(errors.body && "input--error")}>
               <div className="wmde-markdown-var"></div>
@@ -96,7 +82,7 @@ export const CreateEdit = ({
         Поехали
       </button>
 
-      {initialData && (
+      {edit && (
         <button
           className="btn btn--danger mr-4"
           onClick={(e) => {

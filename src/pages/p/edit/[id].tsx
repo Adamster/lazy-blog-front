@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import useSWR from "swr";
 
@@ -16,25 +16,28 @@ const PostEdit = () => {
   const { data: auth }: any = useSession();
   const router = useRouter();
   const { id } = router.query;
-
   const [requesting, setRequesting] = useState(false);
 
-  const form = useForm({ shouldFocusError: false });
-
   const {
-    data: initialData,
+    data: values,
     error,
     isLoading,
-  } = useSWR<IPost>(id ? `${API_URL}/posts/${id}` : null, fetcher);
+  } = useSWR<IPost | FieldValues>(
+    id ? `${API_URL}/posts/${id}` : null,
+    fetcher
+  );
 
-  // TODO: CHECK IF YOU ARE AUTHOR
+  const form = useForm({
+    shouldFocusError: false,
+    values,
+  });
 
   const onSubmit = async (data: any) => {
     setRequesting(true);
 
     await axios
       .put(
-        `${API_URL}/posts/${initialData?.id}`,
+        `${API_URL}/posts/${values?.id}`,
         { ...data, isPublished: true },
         {
           headers: {
@@ -59,7 +62,7 @@ const PostEdit = () => {
     setRequesting(true);
 
     await axios
-      .delete(`${API_URL}/posts/${initialData?.id}`, {
+      .delete(`${API_URL}/posts/${values?.id}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${auth.user.token}`,
@@ -77,7 +80,7 @@ const PostEdit = () => {
       });
   };
 
-  if (error || initialData?.code)
+  if (error || values?.code)
     return <ErrorMessage code={error?.response?.data?.code} />;
 
   return (
@@ -91,10 +94,10 @@ const PostEdit = () => {
       <div className="page-bg">
         <h1 className="page-title">Редактор</h1>
 
-        {initialData && (
+        {values && (
           <CreateEdit
             form={form}
-            initialData={initialData}
+            edit={true}
             onSubmit={onSubmit}
             onDelete={onDelete}
           />
