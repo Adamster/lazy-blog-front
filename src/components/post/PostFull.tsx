@@ -43,19 +43,21 @@ export const PostFull = ({ post, mutate }: IProps) => {
           <div className="authorDate">{formatDate(post.createdAtUtc)}</div>
         </div>
 
-        <div className={classNames("mb-4")}>
+        <div>
           <h1 className="text-3xl font-bold">{post.title}</h1>
           {post.summary && <p>{post.summary}</p>}
         </div>
 
         {post?.coverUrl ? (
-          <div className={classNames(s.previewImage, "mb-6")}>
+          <div className={classNames(s.previewImage, "mt-4")}>
             <img src={post.coverUrl} alt={post.title} loading="lazy" />
           </div>
         ) : (
-          <div className="mb-6"></div>
+          ""
         )}
+      </div>
 
+      <div className={classNames(s.full)}>
         <MDPreview source={post.body} />
 
         <IsAuthor userId={post.author.id}>
