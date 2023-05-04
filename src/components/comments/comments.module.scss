@@ -4,6 +4,10 @@
   border-radius: var(--b-r);
 }
 
+.commentsList {
+  margin-top: var(--space);
+}
+
 .comment {
   position: relative;
   display: flex;
@@ -15,16 +19,49 @@
   }
 }
 
-.commentsList {
-  margin-top: var(--space);
-}
 
-.addComment {
+// Add Edit
+
+.addCommentForm {
   display: flex;
 
   input {
     margin-right: 1rem;
   }
+}
+
+.addCommentInput {
+  width: 100%;
+  position: relative;
+  margin-right: .5rem;
+
+  textarea {
+    height: 32px;
+    min-height: 32px;
+    max-height: 80px;
+  }
+
+  .emojiPicker {
+    position: absolute;
+    z-index: 10;
+    top: 100%;
+    right: 0;
+  }
+
+  .emojiPickerToggle {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    right: 0;
+    top: 0;
+    height: 32px;
+    width: 32px;
+    background: rgba(255,255,255,.1);
+    border-radius: var(--b-r);
+  }
+  
 }
 
 .delete {
@@ -43,3 +80,4 @@
   border-radius: var(--b-r);
   font-weight: normal;
 }
+

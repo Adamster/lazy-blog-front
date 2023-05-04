@@ -1,8 +1,21 @@
 import { IAuthSession } from "@/types";
 import { API_URL } from "@/utils/fetcher";
 import axios from "axios";
+import { EmojiStyle, Theme } from "emoji-picker-react";
+// import { Theme } from "emoji-picker-react/dist/types/exposedTypes";
+import { useTheme } from "@/contexts/ThemeContext";
+import { FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
+import classNames from "classnames";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import s from "./comments.module.scss";
+
+const Picker = dynamic(
+  () => {
+    return import("emoji-picker-react");
+  },
+  { ssr: false }
+);
 
 interface IProps {
   postId: string;
@@ -13,6 +26,8 @@ interface IProps {
 
 const AddEditComment = ({ postId, auth, setRequesting, mutate }: IProps) => {
   const [body, setBody] = useState("");
+  const [showEmoji, setShowEmoji] = useState(true);
+  const { darkTheme } = useTheme();
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -43,17 +58,57 @@ const AddEditComment = ({ postId, auth, setRequesting, mutate }: IProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className={s.addComment}>
-      <input
-        className="input"
-        placeholder="Есть что сказать?"
-        required
-        value={body}
-        onChange={(e: any) => setBody(e.target.value)}
-      />
-      <button type="submit" className="btn btn--primary">
-        Послать
-      </button>
+    <form onSubmit={handleSubmit} className={s.addCommentForm}>
+      <div className={s.addCommentInput}>
+        <textarea
+          className="input"
+          placeholder="Есть что сказать?"
+          required
+          value={body}
+          onChange={(e: any) => setBody(e.target.value)}
+        />
+
+        {showEmoji && (
+          <div className={s.emojiPicker}>
+            <Picker
+              theme={darkTheme ? Theme.DARK : Theme.LIGHT}
+              onEmojiClick={(e: any) => {
+                setBody((body) => body + e.emoji);
+              }}
+              autoFocusSearch={false}
+              emojiStyle={EmojiStyle.NATIVE}
+              searchDisabled
+              height={350}
+              skinTonesDisabled
+              previewConfig={{
+                showPreview: false,
+              }}
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="flex">
+        <div className="mr-2">
+          <button
+            className={classNames(
+              "btn btn--action",
+              showEmoji ? "btn--primary" : ""
+            )}
+            onClick={(e: any) => {
+              e.preventDefault();
+              setShowEmoji((state) => !state);
+            }}
+          >
+            <FaceSmileIcon width={"1rem"} height={"1.5rem"} />
+          </button>
+        </div>
+        <div>
+          <button type="submit" className="btn btn--action">
+            <PaperAirplaneIcon width={"1rem"} height={"1.5rem"} />
+          </button>
+        </div>
+      </div>
     </form>
   );
 };
