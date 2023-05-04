@@ -16,7 +16,7 @@ interface IProps {
 export default function User() {
   const router = useRouter();
   const { user } = router.query;
-  const { data: auth }: any = useSession();
+  const { data: auth } = useSession();
 
   const { data, error, isLoading, mutate } = useSWR<IUserDetails>(
     user ? `${API_URL}/posts/${user}/posts` : null,

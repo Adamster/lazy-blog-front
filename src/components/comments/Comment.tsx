@@ -1,14 +1,15 @@
-import { IAuthSession, IComment } from "@/types";
+import { IComment } from "@/types";
 import { formatDate } from "@/utils/format-date";
 import { generateColor } from "@/utils/generate-color";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
+import { Session } from "next-auth";
 import Link from "next/dist/client/link";
 import s from "./comments.module.scss";
 
 interface IProps {
   comment: IComment;
-  auth?: IAuthSession;
+  auth: Session | null;
   handleDelete: (id: string) => void;
 }
 

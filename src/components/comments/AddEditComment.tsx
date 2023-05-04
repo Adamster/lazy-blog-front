@@ -1,13 +1,13 @@
-import { IAuthSession } from "@/types";
-import { API_URL } from "@/utils/fetcher";
-import axios from "axios";
-import { EmojiStyle, Theme } from "emoji-picker-react";
-// import { Theme } from "emoji-picker-react/dist/types/exposedTypes";
-import { useTheme } from "@/contexts/ThemeContext";
-import { FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
-import classNames from "classnames";
-import dynamic from "next/dynamic";
 import { useState } from "react";
+import { EmojiStyle, Theme } from "emoji-picker-react";
+import { Session } from "next-auth";
+import classNames from "classnames";
+import axios from "axios";
+import dynamic from "next/dynamic";
+
+import { FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
+import { useTheme } from "@/contexts/ThemeContext";
+import { API_URL } from "@/utils/fetcher";
 import s from "./comments.module.scss";
 
 const Picker = dynamic(
@@ -19,7 +19,7 @@ const Picker = dynamic(
 
 interface IProps {
   postId: string;
-  auth: IAuthSession;
+  auth: Session | null;
   mutate: any;
   setRequesting: any;
 }
@@ -37,11 +37,11 @@ const AddEditComment = ({ postId, auth, setRequesting, mutate }: IProps) => {
     await axios
       .post(
         `${API_URL}/comments`,
-        { postId: postId, userId: auth.user?.id, body: body },
+        { postId: postId, userId: auth?.user?.id, body: body },
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${auth.user?.token}`,
+            Authorization: `Bearer ${auth?.user?.token}`,
           },
         }
       )

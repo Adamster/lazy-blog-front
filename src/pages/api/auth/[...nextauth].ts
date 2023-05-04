@@ -11,8 +11,8 @@ const providers = [
       email: { label: "Email", type: "email" },
       password: { label: "Password", type: "password" },
     },
-    async authorize(credentials, req) {
-      const { email, password } = credentials as any;
+    async authorize(credentials, _) {
+      const { email, password } = credentials || {};
 
       try {
         const res = await fetch(`${API_URL}/users/login`, {
@@ -53,7 +53,7 @@ export const authOptions: NextAuthOptions = {
     maxAge: 24 * 60 * 60,
   },
   callbacks: {
-    async session({ session, token }: any) {
+    async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
         session.user.firstName = token.firstName;
