@@ -78,7 +78,8 @@ const AddEditComment = ({ postId, auth, setRequesting, mutate }: IProps) => {
               autoFocusSearch={false}
               emojiStyle={EmojiStyle.NATIVE}
               searchDisabled
-              height={350}
+              height={300}
+              width={300}
               skinTonesDisabled
               previewConfig={{
                 showPreview: false,
