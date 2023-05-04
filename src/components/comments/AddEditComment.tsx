@@ -26,7 +26,7 @@ interface IProps {
 
 const AddEditComment = ({ postId, auth, setRequesting, mutate }: IProps) => {
   const [body, setBody] = useState("");
-  const [showEmoji, setShowEmoji] = useState(true);
+  const [showEmoji, setShowEmoji] = useState(false);
   const { darkTheme } = useTheme();
 
   const handleSubmit = async (e: any) => {
