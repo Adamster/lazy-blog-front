@@ -13,7 +13,7 @@ import { toast } from "react-hot-toast";
 import useSWR from "swr";
 
 const PostEdit = () => {
-  const { data: auth }: any = useSession();
+  const { data: auth } = useSession();
   const router = useRouter();
   const { id } = router.query;
   const [requesting, setRequesting] = useState(false);
@@ -42,7 +42,7 @@ const PostEdit = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${auth.user.token}`,
+            Authorization: `Bearer ${auth?.user.token}`,
           },
         }
       )
@@ -65,7 +65,7 @@ const PostEdit = () => {
       .delete(`${API_URL}/posts/${values?.id}`, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${auth.user.token}`,
+          Authorization: `Bearer ${auth?.user.token}`,
         },
       })
       .then((response) => {

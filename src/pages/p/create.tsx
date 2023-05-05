@@ -14,7 +14,7 @@ import { toast } from "react-hot-toast";
 // Component
 
 const Create = () => {
-  const { data: auth }: any = useSession();
+  const { data: auth } = useSession();
   const router = useRouter();
 
   const [requesting, setRequesting] = useState(false);
@@ -29,13 +29,13 @@ const Create = () => {
       .post(
         `${API_URL}/posts`,
         {
-          userId: auth.user.id,
+          userId: auth?.user.id,
           ...data,
         },
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${auth.user.token}`,
+            Authorization: `Bearer ${auth?.user.token}`,
           },
         }
       )
