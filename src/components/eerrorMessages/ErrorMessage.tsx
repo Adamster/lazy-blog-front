@@ -1,25 +1,27 @@
 interface IProps {
-  code?: keyof typeof errorMessages;
+  code?: string;
 }
 
-const errorMessages = {
-  "Post.NotFound": "Пост не найден, попробуйте еще раз.",
-  "User.NotFound":
-    "Данного юзера не существует, но, вы все еще можете его создать.",
-  "User.EmailAlreadyInUse": "Оный email уже занят.",
-} as const;
-
-const defaultMessage = "Где-то, что-то не работает.";
-
-export default function ErrorMessage({ code }: IProps) {
-  const message = code ? errorMessages[code] : defaultMessage;
+export default function ErrorMessage({ code = "" }: IProps) {
+  const message = (): string => {
+    switch (code) {
+      case "Post.NotFound":
+        return "Пост не найден, попробуйте еще раз.";
+      case "User.NotFound":
+        return "Данного юзера не существует, но, вы все еще можете его создать.";
+      case "User.EmailAlreadyInUse":
+        return "Оный email уже занят.";
+      default:
+        return "Где-то, что-то не работает.";
+    }
+  };
 
   return (
     <div className="background-white rounded-md p-in">
       <h2 className="text-2xl font-bold mb-4">
         К нашему величайшему сожалению
       </h2>
-      <p className="color-gray">{message}</p>
+      <p className="color-gray">{message()}</p>
     </div>
   );
 }
