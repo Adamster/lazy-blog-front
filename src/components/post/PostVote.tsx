@@ -13,7 +13,7 @@ interface IProps {
 }
 
 export const PostVote = ({ postId, rating, mutate }: IProps) => {
-  const { data: auth }: any = useSession();
+  const { data: auth } = useSession();
 
   const handleVote = async (direction: string) => {
     await axios
@@ -23,7 +23,7 @@ export const PostVote = ({ postId, rating, mutate }: IProps) => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${auth.user?.token}`,
+            Authorization: `Bearer ${auth?.user?.token}`,
           },
         }
       )

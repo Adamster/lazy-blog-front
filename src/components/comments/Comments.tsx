@@ -16,7 +16,7 @@ interface IProps {
 }
 
 export function Comments({ postId }: IProps) {
-  const { data: auth }: any = useSession();
+  const { data: auth } = useSession();
   const [requesting, setRequesting] = useState(false);
 
   const { data, mutate, error, isLoading } = useSWR<IComment[]>(

@@ -1,11 +1,17 @@
 import { useSession } from "next-auth/react";
 
-const IsAuth = ({ children }: any) => {
-  const { data: auth }: any = useSession();
+interface IProps {
+  children: React.ReactElement;
+}
+
+const IsAuth = ({ children }: IProps) => {
+  const { data: auth } = useSession();
 
   if (auth?.user.id) {
     return children;
-  } else return <></>;
+  }
+
+  return <></>;
 };
 
 export default IsAuth;

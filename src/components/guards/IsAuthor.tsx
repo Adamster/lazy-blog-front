@@ -1,11 +1,18 @@
 import { useSession } from "next-auth/react";
 
-const IsAuthor = ({ children, userId }: any) => {
-  const { data: auth }: any = useSession();
+interface IProps {
+  children: React.ReactElement;
+  userId: string;
+}
+
+const IsAuthor = ({ children, userId }: IProps) => {
+  const { data: auth } = useSession();
 
   if (auth?.user.id === userId) {
     return children;
-  } else return <></>;
+  }
+
+  return <></>;
 };
 
 export default IsAuthor;

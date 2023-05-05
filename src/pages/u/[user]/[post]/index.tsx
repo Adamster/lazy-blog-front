@@ -15,7 +15,7 @@ interface IProps {
 }
 
 function Post({ fallback }: IProps) {
-  const { data: auth }: any = useSession();
+  const { data: auth } = useSession();
 
   const router = useRouter();
   const { post } = router.query;

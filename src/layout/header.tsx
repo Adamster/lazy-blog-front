@@ -18,7 +18,7 @@ import s from "./layout.module.scss";
 
 export const Header = () => {
   const router = useRouter();
-  const { data: auth }: any = useSession();
+  const { data: auth } = useSession();
 
   const navigation = [
     { name: "Посты", href: "/" },
