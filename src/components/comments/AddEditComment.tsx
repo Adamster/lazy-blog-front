@@ -5,10 +5,10 @@ import { EmojiStyle, Theme } from "emoji-picker-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
+import { Session } from "next-auth";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import s from "./comments.module.scss";
-import { Session } from "next-auth";
 
 const Picker = dynamic(
   () => {
@@ -76,7 +76,7 @@ const AddEditComment = ({ postId, auth, setRequesting, mutate }: IProps) => {
                 setBody((body) => body + e.emoji);
               }}
               autoFocusSearch={false}
-              emojiStyle={EmojiStyle.NATIVE}
+              emojiStyle={EmojiStyle.TWITTER}
               searchDisabled
               height={300}
               width={300}

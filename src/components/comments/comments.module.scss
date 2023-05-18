@@ -12,7 +12,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  word-break: break-all;
+  word-break: break-word;
 
   &:not(:last-of-type) {
     margin-bottom: 1rem;
@@ -44,7 +44,7 @@
   .emojiPicker {
     position: absolute;
     z-index: 10;
-    top: 100%;
+    bottom: calc(100% + .5rem);
     right: 0;
 
     @media (max-width: 500px) {
