@@ -5,7 +5,7 @@ import {
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 import classNames from "classnames";
-import Image from "next/image"
+import Image from "next/image";
 import s from "./user.module.scss";
 
 interface IProps {
@@ -19,19 +19,23 @@ export const UserDetails = ({ user, authUserId, postsNum }: IProps) => {
     <div className={classNames(s.userDetails, "p-in")}>
       {user && (
         <div className="flex">
-          {user.avatarUrl == null ?
-              <div
-                className="authorAva"
-                style={{
-                  backgroundColor: generateColor(user.userName),
-                }}
-              ></div>
-              :
-              <div
-                className="authorAva">
-                <Image src={user.avatarUrl} width={300} height={300} alt={user.userName}></Image>
-              </div>
-            }
+          {user.avatarUrl == null ? (
+            <div
+              className="authorAva"
+              style={{
+                backgroundColor: generateColor(user.userName),
+              }}
+            ></div>
+          ) : (
+            <div className="authorPhoto">
+              <Image
+                src={user.avatarUrl}
+                width={300}
+                height={300}
+                alt={user.userName}
+              ></Image>
+            </div>
+          )}
 
           <div className={s.userDetailsData}>
             <h1 className="text-xl font-bold mb-2 whitespace-normal">
