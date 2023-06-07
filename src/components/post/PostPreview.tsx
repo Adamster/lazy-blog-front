@@ -3,6 +3,7 @@
 import { IPost, IUser } from "@/types";
 import { formatDate } from "@/utils/format-date";
 import { generateColor } from "@/utils/generate-color";
+import Image from "next/image"
 import {
   ChatBubbleBottomCenterTextIcon,
   EyeIcon,
@@ -26,12 +27,19 @@ export default function PostPreview({ post, author }: IProps) {
       <div className={s.previewContent}>
         <div className={classNames("author", "mb-4")}>
           <Link href={`/u/${author.userName}`} className="authorName">
-            <div
-              className="authorAva"
-              style={{
-                backgroundColor: generateColor(author.userName),
-              }}
-            ></div>
+            {author.avatarUrl == null ?
+              <div
+                className="authorAva"
+                style={{
+                  backgroundColor: generateColor(author.userName),
+                }}
+              ></div>
+              :
+              <div
+                className="authorAva">
+                <Image src={author.avatarUrl} width={300} height={300} alt={author.userName}></Image>
+              </div>
+            }
             {author.firstName} {author.lastName && author.lastName}
           </Link>
 
@@ -70,8 +78,8 @@ export default function PostPreview({ post, author }: IProps) {
                   post.rating > 0
                     ? "var(--color-primary)"
                     : post.rating < 0
-                    ? "var(--color-danger)"
-                    : "",
+                      ? "var(--color-danger)"
+                      : "",
               }}
             ></StarIcon>
             <span className={s.footerStatsNum}>{post.rating}</span>
