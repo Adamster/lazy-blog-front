@@ -1,7 +1,6 @@
 import Loading from "@/components/loading";
 import { signIn, useSession } from "next-auth/react";
 import Head from "next/head";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import AuthErrorMessage from "../../../components/eerrorMessages/AuthErrorMessage";
@@ -42,19 +41,18 @@ export default function Login() {
 
       {loading && <Loading />}
 
-      <form className={s.form} onSubmit={handleSubmit}>
-        <div className={s.title}>
-          <h3 className="text-2xl font-bold">Логинься</h3>
-          <Link href="/auth/register" className={s.register}></Link>
-        </div>
+      <div className="text-center">
+        <h3 className="text-2xl font-bold mb-8">Логин</h3>
+      </div>
 
+      <form className={s.form} onSubmit={handleSubmit}>
         {error && (
           <div className="mb-4">
             <AuthErrorMessage error={error} />
           </div>
         )}
 
-        <div className="flex flex-wrap -mx-2 mb-8">
+        <div className="flex flex-wrap -mx-2 mb-4">
           <div className="w-full sm:w-1/2 px-2 mb-4 sm:mb-0">
             <input
               className="input"

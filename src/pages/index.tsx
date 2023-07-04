@@ -27,15 +27,19 @@ export default function Home() {
 
       {isLoading && <Loading />}
 
-      {data &&
-        data.map((post: IPost) => (
-          <PostPreview
-            key={post.id}
-            post={post}
-            author={post.author}
-            mutate={mutate}
-          ></PostPreview>
-        ))}
+      {/* <h2 className="text-2xl mb-8">Recent blog posts</h2> */}
+
+      <div className="postsList">
+        {data &&
+          data.map((post: IPost) => (
+            <PostPreview
+              key={post.id}
+              post={post}
+              author={post.author}
+              mutate={mutate}
+            ></PostPreview>
+          ))}
+      </div>
     </>
   );
 }

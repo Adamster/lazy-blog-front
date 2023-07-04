@@ -1,8 +1,12 @@
 .form {
   @apply rounded-md;
   overflow: hidden;
-  background: var(--color-foreground);
-  padding: var(--space);
+  // background: var(--color-gray-light);
+  background: rgba(250, 250, 250);
+  // padding: var(--space);
+  padding: 2rem;
+  max-width: 768px;
+  margin: 0 auto;
 }
 
 .title {

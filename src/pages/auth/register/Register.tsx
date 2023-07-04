@@ -77,11 +77,11 @@ export default function Register() {
 
       {loading && <Loading />}
 
-      <form className={s.form} onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <h3 className="text-2xl font-bold">Регайся</h3>
-        </div>
+      <div className="text-center mb-8">
+        <h3 className="text-2xl font-bold">Регистрация</h3>
+      </div>
 
+      <form className={s.form} onSubmit={handleSubmit}>
         {error && (
           <div className="mb-4">
             <AuthErrorMessage error={error} />

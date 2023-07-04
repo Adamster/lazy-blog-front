@@ -7,29 +7,25 @@
 @import "./dialog.scss";
 @import "./markdown.scss";
 
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
 :root {
   --color-primary: #f7b641;
   --color-success: rgb(110, 179, 125);
   --color-danger: rgb(255, 83, 83);
 
-  --color-background: #f7f8fa;
+  --color-background: #fff;
   --color-foreground: #fff;
+  --color-header: rgba(250, 250, 250, .95);
   --color-text: #404040;
 
   --color-gray: #7a8086;
   --color-gray-light: #eff0f3;
   --color-opacity: rgba(0, 0, 0, 0.05);
 
-  --max-width: 800px;
+  --max-width: 1200px;
   --b-r: 0.3rem;
 
-  --space: 1rem;
-}
-
-@media (min-width: 640px) {
-  :root {
-    --space: 2rem;
-  }
 }
 
 body.dark {
@@ -43,10 +39,11 @@ body.dark {
   --color-opacity: rgba(255, 255, 255, 0.05);
 }
 
+
 @layer base {
   html {
     font-family: "Montserrat", sans-serif;
-    font-weight: 400;
+    font-weight: 500;
   }
 
   body {
@@ -76,12 +73,13 @@ body.dark {
 
   .btn {
     @apply py-1 px-4;
-    border-color: var(--color-gray-light);
-    background: var(--color-gray-light);
+    // border-color: var(--color-gray-light);
+    // background: var(--color-gray-light);
     border-radius: var(--b-r);
     transition: background 0.3s ease, opacity 0.3s ease;
     display: inline-block;
     cursor: pointer;
+    // font-weight: 400;
 
     &:hover {
       opacity: 0.7;
@@ -91,6 +89,9 @@ body.dark {
   .btn--primary {
     border-color: var(--color-primary);
     background: var(--color-primary);
+    background: #56A3A6;
+    border-color: #56A3A6;
+    color: #fff;
   }
 
   .btn--danger {
@@ -127,4 +128,5 @@ body.dark {
     }
   }
 }
+
 

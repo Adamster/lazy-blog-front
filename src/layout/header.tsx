@@ -1,5 +1,3 @@
-"use client";
-
 import { useTheme } from "@/contexts/ThemeContext";
 import { generateColor } from "@/utils/generate-color";
 import { Menu } from "@headlessui/react";
@@ -7,7 +5,6 @@ import {
   ArrowRightOnRectangleIcon,
   MoonIcon,
   UserCircleIcon,
-  UserIcon,
 } from "@heroicons/react/24/outline";
 import cn from "classnames";
 import { signOut, useSession } from "next-auth/react";
@@ -21,43 +18,45 @@ export const Header = () => {
   const { data: auth } = useSession();
 
   const navigation = [
-    { name: "Посты", href: "/" },
+    { name: "Home", href: "/" },
     { name: "Создать", href: "/p/create", authRequired: true },
   ];
 
   return (
     <header className={s.header}>
-      <div className={s.headerContainer}>
-        <nav className="flex items-center">
-          <Link className="mr-6" href="/">
-            <img className={s.logo} src="/images/logo.png" alt="" />
+      <div className={s.headerInside}>
+        <nav className={"flex items-center " + s.nav}>
+          <Link className={s.logo} href="/">
+            <div>B.LAZY</div>
           </Link>
-          <ul className="flex">
-            {navigation.map(
-              (item) =>
-                ((item.authRequired && auth) || !item.authRequired) && (
-                  <li key={item.name} className="mr-4">
-                    <Link
-                      className={cn(
-                        s.link,
-                        router.pathname === item.href ? s.linkActive : ""
-                      )}
-                      href={item.href}
-                    >
-                      {item.name}
-                    </Link>
-                  </li>
-                )
-            )}
-          </ul>
+          {navigation.map(
+            (item) =>
+              ((item.authRequired && auth) || !item.authRequired) && (
+                <Link
+                  key={item.name}
+                  className={cn(
+                    s.link,
+                    router.pathname === item.href ? s.linkActive : ""
+                  )}
+                  href={item.href}
+                >
+                  {item.name}
+                </Link>
+              )
+          )}
         </nav>
         <div className={s.actions}>
           {auth ? (
             <UserMenu authSession={auth} />
           ) : (
-            <Link className={s.user} href="/auth/login">
-              <UserIcon />
-            </Link>
+            <>
+              <Link className="btn btn--link" href="/auth/login">
+                Логин
+              </Link>
+              <Link className="btn btn--primary" href="/auth/register">
+                Регистрация
+              </Link>
+            </>
           )}
         </div>
       </div>

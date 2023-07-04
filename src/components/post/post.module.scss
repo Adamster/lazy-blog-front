@@ -6,31 +6,32 @@
   width: 100%;
   position: relative;
 
-  &Toggle {
-    // display: flex;
-    // flex-direction: row-reverse;
+  // &Toggle {
+  //   display: flex;
+  //   flex-direction: row-reverse;
 
-    // .previewImage {
-    //   width: 10rem;
-    //   height: 4.5rem;
-    //   overflow: hidden;
-    //   max-width: 10rem;
-    //   margin-right: var(--space);
+  //   .previewImage {
+  //     flex: 0 0 16rem;
+  //     width: 16rem;
+  //     height: 9rem;
+  //     overflow: hidden;
+  //     margin-right: var(--space);
+  
 
-    //   img {
-    //     width: inherit;
-    //     height: inherit;
-    //     object-fit: cover;
-    //   }
-    // }
+  //     img {
+  //       width: inherit;
+  //       height: inherit;
+  //       object-fit: cover;
+  //     }
+  //   }
 
-    // .previewTitle {
-    //   width: 100%;
-    //   flex-grow: 2;
-    //   margin-bottom: 0;
-    //   // max-width: calc(100% - 12rem);
-    // }
-  }
+  //   .previewTitle {
+  //     width: 100%;
+  //     flex-grow: 2;
+  //     margin-bottom: 0;
+  //     // max-width: calc(100% - 12rem);
+  //   }
+  // }
 
   &:not(:last-of-type) {
     margin-bottom: var(--space);
