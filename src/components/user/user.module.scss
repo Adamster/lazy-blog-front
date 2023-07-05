@@ -1,14 +1,14 @@
 .userDetails {
   margin-bottom: var(--space);
   background: var(--color-foreground);
-  border-radius: var(--b-r);
+  border-radius: var(--br);
   position: relative;
 }
 
 .userDetailsAva {
   width: 3.5rem;
   height: 3.5rem;
-  border-radius: var(--b-r);
+  border-radius: var(--br);
   margin-right: 1rem;
   flex-shrink: 0;
 }

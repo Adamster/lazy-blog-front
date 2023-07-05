@@ -1,7 +1,7 @@
 .mainContainer {
   padding: var(--space);
   background: var(--color-foreground);
-  border-radius: var(--b-r);
+  border-radius: var(--br);
 }
 
 .commentsList {
@@ -63,7 +63,7 @@
     height: 32px;
     width: 32px;
     background: rgba(255,255,255,.1);
-    border-radius: var(--b-r);
+    border-radius: var(--br);
   }
   
 }
@@ -81,7 +81,7 @@
   height: 1.5rem;
   line-height: 1.5rem;
   text-align: center;
-  border-radius: var(--b-r);
+  border-radius: var(--br);
   font-weight: normal;
 }
 

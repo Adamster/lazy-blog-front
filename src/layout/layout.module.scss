@@ -48,7 +48,6 @@
 
 .linkActive {
   color: var(--color-text);
-  box-shadow: 0 2px 0 0 #56A3A6;
 }
 
 .actions {
@@ -84,7 +83,7 @@
 //   &Ava {
 //     height: 1rem;
 //     width: 1rem;
-//     border-radius: var(--b-r);
+//     border-radius: var(--br);
 //     margin-right: 0.7rem;
 //   }
 
@@ -113,7 +112,7 @@
     position: absolute;
     background: var(--color-foreground);
     box-shadow: 0 0.1em 0.5em 0 var(--color-opacity);
-    border-radius: var(--b-r);
+    border-radius: var(--br);
     top: calc(100% + 0.8rem);
     right: 0;
     width: 190px;
@@ -125,7 +124,7 @@
       align-items: center;
       padding: 0.5rem 1rem;
       cursor: pointer;
-      border-radius: var(--b-r);
+      border-radius: var(--br);
       transition: background 0.3s ease;
 
       &:hover {

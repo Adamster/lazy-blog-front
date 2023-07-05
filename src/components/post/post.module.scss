@@ -41,14 +41,14 @@
     background: var(--color-foreground);
     position: relative;
     padding: var(--space) var(--space) 1rem;
-    border-radius: var(--b-r);
+    border-radius: var(--br);
     width: 100%;
     max-width: 100%;
   }
 
   &Image {
     display: block;
-    border-radius: var(--b-r);
+    border-radius: var(--br);
     background: var(--color-gray-light);
     height: 15rem;
 
@@ -57,7 +57,7 @@
     }
 
     img {
-      border-radius: var(--b-r);
+      border-radius: var(--br);
       height: inherit;
       max-width: 100%;
       width: 100%;
@@ -81,7 +81,7 @@
     background: var(--color-foreground);
     padding: 1rem var(--space);
     margin-bottom: var(--space);
-    border-radius: var(--b-r);
+    border-radius: var(--br);
   }
 
   &Stats {
@@ -114,7 +114,7 @@
   position: relative;
   width: 100%;
   background: var(--color-foreground);
-  border-radius: var(--b-r);
+  border-radius: var(--br);
   padding: var(--space);
   margin-bottom: .2rem; //var(--space);
 

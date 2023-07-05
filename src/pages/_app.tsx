@@ -24,7 +24,7 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
         </ThemeProvider>
       </SessionProvider>
 
-      <Toaster position="top-right" />
+      <Toaster position="top-center" />
       <Analytics />
     </>
   );

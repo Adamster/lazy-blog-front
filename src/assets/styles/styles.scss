@@ -2,43 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "./utilities.scss";
-@import "./common.scss";
-@import "./dialog.scss";
-@import "./markdown.scss";
-
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
-
 :root {
-  --color-primary: #f7b641;
+
+  // theme
+  --color-primary: #5158BB;
+  --color-gray: #7a8086;
+  --color-gray-light: #eff0f3;
+
+  // layout
+  --color-header: rgba(250, 250, 250, .95);
+  --color-input-back: #fff;
+  --color-input-text: #404040;
+
+  // basic
+  --color-background: #fff;
+  --color-foreground: rgba(250, 250, 250, .95);
+  --color-text: #404040;
+
+  // actions
   --color-success: rgb(110, 179, 125);
   --color-danger: rgb(255, 83, 83);
 
-  --color-background: #fff;
-  --color-foreground: #fff;
-  --color-header: rgba(250, 250, 250, .95);
-  --color-text: #404040;
-
-  --color-gray: #7a8086;
-  --color-gray-light: #eff0f3;
-  --color-opacity: rgba(0, 0, 0, 0.05);
-
+  // additional
   --max-width: 1200px;
-  --b-r: 0.3rem;
+  --br: 0.3rem;
 
 }
 
 body.dark {
-  --color-primary: #49a175;
 
+  // theme
+  --color-gray-light: #2e3035;
+
+  // layout
+  --color-header: rgba(49, 53, 58, 0.9);
+  --color-input-back: rgba(49, 53, 58);
+  --color-input-text: #fff;
+
+  // basic
   --color-background: #202226;
   --color-foreground: #25272b;
   --color-text: #e1e2e6;
-
-  --color-gray-light: #2e3035;
-  --color-opacity: rgba(255, 255, 255, 0.05);
 }
-
 
 @layer base {
   html {
@@ -52,81 +57,12 @@ body.dark {
   }
 }
 
-@layer components {
-  .input {
-    @apply py-1 px-4;
-    border-color: var(--color-gray-light);
-    background: var(--color-gray-light);
-    border-radius: var(--b-r);
-    width: 100%;
 
-    &:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 
-    &--error {
-      border-radius: var(--b-r);
-      box-shadow: 0 0 0 2px var(--color-danger), 0 0 0 1px var(--color-danger) !important;
-    }
-  }
-
-  .btn {
-    @apply py-1 px-4;
-    // border-color: var(--color-gray-light);
-    // background: var(--color-gray-light);
-    border-radius: var(--b-r);
-    transition: background 0.3s ease, opacity 0.3s ease;
-    display: inline-block;
-    cursor: pointer;
-    // font-weight: 400;
-
-    &:hover {
-      opacity: 0.7;
-    }
-  }
-
-  .btn--primary {
-    border-color: var(--color-primary);
-    background: var(--color-primary);
-    background: #56A3A6;
-    border-color: #56A3A6;
-    color: #fff;
-  }
-
-  .btn--danger {
-    border-color: var(--color-danger);
-    background: var(--color-danger);
-  }
-
-  .btn--edit {
-    @apply py-1 px-2;
-    position: absolute;
-    right: -0.5rem;
-    top: var(--space);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    &:hover {
-      border-color: var(--color-primary);
-      background: var(--color-primary);
-      opacity: 1;
-    }
-  }
-
-  .btn--action {
-    @apply py-1 px-2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    &:hover {
-      border-color: var(--color-primary);
-      background: var(--color-primary);
-      opacity: 1;
-    }
-  }
-}
-
+@import "./utilities.scss";
+@import "./common.scss";
+@import "./dialog.scss";
+@import "./markdown.scss";
+@import './forms.scss';
 

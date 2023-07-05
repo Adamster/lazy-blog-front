@@ -1,65 +1,8 @@
 .form {
-  @apply rounded-md;
+  border-radius: var(--br);
   overflow: hidden;
-  // background: var(--color-gray-light);
-  background: rgba(250, 250, 250);
-  // padding: var(--space);
+  background: var(--color-foreground);
   padding: 2rem;
-  max-width: 768px;
+  max-width: 400px;
   margin: 0 auto;
-}
-
-.title {
-  margin-bottom: 1rem;
-  position: relative;
-}
-
-.register {
-  position: absolute;
-  right: -3.8rem;
-
-  top: 0.2rem;
-
-  transition: right 0.3s ease;
-  cursor: pointer;
-
-  width: 5rem;
-  height: 2.25rem;
-
-  &:hover {
-    right: -2.7rem;
-
-    &:after {
-      opacity: 1;
-      background: var(--color-primary);
-      color: var(--color-foreground);
-    }
-  }
-
-  &:before {
-    display: block;
-    content: "";
-    position: absolute;
-    background: url("/images/logo.png") no-repeat;
-    background-size: contain;
-    width: 3rem;
-    height: 2.25rem;
-    right: 0;
-  }
-
-  &:after {
-    position: absolute;
-    display: block;
-    content: "Регистрацию ищешь? ...";
-    right: 3.8rem;
-    border-radius: var(--b-r);
-    top: 0;
-    width: auto;
-    background: var(--color-gray-light);
-    color: var(--color-text);
-    font-size: 0.8rem;
-    padding: 0.1rem 0.5rem;
-    transition: opacity 0.3s ease;
-    white-space: nowrap;
-  }
 }
