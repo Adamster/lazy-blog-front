@@ -96,11 +96,10 @@ export default function Register() {
           <input
             className="input"
             type="text"
-            placeholder="Юзверь"
             {...register("uN", {
               required: {
                 value: true,
-                message: "Введите Юзверя",
+                message: "Введите Юзвернэйм",
               },
               pattern: {
                 value: /^[A-Za-z0-9_.-]+$/,
@@ -119,15 +118,14 @@ export default function Register() {
           <input
             className="input"
             type="email"
-            placeholder="Пошта"
             {...register("email", {
               required: {
                 value: true,
-                message: "Введите Email",
+                message: "Введите Пошту",
               },
               pattern: {
                 value: /^\S+@\S+$/i,
-                message: "Введите валидный Email",
+                message: "Введите валидную Пошту",
               },
             })}
           />
@@ -142,7 +140,6 @@ export default function Register() {
           <input
             className="input"
             type="password"
-            placeholder="Пароль"
             {...register("password", {
               required: {
                 value: true,
@@ -165,7 +162,6 @@ export default function Register() {
           <input
             className="input"
             type="password"
-            placeholder="Все еще помнишь пароль?"
             {...register("confPwd", {
               validate: (value) => value === getValues("password"),
             })}
@@ -183,7 +179,6 @@ export default function Register() {
           <input
             className="input"
             type="text"
-            placeholder="Имя"
             {...register("firstName", {
               required: {
                 value: true,
@@ -202,7 +197,6 @@ export default function Register() {
           <input
             className="input"
             type="text"
-            placeholder="Фамилия"
             {...register("lastName", {
               required: {
                 value: true,

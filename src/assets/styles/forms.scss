@@ -9,7 +9,8 @@ select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
   border: none;
   -webkit-text-fill-color: var(--color-input-text);
-  -webkit-box-shadow: 0 0 0 1000px var(--color-input-back) inset, 0 0 0 1px var(--color-input-text);
+  -webkit-box-shadow: 0 0 0 1000px var(--color-input-back) inset;
+  // 0 0 0 1px var(--color-input-text);
 }
 
 :focus-visible {
@@ -19,11 +20,12 @@ select:-webkit-autofill:focus {
 @layer components {
   .input {
     padding: .3rem 1rem;
-    border-radius: var(--br);
+    // border-radius: var(--br);
     border-color: var(--color-input-back);
     background: var(--color-input-back);
     color: var(--color-input-text) !important;
     width: 100%;
+    // box-shadow: 0 0 0 1px var(--color-text);
 
     &:disabled {
       opacity: 0.4;

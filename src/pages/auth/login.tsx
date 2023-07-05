@@ -71,7 +71,6 @@ export default function Login() {
           <input
             className="input"
             type="email"
-            placeholder="Пошта"
             {...register("email", {
               required: {
                 value: true,
@@ -94,7 +93,6 @@ export default function Login() {
           <input
             className="input"
             type="password"
-            placeholder="Пароль"
             {...register("password", {
               required: {
                 value: true,

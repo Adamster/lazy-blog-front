@@ -59,6 +59,7 @@ export const authOptions: NextAuthOptions = {
         session.user.firstName = token.firstName;
         session.user.lastName = token.lastName;
         session.user.userName = token.username;
+        session.user.avatarUrl = token.avatarUrl;
         session.user.token = token.token;
       }
       return session;
@@ -69,6 +70,7 @@ export const authOptions: NextAuthOptions = {
         token.firstName = user.user.firstName;
         token.lastName = user.user.lastName;
         token.username = user.user.userName;
+        token.avatarUrl = user.user.avatarUrl;
         token.token = user.token;
       }
       return token;
