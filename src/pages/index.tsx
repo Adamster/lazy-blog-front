@@ -27,7 +27,7 @@ export default function Home() {
 
       {isLoading && <Loading />}
 
-      <h2 className="text-2xl text-center font-bold mb-8">Recent blog posts</h2>
+      <h2 className="text-2xl text-center font-bold mb-8">Recent posts</h2>
 
       <div className="postsGridFirst mb-8">
         {data &&
@@ -44,7 +44,7 @@ export default function Home() {
           })}
       </div>
 
-      <h2 className="text-2xl text-center font-bold mb-8">All blog posts</h2>
+      <h2 className="text-2xl text-center font-bold mb-8">All posts</h2>
 
       <div className="postsGrid">
         {data &&

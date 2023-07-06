@@ -62,7 +62,7 @@ const AddEditComment = ({ postId, auth, setRequesting, mutate }: IProps) => {
       <div className={s.addCommentInput}>
         <textarea
           className="input"
-          placeholder="Есть что сказать?"
+          placeholder="И что вы думаете?..."
           required
           value={body}
           onChange={(e: any) => setBody(e.target.value)}
@@ -89,11 +89,11 @@ const AddEditComment = ({ postId, auth, setRequesting, mutate }: IProps) => {
         )}
       </div>
 
-      <div className="flex">
-        <div className="mr-2">
+      <div className="flex gap-4">
+        <div>
           <button
             className={classNames(
-              "btn btn--action",
+              "btn btn--primary px-2",
               showEmoji ? "btn--primary" : ""
             )}
             onClick={(e: any) => {
@@ -105,7 +105,7 @@ const AddEditComment = ({ postId, auth, setRequesting, mutate }: IProps) => {
           </button>
         </div>
         <div>
-          <button type="submit" className="btn btn--action">
+          <button type="submit" className="btn btn--primary px-2">
             <PaperAirplaneIcon width={"1rem"} height={"1.5rem"} />
           </button>
         </div>

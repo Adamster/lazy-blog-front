@@ -1,6 +1,7 @@
 import { IComment } from "@/types";
 import { API_URL, fetcher } from "@/utils/fetcher";
 import axios from "axios";
+import classNames from "classnames";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
@@ -52,33 +53,37 @@ export function Comments({ postId }: IProps) {
     <>
       {(isLoading || requesting) && <Loading />}
 
-      <div className="text-center">
-        <h3 className="text-2xl font-bold">Комментарии</h3>
+      <div className="text-center mb-8">
+        <h5 className="text-2xl font-bold">Комментарии</h5>
       </div>
 
-      <div className={s.mainContainer}>
-        <IsAuth>
+      <IsAuth>
+        <div className={classNames(s.mainContainer, "mb-8")}>
           <AddEditComment
             auth={auth}
             postId={postId}
             mutate={mutate}
             setRequesting={setRequesting}
           />
-        </IsAuth>
-      </div>
+        </div>
+      </IsAuth>
 
-      <div id="comments" className={s.mainContainer}>
-        <div className={s.commentsList}>
-          {data?.map((comment: IComment) => (
-            <Comment
-              key={comment.id}
-              comment={comment}
-              auth={auth}
-              handleDelete={handleDelete}
-            />
-          ))}
+      <div className="p-0 sm:px-16">
+        <div id="comments" className={s.commentsContainer}>
+          <div className={s.commentsList}>
+            {data?.map((comment: IComment) => (
+              <Comment
+                key={comment.id}
+                comment={comment}
+                auth={auth}
+                handleDelete={handleDelete}
+              />
+            ))}
 
-          {data?.length === 0 && <p>Даже намёка нет на наличие комментариев</p>}
+            {data?.length === 0 && (
+              <p>Даже намёка нет на наличие комментариев</p>
+            )}
+          </div>
         </div>
       </div>
     </>

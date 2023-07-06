@@ -19,8 +19,10 @@ export default function PostPreview({ post, author }: IProps) {
         href={`/u/${author.userName}/${post.slug}`}
         className="post-image-preview mb-4"
       >
-        {post?.coverUrl && (
+        {post?.coverUrl ? (
           <img src={post.coverUrl} alt={post.title} loading="lazy" />
+        ) : (
+          <span className="font-bold">B.LAZY</span>
         )}
       </Link>
 

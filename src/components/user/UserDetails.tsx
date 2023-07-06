@@ -21,10 +21,11 @@ export const UserDetails = ({ user, authUserId, postsNum }: IProps) => {
             </div>
           )}
 
-          <div className="text-center">
+          <div className="text-center mb-8">
             <h1 className="text-2xl font-bold">
               {`${user.firstName} ${user.lastName}`}
             </h1>
+            <p className="color-gray">На сайте с 2023</p>
             {/* <div className="flex content-center flex-wrap">
               <div className="flex flex-nowrap content-center text-gray-500 mr-4">
                 <CalendarDaysIcon className="mr-2" width={"1rem"} />

@@ -1,13 +1,12 @@
 .mainContainer {
-  padding: 2rem;
+  padding: 1rem 1rem .5rem 1rem;
   background: var(--color-foreground);
   border-radius: var(--br);
-  margin-top: 2rem;
 }
 
-.commentsList:not(:first-of-type) {
-  margin-top: 2rem;
-}
+// .commentsList:not(:first-of-type) {
+//   margin-top: 2rem;
+// }
 
 .comment {
   position: relative;
@@ -16,7 +15,7 @@
   word-break: break-word;
 
   &:not(:last-of-type) {
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
   }
 }
 
@@ -34,12 +33,12 @@
 .addCommentInput {
   width: 100%;
   position: relative;
-  margin-right: .5rem;
+  margin-right: 1rem;
   min-height: 40px;
 
   textarea {
-    height: 40px;
-    min-height: 40px;
+    height: calc(24px + .6rem);
+    min-height: calc(24px + .6rem);
     max-height: 80px;
   }
 
@@ -70,10 +69,10 @@
   
 }
 
-.delete {
-  position: absolute;
-  right: 0;
-}
+// .delete {
+//   position: absolute;
+//   right: 0;
+// }
 
 .badge {
   margin-left: .5rem;
