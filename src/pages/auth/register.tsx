@@ -90,13 +90,13 @@ export default function Register() {
         <div className="mb-4">
           <div className="mb-1 ml-1">
             <small className={errors?.uN ? "color-danger" : "color-gray"}>
-              {errors?.uN?.message?.toString() ?? "Username"}
+              {errors?.uN?.message?.toString() ?? "Юзвернэйм"}
             </small>
           </div>
           <input
             className="input"
             type="text"
-            {...register("uN", {
+            {...register("uNa", {
               required: {
                 value: true,
                 message: "Введите Юзвернэйм",
@@ -112,7 +112,7 @@ export default function Register() {
         <div className="mb-4">
           <div className="mb-1 ml-1">
             <small className={errors?.email ? "color-danger" : "color-gray"}>
-              {errors?.email?.message?.toString() ?? "Email"}
+              {errors?.email?.message?.toString() ?? "Пошта"}
             </small>
           </div>
           <input
@@ -134,7 +134,7 @@ export default function Register() {
         <div className="mb-4">
           <div className="mb-1 ml-1">
             <small className={errors?.password ? "color-danger" : "color-gray"}>
-              {errors?.password?.message?.toString() ?? "Password"}
+              {errors?.password?.message?.toString() ?? "Пароль"}
             </small>
           </div>
           <input
@@ -156,7 +156,7 @@ export default function Register() {
         <div className="mb-4">
           <div className="mb-1 ml-1">
             <small className={errors?.confPwd ? "color-danger" : "color-gray"}>
-              {errors?.confPwd ? "Пароли не совпадают" : "Confirm Password"}
+              {errors?.confPwd ? "Пароли не совпадают" : "Подтвердите пароль"}
             </small>
           </div>
           <input
@@ -173,7 +173,7 @@ export default function Register() {
             <small
               className={errors?.firstName ? "color-danger" : "color-gray"}
             >
-              {errors?.firstName?.message?.toString() ?? "First Name"}
+              {errors?.firstName?.message?.toString() ?? "Имя"}
             </small>
           </div>
           <input
@@ -191,7 +191,7 @@ export default function Register() {
         <div className="mb-4">
           <div className="mb-1 ml-1">
             <small className={errors?.lastName ? "color-danger" : "color-gray"}>
-              {errors?.lastName?.message?.toString() ?? "Last Name"}
+              {errors?.lastName?.message?.toString() ?? "Фамилия"}
             </small>
           </div>
           <input

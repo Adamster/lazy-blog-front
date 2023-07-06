@@ -65,7 +65,7 @@ export default function Login() {
         <div className="mb-4">
           <div className="mb-1 ml-1">
             <small className={errors?.email ? "color-danger" : "color-gray"}>
-              {errors?.email?.message?.toString() ?? "Email"}
+              {errors?.email?.message?.toString() ?? "Пошта"}
             </small>
           </div>
           <input
@@ -78,7 +78,7 @@ export default function Login() {
               },
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Введите валидный Email",
+                message: "Введите валидную Пошту",
               },
             })}
           />
@@ -87,7 +87,7 @@ export default function Login() {
         <div className="mb-4">
           <div className="mb-1 ml-1">
             <small className={errors?.password ? "color-danger" : "color-gray"}>
-              {errors?.password?.message?.toString() ?? "Password"}
+              {errors?.password?.message?.toString() ?? "Пароль"}
             </small>
           </div>
           <input
