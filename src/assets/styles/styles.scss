@@ -25,6 +25,8 @@
 
   // additional
   --max-width: 1200px;
+  --max-width-md: 900px;
+  --max-width-sm: 400px;
   --br: 0.3rem;
 
 }
@@ -32,6 +34,7 @@
 body.dark {
 
   // theme
+  --color-primary: #5e66d6;
   --color-gray-light: #2e3035;
 
   // layout

@@ -52,16 +52,11 @@ export function Comments({ postId }: IProps) {
     <>
       {(isLoading || requesting) && <Loading />}
 
-      <div id="comments" className={s.mainContainer}>
-        <h3 className="text-xl font-bold mb-4 flex items-center">
-          Комментарии
-          {data?.length && data?.length > 0 ? (
-            <span className={s.badge}>{data?.length}</span>
-          ) : (
-            <></>
-          )}
-        </h3>
+      <div className="text-center">
+        <h3 className="text-2xl font-bold">Комментарии</h3>
+      </div>
 
+      <div className={s.mainContainer}>
         <IsAuth>
           <AddEditComment
             auth={auth}
@@ -70,7 +65,9 @@ export function Comments({ postId }: IProps) {
             setRequesting={setRequesting}
           />
         </IsAuth>
+      </div>
 
+      <div id="comments" className={s.mainContainer}>
         <div className={s.commentsList}>
           {data?.map((comment: IComment) => (
             <Comment

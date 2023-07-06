@@ -3,6 +3,6 @@
   overflow: hidden;
   background: var(--color-foreground);
   padding: 2rem;
-  max-width: 400px;
+  max-width: var(--max-width-sm);
   margin: 0 auto;
 }

@@ -85,10 +85,13 @@
   box-shadow: none !important;
   background-color: var;
   border-radius: var(--br) !important;
+  min-height: 200px;
 
   --color-canvas-subtle: var(--color-gray-light) !important;
 
   a {
     color: var(--color-primary) !important;
   }
+
+
 }

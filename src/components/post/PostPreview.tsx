@@ -13,7 +13,7 @@ import classNames from "classnames";
 import Image from "next/image";
 import Link from "next/link";
 import IsAuthor from "../guards/IsAuthor";
-import s from "./post.module.scss";
+import s from "./postPreview.module.scss";
 
 interface IProps {
   post: IPost;

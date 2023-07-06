@@ -1,11 +1,12 @@
 .mainContainer {
-  padding: var(--space);
+  padding: 2rem;
   background: var(--color-foreground);
   border-radius: var(--br);
+  margin-top: 2rem;
 }
 
-.commentsList {
-  margin-top: var(--space);
+.commentsList:not(:first-of-type) {
+  margin-top: 2rem;
 }
 
 .comment {
@@ -34,10 +35,11 @@
   width: 100%;
   position: relative;
   margin-right: .5rem;
+  min-height: 40px;
 
   textarea {
-    height: 32px;
-    min-height: 32px;
+    height: 40px;
+    min-height: 40px;
     max-height: 80px;
   }
 

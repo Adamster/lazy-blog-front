@@ -4,7 +4,7 @@ import axios from "axios";
 import classNames from "classnames";
 import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
-import s from "./post.module.scss";
+import s from "./postFull.module.scss";
 
 interface IProps {
   postId: string;

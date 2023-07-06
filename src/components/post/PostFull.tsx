@@ -1,19 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { IPost } from "@/types";
-import { formatDate } from "@/utils/format-date";
-import { generateColor } from "@/utils/generate-color";
 import classNames from "classnames";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
-import { EyeIcon, PaintBrushIcon } from "@heroicons/react/24/outline";
+import { formatDate } from "@/utils/format-date";
+import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import "@uiw/react-markdown-preview/markdown.css";
-import { Comments } from "../comments/Comments";
-import IsAuth from "../guards/IsAuth";
 import IsAuthor from "../guards/IsAuthor";
-import s from "./post.module.scss";
-import { PostVote } from "./PostVote";
+import s from "./postFull.module.scss";
 
 const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
   ssr: false,
@@ -26,59 +22,69 @@ interface IProps {
 
 export const PostFull = ({ post, mutate }: IProps) => {
   return (
-    <>
-      <div className={classNames(s.full)}>
-        <div className={classNames("author", "mb-4")}>
-          <Link href={`/u/${post.author.userName}`} className="authorName">
-            <div
-              className="authorAva"
-              style={{
-                backgroundColor: generateColor(post.author.userName),
-              }}
-            ></div>
-            {post.author.firstName}{" "}
-            {post.author.lastName && post.author.lastName}
-          </Link>
+    <div className={s.root}>
+      <div>
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold">
+            {post.title}
+            <IsAuthor userId={post.author.id}>
+              <Link
+                className="inline-block color-primary ml-4"
+                href={`/p/edit/${post.id}`}
+              >
+                <PencilSquareIcon width={"1rem"} />
+              </Link>
+            </IsAuthor>
+          </h1>
 
-          <div className="authorDate">{formatDate(post.createdAtUtc)}</div>
-        </div>
-
-        <div>
-          <h1 className="text-3xl font-bold">{post.title}</h1>
           {post.summary && <p>{post.summary}</p>}
+
+          <div className={s.infoLine}>
+            <div className={s.infoLineStat}>
+              <Link href={`/u/${post.author.userName}`} className="authorName">
+                {post.author.avatarUrl && (
+                  <img src={post.author.avatarUrl} alt={post.author.userName} />
+                )}
+                {post.author.firstName} {post.author.lastName}
+              </Link>
+            </div>
+
+            <div className={s.infoLineStat}>
+              <span>{formatDate(post.createdAtUtc)}</span>
+            </div>
+
+            <div className={s.infoLineStat}>
+              <span>{post.views} views</span>
+            </div>
+
+            {/* <div className={s.infoLineStat}>
+              <span>{post.rating} karma</span>
+            </div> */}
+          </div>
         </div>
 
-        {post?.coverUrl && (
-          <div className={classNames(s.previewImage, "mt-4")}>
+        {post?.coverUrl ? (
+          <div className={classNames("post-image-preview", "mb-8")}>
             <img src={post.coverUrl} alt={post.title} loading="lazy" />
           </div>
+        ) : (
+          <>
+            <hr className="mb-8" />
+          </>
         )}
-
-        <IsAuthor userId={post.author.id}>
-          <Link href={`/p/edit/${post.id}`} className="btn btn--edit">
-            <PaintBrushIcon width={"1rem"} />
-          </Link>
-        </IsAuthor>
       </div>
 
-      <div className={classNames(s.full)}>
+      <div className={classNames(s.post, "px-0 sm:px-16")}>
         <MDPreview source={post.body} />
       </div>
 
-      <div className={s.footerFull}>
-        <div className={s.footerStats}>
-          <EyeIcon className={s.footerStatsIcon}></EyeIcon>
-          <span className={s.footerStatsNum}>{post.views}</span>
+      {/* <IsAuth>
+        <div className={classNames(s.footerStats, "ml-auto")}>
+          <PostVote rating={post.rating} postId={post.id} mutate={mutate} />
         </div>
+      </IsAuth> */}
 
-        <IsAuth>
-          <div className={classNames(s.footerStats, "ml-auto")}>
-            <PostVote rating={post.rating} postId={post.id} mutate={mutate} />
-          </div>
-        </IsAuth>
-      </div>
-
-      <Comments postId={post.id} />
-    </>
+      {/* <Comments postId={post.id} /> */}
+    </div>
   );
 };

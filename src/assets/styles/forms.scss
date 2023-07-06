@@ -27,6 +27,10 @@ select:-webkit-autofill:focus {
     width: 100%;
     // box-shadow: 0 0 0 1px var(--color-text);
 
+    &--underline {
+      box-shadow: 0 1px 0 0 var(--color-primary) !important;
+    }
+
     &:disabled {
       opacity: 0.4;
       cursor: not-allowed;
@@ -71,6 +75,7 @@ select:-webkit-autofill:focus {
   .btn--danger {
     border-color: var(--color-danger);
     background: var(--color-danger);
+    color: #fff;
   }
 
   .btn--edit {

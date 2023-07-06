@@ -41,6 +41,7 @@ const Comment = ({ comment, auth, handleDelete }: IProps) => {
           </button>
         )}
       </div>
+
       <div className={s.commentBody} style={{ whiteSpace: "pre-line" }}>
         {comment.body}
       </div>
