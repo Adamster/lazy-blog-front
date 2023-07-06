@@ -35,7 +35,7 @@ const Create = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${auth?.user.token}`,
+            Authorization: `Bearer ${auth?.user.accessToken}`,
           },
         }
       )

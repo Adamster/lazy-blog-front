@@ -49,6 +49,6 @@ export interface IComment {
 }
 
 export type SessionUser = Omit<IUser, "code" | "message"> & {
-  token: string;
+  accessToken: string;
   username: string;
 };
