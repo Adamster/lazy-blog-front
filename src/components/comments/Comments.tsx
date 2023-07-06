@@ -55,6 +55,9 @@ export function Comments({ postId }: IProps) {
 
       <div className="text-center mb-8">
         <h5 className="text-2xl font-bold">Комментарии</h5>
+        {data?.length === 0 && (
+          <p className="text-center">Даже намёка нет на наличие комментариев</p>
+        )}
       </div>
 
       <IsAuth>
@@ -79,10 +82,6 @@ export function Comments({ postId }: IProps) {
                 handleDelete={handleDelete}
               />
             ))}
-
-            {data?.length === 0 && (
-              <p>Даже намёка нет на наличие комментариев</p>
-            )}
           </div>
         </div>
       </div>
