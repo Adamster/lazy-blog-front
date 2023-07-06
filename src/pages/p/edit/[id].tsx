@@ -42,7 +42,7 @@ const PostEdit = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${auth?.user.token}`,
+            Authorization: `Bearer ${auth?.user.accessToken}`,
           },
         }
       )
@@ -65,7 +65,7 @@ const PostEdit = () => {
       .delete(`${API_URL}/posts/${values?.id}`, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${auth?.user.token}`,
+          Authorization: `Bearer ${auth?.user.accessToken}`,
         },
       })
       .then((response) => {

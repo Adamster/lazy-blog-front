@@ -32,7 +32,7 @@ export function Comments({ postId }: IProps) {
         .delete(`${API_URL}/comments/${id}`, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${auth?.user?.token}`,
+            Authorization: `Bearer ${auth?.user?.accessToken}`,
           },
         })
         .then(() => {
