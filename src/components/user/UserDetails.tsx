@@ -1,11 +1,5 @@
 import { IUser } from "@/types";
-import { generateColor } from "@/utils/generate-color";
-import {
-  CalendarDaysIcon,
-  PencilSquareIcon,
-} from "@heroicons/react/24/outline";
 import classNames from "classnames";
-import Image from "next/image";
 import s from "./user.module.scss";
 
 interface IProps {
@@ -18,30 +12,21 @@ export const UserDetails = ({ user, authUserId, postsNum }: IProps) => {
   return (
     <div className={classNames(s.userDetails, "p-in")}>
       {user && (
-        <div className="flex">
-          {user.avatarUrl == null ? (
-            <div
-              className="authorAva"
-              style={{
-                backgroundColor: generateColor(user.userName),
-              }}
-            ></div>
-          ) : (
-            <div className="authorPhoto">
-              <Image
-                src={user.avatarUrl}
-                width={300}
-                height={300}
-                alt={user.userName}
-              ></Image>
+        <div>
+          {user.avatarUrl && (
+            <div className="flex items-center w-full justify-center mb-4">
+              <div className={s.avatar}>
+                <img src={user.avatarUrl} alt={user.userName} />
+              </div>
             </div>
           )}
 
-          <div className={s.userDetailsData}>
-            <h1 className="text-xl font-bold mb-2 whitespace-normal">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold">
               {`${user.firstName} ${user.lastName}`}
             </h1>
-            <div className="flex content-center flex-wrap">
+            <p className="color-gray">На сайте с 2023</p>
+            {/* <div className="flex content-center flex-wrap">
               <div className="flex flex-nowrap content-center text-gray-500 mr-4">
                 <CalendarDaysIcon className="mr-2" width={"1rem"} />
                 <small className="whitespace-nowrap">На сайте с 2023</small>
@@ -50,7 +35,7 @@ export const UserDetails = ({ user, authUserId, postsNum }: IProps) => {
                 <PencilSquareIcon className="mr-2" width={"1rem"} />
                 <small className="whitespace-nowrap">{postsNum} постов</small>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* TODO: USER EDIT BUTTON */}

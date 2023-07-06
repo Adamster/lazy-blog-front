@@ -1,7 +1,7 @@
 const errors: { [key: string]: string } = {
   CredentialsSignin: "Проверьте правильность введенных данных",
-  "User.EmailAlreadyInUse": "Оный email уже используется",
-  "User.UserNameAlreadyInUse": "Оный username уже используется",
+  "User.EmailAlreadyInUse": "Введенный Email уже используется",
+  "User.UserNameAlreadyInUse": "Введенный Username уже используется",
 };
 
 interface IProps {
@@ -11,5 +11,5 @@ interface IProps {
 export default function AuthErrorMessage({ error }: IProps) {
   const errorKey = Array.isArray(error) ? error[0] : error;
   const errorMessage = error && (errors[errorKey] ?? error);
-  return <p className="color-danger">{errorMessage}</p>;
+  return <small className="color-danger">{errorMessage}</small>;
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import classNames from "classnames";
 import { Controller, FieldValues, UseFormReturn } from "react-hook-form";
 
@@ -28,79 +29,142 @@ export const CreateEdit = ({
     register,
     handleSubmit,
     control,
+    watch,
     formState: { errors },
   } = form;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="mb-4">
-        {errors?.title && (
-          <small className="color-danger">Очень сильно необходимо</small>
-        )}
-        <input
-          placeholder="Тайтл"
-          className={classNames("input", errors.title && "input--error")}
-          {...register("title", { required: true })}
-        />
-      </div>
+    <div className="mx-auto" style={{ maxWidth: "var(--max-width-md)" }}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="px-0 sm:px-8">
+          <div className="text-center">
+            {errors?.title && (
+              <small className="color-danger">
+                {errors?.title?.message?.toString()}
+              </small>
+            )}
 
-      {edit && (
-        <div className="mb-4">
-          <input className="input" {...register("slug")} placeholder="Slug" />
-        </div>
-      )}
+            <h1 className="text-2xl font-bold" style={{ marginBottom: "2px" }}>
+              <input
+                className="input"
+                placeholder="Название"
+                style={{
+                  textAlign: "center",
+                  paddingTop: 0,
+                  paddingBottom: 0,
+                  background: "transparent",
+                }}
+                {...register("title", {
+                  required: {
+                    value: true,
+                    message: "Введите Название",
+                  },
+                })}
+              />
+            </h1>
+          </div>
 
-      <div className="mb-4">
-        <input
-          className="input"
-          {...register("summary")}
-          placeholder="Короткое описание"
-        />
-      </div>
+          <div>
+            <input
+              style={{
+                textAlign: "center",
+                paddingTop: 0,
+                paddingBottom: 0,
+                background: "transparent",
+              }}
+              className="input"
+              {...register("summary")}
+              placeholder="Короткое описание (опционально)"
+            />
+          </div>
 
-      <div className="mb-4">
-        <input
-          className="input"
-          {...register("coverUrl")}
-          placeholder="Картиночка (url)"
-        />
-      </div>
+          <div className="mt-4 mb-8">
+            {/* {!edit && (
+              <div>
+                <span>URL: &nbsp;</span>
+                <input
+                  style={{
+                    paddingTop: 0,
+                    paddingBottom: 0,
+                    width: "200px",
+                    background: "var(--color-gray-light)",
+                  }}
+                  className="input rounded"
+                  {...register("slug")}
+                  placeholder="Slug"
+                />
+              </div>
+            )} */}
 
-      <div className="mb-6">
-        {errors?.body && (
-          <small className="color-danger">Очень сильно необходимо</small>
-        )}
-        <Controller
-          name="body"
-          control={control}
-          rules={{ required: true }}
-          render={({ field }) => (
-            <div className={classNames(errors.body && "input--error")}>
-              <div className="wmde-markdown-var"></div>
-              <MarkdownEditor {...field} />
+            <div className="text-center">
+              <input
+                style={{
+                  paddingTop: 0,
+                  paddingBottom: 0,
+                  width: "100%",
+                  maxWidth: "425px",
+                  background: "var(--color-gray-light)",
+                  textAlign: "center",
+                }}
+                className="input rounded"
+                placeholder="Превьюшка"
+                {...register("coverUrl")}
+              />
             </div>
+          </div>
+        </div>
+
+        <div className="mb-8 text-center">
+          {watch("coverUrl") ? (
+            <div className="post-image-preview">
+              <img src={watch("coverUrl")} alt="" />
+            </div>
+          ) : (
+            <>
+              <hr />
+            </>
           )}
-        />
-      </div>
+        </div>
 
-      <button className="btn btn--primary mr-4" type="submit">
-        Поехали
-      </button>
+        <div className="px-0 sm:px-16">
+          <div className="mb-6">
+            {errors?.body && (
+              <small className="color-danger">Очень сильно необходимо</small>
+            )}
+            <Controller
+              name="body"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <div className={classNames(errors.body && "input--error")}>
+                  <div className="wmde-markdown-var"></div>
+                  <MarkdownEditor {...field} />
+                </div>
+              )}
+            />
+          </div>
 
-      {edit && (
-        <button
-          className="btn btn--danger mr-4"
-          onClick={(e) => {
-            e.preventDefault();
+          <div className="text-center">
+            <button className="btn btn--primary mr-4" type="submit">
+              Поехали
+            </button>
+            {edit && (
+              <button
+                className="btn btn--danger mr-4"
+                onClick={(e) => {
+                  e.preventDefault();
 
-            if (confirm("Ты точно хочешь удолить этот пост?")) {
-              onDelete && onDelete();
-            }
-          }}
-        >
-          Удолить
-        </button>
-      )}
-    </form>
+                  if (confirm("Ты точно хочешь удолить этот пост?")) {
+                    onDelete && onDelete();
+                  }
+                }}
+              >
+                Удолить
+              </button>
+            )}
+          </div>
+        </div>
+      </form>
+    </div>
   );
 };

@@ -35,21 +35,25 @@ export default function User() {
 
       {isLoading && <Loading />}
 
-      <UserDetails
-        user={data?.user}
-        authUserId={auth?.user.id}
-        postsNum={data?.postItems?.length}
-      />
+      <div className="mb-8">
+        <UserDetails
+          user={data?.user}
+          authUserId={auth?.user.id}
+          postsNum={data?.postItems?.length}
+        />
+      </div>
 
-      {data?.postItems &&
-        data.postItems.map((post: IPost) => (
-          <PostPreview
-            key={post.id}
-            post={post}
-            author={data.user}
-            mutate={mutate}
-          ></PostPreview>
-        ))}
+      <div className="postsGrid">
+        {data?.postItems &&
+          data.postItems.map((post: IPost) => (
+            <PostPreview
+              key={post.id}
+              post={post}
+              author={data.user}
+              mutate={mutate}
+            ></PostPreview>
+          ))}
+      </div>
     </>
   );
 }

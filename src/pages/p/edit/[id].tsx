@@ -91,18 +91,16 @@ const PostEdit = () => {
 
       {(isLoading || requesting) && <Loading />}
 
-      <div className="page-bg">
-        <h1 className="page-title">Редактор</h1>
+      {/* <h1 className="page-title">Редактор</h1> */}
 
-        {values && (
-          <CreateEdit
-            form={form}
-            edit={true}
-            onSubmit={onSubmit}
-            onDelete={onDelete}
-          />
-        )}
-      </div>
+      {values && (
+        <CreateEdit
+          form={form}
+          edit={true}
+          onSubmit={onSubmit}
+          onDelete={onDelete}
+        />
+      )}
     </>
   );
 };

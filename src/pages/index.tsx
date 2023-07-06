@@ -27,15 +27,39 @@ export default function Home() {
 
       {isLoading && <Loading />}
 
-      {data &&
-        data.map((post: IPost) => (
-          <PostPreview
-            key={post.id}
-            post={post}
-            author={post.author}
-            mutate={mutate}
-          ></PostPreview>
-        ))}
+      <h2 className="text-2xl text-center font-bold mb-8">Recent posts</h2>
+
+      <div className="postsGridFirst mb-8">
+        {data &&
+          data.map((post: IPost, index) => {
+            if (index < 2)
+              return (
+                <PostPreview
+                  key={post.id}
+                  post={post}
+                  author={post.author}
+                  mutate={mutate}
+                ></PostPreview>
+              );
+          })}
+      </div>
+
+      <h2 className="text-2xl text-center font-bold mb-8">All posts</h2>
+
+      <div className="postsGrid">
+        {data &&
+          data.map((post: IPost, index) => {
+            if (index > 2)
+              return (
+                <PostPreview
+                  key={post.id}
+                  post={post}
+                  author={post.author}
+                  mutate={mutate}
+                ></PostPreview>
+              );
+          })}
+      </div>
     </>
   );
 }

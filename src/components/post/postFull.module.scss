@@ -1,0 +1,118 @@
+.root {
+  margin: 0 auto;
+  max-width: var(--max-width-md);
+
+  .previewImage {
+    height: auto !important;
+  }
+}
+
+.infoLine {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  column-gap: 2rem;
+  row-gap: .2rem;
+
+
+  &Stat {
+    font-size: 0.8rem;
+    color: var(--color-gray);
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    
+    &:not(:first-of-type):after {
+      position: absolute;
+      content: "";
+      left: -1rem;
+      top: 50%;
+      margin-top: -1px;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: var(--color-gray);
+    }
+  }
+
+}
+
+.preview {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  position: relative;
+
+  // &Toggle {
+  //   display: flex;
+  //   flex-direction: row-reverse;
+
+  //   .previewImage {
+  //     flex: 0 0 16rem;
+  //     width: 16rem;
+  //     height: 9rem;
+  //     overflow: hidden;
+  //     margin-right: var(--space);
+  
+
+  //     img {
+  //       width: inherit;
+  //       height: inherit;
+  //       object-fit: cover;
+  //     }
+  //   }
+
+  //   .previewTitle {
+  //     width: 100%;
+  //     flex-grow: 2;
+  //     margin-bottom: 0;
+  //     // max-width: calc(100% - 12rem);
+  //   }
+  // }
+
+  &:not(:last-of-type) {
+    margin-bottom: var(--space);
+  }
+
+  &Content {
+    background: var(--color-foreground);
+    position: relative;
+    padding: var(--space) var(--space) 1rem;
+    border-radius: var(--br);
+    width: 100%;
+    max-width: 100%;
+  }
+
+  &Image {
+    display: block;
+    border-radius: var(--br);
+    background: var(--color-gray-light);
+    height: 15rem;
+
+    @media (min-width: 640px) {
+      height: 25rem;
+    }
+
+    img {
+      border-radius: var(--br);
+      height: inherit;
+      max-width: 100%;
+      width: 100%;
+      margin: 0 auto;
+      object-fit: cover;
+    }
+  }
+}
+
+// Post Container
+
+.post {
+  position: relative;
+  width: 100%;
+  margin-bottom: 2rem;
+}
