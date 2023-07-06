@@ -34,7 +34,7 @@
 body.dark {
 
   // theme
-  --color-primary: #5e66d6;
+  --color-primary: #5DD39E;
   --color-gray-light: #2e3035;
 
   // layout
@@ -68,4 +68,19 @@ body.dark {
 @import "./dialog.scss";
 @import "./markdown.scss";
 @import './forms.scss';
+
+
+.postsGridFirst {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  max-width: 100%;
+  gap: 2rem;
+}
+
+.postsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  max-width: 100%;
+  gap: 2rem;
+}
 

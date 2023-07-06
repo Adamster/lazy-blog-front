@@ -8,6 +8,7 @@ import Link from "next/link";
 import { formatDate } from "@/utils/format-date";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import "@uiw/react-markdown-preview/markdown.css";
+import { Comments } from "../comments/Comments";
 import IsAuthor from "../guards/IsAuthor";
 import s from "./postFull.module.scss";
 
@@ -84,7 +85,7 @@ export const PostFull = ({ post, mutate }: IProps) => {
         </div>
       </IsAuth> */}
 
-      {/* <Comments postId={post.id} /> */}
+      <Comments postId={post.id} />
     </div>
   );
 };

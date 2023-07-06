@@ -14,6 +14,8 @@
   width: 100%;
   padding-bottom: 50%;
   position: relative;
+  background: var(--color-foreground);
+  border-radius: var(--br);
 
   img {
     position: absolute;

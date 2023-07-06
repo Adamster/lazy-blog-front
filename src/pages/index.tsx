@@ -27,18 +27,38 @@ export default function Home() {
 
       {isLoading && <Loading />}
 
-      {/* <h2 className="text-2xl mb-8">Recent blog posts</h2> */}
+      <h2 className="text-2xl text-center font-bold mb-8">Recent blog posts</h2>
 
-      <div className="postsList">
+      <div className="postsGridFirst mb-8">
         {data &&
-          data.map((post: IPost) => (
-            <PostPreview
-              key={post.id}
-              post={post}
-              author={post.author}
-              mutate={mutate}
-            ></PostPreview>
-          ))}
+          data.map((post: IPost, index) => {
+            if (index < 2)
+              return (
+                <PostPreview
+                  key={post.id}
+                  post={post}
+                  author={post.author}
+                  mutate={mutate}
+                ></PostPreview>
+              );
+          })}
+      </div>
+
+      <h2 className="text-2xl text-center font-bold mb-8">All blog posts</h2>
+
+      <div className="postsGrid">
+        {data &&
+          data.map((post: IPost, index) => {
+            if (index > 2)
+              return (
+                <PostPreview
+                  key={post.id}
+                  post={post}
+                  author={post.author}
+                  mutate={mutate}
+                ></PostPreview>
+              );
+          })}
       </div>
     </>
   );

@@ -1,20 +1,11 @@
-.userDetails {
-  margin-bottom: var(--space);
-  background: var(--color-foreground);
-  border-radius: var(--br);
-  position: relative;
-}
 
-.userDetailsAva {
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: var(--br);
-  margin-right: 1rem;
+.avatar {
+  width: 5rem;
+  height: 5rem;
   flex-shrink: 0;
+
+  img {
+    border-radius: var(--br);
+  }
 }
 
-.userDetailsData {
-  display: flex;
-  flex-direction: column;
-  max-width: calc(100% - 4.5rem);
-}

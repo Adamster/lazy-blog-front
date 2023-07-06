@@ -2,17 +2,8 @@
 
 import { IPost, IUser } from "@/types";
 import { formatDate } from "@/utils/format-date";
-import { generateColor } from "@/utils/generate-color";
-import {
-  ChatBubbleBottomCenterTextIcon,
-  EyeIcon,
-  PaintBrushIcon,
-  StarIcon,
-} from "@heroicons/react/24/outline";
 import classNames from "classnames";
-import Image from "next/image";
 import Link from "next/link";
-import IsAuthor from "../guards/IsAuthor";
 import s from "./postPreview.module.scss";
 
 interface IProps {
@@ -24,56 +15,37 @@ interface IProps {
 export default function PostPreview({ post, author }: IProps) {
   return (
     <div key={post.id} className={s.preview}>
-      <div className={s.previewContent}>
-        <div className={classNames("author", "mb-4")}>
-          <Link href={`/u/${author.userName}`} className="authorName">
-            {author.avatarUrl == null ? (
-              <div
-                className="authorAva"
-                style={{
-                  backgroundColor: generateColor(author.userName),
-                }}
-              ></div>
-            ) : (
-              <div className="authorAva">
-                <Image
-                  src={author.avatarUrl}
-                  width={300}
-                  height={300}
-                  alt={author.userName}
-                ></Image>
-              </div>
-            )}
-            {author.firstName} {author.lastName && author.lastName}
-          </Link>
+      <Link
+        href={`/u/${author.userName}/${post.slug}`}
+        className="post-image-preview mb-4"
+      >
+        {post?.coverUrl && (
+          <img src={post.coverUrl} alt={post.title} loading="lazy" />
+        )}
+      </Link>
 
-          <div className="authorDate">
-            <span>{formatDate(post.createdAtUtc)}</span>
-          </div>
-        </div>
-
-        <div className={s.previewToggle}>
-          <Link
-            className={classNames("block mb-4", s.previewTitle)}
-            href={`/u/${author.userName}/${post.slug}`}
-          >
-            <h2 className={classNames(s.previewTitle, "text-xl font-bold")}>
-              {post.title}
-            </h2>
-            {post.summary && <p className={s.previewSummary}>{post.summary}</p>}
-          </Link>
-
-          {post?.coverUrl && (
-            <Link
-              href={`/u/${author.userName}/${post.slug}`}
-              className={s.previewImage}
-            >
-              <img src={post.coverUrl} alt={post.title} loading="lazy" />
-            </Link>
+      <div className={classNames("author", "mb-4")}>
+        <Link href={`/u/${author.userName}`} className="authorName">
+          {post.author?.avatarUrl && (
+            <img src={post.author.avatarUrl} alt={post.author.userName} />
           )}
-        </div>
+          {author.firstName} {author.lastName}
+        </Link>
 
-        <div className={s.footer}>
+        <div className="authorDate">
+          <span>{formatDate(post.createdAtUtc)}</span>
+        </div>
+      </div>
+
+      <Link
+        className={classNames("block", s.previewTitle)}
+        href={`/u/${author.userName}/${post.slug}`}
+      >
+        <h2 className={classNames("text-md font-bold")}>{post.title}</h2>
+        {post.summary && <p className={s.previewSummary}>{post.summary}</p>}
+      </Link>
+
+      {/* <div className={s.footer}>
           <div className={s.footerStats}>
             <StarIcon
               className={s.footerStatsIcon}
@@ -102,10 +74,9 @@ export default function PostPreview({ post, author }: IProps) {
           </div>
 
           <div className={classNames(s.footerStats, "ml-auto")}></div>
-        </div>
-      </div>
+        </div> */}
 
-      <IsAuthor userId={author.id}>
+      {/* <IsAuthor userId={author.id}>
         <Link
           href={`/p/edit/${post.id}`}
           className="btn btn--edit"
@@ -113,7 +84,7 @@ export default function PostPreview({ post, author }: IProps) {
         >
           <PaintBrushIcon width={"1rem"} />
         </Link>
-      </IsAuthor>
+      </IsAuthor> */}
     </div>
   );
 }
