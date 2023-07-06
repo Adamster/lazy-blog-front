@@ -9,7 +9,7 @@ import { Toaster } from "react-hot-toast";
 import "../assets/styles/styles.scss";
 
 const montserrat = Montserrat({
-  weight: ["300", "400", "600", "700"],
+  weight: ["300", "400", "500", "600", "700"],
   subsets: ["latin"],
 });
 
