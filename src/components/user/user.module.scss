@@ -1,7 +1,8 @@
 
 .avatar {
-  width: 5rem;
-  height: 5rem;
+  margin: 0 auto 1rem;
+  width: 3rem;
+  height: 3rem;
   flex-shrink: 0;
 
   img {
@@ -9,3 +10,9 @@
   }
 }
 
+
+// .userTop {
+//   display: flex;
+//   align-items: center;
+//   justify-content: start;
+// }

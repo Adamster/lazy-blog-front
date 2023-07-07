@@ -89,9 +89,9 @@ const PostEdit = () => {
         <title>Редактор | Not Lazy Blog</title>
       </Head>
 
-      <div className="wrapper p-8">
-        {(isLoading || requesting) && <Loading />}
+      {(isLoading || requesting) && <Loading />}
 
+      <div className="wrapper p-8">
         {values && (
           <CreateEdit
             form={form}

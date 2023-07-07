@@ -51,9 +51,9 @@ export function Comments({ postId }: IProps) {
 
   return (
     <div className={s.comments}>
-      <div className="wrapper-md p-8">
-        {(isLoading || requesting) && <Loading />}
+      {(isLoading || requesting) && <Loading />}
 
+      <div className="wrapper-md p-8">
         <div className="text-center mb-8">
           <h5 className="text-2xl font-bold">Комментарии</h5>
           {data?.length === 0 && <p>Даже намёка нет на наличие комментариев</p>}

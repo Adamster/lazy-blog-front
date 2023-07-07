@@ -1,4 +1,5 @@
 import { IUser } from "@/types";
+import { formatDate2 } from "@/utils/format-date";
 import classNames from "classnames";
 import s from "./user.module.scss";
 
@@ -12,12 +13,10 @@ export const UserDetails = ({ user, authUserId, postsNum }: IProps) => {
   return (
     <div className={classNames(s.userDetails, "p-in")}>
       {user && (
-        <div>
+        <div className={s.userTop}>
           {user.avatarUrl && (
-            <div className="flex items-center w-full justify-center mb-4">
-              <div className={s.avatar}>
-                <img src={user.avatarUrl} alt={user.userName} />
-              </div>
+            <div className={s.avatar}>
+              <img src={user.avatarUrl} alt={user.userName} />
             </div>
           )}
 
@@ -25,7 +24,10 @@ export const UserDetails = ({ user, authUserId, postsNum }: IProps) => {
             <h1 className="text-2xl font-bold">
               {`${user.firstName} ${user.lastName}`}
             </h1>
-            <p className="color-gray">На сайте с 2023</p>
+            <p className="color-gray">
+              Зарегался {formatDate2(user.createdOnUtc)}
+            </p>
+
             {/* <div className="flex content-center flex-wrap">
               <div className="flex flex-nowrap content-center text-gray-500 mr-4">
                 <CalendarDaysIcon className="mr-2" width={"1rem"} />

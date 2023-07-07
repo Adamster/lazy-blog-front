@@ -29,13 +29,18 @@ export default function User() {
   return (
     <>
       <Head>
-        <title>{data?.user.userName} | Not Lazy Blog</title>
-        <meta property="og:title" content={data?.user.userName} />
+        <title>
+          {data?.user.firstName + " " + data?.user.lastName} | Not Lazy Blog
+        </title>
+        <meta
+          property="og:title"
+          content={data?.user.firstName + " " + data?.user.lastName}
+        />
       </Head>
 
-      <div className="wrapper p-8">
-        {isLoading && <Loading />}
+      {isLoading && <Loading />}
 
+      <div className="wrapper p-8">
         <div className="mb-8">
           <UserDetails
             user={data?.user}

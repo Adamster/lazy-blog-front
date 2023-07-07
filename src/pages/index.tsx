@@ -25,9 +25,9 @@ export default function Home() {
         />
       </Head>
 
-      <div className="wrapper p-8">
-        {isLoading && <Loading />}
+      {isLoading && <Loading />}
 
+      <div className="wrapper p-8">
         {data && (
           <h2 className="text-2xl text-center font-bold mb-8">Все посты</h2>
         )}

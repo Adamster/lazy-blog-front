@@ -53,9 +53,9 @@ export default function Login() {
         <title>Логин | Not Lazy Blog</title>
       </Head>
 
-      <div className="wrapper p-8">
-        {loading && <Loading />}
+      {loading && <Loading />}
 
+      <div className="wrapper p-8">
         <div className="text-center mb-8">
           <h3 className="text-2xl font-bold">Войти</h3>
         </div>

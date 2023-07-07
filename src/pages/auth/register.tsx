@@ -73,9 +73,9 @@ export default function Register() {
         <title>Регистрация | Not Lazy Blog</title>
       </Head>
 
-      <div className="wrapper p-8">
-        {loading && <Loading />}
+      {loading && <Loading />}
 
+      <div className="wrapper p-8">
         <div className="text-center mb-8">
           <h3 className="text-2xl font-bold">Создать аккаунт</h3>
         </div>
