@@ -1,5 +1,15 @@
+.comments {
+  background: var(--color-foreground);
+}
+
+// .inside {
+//   padding: 2rem 0;
+//   max-width: var(--max-width-md);
+//   margin: 0 auto;
+// }
+
 .mainContainer {
-  padding: 1rem 1rem .5rem 1rem;
+  // padding: 1rem 1rem .5rem 1rem;
   background: var(--color-foreground);
   border-radius: var(--br);
 }
@@ -13,10 +23,7 @@
   display: flex;
   flex-direction: column;
   word-break: break-word;
-
-  &:not(:last-of-type) {
-    margin-bottom: 2rem;
-  }
+  margin-bottom: 2rem;
 }
 
 

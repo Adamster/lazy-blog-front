@@ -50,41 +50,41 @@ export function Comments({ postId }: IProps) {
   };
 
   return (
-    <>
-      {(isLoading || requesting) && <Loading />}
+    <div className={s.comments}>
+      <div className="wrapper-md p-8">
+        {(isLoading || requesting) && <Loading />}
 
-      <div className="text-center mb-8">
-        <h5 className="text-2xl font-bold">Комментарии</h5>
-        {data?.length === 0 && (
-          <p className="text-center">Даже намёка нет на наличие комментариев</p>
-        )}
-      </div>
-
-      <IsAuth>
-        <div className={classNames(s.mainContainer, "mb-8")}>
-          <AddEditComment
-            auth={auth}
-            postId={postId}
-            mutate={mutate}
-            setRequesting={setRequesting}
-          />
+        <div className="text-center mb-8">
+          <h5 className="text-2xl font-bold">Комментарии</h5>
+          {data?.length === 0 && <p>Даже намёка нет на наличие комментариев</p>}
         </div>
-      </IsAuth>
 
-      <div className="p-0 sm:px-16">
-        <div id="comments" className={s.commentsContainer}>
-          <div className={s.commentsList}>
-            {data?.map((comment: IComment) => (
-              <Comment
-                key={comment.id}
-                comment={comment}
-                auth={auth}
-                handleDelete={handleDelete}
-              />
-            ))}
+        <IsAuth>
+          <div className={classNames(s.mainContainer, "mb-8")}>
+            <AddEditComment
+              auth={auth}
+              postId={postId}
+              mutate={mutate}
+              setRequesting={setRequesting}
+            />
+          </div>
+        </IsAuth>
+
+        <div className="p-0 sm:px-16">
+          <div id="comments" className={s.commentsContainer}>
+            <div className={s.commentsList}>
+              {data?.map((comment: IComment) => (
+                <Comment
+                  key={comment.id}
+                  comment={comment}
+                  auth={auth}
+                  handleDelete={handleDelete}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

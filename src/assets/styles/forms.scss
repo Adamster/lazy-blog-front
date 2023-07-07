@@ -59,7 +59,7 @@ select:-webkit-autofill:focus {
       text-decoration: underline;
     }
 
-    &-default {
+    &--default {
       border-color: var(--color-gray-light);
       background: var(--color-gray-light);
     }

@@ -58,9 +58,10 @@ const Create = () => {
         <title>Новый Пост | Not Lazy Blog</title>
       </Head>
 
-      {requesting && <Loading />}
-
-      <CreateEdit form={form} onSubmit={onSubmit} />
+      <div className="wrapper p-8">
+        {requesting && <Loading />}
+        <CreateEdit form={form} onSubmit={onSubmit} />
+      </div>
     </>
   );
 };

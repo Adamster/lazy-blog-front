@@ -33,26 +33,28 @@ export default function User() {
         <meta property="og:title" content={data?.user.userName} />
       </Head>
 
-      {isLoading && <Loading />}
+      <div className="wrapper p-8">
+        {isLoading && <Loading />}
 
-      <div className="mb-8">
-        <UserDetails
-          user={data?.user}
-          authUserId={auth?.user.id}
-          postsNum={data?.postItems?.length}
-        />
-      </div>
+        <div className="mb-8">
+          <UserDetails
+            user={data?.user}
+            authUserId={auth?.user.id}
+            postsNum={data?.postItems?.length}
+          />
+        </div>
 
-      <div className="postsGrid">
-        {data?.postItems &&
-          data.postItems.map((post: IPost) => (
-            <PostPreview
-              key={post.id}
-              post={post}
-              author={data.user}
-              mutate={mutate}
-            ></PostPreview>
-          ))}
+        <div className="postsGrid">
+          {data?.postItems &&
+            data.postItems.map((post: IPost) => (
+              <PostPreview
+                key={post.id}
+                post={post}
+                author={data.user}
+                mutate={mutate}
+              ></PostPreview>
+            ))}
+        </div>
       </div>
     </>
   );

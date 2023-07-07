@@ -6,6 +6,8 @@
 
   // theme
   --color-primary: #5158BB;
+  --color-secondary: #86A59C;
+  --color-secondary-light: rgba(81, 88, 187, .15);
   --color-gray: #7a8086;
   --color-gray-light: #eff0f3;
 
@@ -60,27 +62,10 @@ body.dark {
   }
 }
 
-
-// @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
-
 @import "./utilities.scss";
 @import "./common.scss";
 @import "./dialog.scss";
 @import "./markdown.scss";
 @import './forms.scss';
 
-
-.postsGridFirst {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  max-width: 100%;
-  gap: 2rem;
-}
-
-.postsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  max-width: 100%;
-  gap: 2rem ;
-}
 

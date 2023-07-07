@@ -93,8 +93,8 @@ const AddEditComment = ({ postId, auth, setRequesting, mutate }: IProps) => {
         <div>
           <button
             className={classNames(
-              "btn btn--primary px-2",
-              showEmoji ? "btn--primary" : ""
+              "btn btn--primary px-2 opacity-50",
+              showEmoji ? "opacity-100" : ""
             )}
             onClick={(e: any) => {
               e.preventDefault();

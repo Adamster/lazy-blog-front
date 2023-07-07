@@ -9,8 +9,10 @@ import { formatDate } from "@/utils/format-date";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import "@uiw/react-markdown-preview/markdown.css";
 import { Comments } from "../comments/Comments";
+import IsAuth from "../guards/IsAuth";
 import IsAuthor from "../guards/IsAuthor";
 import s from "./postFull.module.scss";
+import { PostVote } from "./PostVote";
 
 const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
   ssr: false,
@@ -23,10 +25,12 @@ interface IProps {
 
 export const PostFull = ({ post, mutate }: IProps) => {
   return (
-    <div className={s.root}>
-      <div>
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold">
+    <>
+      <div className="wrapper-md p-8">
+        <div className="mb-8">
+          {/* Header */}
+
+          <h1 className="main-title">
             {post.title}
             <IsAuthor userId={post.author.id}>
               <Link
@@ -38,7 +42,7 @@ export const PostFull = ({ post, mutate }: IProps) => {
             </IsAuthor>
           </h1>
 
-          {post.summary && <p>{post.summary}</p>}
+          {post.summary && <p className="text-center">{post.summary}</p>}
 
           <div className={s.infoLine}>
             <div className={s.infoLineStat}>
@@ -58,11 +62,19 @@ export const PostFull = ({ post, mutate }: IProps) => {
               <span>{post.views} views</span>
             </div>
 
-            {/* <div className={s.infoLineStat}>
-              <span>{post.rating} karma</span>
-            </div> */}
+            <div className={s.infoLineStat}>
+              <IsAuth isNot={<span>{post.rating} likes</span>}>
+                <PostVote
+                  rating={post.rating}
+                  postId={post.id}
+                  mutate={mutate}
+                />
+              </IsAuth>
+            </div>
           </div>
         </div>
+
+        {/* Image */}
 
         {post?.coverUrl ? (
           <div className={classNames("post-image-preview", "mb-8")}>
@@ -73,19 +85,16 @@ export const PostFull = ({ post, mutate }: IProps) => {
             <hr className="mb-8" />
           </>
         )}
-      </div>
 
-      <div className={classNames(s.post, "px-0 sm:px-16")}>
-        <MDPreview source={post.body} />
-      </div>
+        {/* Content */}
 
-      {/* <IsAuth>
-        <div className={classNames(s.footerStats, "ml-auto")}>
-          <PostVote rating={post.rating} postId={post.id} mutate={mutate} />
+        <div className={"px-0 sm:px-16"}>
+          <MDPreview source={post.body} />
         </div>
-      </IsAuth> */}
+      </div>
 
+      {/* Comments */}
       <Comments postId={post.id} />
-    </div>
+    </>
   );
 };

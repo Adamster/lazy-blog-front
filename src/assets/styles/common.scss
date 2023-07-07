@@ -1,14 +1,35 @@
-// Common
-
-.page-bg {
-  background: var(--color-foreground);
-  border-radius: var(--br);
+hr {
+  border-color: var(--color-gray-light);
 }
 
-.page-title {
+// Page wrapper 
+
+.wrapper {
+  margin: 0 auto;
+  max-width: var(--max-width);
+ 
+  &-md {
+    margin: 0 auto;
+    max-width: var(--max-width-md);
+  }
+
+  &-sm {
+    margin: 0 auto;
+    max-width: var(--max-width-sm);
+  }
+
+}
+
+// Title 
+
+.main-title {
   font-size: x-large;
   font-weight: 700;
+  text-align: center;
+  line-height: 2rem;
 }
+
+// Image preview size
 
 .post-image-preview {
   width: 100%;
@@ -16,6 +37,7 @@
   position: relative;
   background: var(--color-foreground);
   border-radius: var(--br);
+  position: relative;
 
   img {
     position: absolute;
@@ -37,7 +59,27 @@
     align-items: center;
     justify-content: center;
   }
+
 }
+
+.postsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  max-width: 100%;
+  gap: 2rem ;
+
+  // > div:first-of-type  {
+  //   grid-column: span 3;
+  //   padding: 0 16rem;
+  // }
+
+}
+
+.page-bg {
+  background: var(--color-foreground);
+  border-radius: var(--br);
+}
+
 
 // Author
 
@@ -83,5 +125,21 @@
       border-radius: 50%;
       background: var(--color-gray);
     }
+  }
+}
+
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  .tag {
+    font-size: small;
+    color: var(--color-primary);
+    background: var(--color-secondary-light);
+    box-shadow: inset 0 0 0 1px var(--color-primary);
+    padding: .1rem .8rem;
+    border-radius: 1rem;
   }
 }
