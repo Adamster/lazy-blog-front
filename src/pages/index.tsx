@@ -37,7 +37,6 @@ export default function Home() {
             data.map((post: IPost, index) => {
               return (
                 <PostPreview
-                  index={index}
                   key={post.id}
                   post={post}
                   author={post.author}
