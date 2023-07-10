@@ -97,7 +97,7 @@ export default function Register() {
             <input
               className="input"
               type="text"
-              {...register("uNa", {
+              {...register("uN", {
                 required: {
                   value: true,
                   message: "Введите Юзвернэйм",
