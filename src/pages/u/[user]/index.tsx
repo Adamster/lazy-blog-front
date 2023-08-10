@@ -59,6 +59,10 @@ export default function User() {
                 mutate={mutate}
               ></PostPreview>
             ))}
+
+          {data?.postItems && !data?.postItems.length && (
+            <p className="text-center">Нет постов</p>
+          )}
         </div>
       </div>
     </>
