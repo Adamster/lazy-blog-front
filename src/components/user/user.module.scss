@@ -7,6 +7,9 @@
 
   img {
     border-radius: var(--br);
+    height: inherit;
+    width: inherit;
+    object-fit: cover;
   }
 }
 
