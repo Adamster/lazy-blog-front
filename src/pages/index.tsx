@@ -27,15 +27,25 @@ export default function Home() {
 
       {isLoading && <Loading />}
 
-      {data &&
-        data.map((post: IPost) => (
-          <PostPreview
-            key={post.id}
-            post={post}
-            author={post.author}
-            mutate={mutate}
-          ></PostPreview>
-        ))}
+      <div className="wrapper p-8">
+        {data && (
+          <h2 className="text-2xl text-center font-bold mb-8">Все посты</h2>
+        )}
+
+        <div className="postsGrid">
+          {data &&
+            data.map((post: IPost, index) => {
+              return (
+                <PostPreview
+                  key={post.id}
+                  post={post}
+                  author={post.author}
+                  mutate={mutate}
+                ></PostPreview>
+              );
+            })}
+        </div>
+      </div>
     </>
   );
 }

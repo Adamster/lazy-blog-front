@@ -10,6 +10,7 @@ export interface IUser extends IRequest {
   lastName: string;
   userName: string;
   avatarUrl: string;
+  createdOnUtc: string;
 }
 
 export interface IUserDetails extends IRequest {

@@ -1,20 +1,21 @@
-.userDetails {
-  margin-bottom: var(--space);
-  background: var(--color-foreground);
-  border-radius: var(--b-r);
-  position: relative;
-}
 
-.userDetailsAva {
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: var(--b-r);
-  margin-right: 1rem;
+.avatar {
+  margin: 0 auto 1rem;
+  width: 3rem;
+  height: 3rem;
   flex-shrink: 0;
+
+  img {
+    border-radius: var(--br);
+    height: inherit;
+    width: inherit;
+    object-fit: cover;
+  }
 }
 
-.userDetailsData {
-  display: flex;
-  flex-direction: column;
-  max-width: calc(100% - 4.5rem);
-}
+
+// .userTop {
+//   display: flex;
+//   align-items: center;
+//   justify-content: start;
+// }

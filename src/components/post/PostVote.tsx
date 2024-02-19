@@ -1,10 +1,8 @@
 import { API_URL } from "@/utils/fetcher";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
-import classNames from "classnames";
 import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
-import s from "./post.module.scss";
 
 interface IProps {
   postId: string;
@@ -30,40 +28,36 @@ export const PostVote = ({ postId, rating, mutate }: IProps) => {
       .then(async (response) => {
         mutate();
       })
-      .catch(({ error }) => {
-        toast.error("Больше не положено");
+      .catch((error) => {
+        toast.error(
+          error.response.data.detail ?? "Возможно ошибка авторизации"
+        );
       });
   };
 
   return (
-    <div className="flex items-center">
-      <div
-        className="btn px-1"
+    <div className="flex items-center justify-center">
+      <button
+        className="btn btn--default btn--link"
+        style={{ padding: ".1rem" }}
         onClick={() => {
           handleVote("down");
         }}
       >
-        <ChevronDownIcon
-          width={".9rem"}
-          color="var(--color-danger)"
-        ></ChevronDownIcon>
-      </div>
+        <ChevronDownIcon width={".9rem"}></ChevronDownIcon>
+      </button>
 
-      <div className={classNames(s.footerStatsNum, "flex items-center mx-3")}>
-        {rating}
-      </div>
+      <div className="mx-2">{rating}</div>
 
-      <div
-        className="btn px-1"
+      <button
+        className="btn btn--default btn--link"
+        style={{ padding: ".1rem" }}
         onClick={() => {
           handleVote("up");
         }}
       >
-        <ChevronUpIcon
-          width={".9rem"}
-          color="var(--color-success)"
-        ></ChevronUpIcon>
-      </div>
+        <ChevronUpIcon width={".9rem"}></ChevronUpIcon>
+      </button>
     </div>
   );
 };

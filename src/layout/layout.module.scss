@@ -1,60 +1,58 @@
-.main {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  margin-top: 4rem;
-  padding: 2rem 1rem;
-}
-
 // header
 
 .header {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
+  width: 100%;
   z-index: 999;
-  background: var(--color-foreground);
+  background: var(--color-header);
   height: 4rem;
 }
 
-.headerContainer {
+.headerInside {
   margin: 0 auto;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1rem;
+  padding: 0 2rem;
   max-width: var(--max-width);
 }
 
-.logo {
-  height: 2.5rem;
-  width: 2.5rem;
-  min-width: 2.5rem;
-  object-fit: contain;
+// main
+
+.main {
+  margin: 0 auto;
+  margin-top: 4rem;
 }
 
-.navLinks {
-  @apply flex;
+// -- 
+
+.logo {
+  font-weight: 900;
+  margin-right: 1rem;
+}
+
+.nav {
+  display: flex;
+  gap: 1rem;
 }
 
 .link {
-  display: block;
-  color: var(--color-text);
-  background: var(--color-gray-light);
-  padding: 0.25rem 1rem;
-  border-radius: 0.3rem;
+  color: var(--color-gray);
+  font-weight: 500;
 }
 
 .linkActive {
-  background: var(--color-primary);
-  color: white;
+  color: var(--color-text);
 }
 
 .actions {
   display: flex;
   align-items: center;
   position: relative;
+  gap: 1rem;
 }
 
 .search {
@@ -64,43 +62,47 @@
   width: 100%;
 }
 
-.user {
-  width: 2rem;
-  min-width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background: var(--color-gray-light);
-  padding: 0.35rem;
-  transition: background 0.3s ease, color 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+// .user {
+//   width: 2rem;
+//   min-width: 2rem;
+//   height: 2rem;
+//   border-radius: 50%;
+//   background: var(--color-gray-light);
+//   padding: 0.35rem;
+//   transition: background 0.3s ease, color 0.3s ease;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
 
-  svg {
-    width: 1rem;
-  }
+//   svg {
+//     width: 1rem;
+//   }
 
-  &Ava {
-    height: 1rem;
-    width: 1rem;
-    border-radius: var(--b-r);
-    margin-right: 0.7rem;
-  }
+//   &Ava {
+//     height: 1rem;
+//     width: 1rem;
+//     border-radius: var(--br);
+//     margin-right: 0.7rem;
+//   }
 
-  &Name {
-    font-weight: 600;
-    font-size: 0.8rem;
-    display: none;
+//   &Name {
+//     font-weight: 600;
+//     font-size: 0.8rem;
+//     display: none;
 
-    @media (min-width: 640px) {
-      display: block;
-    }
-  }
+//     @media (min-width: 640px) {
+//       display: block;
+//     }
+//   }
 
-  &:hover {
-    background: var(--color-primary);
-    color: #fff;
-  }
+//   &:hover {
+//     background: var(--color-primary);
+//     color: #fff;
+//   }
+// }
+
+.auth {
+
 }
 
 .user {
@@ -108,7 +110,7 @@
     position: absolute;
     background: var(--color-foreground);
     box-shadow: 0 0.1em 0.5em 0 var(--color-opacity);
-    border-radius: var(--b-r);
+    border-radius: var(--br);
     top: calc(100% + 0.8rem);
     right: 0;
     width: 190px;
@@ -120,7 +122,7 @@
       align-items: center;
       padding: 0.5rem 1rem;
       cursor: pointer;
-      border-radius: var(--b-r);
+      border-radius: var(--br);
       transition: background 0.3s ease;
 
       &:hover {

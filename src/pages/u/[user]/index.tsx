@@ -29,27 +29,42 @@ export default function User() {
   return (
     <>
       <Head>
-        <title>{data?.user.userName} | Not Lazy Blog</title>
-        <meta property="og:title" content={data?.user.userName} />
+        <title>
+          {data?.user.firstName + " " + data?.user.lastName} | Not Lazy Blog
+        </title>
+        <meta
+          property="og:title"
+          content={data?.user.firstName + " " + data?.user.lastName}
+        />
       </Head>
 
       {isLoading && <Loading />}
 
-      <UserDetails
-        user={data?.user}
-        authUserId={auth?.user.id}
-        postsNum={data?.postItems?.length}
-      />
+      <div className="wrapper p-8">
+        <div className="mb-8">
+          <UserDetails
+            user={data?.user}
+            authUserId={auth?.user.id}
+            postsNum={data?.postItems?.length}
+          />
+        </div>
 
-      {data?.postItems &&
-        data.postItems.map((post: IPost) => (
-          <PostPreview
-            key={post.id}
-            post={post}
-            author={data.user}
-            mutate={mutate}
-          ></PostPreview>
-        ))}
+        <div className="postsGrid">
+          {data?.postItems &&
+            data.postItems.map((post: IPost) => (
+              <PostPreview
+                key={post.id}
+                post={post}
+                author={data.user}
+                mutate={mutate}
+              ></PostPreview>
+            ))}
+
+          {data?.postItems && !data?.postItems.length && (
+            <p className="text-center">Нет постов</p>
+          )}
+        </div>
+      </div>
     </>
   );
 }

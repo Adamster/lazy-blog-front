@@ -1,22 +1,33 @@
-.mainContainer {
-  padding: var(--space);
+.comments {
   background: var(--color-foreground);
-  border-radius: var(--b-r);
 }
 
-.commentsList {
-  margin-top: var(--space);
+// .inside {
+//   padding: 2rem 0;
+//   max-width: var(--max-width-md);
+//   margin: 0 auto;
+// }
+
+.mainContainer {
+  // padding: 1rem 1rem .5rem 1rem;
+  background: var(--color-foreground);
+  border-radius: var(--br);
 }
+
+// .commentsList:not(:first-of-type) {
+//   margin-top: 2rem;
+// }
 
 .comment {
   position: relative;
   display: flex;
   flex-direction: column;
   word-break: break-word;
-
+  
   &:not(:last-of-type) {
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
   }
+  
 }
 
 
@@ -33,11 +44,12 @@
 .addCommentInput {
   width: 100%;
   position: relative;
-  margin-right: .5rem;
+  margin-right: 1rem;
+  min-height: 40px;
 
   textarea {
-    height: 32px;
-    min-height: 32px;
+    height: calc(24px + .6rem);
+    min-height: calc(24px + .6rem);
     max-height: 80px;
   }
 
@@ -63,15 +75,15 @@
     height: 32px;
     width: 32px;
     background: rgba(255,255,255,.1);
-    border-radius: var(--b-r);
+    border-radius: var(--br);
   }
   
 }
 
-.delete {
-  position: absolute;
-  right: 0;
-}
+// .delete {
+//   position: absolute;
+//   right: 0;
+// }
 
 .badge {
   margin-left: .5rem;
@@ -81,7 +93,7 @@
   height: 1.5rem;
   line-height: 1.5rem;
   text-align: center;
-  border-radius: var(--b-r);
+  border-radius: var(--br);
   font-weight: normal;
 }
 

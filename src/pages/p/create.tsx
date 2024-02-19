@@ -55,14 +55,12 @@ const Create = () => {
   return (
     <>
       <Head>
-        <title>Создаем Пост | Not Lazy Blog</title>
+        <title>Новый Пост | Not Lazy Blog</title>
       </Head>
 
       {requesting && <Loading />}
 
-      <div className="page-bg">
-        <h1 className="page-title">Cоздавай контент</h1>
-
+      <div className="wrapper p-8">
         <CreateEdit form={form} onSubmit={onSubmit} />
       </div>
     </>

@@ -1,15 +1,83 @@
-// Common
+hr {
+  border-color: var(--color-gray-light);
+}
+
+// Page wrapper 
+
+.wrapper {
+  margin: 0 auto;
+  max-width: var(--max-width);
+ 
+  &-md {
+    margin: 0 auto;
+    max-width: var(--max-width-md);
+  }
+
+  &-sm {
+    margin: 0 auto;
+    max-width: var(--max-width-sm);
+  }
+
+}
+
+// Title 
+
+.main-title {
+  font-size: x-large;
+  font-weight: 700;
+  text-align: center;
+  line-height: 2rem;
+}
+
+// Image preview size
+
+.post-image-preview {
+  width: 100%;
+  padding-bottom: 50%;
+  position: relative;
+  background: var(--color-foreground);
+  border-radius: var(--br);
+  position: relative;
+
+  img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--br);
+  }
+
+  span {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+}
+
+.postsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  max-width: 100%;
+  gap: 2rem ;
+
+  // > div:first-of-type  {
+  //   grid-column: span 3;
+  //   padding: 0 16rem;
+  // }
+
+}
 
 .page-bg {
   background: var(--color-foreground);
-  padding: var(--space);
-  border-radius: var(--b-r);
-}
-
-.page-title {
-  font-size: x-large;
-  font-weight: 700;
-  margin-bottom: 1rem;
+  border-radius: var(--br);
 }
 
 
@@ -19,34 +87,7 @@
   display: flex;
   align-items: center;
   flex-direction: row;
-
-  &Ava {
-    height: 1.25rem;
-    width: 1.25rem;
-    min-width: 1rem;
-    border-radius: var(--b-r);
-    margin-right: 0.7rem;
-
-    img {
-      width: inherit;
-      height: inherit;
-      object-fit: cover;
-      border-radius: var(--b-r);
-    }
-  }
-
-  &Photo {
-    height: 4rem;
-    width: 4rem;
-    margin-right: 1rem;
-
-    img {
-      width: inherit;
-      height: inherit;
-      object-fit: cover;
-      border-radius: var(--b-r);
-    }
-  }
+  justify-content: flex-start;
 
   &Name {
     display: flex;
@@ -54,6 +95,14 @@
     font-weight: 600;
     font-size: 0.8rem;
     white-space: nowrap;
+    color: var(--color-primary);
+
+    img {
+      width: 1.2rem;
+      height: 1.2rem;
+      border-radius: var(--br);
+      margin-right: .5rem;
+    }
   }
 
   &Date {
@@ -64,7 +113,6 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    // white-space: nowrap;
 
     &:after {
       position: absolute;
@@ -77,5 +125,21 @@
       border-radius: 50%;
       background: var(--color-gray);
     }
+  }
+}
+
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  .tag {
+    font-size: small;
+    color: var(--color-primary);
+    background: var(--color-secondary-light);
+    box-shadow: inset 0 0 0 1px var(--color-primary);
+    padding: .1rem .8rem;
+    border-radius: 1rem;
   }
 }

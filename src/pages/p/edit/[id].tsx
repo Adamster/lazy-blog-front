@@ -91,9 +91,7 @@ const PostEdit = () => {
 
       {(isLoading || requesting) && <Loading />}
 
-      <div className="page-bg">
-        <h1 className="page-title">Редактор</h1>
-
+      <div className="wrapper p-8">
         {values && (
           <CreateEdit
             form={form}

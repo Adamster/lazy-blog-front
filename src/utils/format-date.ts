@@ -24,3 +24,7 @@ import moment from "moment";
 export function formatDate(date: string) {
   return moment.parseZone(date).utcOffset(date).fromNow();
 }
+
+export function formatDate2(date: string) {
+  return moment(date).format("D MMM YYYY");
+}

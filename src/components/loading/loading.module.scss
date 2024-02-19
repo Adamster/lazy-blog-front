@@ -1,17 +1,18 @@
 .loading {
   display: block;
   position: absolute;
-  width: 80px;
+  width: 74px;
   height: 13px;
-  margin: -1.4rem -40px 0;
+  margin: -2.3rem -37px 0;
   left: 50%;
+  z-index: 99999;
 }
 
 .loading div {
   position: absolute;
   top: 0;
-  width: 13px;
-  height: 13px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--color-primary);
   animation-timing-function: cubic-bezier(0, 1, 1, 0);
