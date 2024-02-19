@@ -83,7 +83,7 @@ export const authOptions: NextAuthOptions = {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        domain: `${useSecureCookies ? ".notlazy.blog" : "localhost"}`,
+        domain: `${useSecureCookies ? ".notlazy.org" : "localhost"}`,
         secure: useSecureCookies,
       },
     },
