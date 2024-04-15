@@ -18,7 +18,6 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
     <>
       <SessionProvider session={session}>
         <ThemeProvider>
-          {/* <Layout> */}
           <Layout className={montserrat.className}>
             <Component {...pageProps} />
           </Layout>
