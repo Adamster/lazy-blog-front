@@ -89,7 +89,6 @@ export const authOptions: NextAuthOptions = {
       }
 
       if (Date.now() < token.accessTokenExpires) {
-        // console.log('return token', token.accessTokenExpires)
         return token
       }
 
@@ -97,8 +96,8 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }: any) {
       if (token) {
-        session.accessToken = token.accessToken;
         session.user = token.user;
+        session.user.accessToken = token.accessToken;
         session.error = token.error ? token.error : null;
       }
 
