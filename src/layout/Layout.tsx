@@ -11,7 +11,6 @@ export const Layout = ({ children, className }: any) => {
 
   useEffect(() => {
     if ((auth as any)?.error === "RefreshAccessTokenError") {
-      // console.log("RefreshAccessTokenError", auth);
       signOut();
     }
   }, [auth]);
