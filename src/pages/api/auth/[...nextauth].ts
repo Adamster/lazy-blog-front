@@ -8,11 +8,14 @@ async function refreshAccessToken(token: any) {
   try {
     const response = await fetch(`${API_URL}/users/refresh`, {
       method: "POST",
-      body: JSON.stringify({ accessToken: token.accessToken, refreshToken: token.refreshToken }),
+      body: JSON.stringify({ refreshToken: token.refreshToken }),
       headers: { "Content-Type": "application/json" },
     });
 
     const refreshedTokens = await response.json();
+
+    // console.log('refreshAccessToken', refreshedTokens)
+    // console.log('refreshAccessToken', ref/reshedTokens.accessToken, refreshedTokens.refreshToken)
 
     if (!response.ok) {
       throw refreshedTokens
@@ -22,7 +25,7 @@ async function refreshAccessToken(token: any) {
       ...token,
       accessToken: refreshedTokens.accessToken,
       refreshToken: refreshedTokens.refreshToken,
-      accessTokenExpires: Date.now() + 10 * 60 * 1000,
+      accessTokenExpires: Date.now() + 30 * 60 * 1000, // 30 minutes
     }
   } catch (error) {
 
@@ -55,6 +58,8 @@ export const authOptions: NextAuthOptions = {
 
           const user = await res.json();
 
+          // console.log('authorize', user)
+
           if (res.ok && user) {
             return user;
           }
@@ -74,7 +79,7 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 6 months
   },
   jwt: {
-    maxAge: 10 * 60, // 10 minutes
+    maxAge: 30 * 60,
   },
   callbacks: {
     async jwt({ token, user, account }: any) {
@@ -84,11 +89,12 @@ export const authOptions: NextAuthOptions = {
           ...user,
           accessToken: user.accessToken,
           refreshToken: user.refreshToken,
-          accessTokenExpires: Date.now() + 10 * 60 * 1000, // 10 minutes
+          accessTokenExpires: Date.now() + 30 * 60 * 1000, // 30 minutes
         };
       }
 
       if (Date.now() < token.accessTokenExpires) {
+        // console.log('return token', token)
         return token
       }
 
