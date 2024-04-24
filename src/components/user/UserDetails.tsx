@@ -1,7 +1,9 @@
-import { IUser } from "@/types";
-import { formatDate2 } from "@/utils/format-date";
-import classNames from "classnames";
-import s from "./user.module.scss";
+import { IUser } from '@/types';
+import { formatDate2 } from '@/utils/format-date';
+import { PencilSquareIcon } from '@heroicons/react/24/outline';
+import classNames from 'classnames';
+import Link from 'next/link';
+import s from './user.module.scss';
 
 interface IProps {
   user: IUser | undefined;
@@ -11,7 +13,7 @@ interface IProps {
 
 export const UserDetails = ({ user, authUserId, postsNum }: IProps) => {
   return (
-    <div className={classNames(s.userDetails, "p-in")}>
+    <div className={classNames(s.userDetails, 'p-in')}>
       {user && (
         <div className={s.userTop}>
           {user.avatarUrl && (
@@ -21,9 +23,17 @@ export const UserDetails = ({ user, authUserId, postsNum }: IProps) => {
           )}
 
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold">
-              {`${user.firstName} ${user.lastName}`}
-            </h1>
+            {`${user.firstName} ${user.lastName}`}
+            {user.id === authUserId && (
+              <Link
+                href={`/u/edit/`}
+                className="inline-block color-primary ml-4"
+              >
+                <PencilSquareIcon width={'1rem'} />
+              </Link>
+            )}
+            <h1 className="text-2xl font-bold"></h1>
+
             <p className="color-gray">
               Зарегался {formatDate2(user.createdOnUtc)}
             </p>
@@ -39,13 +49,6 @@ export const UserDetails = ({ user, authUserId, postsNum }: IProps) => {
               </div>
             </div> */}
           </div>
-
-          {/* TODO: USER EDIT BUTTON */}
-          {/* {user.id === authUserId && (
-            <Link href="/u/edit" className="btn btn--edit">
-              <PaintBrushIcon width={"1rem"} />
-            </Link>
-          )} */}
         </div>
       )}
     </div>
