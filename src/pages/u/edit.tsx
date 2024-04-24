@@ -6,7 +6,6 @@ import { CloudArrowUpIcon } from '@heroicons/react/24/outline';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { API_URL } from '@/utils/fetcher';
@@ -18,16 +17,17 @@ interface IProps {
 export default function EditProfile() {
   const { data: auth } = useSession();
   const router = useRouter();
+
   const [requesting, setRequesting] = useState(false);
 
   const form = useForm();
 
-  const handleAvatarChange = (e) => {
+  const handleAvatarChange = (e: any) => {
     const file = e.target.files[0];
     form.setValue('avatar', file);
   };
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = async (data: any) => {
     setRequesting(true);
 
     const formData = new FormData();
@@ -39,7 +39,7 @@ export default function EditProfile() {
       await axios.post(`${API_URL}/users/${auth?.user.id}/avatar`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${auth.user.accessToken}`,
+          Authorization: `Bearer ${auth?.user.accessToken}`,
         },
       });
       toast.success('Аватар успешно обновлен!');
