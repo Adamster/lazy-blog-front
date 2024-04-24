@@ -18,7 +18,6 @@ interface IProps {
 export default function EditProfile() {
   const { data: auth } = useSession();
   const router = useRouter();
-  const { id } = auth?.user.id; // Здесь вы можете использовать идентификатор текущего пользователя
   const [requesting, setRequesting] = useState(false);
 
   const form = useForm();
