@@ -1,12 +1,11 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import {
-  ArrowRightOnRectangleIcon,
-  MoonIcon,
+  MoonIcon
 } from "@heroicons/react/24/outline";
 
 import { MoonIcon as MoonIconSolid, UserIcon } from "@heroicons/react/24/solid";
 import cn from "classnames";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -79,14 +78,14 @@ export const Header = () => {
                   </div>
                 )}
               </Link>
-              <button
+              {/* <button
                 className="btn btn--link color-primary"
                 onClick={() => {
                   signOut();
                 }}
               >
                 <ArrowRightOnRectangleIcon width={"1.3rem"} />
-              </button>
+              </button> */}
             </>
           ) : (
             <Link className="btn btn--primary" href="/auth/login">

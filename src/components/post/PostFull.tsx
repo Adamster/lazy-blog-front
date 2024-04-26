@@ -11,8 +11,8 @@ import "@uiw/react-markdown-preview/markdown.css";
 import { Comments } from "../comments/Comments";
 import IsAuth from "../guards/IsAuth";
 import IsAuthor from "../guards/IsAuthor";
-import s from "./postFull.module.scss";
 import { PostVote } from "./PostVote";
+import s from "./postFull.module.scss";
 
 const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
   ssr: false,
@@ -26,7 +26,7 @@ interface IProps {
 export const PostFull = ({ post, mutate }: IProps) => {
   return (
     <>
-      <div className="wrapper-md p-8">
+      <div className="wrapper p-8">
         <div className="mb-8">
           {/* Header */}
 
@@ -77,7 +77,7 @@ export const PostFull = ({ post, mutate }: IProps) => {
         {/* Image */}
 
         {post?.coverUrl ? (
-          <div className={classNames("post-image-preview", "mb-8")}>
+          <div className={classNames("post-image-preview full", "mb-8")}>
             <img src={post.coverUrl} alt={post.title} loading="lazy" />
           </div>
         ) : (

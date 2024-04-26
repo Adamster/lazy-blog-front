@@ -3,12 +3,12 @@ import { Layout } from "@/layout/Layout";
 import { Analytics } from "@vercel/analytics/react";
 import { SessionProvider } from "next-auth/react";
 import { AppProps } from "next/app";
-import { Montserrat } from "next/font/google";
+import { Mulish } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 
 import "../assets/styles/styles.scss";
 
-const montserrat = Montserrat({
+const font = Mulish({
   weight: ["300", "400", "500", "600", "700"],
   subsets: ["latin"],
 });
@@ -18,13 +18,13 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
     <>
       <SessionProvider session={session}>
         <ThemeProvider>
-          <Layout className={montserrat.className}>
+          <Layout className={font.className}>
             <Component {...pageProps} />
           </Layout>
         </ThemeProvider>
       </SessionProvider>
 
-      <Toaster position="top-center" />
+      <Toaster position="top-right" />
       <Analytics />
     </>
   );

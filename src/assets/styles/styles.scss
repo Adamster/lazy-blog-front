@@ -26,11 +26,15 @@
   --color-danger: rgb(255, 83, 83);
 
   // additional
-  --max-width: 1200px;
+  --max-width: 900px;
   --max-width-md: 900px;
   --max-width-sm: 400px;
-  --br: 0.3rem;
+  --br: 0.4rem;
 
+}
+
+body {
+  font-size: 14px;
 }
 
 body.dark {

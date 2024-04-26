@@ -21,17 +21,13 @@ export default function Home() {
         <meta
           key="og:title"
           property="og:title"
-          content="Посты | Not Lazy Blog"
+          content="Not Lazy Blog"
         />
       </Head>
 
       {isLoading && <Loading />}
 
       <div className="wrapper p-8">
-        {data && (
-          <h2 className="text-2xl text-center font-bold mb-8">Все посты</h2>
-        )}
-
         <div className="postsGrid">
           {data &&
             data.map((post: IPost, index) => {
