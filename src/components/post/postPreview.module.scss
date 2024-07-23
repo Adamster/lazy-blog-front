@@ -1,10 +1,11 @@
 .preview {
   display: flex;
-  flex-direction: row;
-  gap: 2rem;
+  flex-direction: column;
+  gap: 1rem;
 
   &:hover .previewCover img {
     opacity: 1;
+    filter: grayscale(0);
   }
 
   @media screen and (max-width: 580px) {
@@ -28,15 +29,13 @@
 .previewCover {
   flex-shrink: 0;
   width: 100%;
-  max-width: 10rem;
-  // position: relative;
+  // max-width: 13rem;
 }
 
 .previewTitle {
   max-width: 100%;
 
   h2 {
-    // white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     color: var(--color-primary);
@@ -44,7 +43,6 @@
 }
 
 .previewSummary {
-  // color: var(--color-gray);
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;

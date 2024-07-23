@@ -60,7 +60,7 @@ const Create = () => {
 
       {requesting && <Loading />}
 
-      <div className="wrapper p-8">
+      <div className="p-8">
         <CreateEdit form={form} onSubmit={onSubmit} />
       </div>
     </>

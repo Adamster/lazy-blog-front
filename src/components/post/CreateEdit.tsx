@@ -34,7 +34,7 @@ export const CreateEdit = ({
   } = form;
 
   return (
-    <div className="mx-auto" style={{ maxWidth: "var(--max-width-md)" }}>
+    <div className="mx-auto" style={{ maxWidth: "var(--max-width-lg)" }}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="px-0 sm:px-8">
           <div className="text-center">
@@ -126,7 +126,7 @@ export const CreateEdit = ({
           )}
         </div>
 
-        <div className="px-0 sm:px-16">
+        <div className="px-0">
           <div className="mb-6">
             {errors?.body && (
               <small className="color-danger">Очень сильно необходимо</small>
