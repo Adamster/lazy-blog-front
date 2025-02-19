@@ -1,5 +1,8 @@
+import { apiClient } from "@/api/apiClient";
+import { VoteDirection } from "@/api/apis";
 import { API_URL } from "@/utils/fetcher";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
@@ -11,29 +14,46 @@ interface IProps {
 }
 
 export const PostVote = ({ postId, rating, mutate }: IProps) => {
-  const { data: auth } = useSession();
+  // const { data: auth } = useSession();
 
-  const handleVote = async (direction: string) => {
-    await axios
-      .put(
-        `${API_URL}/posts/${postId}/vote?direction=${direction}`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${auth?.user?.accessToken}`,
-          },
-        }
-      )
-      .then(async (response) => {
-        mutate();
-      })
-      .catch((error) => {
-        toast.error(
-          error.response.data.detail ?? "Возможно ошибка авторизации"
-        );
+  const handleVote = useMutation({
+    mutationFn: ({ direction }: { direction: VoteDirection }) => {
+      return apiClient.posts.apiPostsIdVotePut({
+        id: postId,
+        direction,
       });
-  };
+    },
+
+    onError: (error: any) => {
+      mutate();
+
+      if (error?.response?.status == 400) {
+        toast.error("Пожалуй хватит");
+      }
+    },
+  });
+
+  // const handleVote = async (direction: string) => {
+  //   await axios
+  //     .put(
+  //       `${API_URL}/posts/${postId}/vote?direction=${direction}`,
+  //       {},
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${auth?.user?.accessToken}`,
+  //         },
+  //       }
+  //     )
+  //     .then(async (response) => {
+  //       mutate();
+  //     })
+  //     .catch((error) => {
+  //       toast.error(
+  //         error.response.data.detail ?? "Возможно ошибка авторизации"
+  //       );
+  //     });
+  // };
 
   return (
     <div className="flex items-center justify-center">
@@ -41,7 +61,7 @@ export const PostVote = ({ postId, rating, mutate }: IProps) => {
         className="btn btn--default btn--link"
         style={{ padding: ".1rem" }}
         onClick={() => {
-          handleVote("down");
+          handleVote.mutate({ direction: VoteDirection.Down });
         }}
       >
         <ChevronDownIcon width={".9rem"}></ChevronDownIcon>
@@ -53,7 +73,7 @@ export const PostVote = ({ postId, rating, mutate }: IProps) => {
         className="btn btn--default btn--link"
         style={{ padding: ".1rem" }}
         onClick={() => {
-          handleVote("up");
+          handleVote.mutate({ direction: VoteDirection.Up });
         }}
       >
         <ChevronUpIcon width={".9rem"}></ChevronUpIcon>

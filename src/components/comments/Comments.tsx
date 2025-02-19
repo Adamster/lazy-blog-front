@@ -11,6 +11,9 @@ import Loading from "../loading";
 import AddEditComment from "./AddEditComment";
 import Comment from "./Comment";
 import s from "./comments.module.scss";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/api/apiClient";
+import { CommentResponse } from "@/api/apis";
 
 interface IProps {
   postId: string;
@@ -20,24 +23,25 @@ export function Comments({ postId }: IProps) {
   const { data: auth } = useSession();
   const [requesting, setRequesting] = useState(false);
 
-  const { data, mutate, error, isLoading } = useSWR<IComment[]>(
-    postId ? `${API_URL}/posts/${postId}/comments` : null,
-    fetcher
-  );
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["apiPostsIdCommentsGet", postId],
+    queryFn: () => apiClient.posts.apiPostsIdCommentsGet({ id: postId }),
+    enabled: !!postId,
+  });
 
   const handleDelete = async (id: string) => {
     if (confirm("Ты точно хочешь удолить этот коммент?")) {
       setRequesting(true);
 
       await axios
-        .delete(`${API_URL}/comments/${id}`, {
+        .delete(`${API_URL}/api/comments/${id}`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${auth?.user?.accessToken}`,
           },
         })
         .then(() => {
-          mutate();
+          refetch();
         })
         .catch(({ error }) => {
           console.log(error);
@@ -64,7 +68,7 @@ export function Comments({ postId }: IProps) {
             <AddEditComment
               auth={auth}
               postId={postId}
-              mutate={mutate}
+              mutate={refetch}
               setRequesting={setRequesting}
             />
           </div>
@@ -73,7 +77,7 @@ export function Comments({ postId }: IProps) {
         <div className="p-0 sm:px-16">
           <div id="comments" className={s.commentsContainer}>
             <div className={s.commentsList}>
-              {data?.map((comment: IComment) => (
+              {data?.map((comment: CommentResponse) => (
                 <Comment
                   key={comment.id}
                   comment={comment}

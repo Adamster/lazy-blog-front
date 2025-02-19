@@ -66,6 +66,7 @@ export const CreateEdit = ({
 
           <div>
             <input
+              required
               style={{
                 textAlign: "center",
                 paddingTop: 0,
@@ -74,7 +75,7 @@ export const CreateEdit = ({
               }}
               className="input"
               {...register("summary")}
-              placeholder="Короткое описание (опционально)"
+              placeholder="Короткое описание"
             />
           </div>
 
@@ -116,7 +117,7 @@ export const CreateEdit = ({
 
         <div className="mb-8 text-center">
           {watch("coverUrl") ? (
-            <div className="post-image-preview">
+            <div className="post-image-preview full">
               <img src={watch("coverUrl")} alt="" />
             </div>
           ) : (

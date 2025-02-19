@@ -2,13 +2,15 @@ import { API_URL } from "@/utils/fetcher";
 import axios from "axios";
 import { EmojiStyle, Theme } from "emoji-picker-react";
 // import { Theme } from "emoji-picker-react/dist/types/exposedTypes";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/providers/ThemeProvider";
 import { FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { Session } from "next-auth";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import s from "./comments.module.scss";
+import { useMutation } from "@tanstack/react-query";
+import { apiClient } from "@/api/apiClient";
 
 const Picker = dynamic(
   () => {
@@ -27,34 +29,56 @@ interface IProps {
 const AddEditComment = ({ postId, auth, setRequesting, mutate }: IProps) => {
   const [body, setBody] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
-  const { darkTheme } = useTheme();
+  const { theme } = useTheme();
+
+  const handleSend = useMutation({
+    mutationFn: () => {
+      return apiClient.comments.apiCommentsPost({
+        addCommentRequest: { postId: postId, userId: auth!.user?.id, body },
+      });
+    },
+
+    onSuccess: () => {
+      setBody("");
+      mutate();
+    },
+
+    onError: (error: any) => {
+      console.log(error);
+    },
+
+    onSettled: () => {
+      setRequesting(false);
+    },
+  });
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     setRequesting(true);
+    handleSend.mutate();
 
-    await axios
-      .post(
-        `${API_URL}/comments`,
-        { postId: postId, userId: auth?.user?.id, body: body },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${auth?.user?.accessToken}`,
-          },
-        }
-      )
-      .then(async (response) => {
-        setBody("");
-        mutate();
-      })
-      .catch(({ error }) => {
-        console.log(error);
-      })
-      .finally(() => {
-        setRequesting(false);
-      });
+    // await axios
+    //   .post(
+    //     `${API_URL}/comments`,
+    //     { postId: postId, userId: auth?.user?.id, body: body },
+    //     {
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //         Authorization: `Bearer ${auth?.user?.accessToken}`,
+    //       },
+    //     }
+    //   )
+    //   .then(async (response) => {
+    //     setBody("");
+    //     mutate();
+    //   })
+    //   .catch(({ error }) => {
+    //     console.log(error);
+    //   })
+    //   .finally(() => {
+    //     setRequesting(false);
+    //   });
   };
 
   return (
@@ -62,7 +86,7 @@ const AddEditComment = ({ postId, auth, setRequesting, mutate }: IProps) => {
       <div className={s.addCommentInput}>
         <textarea
           className="input"
-          placeholder="И что вы думаете?..."
+          placeholder="Напиши что-ли пару строк"
           required
           value={body}
           onChange={(e: any) => setBody(e.target.value)}
@@ -71,7 +95,7 @@ const AddEditComment = ({ postId, auth, setRequesting, mutate }: IProps) => {
         {showEmoji && (
           <div className={s.emojiPicker}>
             <Picker
-              theme={darkTheme ? Theme.DARK : Theme.LIGHT}
+              theme={theme === "dark" ? Theme.DARK : Theme.LIGHT}
               onEmojiClick={(e: any) => {
                 setBody((body) => body + e.emoji);
               }}
