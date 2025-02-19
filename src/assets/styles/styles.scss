@@ -27,11 +27,13 @@
 
   // additional
   --max-width-lg: 1200px;
-  --max-width: 1000px;
+  --max-width: 1200px;
   --max-width-md: 900px;
   --max-width-sm: 400px;
-  --br: 0.4rem;
-
+  --br: 10px;
+  // --br: 1rem;
+  --space: 3rem;
+  
 }
 
 body {
@@ -74,3 +76,7 @@ body.dark {
 @import './forms.scss';
 
 
+.layout-main {
+  margin: 0 auto;
+  margin-top: 4rem;
+}

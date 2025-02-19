@@ -1,9 +1,10 @@
 .loading {
   display: block;
-  position: absolute;
+  position: fixed;
   width: 74px;
   height: 13px;
-  margin: -2.3rem -37px 0;
+  margin: 0 -37px 0;
+  top: calc(2rem - 12px/2);
   left: 50%;
   z-index: 99999;
 }

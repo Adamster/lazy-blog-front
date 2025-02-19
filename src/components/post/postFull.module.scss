@@ -1,13 +1,18 @@
 .infoLine {
-  display: flex;
+  margin: 0 auto;
+  display: inline-flex;
   align-items: center;
   flex-direction: row;
   justify-content: center;
   margin-top: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   flex-wrap: wrap;
   column-gap: 2rem;
   row-gap: .5rem;
+
+  background: #eee;
+  padding: 5px 10px;
+  border-radius: 10px;
 
   &Stat {
     font-size: 0.8rem;

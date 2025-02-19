@@ -1,30 +1,14 @@
-import moment from "moment";
+import { format, formatDistanceToNow, isValid } from "date-fns";
+import { enUS } from "date-fns/locale";
 
-// moment.updateLocale("en", {
-//   relativeTime: {
-//     future: "в %s",
-//     past: "%s назад",
-//     s: "несколько секунд",
-//     ss: "%d секунд",
-//     m: "минуту",
-//     mm: "%d минут",
-//     h: "час",
-//     hh: "%d часов",
-//     d: "день",
-//     dd: "%d дней",
-//     w: "неделю",
-//     ww: "%d недель",
-//     M: "месяц",
-//     MM: "%d месяцев",
-//     y: "год",
-//     yy: "%d лет",
-//   },
-// });
-
-export function formatDate(date: string) {
-  return moment.parseZone(date).utcOffset(date).fromNow();
+export function formatDate(date: string | Date) {
+  const parsedDate = date instanceof Date ? date : new Date(date);
+  if (!isValid(parsedDate)) return "Invalid date";
+  return formatDistanceToNow(parsedDate, { addSuffix: true, locale: enUS });
 }
 
-export function formatDate2(date: string) {
-  return moment(date).format("D MMM YYYY");
+export function formatDate2(date: string | Date) {
+  const parsedDate = date instanceof Date ? date : new Date(date);
+  if (!isValid(parsedDate)) return "Invalid date";
+  return format(parsedDate, "d MMM yyyy", { locale: enUS });
 }

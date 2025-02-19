@@ -1,15 +1,15 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Lazy Blog
 
-## Getting Started
+Lazy Blog — это минималистичный блог на Next.js, в котором публикуются случайные темы без строгих ограничений.
 
-First, run the development server:
+## Технологии
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+- Next.js
+- React Query
+- TypeScript
+- Tailwind CSS
+- Markdown/MDX
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Лицензия
+
+MIT

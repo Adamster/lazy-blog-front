@@ -1,9 +1,9 @@
-import { IUser } from '@/types';
-import { formatDate2 } from '@/utils/format-date';
-import { PencilSquareIcon } from '@heroicons/react/24/outline';
-import classNames from 'classnames';
-import Link from 'next/link';
-import s from './user.module.scss';
+import { IUser } from "@/types";
+import { formatDate2 } from "@/utils/format-date";
+import { PencilSquareIcon } from "@heroicons/react/24/outline";
+import classNames from "classnames";
+import Link from "next/link";
+import s from "./user.module.scss";
 
 interface IProps {
   user: IUser | undefined;
@@ -13,7 +13,7 @@ interface IProps {
 
 export const UserDetails = ({ user, authUserId, postsNum }: IProps) => {
   return (
-    <div className={classNames(s.userDetails, 'p-in')}>
+    <div className={classNames(s.userDetails)}>
       {user && (
         <div className={s.userTop}>
           {user.avatarUrl && (
@@ -29,7 +29,7 @@ export const UserDetails = ({ user, authUserId, postsNum }: IProps) => {
                 href={`/u/edit/`}
                 className="inline-block color-primary ml-4"
               >
-                <PencilSquareIcon width={'1rem'} />
+                <PencilSquareIcon width={"1rem"} />
               </Link>
             )}
             <h1 className="text-2xl font-bold"></h1>

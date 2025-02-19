@@ -4,9 +4,11 @@ import classNames from "classnames";
 import { Session } from "next-auth";
 import Link from "next/dist/client/link";
 import s from "./comments.module.scss";
+import { CommentResponse } from "@/api/apis";
+import { TrashIcon } from "@heroicons/react/24/solid";
 
 interface IProps {
-  comment: IComment;
+  comment: CommentResponse;
   auth?: Session | null;
   handleDelete: (id: string) => void;
 }
@@ -15,7 +17,7 @@ const Comment = ({ comment, auth, handleDelete }: IProps) => {
   return (
     <div className={s.comment}>
       <div className={classNames("author", "mb-2")}>
-        <Link href={`/u/${comment.user.userName}`} className="authorName">
+        <Link href={`/${comment.user.userName}`} className="authorName">
           {comment.user.avatarUrl && (
             <img src={comment.user.avatarUrl} alt={comment.user.userName} />
           )}
@@ -27,8 +29,8 @@ const Comment = ({ comment, auth, handleDelete }: IProps) => {
           <span>{formatDate(comment.createdAtUtc)}</span>
         </div>
 
-        {/* {auth?.user?.id == comment.user.id && (
-          <div className="authorDate">
+        {auth?.user?.id == comment.user.id && (
+          <div className="authorIcon">
             <button
               className={classNames("btn btn--link", s.delete)}
               onClick={() => {
@@ -38,7 +40,7 @@ const Comment = ({ comment, auth, handleDelete }: IProps) => {
               <TrashIcon width={"1rem"} />
             </button>
           </div>
-        )} */}
+        )}
       </div>
 
       <div className={s.commentBody} style={{ whiteSpace: "pre-line" }}>
