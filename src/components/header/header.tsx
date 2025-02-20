@@ -1,25 +1,23 @@
 "use client";
 
-import { MoonIcon, PowerIcon, UserIcon } from "@heroicons/react/24/solid";
+import { PowerIcon, UserIcon } from "@heroicons/react/24/solid";
 import cn from "classnames";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 import s from "./header.module.scss";
-import { useTheme } from "@/providers/ThemeProvider";
+import { AuthModal } from "../auth/auth-modal";
 
 export const Header = () => {
-  // const router = useRouter();
   const { data: auth } = useSession();
-  const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
 
-  const navigation = [
-    // { name: "Домой", href: "/" },
-    { name: "Создать", href: "/create", authRequired: true },
-  ];
+  const [isAuthModalOpen, setAuthModalOpen] = useState(false);
+
+  const navigation = [{ name: "Создать", href: "/create", authRequired: true }];
 
   return (
     <header className={s.header}>
@@ -46,14 +44,6 @@ export const Header = () => {
         </nav>
 
         <div className={s.actions}>
-          {/* <button className="btn btn--link" onClick={toggleTheme}>
-            {darkTheme ? (
-              <MoonIcon width={"1.1rem"} color="var(--color-primary)" />
-            ) : (
-              <MoonIconSolid width={"1.1rem"} color="var(--color-primary)" />
-            )}
-          </button> */}
-
           {auth ? (
             <>
               <Link
@@ -72,7 +62,7 @@ export const Header = () => {
                       maxHeight: "30px",
                       maxWidth: "30px",
                     }}
-                  ></Image>
+                  />
                 ) : (
                   <div
                     className="rounded-full p-1"
@@ -84,28 +74,26 @@ export const Header = () => {
               </Link>
               <button
                 className="btn btn--link color-primary"
-                onClick={() => {
-                  signOut();
-                }}
+                onClick={() => signOut()}
               >
                 <PowerIcon width={"1.3rem"} />
               </button>
             </>
           ) : (
-            <Link className="btn btn--primary" href="/auth/login">
+            <button
+              className="btn btn--primary"
+              onClick={() => setAuthModalOpen(true)}
+            >
               Войти
-            </Link>
+            </button>
           )}
-
-          {/* <button className="btn btn--link" onClick={toggleTheme}>
-            {theme === "dark" ? (
-              <MoonIcon width={"1.1rem"} color="var(--color-primary)" />
-            ) : (
-              <MoonIconSolid width={"1.1rem"} color="var(--color-primary)" />
-            )}
-          </button> */}
         </div>
       </div>
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
     </header>
   );
 };

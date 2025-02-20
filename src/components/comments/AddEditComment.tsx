@@ -1,16 +1,14 @@
-import { API_URL } from "@/utils/fetcher";
-import axios from "axios";
 import { EmojiStyle, Theme } from "emoji-picker-react";
 // import { Theme } from "emoji-picker-react/dist/types/exposedTypes";
+import { apiClient } from "@/api/api-client";
 import { useTheme } from "@/providers/ThemeProvider";
 import { FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
+import { useMutation } from "@tanstack/react-query";
 import classNames from "classnames";
 import { Session } from "next-auth";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import s from "./comments.module.scss";
-import { useMutation } from "@tanstack/react-query";
-import { apiClient } from "@/api/apiClient";
 
 const Picker = dynamic(
   () => {

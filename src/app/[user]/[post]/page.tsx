@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { apiClient } from "@/api/apiClient";
-import PostClient from "./postClient";
+import { apiClient } from "@/api/api-client";
 import { PageProps } from "../../../../.next/types/app/layout";
+import PostClient from "./postClient";
 
 export async function generateMetadata({ params }: PageProps) {
   try {

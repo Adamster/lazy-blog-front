@@ -1,14 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import axios from "axios";
-import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 
+import { apiClient } from "@/api/api-client";
 import ErrorMessage from "@/components/errorMessages/ErrorMessage";
 import Loading from "@/components/loading";
 import { PostFull } from "@/components/post/PostFull";
-import { apiClient } from "@/api/apiClient";
 
 export default function PostClient({ postSlug }: { postSlug: string }) {
   // const { data: auth } = useSession();

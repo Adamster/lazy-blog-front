@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
+import { useEffect, useRef } from "react";
 
-import { apiClient } from "@/api/apiClient";
+import { apiClient } from "@/api/api-client";
 import ErrorMessage from "@/components/errorMessages/ErrorMessage";
 import Loading from "@/components/loading";
 import PostPreview from "@/components/post/PostPreview";

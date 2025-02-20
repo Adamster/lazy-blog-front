@@ -3,17 +3,15 @@
 import { useSession } from "next-auth/react";
 
 import Head from "next/head";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
 import Loading from "@/components/loading";
 import { CreateEdit } from "@/components/post/CreateEdit";
-import { API_URL } from "@/utils/fetcher";
-import axios from "axios";
 // import { useRouter } from 'next/dist/client/router';
+import { apiClient } from "@/api/api-client";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { useMutation } from "@tanstack/react-query";
-import { apiClient } from "@/api/apiClient";
 // import { useRouter } from "next/navigation";
 
 // Component

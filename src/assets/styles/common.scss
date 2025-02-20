@@ -193,3 +193,12 @@ hr {
     border-radius: 1rem;
   }
 }
+
+.auth-form {
+  border-radius: var(--br);
+  overflow: hidden;
+  background: var(--color-foreground);
+  padding: 2rem;
+  width: var(--max-width-sm);
+  margin: 0 auto;
+}

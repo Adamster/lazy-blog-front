@@ -1,10 +1,7 @@
-import { apiClient } from "@/api/apiClient";
+import { apiClient } from "@/api/api-client";
 import { VoteDirection } from "@/api/apis";
-import { API_URL } from "@/utils/fetcher";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
-import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
 
 interface IProps {

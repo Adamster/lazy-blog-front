@@ -1,19 +1,17 @@
-import { IComment } from "@/types";
-import { API_URL, fetcher } from "@/utils/fetcher";
+import { apiClient } from "@/api/api-client";
+import { CommentResponse } from "@/api/apis";
+import { API_URL } from "@/utils/fetcher";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import classNames from "classnames";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import useSWR from "swr";
 import IsAuth from "../guards/IsAuth";
 import Loading from "../loading";
 import AddEditComment from "./AddEditComment";
 import Comment from "./Comment";
 import s from "./comments.module.scss";
-import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/api/apiClient";
-import { CommentResponse } from "@/api/apis";
 
 interface IProps {
   postId: string;

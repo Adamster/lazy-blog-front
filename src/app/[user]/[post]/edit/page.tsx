@@ -1,11 +1,10 @@
 "use client";
 
-import { apiClient } from "@/api/apiClient";
+import { apiClient } from "@/api/api-client";
 import ErrorMessage from "@/components/errorMessages/ErrorMessage";
 import Loading from "@/components/loading";
 import { CreateEdit } from "@/components/post/CreateEdit";
-import { IPost } from "@/types";
-import { API_URL, fetcher } from "@/utils/fetcher";
+import { API_URL } from "@/utils/fetcher";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useSession } from "next-auth/react";
@@ -13,9 +12,8 @@ import Head from "next/head";
 import { useParams, useRouter } from "next/navigation";
 // import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
-import { FieldValues, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import useSWR from "swr";
 
 const PostEdit = () => {
   const { data: auth } = useSession();

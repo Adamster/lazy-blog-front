@@ -2,18 +2,6 @@ import type { NextConfig } from "next";
 import removeImports from "next-remove-imports";
 
 const nextConfig: NextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  async redirects() {
-    return [
-      {
-        source: "/u/:user/:post",
-        destination: "/:user/:post",
-        permanent: true,
-      },
-    ];
-  },
   experimental: {
     scrollRestoration: true,
   },
@@ -26,6 +14,15 @@ const nextConfig: NextConfig = {
         pathname: "/images/**",
       },
     ],
+  },
+  async redirects() {
+    return [
+      {
+        source: "/u/:user/:post",
+        destination: "/:user/:post",
+        permanent: true,
+      },
+    ];
   },
   ...removeImports(),
 };

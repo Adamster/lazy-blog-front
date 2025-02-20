@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { apiClient } from "@/api/apiClient";
+import { apiClient } from "@/api/api-client";
 import ErrorMessage from "@/components/errorMessages/ErrorMessage";
 import Loading from "@/components/loading";
 import PostPreview from "@/components/post/PostPreview";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 
 export default function Home() {
   const observerRef = useRef(null);
@@ -21,12 +21,9 @@ export default function Home() {
   } = useInfiniteQuery({
     queryKey: ["apiPostsGet"],
     queryFn: ({ pageParam = 0 }) =>
-      apiClient.posts.apiPostsGet({ offset: pageParam }) || [],
-    getNextPageParam: (lastPage, allPages) => {
-      return lastPage.length === PAGE_SIZE
-        ? allPages.length * PAGE_SIZE
-        : undefined;
-    },
+      apiClient.posts.apiPostsGet({ offset: pageParam }) ?? [],
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length === PAGE_SIZE ? allPages.flat().length : undefined,
     initialPageParam: 0,
   });
 
