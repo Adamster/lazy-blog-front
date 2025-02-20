@@ -9,7 +9,7 @@ import { useEffect, useRef } from "react";
 
 export default function Home() {
   const observerRef = useRef(null);
-  const PAGE_SIZE = 12;
+  const PAGE_SIZE = 24;
 
   const {
     data,

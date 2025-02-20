@@ -11,7 +11,7 @@ import Loading from "@/components/loading";
 import PostPreview from "@/components/post/PostPreview";
 import { UserDetails } from "@/components/user/UserDetails";
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 24;
 
 export default function User() {
   const observerRef = useRef(null);
@@ -36,12 +36,12 @@ export default function User() {
 
       return {
         postItems: response?.postItems || [],
-        user: response?.user || null, // Убеждаемся, что `user` есть
+        user: response?.user || null,
       };
     },
     getNextPageParam: (lastPage, allPages) =>
       lastPage.postItems.length === PAGE_SIZE
-        ? allPages.length * PAGE_SIZE
+        ? allPages.flat().length
         : undefined,
     initialPageParam: 0,
     enabled: !!userName, // Запрос выполняется только при наличии userName
@@ -61,8 +61,8 @@ export default function User() {
 
   if (error) return <ErrorMessage code={error.message || "Unknown error"} />;
 
-  const user = data?.pages?.[0]?.user; // Гарантированно берем `user` из первой страницы
-  const posts = data?.pages?.flatMap((page) => page.postItems) || []; // Собираем `postItems` из всех страниц
+  const user = data?.pages?.[0]?.user;
+  const posts = data?.pages?.flatMap((page) => page.postItems) || [];
 
   return (
     <div className="wrapper p-8">
