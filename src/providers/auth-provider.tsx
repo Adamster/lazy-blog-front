@@ -15,17 +15,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 function AuthHandler({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
 
-  // const handleSignOut = useCallback(() => {
-  //   console.warn("[Auth] Token refresh error, signing out...");
-  //   signOut();
-  // }, []);
-
   useEffect(() => {
-    if ((session as any)?.error) {
-      console.log("session", session);
+    if (
+      status === "authenticated" &&
+      (session as any)?.error === "RefreshAccessTokenError"
+    ) {
       signOut();
     }
-  }, [session]);
+  }, [session, status]);
 
   if (status === "loading") return null;
 
