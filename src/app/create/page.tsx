@@ -78,53 +78,6 @@ const Create = () => {
   //     });
   // };
 
-  const handlePaste = useCallback(async (event: any) => {
-    const items = event.clipboardData?.items;
-    if (!items) return;
-
-    for (const item of items) {
-      if (item.type.indexOf("image") === -1) continue;
-
-      const file = item.getAsFile();
-      if (!file) return;
-
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const response = await axios.post(
-          `${API_URL}/media/${auth?.user.id}/upload`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${auth?.user.accessToken}`,
-            },
-          }
-        );
-        const imageUrl = response.data; // Adjust based on returned data structure
-        console.log("File uploaded on url:");
-        console.log(imageUrl);
-        console.log(response.data);
-        if (imageUrl) {
-          const activeElement = document.activeElement;
-          console.log(activeElement);
-          const contentToAppend = `![image](${imageUrl})`;
-          activeElement?.append(contentToAppend);
-        }
-      } catch (error) {
-        console.error("Image upload failed:", error);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    document.addEventListener("paste", handlePaste);
-    return () => {
-      document.removeEventListener("paste", handlePaste);
-    };
-  }, [handlePaste]);
-
   return (
     <>
       <Head>

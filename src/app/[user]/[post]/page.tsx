@@ -1,13 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiClient } from "@/api/apiClient";
 import PostClient from "./postClient";
+import { PageProps } from "../../../../.next/types/app/layout";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { post: string };
-}) {
+export async function generateMetadata({ params }: PageProps) {
   try {
-    const postSlug = params.post;
+    const postSlug = (params as any).post;
     const post = await apiClient.posts.apiPostsSlugGet({ slug: postSlug });
 
     return {
@@ -33,6 +31,6 @@ export async function generateMetadata({
   }
 }
 
-export default function Post({ params }: { params: { post: string } }) {
-  return <PostClient postSlug={params.post} />;
+export default function Post({ params }: PageProps) {
+  return <PostClient postSlug={(params as any).post} />;
 }

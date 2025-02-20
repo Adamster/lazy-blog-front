@@ -25,7 +25,8 @@ async function refreshAccessToken(token: any) {
   }
 }
 
-export const authOptions: NextAuthOptions = {
+// Сделай authOptions локальной константой, не экспортируя её
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -64,21 +65,21 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         return {
           ...user,
-          accessToken: user.accessToken,
-          refreshToken: user.refreshToken,
+          accessToken: (user as any).accessToken,
+          refreshToken: (user as any).refreshToken,
           accessTokenExpires: Date.now() + 30 * 60 * 1000,
         };
       }
 
-      if (Date.now() < token.accessTokenExpires) return token;
+      if (Date.now() < (token as any).accessTokenExpires) return token;
 
       return refreshAccessToken(token);
     },
     async session({ session, token }) {
       if (token) {
-        session.user = token.user;
-        session.user.accessToken = token.accessToken;
-        session.error = token.error ? token.error : null;
+        (session as any).user = token.user;
+        (session as any).user.accessToken = token.accessToken;
+        (session as any).error = token.error ? token.error : null;
       }
       return session;
     },

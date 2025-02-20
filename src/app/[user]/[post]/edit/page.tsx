@@ -45,7 +45,6 @@ const PostEdit = () => {
     return auth?.user?.id && values?.author?.id === auth?.user?.id;
   }, [auth?.user?.id, values?.author?.id]);
 
-  // ✅ Редирект, если не автор
   useEffect(() => {
     if (!isLoading && !isAuthor) {
       router.replace("/");
@@ -100,8 +99,7 @@ const PostEdit = () => {
       });
   };
 
-  if (error || values?.code)
-    return <ErrorMessage code={error?.response?.data?.code} />;
+  if (error) return <ErrorMessage />;
 
   return (
     <>

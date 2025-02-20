@@ -6,6 +6,11 @@ import "@uiw/react-markdown-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 
 import dynamic from "next/dynamic";
+import { PostDetailedResponse } from "@/api/apis";
+import { API_URL } from "@/utils/fetcher";
+import axios from "axios";
+import { useCallback, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 const MarkdownEditor = dynamic(
   () => import("@uiw/react-markdown-editor").then((mod) => mod.default),
@@ -13,7 +18,7 @@ const MarkdownEditor = dynamic(
 );
 
 interface IProps {
-  form: UseFormReturn<FieldValues, any>;
+  form: any;
   onSubmit: (data: any) => void;
   onDelete?: () => void;
   edit?: boolean;
@@ -32,6 +37,55 @@ export const CreateEdit = ({
     watch,
     formState: { errors },
   } = form;
+
+  const { data: auth } = useSession();
+
+  const handlePaste = useCallback(async (event: any) => {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+
+    for (const item of items) {
+      if (item.type.indexOf("image") === -1) continue;
+
+      const file = item.getAsFile();
+      if (!file) return;
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await axios.post(
+          `${API_URL}/api/media/${auth?.user.id}/upload`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${auth?.user.accessToken}`,
+            },
+          }
+        );
+        const imageUrl = response.data; // Adjust based on returned data structure
+        console.log("File uploaded on url:");
+        console.log(imageUrl);
+        console.log(response.data);
+        if (imageUrl) {
+          const activeElement = document.activeElement;
+          console.log(activeElement);
+          const contentToAppend = `![image](${imageUrl})`;
+          activeElement?.append(contentToAppend);
+        }
+      } catch (error) {
+        console.error("Image upload failed:", error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("paste", handlePaste);
+    return () => {
+      document.removeEventListener("paste", handlePaste);
+    };
+  }, [handlePaste]);
 
   return (
     <div className="mx-auto" style={{ maxWidth: "var(--max-width-lg)" }}>
