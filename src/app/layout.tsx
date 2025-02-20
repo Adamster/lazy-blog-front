@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/next-script-for-ga */
 import type { Metadata } from "next";
 import { Mulish } from "next/font/google";
-import { Layout, LayoutClient } from "../components/layout/layout";
+import { Layout } from "../components/layout/layout";
 
 const font = Mulish({
   weight: ["300", "400", "500", "600", "700"],
