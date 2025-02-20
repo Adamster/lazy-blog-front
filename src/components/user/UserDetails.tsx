@@ -4,9 +4,10 @@ import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import Link from "next/link";
 import s from "./user.module.scss";
+import { UserResponse } from "@/api/apis";
 
 interface IProps {
-  user: IUser | undefined;
+  user: UserResponse | undefined;
   postsNum: number | undefined;
   authUserId: string | undefined;
 }
@@ -35,7 +36,7 @@ export const UserDetails = ({ user, authUserId, postsNum }: IProps) => {
             <h1 className="text-2xl font-bold"></h1>
 
             <p className="color-gray">
-              Зарегался {formatDate2(user.createdOnUtc)}
+              Зарегался {formatDate2(user.createdOnUtc || "")}
             </p>
 
             {/* <div className="flex content-center flex-wrap">

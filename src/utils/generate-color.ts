@@ -1,3 +1,4 @@
+/* eslint-disable no-var */
 export const generateColor = function (str: string) {
   var hash = 0;
   for (var i = 0; i < str.length; i++) {

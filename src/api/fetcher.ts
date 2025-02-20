@@ -1,6 +1,6 @@
 import { getSession } from "next-auth/react";
 
-export const customFetcher = async (config) => {
+export const customFetcher = async (config: any) => {
   const session = await getSession(); // NextAuth
 
   const response = await fetch(config.url, {

@@ -48,7 +48,7 @@ export default function EditProfile() {
         }
       );
       toast.success("Аватар успешно обновлен!");
-      router.back();
+      // router.back();
     } catch (error) {
       toast.error("Произошла ошибка при обновлении аватара");
       console.error(error);

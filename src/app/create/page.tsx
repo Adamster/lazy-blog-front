@@ -82,7 +82,7 @@ const Create = () => {
     const items = event.clipboardData?.items;
     if (!items) return;
 
-    for (let item of items) {
+    for (const item of items) {
       if (item.type.indexOf("image") === -1) continue;
 
       const file = item.getAsFile();
@@ -109,7 +109,7 @@ const Create = () => {
         if (imageUrl) {
           const activeElement = document.activeElement;
           console.log(activeElement);
-          var contentToAppend = `![image](${imageUrl})`;
+          const contentToAppend = `![image](${imageUrl})`;
           activeElement?.append(contentToAppend);
         }
       } catch (error) {

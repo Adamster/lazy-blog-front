@@ -1,4 +1,5 @@
 import { useSession } from "next-auth/react";
+import { JSX } from "react";
 
 interface IProps {
   children: React.ReactElement;

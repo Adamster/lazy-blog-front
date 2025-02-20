@@ -15,7 +15,7 @@ function AuthHandler({ children }: { children: React.ReactNode }) {
   const { data: auth } = useSession();
 
   useEffect(() => {
-    if (auth?.error === "RefreshAccessTokenError") {
+    if ((auth as any)?.error === "RefreshAccessTokenError") {
       signOut();
     }
   }, [auth]);
