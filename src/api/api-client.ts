@@ -1,4 +1,5 @@
-import { getSession } from "next-auth/react";
+"use client";
+
 import {
   CommentsApi,
   MediaApi,
@@ -11,14 +12,20 @@ import { Configuration } from "./apis/runtime";
 const apiConfig = new Configuration({
   basePath: process.env.NEXT_PUBLIC_API,
   fetchApi: async (input, init) => {
-    const session = await getSession();
+    let accessToken = "";
+
+    const storedAuth = localStorage.getItem("auth");
+
+    if (storedAuth) {
+      const auth = JSON.parse(storedAuth);
+      accessToken = auth.accessToken || "";
+    }
+
     const response = await fetch(input, {
       ...init,
       headers: {
         ...init?.headers,
-        Authorization: session?.user?.accessToken
-          ? `Bearer ${session.user.accessToken}`
-          : "",
+        Authorization: accessToken ? `Bearer ${accessToken}` : "",
       },
     });
 

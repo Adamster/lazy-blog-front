@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import removeImports from "next-remove-imports";
 
 const nextConfig: NextConfig = {
+  reactStrictMode: true,
   experimental: {
     scrollRestoration: true,
   },

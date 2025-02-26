@@ -43,39 +43,39 @@ import {
     UserResponseToJSON,
 } from '../models/index';
 
-export interface ApiUsersIdAvatarPostRequest {
-    id: string;
-    file?: Blob;
+export interface CheckUserAvailabilityRequest {
+    username: string;
 }
 
-export interface ApiUsersIdGetRequest {
-    id: string;
-}
-
-export interface ApiUsersIdPostsGetRequest {
+export interface GetPostsByUserIdRequest {
     id: string;
     offset?: number;
 }
 
-export interface ApiUsersIdPutRequest {
+export interface GetUserByIdRequest {
+    id: string;
+}
+
+export interface LoginOperationRequest {
+    loginRequest: LoginRequest;
+}
+
+export interface RefreshTokenOperationRequest {
+    refreshTokenRequest: RefreshTokenRequest;
+}
+
+export interface RegisterRequest {
+    registerUserRequest: RegisterUserRequest;
+}
+
+export interface UpdateUserOperationRequest {
     id: string;
     updateUserRequest: UpdateUserRequest;
 }
 
-export interface ApiUsersLoginPostRequest {
-    loginRequest: LoginRequest;
-}
-
-export interface ApiUsersRefreshPostRequest {
-    refreshTokenRequest: RefreshTokenRequest;
-}
-
-export interface ApiUsersRegisterPostRequest {
-    registerUserRequest: RegisterUserRequest;
-}
-
-export interface ApiUsersUsernameAvailableGetRequest {
-    username: string;
+export interface UploadUserAvatarRequest {
+    id: string;
+    file?: Blob;
 }
 
 /**
@@ -87,30 +87,16 @@ export interface ApiUsersUsernameAvailableGetRequest {
 export interface UsersApiInterface {
     /**
      * 
-     * @param {string} id 
-     * @param {Blob} [file] 
+     * @param {string} username 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof UsersApiInterface
      */
-    apiUsersIdAvatarPostRaw(requestParameters: ApiUsersIdAvatarPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    checkUserAvailabilityRaw(requestParameters: CheckUserAvailabilityRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<boolean>>;
 
     /**
      */
-    apiUsersIdAvatarPost(requestParameters: ApiUsersIdAvatarPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
-
-    /**
-     * 
-     * @param {string} id 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof UsersApiInterface
-     */
-    apiUsersIdGetRaw(requestParameters: ApiUsersIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserResponse>>;
-
-    /**
-     */
-    apiUsersIdGet(requestParameters: ApiUsersIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserResponse>;
+    checkUserAvailability(requestParameters: CheckUserAvailabilityRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<boolean>;
 
     /**
      * 
@@ -120,11 +106,63 @@ export interface UsersApiInterface {
      * @throws {RequiredError}
      * @memberof UsersApiInterface
      */
-    apiUsersIdPostsGetRaw(requestParameters: ApiUsersIdPostsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserPostResponse>>;
+    getPostsByUserIdRaw(requestParameters: GetPostsByUserIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserPostResponse>>;
 
     /**
      */
-    apiUsersIdPostsGet(requestParameters: ApiUsersIdPostsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserPostResponse>;
+    getPostsByUserId(requestParameters: GetPostsByUserIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserPostResponse>;
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApiInterface
+     */
+    getUserByIdRaw(requestParameters: GetUserByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserResponse>>;
+
+    /**
+     */
+    getUserById(requestParameters: GetUserByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserResponse>;
+
+    /**
+     * 
+     * @param {LoginRequest} loginRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApiInterface
+     */
+    loginRaw(requestParameters: LoginOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LoginResponse>>;
+
+    /**
+     */
+    login(requestParameters: LoginOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginResponse>;
+
+    /**
+     * 
+     * @param {RefreshTokenRequest} refreshTokenRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApiInterface
+     */
+    refreshTokenRaw(requestParameters: RefreshTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LoginResponse>>;
+
+    /**
+     */
+    refreshToken(requestParameters: RefreshTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginResponse>;
+
+    /**
+     * 
+     * @param {RegisterUserRequest} registerUserRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApiInterface
+     */
+    registerRaw(requestParameters: RegisterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     */
+    register(requestParameters: RegisterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
     /**
      * 
@@ -134,63 +172,25 @@ export interface UsersApiInterface {
      * @throws {RequiredError}
      * @memberof UsersApiInterface
      */
-    apiUsersIdPutRaw(requestParameters: ApiUsersIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    updateUserRaw(requestParameters: UpdateUserOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
 
     /**
      */
-    apiUsersIdPut(requestParameters: ApiUsersIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    updateUser(requestParameters: UpdateUserOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
     /**
      * 
-     * @param {LoginRequest} loginRequest 
+     * @param {string} id 
+     * @param {Blob} [file] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof UsersApiInterface
      */
-    apiUsersLoginPostRaw(requestParameters: ApiUsersLoginPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LoginResponse>>;
+    uploadUserAvatarRaw(requestParameters: UploadUserAvatarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
 
     /**
      */
-    apiUsersLoginPost(requestParameters: ApiUsersLoginPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginResponse>;
-
-    /**
-     * 
-     * @param {RefreshTokenRequest} refreshTokenRequest 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof UsersApiInterface
-     */
-    apiUsersRefreshPostRaw(requestParameters: ApiUsersRefreshPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LoginResponse>>;
-
-    /**
-     */
-    apiUsersRefreshPost(requestParameters: ApiUsersRefreshPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginResponse>;
-
-    /**
-     * 
-     * @param {RegisterUserRequest} registerUserRequest 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof UsersApiInterface
-     */
-    apiUsersRegisterPostRaw(requestParameters: ApiUsersRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
-
-    /**
-     */
-    apiUsersRegisterPost(requestParameters: ApiUsersRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
-
-    /**
-     * 
-     * @param {string} username 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof UsersApiInterface
-     */
-    apiUsersUsernameAvailableGetRaw(requestParameters: ApiUsersUsernameAvailableGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<boolean>>;
-
-    /**
-     */
-    apiUsersUsernameAvailableGet(requestParameters: ApiUsersUsernameAvailableGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<boolean>;
+    uploadUserAvatar(requestParameters: UploadUserAvatarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
 }
 
@@ -201,11 +201,253 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
 
     /**
      */
-    async apiUsersIdAvatarPostRaw(requestParameters: ApiUsersIdAvatarPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async checkUserAvailabilityRaw(requestParameters: CheckUserAvailabilityRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<boolean>> {
+        if (requestParameters['username'] == null) {
+            throw new runtime.RequiredError(
+                'username',
+                'Required parameter "username" was null or undefined when calling checkUserAvailability().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/users/{username}/available`.replace(`{${"username"}}`, encodeURIComponent(String(requestParameters['username']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<boolean>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
+    }
+
+    /**
+     */
+    async checkUserAvailability(requestParameters: CheckUserAvailabilityRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<boolean> {
+        const response = await this.checkUserAvailabilityRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getPostsByUserIdRaw(requestParameters: GetPostsByUserIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserPostResponse>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling apiUsersIdAvatarPost().'
+                'Required parameter "id" was null or undefined when calling getPostsByUserId().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/users/{id}/posts`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserPostResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getPostsByUserId(requestParameters: GetPostsByUserIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserPostResponse> {
+        const response = await this.getPostsByUserIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getUserByIdRaw(requestParameters: GetUserByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserResponse>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getUserById().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/users/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getUserById(requestParameters: GetUserByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserResponse> {
+        const response = await this.getUserByIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async loginRaw(requestParameters: LoginOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LoginResponse>> {
+        if (requestParameters['loginRequest'] == null) {
+            throw new runtime.RequiredError(
+                'loginRequest',
+                'Required parameter "loginRequest" was null or undefined when calling login().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/users/login`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: LoginRequestToJSON(requestParameters['loginRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => LoginResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async login(requestParameters: LoginOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginResponse> {
+        const response = await this.loginRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async refreshTokenRaw(requestParameters: RefreshTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LoginResponse>> {
+        if (requestParameters['refreshTokenRequest'] == null) {
+            throw new runtime.RequiredError(
+                'refreshTokenRequest',
+                'Required parameter "refreshTokenRequest" was null or undefined when calling refreshToken().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/users/refresh`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RefreshTokenRequestToJSON(requestParameters['refreshTokenRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => LoginResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async refreshToken(requestParameters: RefreshTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginResponse> {
+        const response = await this.refreshTokenRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async registerRaw(requestParameters: RegisterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['registerUserRequest'] == null) {
+            throw new runtime.RequiredError(
+                'registerUserRequest',
+                'Required parameter "registerUserRequest" was null or undefined when calling register().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/users/register`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RegisterUserRequestToJSON(requestParameters['registerUserRequest']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async register(requestParameters: RegisterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.registerRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async updateUserRaw(requestParameters: UpdateUserOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateUser().'
+            );
+        }
+
+        if (requestParameters['updateUserRequest'] == null) {
+            throw new runtime.RequiredError(
+                'updateUserRequest',
+                'Required parameter "updateUserRequest" was null or undefined when calling updateUser().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/users/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateUserRequestToJSON(requestParameters['updateUserRequest']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async updateUser(requestParameters: UpdateUserOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateUserRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async uploadUserAvatarRaw(requestParameters: UploadUserAvatarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling uploadUserAvatar().'
             );
         }
 
@@ -246,250 +488,8 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
 
     /**
      */
-    async apiUsersIdAvatarPost(requestParameters: ApiUsersIdAvatarPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiUsersIdAvatarPostRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async apiUsersIdGetRaw(requestParameters: ApiUsersIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserResponse>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiUsersIdGet().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/users/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => UserResponseFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiUsersIdGet(requestParameters: ApiUsersIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserResponse> {
-        const response = await this.apiUsersIdGetRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiUsersIdPostsGetRaw(requestParameters: ApiUsersIdPostsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserPostResponse>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiUsersIdPostsGet().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        if (requestParameters['offset'] != null) {
-            queryParameters['offset'] = requestParameters['offset'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/users/{id}/posts`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => UserPostResponseFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiUsersIdPostsGet(requestParameters: ApiUsersIdPostsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserPostResponse> {
-        const response = await this.apiUsersIdPostsGetRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiUsersIdPutRaw(requestParameters: ApiUsersIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiUsersIdPut().'
-            );
-        }
-
-        if (requestParameters['updateUserRequest'] == null) {
-            throw new runtime.RequiredError(
-                'updateUserRequest',
-                'Required parameter "updateUserRequest" was null or undefined when calling apiUsersIdPut().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/api/users/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-            body: UpdateUserRequestToJSON(requestParameters['updateUserRequest']),
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiUsersIdPut(requestParameters: ApiUsersIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiUsersIdPutRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async apiUsersLoginPostRaw(requestParameters: ApiUsersLoginPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LoginResponse>> {
-        if (requestParameters['loginRequest'] == null) {
-            throw new runtime.RequiredError(
-                'loginRequest',
-                'Required parameter "loginRequest" was null or undefined when calling apiUsersLoginPost().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/api/users/login`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: LoginRequestToJSON(requestParameters['loginRequest']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => LoginResponseFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiUsersLoginPost(requestParameters: ApiUsersLoginPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginResponse> {
-        const response = await this.apiUsersLoginPostRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiUsersRefreshPostRaw(requestParameters: ApiUsersRefreshPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LoginResponse>> {
-        if (requestParameters['refreshTokenRequest'] == null) {
-            throw new runtime.RequiredError(
-                'refreshTokenRequest',
-                'Required parameter "refreshTokenRequest" was null or undefined when calling apiUsersRefreshPost().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/api/users/refresh`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: RefreshTokenRequestToJSON(requestParameters['refreshTokenRequest']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => LoginResponseFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiUsersRefreshPost(requestParameters: ApiUsersRefreshPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginResponse> {
-        const response = await this.apiUsersRefreshPostRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiUsersRegisterPostRaw(requestParameters: ApiUsersRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['registerUserRequest'] == null) {
-            throw new runtime.RequiredError(
-                'registerUserRequest',
-                'Required parameter "registerUserRequest" was null or undefined when calling apiUsersRegisterPost().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/api/users/register`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: RegisterUserRequestToJSON(requestParameters['registerUserRequest']),
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiUsersRegisterPost(requestParameters: ApiUsersRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiUsersRegisterPostRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async apiUsersUsernameAvailableGetRaw(requestParameters: ApiUsersUsernameAvailableGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<boolean>> {
-        if (requestParameters['username'] == null) {
-            throw new runtime.RequiredError(
-                'username',
-                'Required parameter "username" was null or undefined when calling apiUsersUsernameAvailableGet().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/users/{username}/available`.replace(`{${"username"}}`, encodeURIComponent(String(requestParameters['username']))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        if (this.isJsonMime(response.headers.get('content-type'))) {
-            return new runtime.JSONApiResponse<boolean>(response);
-        } else {
-            return new runtime.TextApiResponse(response) as any;
-        }
-    }
-
-    /**
-     */
-    async apiUsersUsernameAvailableGet(requestParameters: ApiUsersUsernameAvailableGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<boolean> {
-        const response = await this.apiUsersUsernameAvailableGetRaw(requestParameters, initOverrides);
-        return await response.value();
+    async uploadUserAvatar(requestParameters: UploadUserAvatarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.uploadUserAvatarRaw(requestParameters, initOverrides);
     }
 
 }

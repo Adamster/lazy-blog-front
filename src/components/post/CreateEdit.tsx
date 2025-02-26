@@ -5,17 +5,16 @@ import { Controller, FieldValues, UseFormReturn } from "react-hook-form";
 import "@uiw/react-markdown-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 
-import dynamic from "next/dynamic";
-import { PostDetailedResponse } from "@/api/apis";
 import { API_URL } from "@/utils/fetcher";
 import axios from "axios";
 import { useCallback, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { MarkEditor } from "../libs/Editor";
+import { useAuth } from "@/providers/auth-provider";
 
-const MarkdownEditor = dynamic(
-  () => import("@uiw/react-markdown-editor").then((mod) => mod.default),
-  { ssr: false }
-);
+// const MarkdownEditor = dynamic(
+//   () => import("@uiw/react-markdown-editor").then((mod) => mod.default),
+//   { ssr: false }
+// );
 
 interface IProps {
   form: any;
@@ -24,12 +23,7 @@ interface IProps {
   edit?: boolean;
 }
 
-export const CreateEdit = ({
-  form,
-  onSubmit,
-  onDelete,
-  edit = false,
-}: IProps) => {
+export const CreateEdit = ({ form, onSubmit, edit = false }: IProps) => {
   const {
     register,
     handleSubmit,
@@ -38,7 +32,7 @@ export const CreateEdit = ({
     formState: { errors },
   } = form;
 
-  const { data: auth } = useSession();
+  const { auth, user } = useAuth();
 
   const handlePaste = useCallback(async (event: any) => {
     const items = event.clipboardData?.items;
@@ -55,12 +49,12 @@ export const CreateEdit = ({
         formData.append("file", file);
 
         const response = await axios.post(
-          `${API_URL}/api/media/${auth?.user.id}/upload`,
+          `${API_URL}/api/media/${user?.id}/upload`,
           formData,
           {
             headers: {
               "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${auth?.user.accessToken}`,
+              Authorization: `Bearer ${auth.accessToken}`,
             },
           }
         );
@@ -192,8 +186,10 @@ export const CreateEdit = ({
               rules={{ required: true }}
               render={({ field }) => (
                 <div className={classNames(errors.body && "input--error")}>
-                  <div className="wmde-markdown-var"></div>
-                  <MarkdownEditor {...field} />
+                  <MarkEditor
+                    markdown={field.value ?? ""}
+                    onChange={field.onChange}
+                  />
                 </div>
               )}
             />
@@ -210,7 +206,7 @@ export const CreateEdit = ({
                   e.preventDefault();
 
                   if (confirm("Ты точно хочешь удолить этот пост?")) {
-                    onDelete && onDelete();
+                    // onDelete && onDelete();
                   }
                 }}
               >

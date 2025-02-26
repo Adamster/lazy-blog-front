@@ -22,7 +22,7 @@ import {
     ProblemDetailsToJSON,
 } from '../models/index';
 
-export interface ApiMediaIdUploadPostRequest {
+export interface UploadMediaRequest {
     id: string;
     file?: Blob;
 }
@@ -42,11 +42,11 @@ export interface MediaApiInterface {
      * @throws {RequiredError}
      * @memberof MediaApiInterface
      */
-    apiMediaIdUploadPostRaw(requestParameters: ApiMediaIdUploadPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>>;
+    uploadMediaRaw(requestParameters: UploadMediaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>>;
 
     /**
      */
-    apiMediaIdUploadPost(requestParameters: ApiMediaIdUploadPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string>;
+    uploadMedia(requestParameters: UploadMediaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string>;
 
 }
 
@@ -57,11 +57,11 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
 
     /**
      */
-    async apiMediaIdUploadPostRaw(requestParameters: ApiMediaIdUploadPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+    async uploadMediaRaw(requestParameters: UploadMediaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling apiMediaIdUploadPost().'
+                'Required parameter "id" was null or undefined when calling uploadMedia().'
             );
         }
 
@@ -106,8 +106,8 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
 
     /**
      */
-    async apiMediaIdUploadPost(requestParameters: ApiMediaIdUploadPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
-        const response = await this.apiMediaIdUploadPostRaw(requestParameters, initOverrides);
+    async uploadMedia(requestParameters: UploadMediaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+        const response = await this.uploadMediaRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

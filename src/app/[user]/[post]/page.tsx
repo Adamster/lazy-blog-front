@@ -1,35 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { apiClient } from "@/api/api-client";
-import PostClient from "./postClient";
+import { generateMeta } from "@/components/meta/meta-data";
+import PostClient from "./page-client";
 
 export async function generateMetadata({ params }: any) {
   try {
-    const postSlug = (params as any).post;
-    const post = await apiClient.posts.apiPostsSlugGet({ slug: postSlug });
+    const { user, post } = await params;
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API}/api/posts/${post}`
+    );
+    const postData: any = await response.json();
 
-    return {
-      title: `${post?.title} | !LAZY Blog`,
-      description: post?.summary || post?.body?.substring(0, 100) || "",
-      openGraph: {
-        title: post?.title,
-        description: post?.summary || post?.body?.substring(0, 100),
-        images: [{ url: post?.coverUrl }],
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: post?.title,
-        description: post?.summary || post?.body?.substring(0, 100),
-        images: [post?.coverUrl],
-      },
-    };
+    return generateMeta({
+      title: postData.title,
+      description: postData.summary || postData.body?.substring(0, 100),
+      image: postData.coverUrl || null,
+      url: `${user}/${post}`,
+    });
   } catch {
     return {
       title: "Not Found | !LAZY Blog",
-      description: "Пост не найден",
     };
   }
 }
 
-export default function Post({ params }: any) {
-  return <PostClient postSlug={(params as any).post} />;
+export default function Post() {
+  return <PostClient />;
 }

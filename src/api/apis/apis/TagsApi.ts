@@ -25,13 +25,13 @@ import {
     TagResponseToJSON,
 } from '../models/index';
 
-export interface ApiTagsIdPutRequest {
-    id: string;
-    tag?: string;
+export interface SearchTagsRequest {
+    searchTerm: string;
 }
 
-export interface ApiTagsSearchTermGetRequest {
-    searchTerm: string;
+export interface UpdateTagRequest {
+    id: string;
+    tag?: string;
 }
 
 /**
@@ -43,30 +43,30 @@ export interface ApiTagsSearchTermGetRequest {
 export interface TagsApiInterface {
     /**
      * 
+     * @param {string} searchTerm 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TagsApiInterface
+     */
+    searchTagsRaw(requestParameters: SearchTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagResponse>>>;
+
+    /**
+     */
+    searchTags(requestParameters: SearchTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagResponse>>;
+
+    /**
+     * 
      * @param {string} id 
      * @param {string} [tag] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof TagsApiInterface
      */
-    apiTagsIdPutRaw(requestParameters: ApiTagsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    updateTagRaw(requestParameters: UpdateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
 
     /**
      */
-    apiTagsIdPut(requestParameters: ApiTagsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
-
-    /**
-     * 
-     * @param {string} searchTerm 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof TagsApiInterface
-     */
-    apiTagsSearchTermGetRaw(requestParameters: ApiTagsSearchTermGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagResponse>>>;
-
-    /**
-     */
-    apiTagsSearchTermGet(requestParameters: ApiTagsSearchTermGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagResponse>>;
+    updateTag(requestParameters: UpdateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
 }
 
@@ -77,11 +77,42 @@ export class TagsApi extends runtime.BaseAPI implements TagsApiInterface {
 
     /**
      */
-    async apiTagsIdPutRaw(requestParameters: ApiTagsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async searchTagsRaw(requestParameters: SearchTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagResponse>>> {
+        if (requestParameters['searchTerm'] == null) {
+            throw new runtime.RequiredError(
+                'searchTerm',
+                'Required parameter "searchTerm" was null or undefined when calling searchTags().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/tags/{searchTerm}`.replace(`{${"searchTerm"}}`, encodeURIComponent(String(requestParameters['searchTerm']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagResponseFromJSON));
+    }
+
+    /**
+     */
+    async searchTags(requestParameters: SearchTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagResponse>> {
+        const response = await this.searchTagsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async updateTagRaw(requestParameters: UpdateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling apiTagsIdPut().'
+                'Required parameter "id" was null or undefined when calling updateTag().'
             );
         }
 
@@ -105,39 +136,8 @@ export class TagsApi extends runtime.BaseAPI implements TagsApiInterface {
 
     /**
      */
-    async apiTagsIdPut(requestParameters: ApiTagsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiTagsIdPutRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async apiTagsSearchTermGetRaw(requestParameters: ApiTagsSearchTermGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagResponse>>> {
-        if (requestParameters['searchTerm'] == null) {
-            throw new runtime.RequiredError(
-                'searchTerm',
-                'Required parameter "searchTerm" was null or undefined when calling apiTagsSearchTermGet().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/tags/{searchTerm}`.replace(`{${"searchTerm"}}`, encodeURIComponent(String(requestParameters['searchTerm']))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagResponseFromJSON));
-    }
-
-    /**
-     */
-    async apiTagsSearchTermGet(requestParameters: ApiTagsSearchTermGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagResponse>> {
-        const response = await this.apiTagsSearchTermGetRaw(requestParameters, initOverrides);
-        return await response.value();
+    async updateTag(requestParameters: UpdateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateTagRaw(requestParameters, initOverrides);
     }
 
 }

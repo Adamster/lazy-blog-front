@@ -15,7 +15,7 @@ export const PostVote = ({ postId, rating, mutate }: IProps) => {
 
   const handleVote = useMutation({
     mutationFn: ({ direction }: { direction: VoteDirection }) => {
-      return apiClient.posts.apiPostsIdVotePut({
+      return apiClient.posts.votePost({
         id: postId,
         direction,
       });

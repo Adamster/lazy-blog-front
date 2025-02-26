@@ -2,8 +2,22 @@
   line-height: inherit !important;
   font-family: inherit !important;
   background: transparent !important;
-  font-size: 14px !important;
+  font-size: 16px !important;
   color: var(--color-text) !important;
+
+  table {
+    display: table !important;
+    width: 100% !important;
+
+    th {
+      font-weight: 700 !important;
+    }
+  }
+
+  bold,
+  strong {
+    font-weight: 700 !important;
+  }
 
   ul,
   ol {
@@ -28,25 +42,34 @@
   h4,
   h5,
   h6 {
-    border-bottom: none;
-    margin-top: 0;
-    padding-bottom: 0;
-    margin-bottom: 1rem;
-    font-weight: 700;
+    margin: 0 0 1rem !important;
+    font-weight: 700 !important;
   }
 
   h1 {
-    font-size: x-large;
+    @apply text-4xl;
   }
 
   h2 {
-    font-size: large;
+    @apply text-3xl;
   }
 
   h3 {
-    font-size: medium;
+    @apply text-2xl;
   }
 
+  h4 {
+    @apply text-xl;
+  }
+
+  h5 {
+    @apply text-lg;
+  }
+
+  h6 {
+    @apply text-base;
+  }
+  
   img {
     display: block !important;
     margin: 0 auto;
@@ -58,10 +81,6 @@
     margin: 0 auto;
   }
 
-  hr {
-    margin: 1rem auto;
-  }
-
   table th {
     text-align: left;
   }
@@ -70,30 +89,27 @@
     list-style: none;
   }
 
-  > blockquote,
-  > blockquote blockquote {
+  >blockquote,
+  >blockquote blockquote {
     color: var(--color-gray);
   }
 
-  iframe {
-    margin-bottom: 1rem;
-  }
 }
 
-.md-editor {
-  background: transparent;
-  line-height: inherit !important;
-  font-family: inherit !important;
-  box-shadow: none !important;
-  background-color: var;
-  border-radius: var(--br) !important;
-  min-height: 200px;
+// .md-editor {
+//   background: transparent;
+//   line-height: inherit !important;
+//   font-family: inherit !important;
+//   box-shadow: none !important;
+//   background-color: var;
+//   border-radius: var(--br) !important;
+//   min-height: 200px;
 
-  --color-canvas-subtle: var(--color-gray-light) !important;
+//   --color-canvas-subtle: var(--color-gray-light) !important;
 
-  a {
-    color: var(--color-primary) !important;
-  }
+//   a {
+//     color: var(--color-primary) !important;
+//   }
 
 
-}
+// }

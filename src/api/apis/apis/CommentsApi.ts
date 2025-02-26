@@ -31,19 +31,19 @@ import {
     UpdateCommentRequestToJSON,
 } from '../models/index';
 
-export interface ApiCommentsIdDeleteRequest {
-    id: string;
-}
-
-export interface ApiCommentsIdGetRequest {
-    id: string;
-}
-
-export interface ApiCommentsPostRequest {
+export interface AddCommentOperationRequest {
     addCommentRequest: AddCommentRequest;
 }
 
-export interface ApiCommentsPutRequest {
+export interface DeleteCommentRequest {
+    id: string;
+}
+
+export interface GetCommentByIdRequest {
+    id: string;
+}
+
+export interface UpdateCommentOperationRequest {
     updateCommentRequest: UpdateCommentRequest;
 }
 
@@ -56,42 +56,42 @@ export interface ApiCommentsPutRequest {
 export interface CommentsApiInterface {
     /**
      * 
-     * @param {string} id 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CommentsApiInterface
-     */
-    apiCommentsIdDeleteRaw(requestParameters: ApiCommentsIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
-
-    /**
-     */
-    apiCommentsIdDelete(requestParameters: ApiCommentsIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
-
-    /**
-     * 
-     * @param {string} id 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CommentsApiInterface
-     */
-    apiCommentsIdGetRaw(requestParameters: ApiCommentsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentResponse>>;
-
-    /**
-     */
-    apiCommentsIdGet(requestParameters: ApiCommentsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentResponse>;
-
-    /**
-     * 
      * @param {AddCommentRequest} addCommentRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CommentsApiInterface
      */
-    apiCommentsPostRaw(requestParameters: ApiCommentsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    addCommentRaw(requestParameters: AddCommentOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
 
     /**
      */
-    apiCommentsPost(requestParameters: ApiCommentsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    addComment(requestParameters: AddCommentOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CommentsApiInterface
+     */
+    deleteCommentRaw(requestParameters: DeleteCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     */
+    deleteComment(requestParameters: DeleteCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CommentsApiInterface
+     */
+    getCommentByIdRaw(requestParameters: GetCommentByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentResponse>>;
+
+    /**
+     */
+    getCommentById(requestParameters: GetCommentByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentResponse>;
 
     /**
      * 
@@ -100,11 +100,11 @@ export interface CommentsApiInterface {
      * @throws {RequiredError}
      * @memberof CommentsApiInterface
      */
-    apiCommentsPutRaw(requestParameters: ApiCommentsPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    updateCommentRaw(requestParameters: UpdateCommentOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
 
     /**
      */
-    apiCommentsPut(requestParameters: ApiCommentsPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    updateComment(requestParameters: UpdateCommentOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
 }
 
@@ -115,72 +115,11 @@ export class CommentsApi extends runtime.BaseAPI implements CommentsApiInterface
 
     /**
      */
-    async apiCommentsIdDeleteRaw(requestParameters: ApiCommentsIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiCommentsIdDelete().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/comments/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'DELETE',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiCommentsIdDelete(requestParameters: ApiCommentsIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiCommentsIdDeleteRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async apiCommentsIdGetRaw(requestParameters: ApiCommentsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentResponse>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiCommentsIdGet().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/comments/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => CommentResponseFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiCommentsIdGet(requestParameters: ApiCommentsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentResponse> {
-        const response = await this.apiCommentsIdGetRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiCommentsPostRaw(requestParameters: ApiCommentsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async addCommentRaw(requestParameters: AddCommentOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['addCommentRequest'] == null) {
             throw new runtime.RequiredError(
                 'addCommentRequest',
-                'Required parameter "addCommentRequest" was null or undefined when calling apiCommentsPost().'
+                'Required parameter "addCommentRequest" was null or undefined when calling addComment().'
             );
         }
 
@@ -203,17 +142,78 @@ export class CommentsApi extends runtime.BaseAPI implements CommentsApiInterface
 
     /**
      */
-    async apiCommentsPost(requestParameters: ApiCommentsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiCommentsPostRaw(requestParameters, initOverrides);
+    async addComment(requestParameters: AddCommentOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.addCommentRaw(requestParameters, initOverrides);
     }
 
     /**
      */
-    async apiCommentsPutRaw(requestParameters: ApiCommentsPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteCommentRaw(requestParameters: DeleteCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling deleteComment().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/comments/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async deleteComment(requestParameters: DeleteCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteCommentRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async getCommentByIdRaw(requestParameters: GetCommentByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentResponse>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getCommentById().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/comments/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CommentResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getCommentById(requestParameters: GetCommentByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentResponse> {
+        const response = await this.getCommentByIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async updateCommentRaw(requestParameters: UpdateCommentOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['updateCommentRequest'] == null) {
             throw new runtime.RequiredError(
                 'updateCommentRequest',
-                'Required parameter "updateCommentRequest" was null or undefined when calling apiCommentsPut().'
+                'Required parameter "updateCommentRequest" was null or undefined when calling updateComment().'
             );
         }
 
@@ -236,8 +236,8 @@ export class CommentsApi extends runtime.BaseAPI implements CommentsApiInterface
 
     /**
      */
-    async apiCommentsPut(requestParameters: ApiCommentsPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiCommentsPutRaw(requestParameters, initOverrides);
+    async updateComment(requestParameters: UpdateCommentOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateCommentRaw(requestParameters, initOverrides);
     }
 
 }

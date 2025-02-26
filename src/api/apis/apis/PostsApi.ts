@@ -49,59 +49,59 @@ import {
     VoteDirectionToJSON,
 } from '../models/index';
 
-export interface ApiPostsGetRequest {
+export interface CreatePostOperationRequest {
+    createPostRequest: CreatePostRequest;
+}
+
+export interface DeletePostRequest {
+    id: string;
+}
+
+export interface GetAllPostsRequest {
     offset?: number;
 }
 
-export interface ApiPostsIdCommentsGetRequest {
+export interface GetCommentsByPostIdRequest {
     id: string;
 }
 
-export interface ApiPostsIdCountViewPutRequest {
+export interface GetPostByIdRequest {
     id: string;
 }
 
-export interface ApiPostsIdDeleteRequest {
+export interface GetPostsBySlugRequest {
+    slug: string;
+}
+
+export interface GetPostsByTagRequest {
+    tag: string;
+}
+
+export interface GetPostsByUserNameRequest {
+    userName: string;
+    offset?: number;
+}
+
+export interface HidePostRequest {
     id: string;
 }
 
-export interface ApiPostsIdGetRequest {
+export interface IncrementViewCountRequest {
     id: string;
 }
 
-export interface ApiPostsIdHidePutRequest {
+export interface PublishPostRequest {
     id: string;
 }
 
-export interface ApiPostsIdPublishPutRequest {
-    id: string;
-}
-
-export interface ApiPostsIdPutRequest {
+export interface UpdatePostOperationRequest {
     id: string;
     updatePostRequest: UpdatePostRequest;
 }
 
-export interface ApiPostsIdVotePutRequest {
+export interface VotePostRequest {
     id: string;
     direction?: VoteDirection;
-}
-
-export interface ApiPostsPostRequest {
-    createPostRequest: CreatePostRequest;
-}
-
-export interface ApiPostsSlugGetRequest {
-    slug: string;
-}
-
-export interface ApiPostsTTagGetRequest {
-    tag: string;
-}
-
-export interface ApiPostsUserNamePostsGetRequest {
-    userName: string;
-    offset?: number;
 }
 
 /**
@@ -113,135 +113,68 @@ export interface ApiPostsUserNamePostsGetRequest {
 export interface PostsApiInterface {
     /**
      * 
-     * @param {number} [offset] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PostsApiInterface
-     */
-    apiPostsGetRaw(requestParameters: ApiPostsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PublishedPostResponse>>>;
-
-    /**
-     */
-    apiPostsGet(requestParameters: ApiPostsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PublishedPostResponse>>;
-
-    /**
-     * 
-     * @param {string} id 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PostsApiInterface
-     */
-    apiPostsIdCommentsGetRaw(requestParameters: ApiPostsIdCommentsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CommentResponse>>>;
-
-    /**
-     */
-    apiPostsIdCommentsGet(requestParameters: ApiPostsIdCommentsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CommentResponse>>;
-
-    /**
-     * 
-     * @param {string} id 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PostsApiInterface
-     */
-    apiPostsIdCountViewPutRaw(requestParameters: ApiPostsIdCountViewPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
-
-    /**
-     */
-    apiPostsIdCountViewPut(requestParameters: ApiPostsIdCountViewPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
-
-    /**
-     * 
-     * @param {string} id 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PostsApiInterface
-     */
-    apiPostsIdDeleteRaw(requestParameters: ApiPostsIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
-
-    /**
-     */
-    apiPostsIdDelete(requestParameters: ApiPostsIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
-
-    /**
-     * 
-     * @param {string} id 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PostsApiInterface
-     */
-    apiPostsIdGetRaw(requestParameters: ApiPostsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostResponse>>;
-
-    /**
-     */
-    apiPostsIdGet(requestParameters: ApiPostsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostResponse>;
-
-    /**
-     * 
-     * @param {string} id 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PostsApiInterface
-     */
-    apiPostsIdHidePutRaw(requestParameters: ApiPostsIdHidePutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
-
-    /**
-     */
-    apiPostsIdHidePut(requestParameters: ApiPostsIdHidePutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
-
-    /**
-     * 
-     * @param {string} id 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PostsApiInterface
-     */
-    apiPostsIdPublishPutRaw(requestParameters: ApiPostsIdPublishPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
-
-    /**
-     */
-    apiPostsIdPublishPut(requestParameters: ApiPostsIdPublishPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
-
-    /**
-     * 
-     * @param {string} id 
-     * @param {UpdatePostRequest} updatePostRequest 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PostsApiInterface
-     */
-    apiPostsIdPutRaw(requestParameters: ApiPostsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
-
-    /**
-     */
-    apiPostsIdPut(requestParameters: ApiPostsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
-
-    /**
-     * 
-     * @param {string} id 
-     * @param {VoteDirection} [direction] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PostsApiInterface
-     */
-    apiPostsIdVotePutRaw(requestParameters: ApiPostsIdVotePutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<NoContent>>;
-
-    /**
-     */
-    apiPostsIdVotePut(requestParameters: ApiPostsIdVotePutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<NoContent>;
-
-    /**
-     * 
      * @param {CreatePostRequest} createPostRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PostsApiInterface
      */
-    apiPostsPostRaw(requestParameters: ApiPostsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    createPostRaw(requestParameters: CreatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
 
     /**
      */
-    apiPostsPost(requestParameters: ApiPostsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    createPost(requestParameters: CreatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PostsApiInterface
+     */
+    deletePostRaw(requestParameters: DeletePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     */
+    deletePost(requestParameters: DeletePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
+     * 
+     * @param {number} [offset] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PostsApiInterface
+     */
+    getAllPostsRaw(requestParameters: GetAllPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PublishedPostResponse>>>;
+
+    /**
+     */
+    getAllPosts(requestParameters: GetAllPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PublishedPostResponse>>;
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PostsApiInterface
+     */
+    getCommentsByPostIdRaw(requestParameters: GetCommentsByPostIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CommentResponse>>>;
+
+    /**
+     */
+    getCommentsByPostId(requestParameters: GetCommentsByPostIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CommentResponse>>;
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PostsApiInterface
+     */
+    getPostByIdRaw(requestParameters: GetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostResponse>>;
+
+    /**
+     */
+    getPostById(requestParameters: GetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostResponse>;
 
     /**
      * 
@@ -250,11 +183,11 @@ export interface PostsApiInterface {
      * @throws {RequiredError}
      * @memberof PostsApiInterface
      */
-    apiPostsSlugGetRaw(requestParameters: ApiPostsSlugGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetailedResponse>>;
+    getPostsBySlugRaw(requestParameters: GetPostsBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetailedResponse>>;
 
     /**
      */
-    apiPostsSlugGet(requestParameters: ApiPostsSlugGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetailedResponse>;
+    getPostsBySlug(requestParameters: GetPostsBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetailedResponse>;
 
     /**
      * 
@@ -263,11 +196,11 @@ export interface PostsApiInterface {
      * @throws {RequiredError}
      * @memberof PostsApiInterface
      */
-    apiPostsTTagGetRaw(requestParameters: ApiPostsTTagGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PublishedPostResponse>>>;
+    getPostsByTagRaw(requestParameters: GetPostsByTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PublishedPostResponse>>>;
 
     /**
      */
-    apiPostsTTagGet(requestParameters: ApiPostsTTagGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PublishedPostResponse>>;
+    getPostsByTag(requestParameters: GetPostsByTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PublishedPostResponse>>;
 
     /**
      * 
@@ -277,11 +210,78 @@ export interface PostsApiInterface {
      * @throws {RequiredError}
      * @memberof PostsApiInterface
      */
-    apiPostsUserNamePostsGetRaw(requestParameters: ApiPostsUserNamePostsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserPostResponse>>;
+    getPostsByUserNameRaw(requestParameters: GetPostsByUserNameRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserPostResponse>>;
 
     /**
      */
-    apiPostsUserNamePostsGet(requestParameters: ApiPostsUserNamePostsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserPostResponse>;
+    getPostsByUserName(requestParameters: GetPostsByUserNameRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserPostResponse>;
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PostsApiInterface
+     */
+    hidePostRaw(requestParameters: HidePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     */
+    hidePost(requestParameters: HidePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PostsApiInterface
+     */
+    incrementViewCountRaw(requestParameters: IncrementViewCountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     */
+    incrementViewCount(requestParameters: IncrementViewCountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PostsApiInterface
+     */
+    publishPostRaw(requestParameters: PublishPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     */
+    publishPost(requestParameters: PublishPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {UpdatePostRequest} updatePostRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PostsApiInterface
+     */
+    updatePostRaw(requestParameters: UpdatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     */
+    updatePost(requestParameters: UpdatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {VoteDirection} [direction] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PostsApiInterface
+     */
+    votePostRaw(requestParameters: VotePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<NoContent>>;
+
+    /**
+     */
+    votePost(requestParameters: VotePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<NoContent>;
 
 }
 
@@ -292,296 +292,11 @@ export class PostsApi extends runtime.BaseAPI implements PostsApiInterface {
 
     /**
      */
-    async apiPostsGetRaw(requestParameters: ApiPostsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PublishedPostResponse>>> {
-        const queryParameters: any = {};
-
-        if (requestParameters['offset'] != null) {
-            queryParameters['offset'] = requestParameters['offset'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/posts`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PublishedPostResponseFromJSON));
-    }
-
-    /**
-     */
-    async apiPostsGet(requestParameters: ApiPostsGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PublishedPostResponse>> {
-        const response = await this.apiPostsGetRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiPostsIdCommentsGetRaw(requestParameters: ApiPostsIdCommentsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CommentResponse>>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiPostsIdCommentsGet().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/posts/{id}/comments`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CommentResponseFromJSON));
-    }
-
-    /**
-     */
-    async apiPostsIdCommentsGet(requestParameters: ApiPostsIdCommentsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CommentResponse>> {
-        const response = await this.apiPostsIdCommentsGetRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiPostsIdCountViewPutRaw(requestParameters: ApiPostsIdCountViewPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiPostsIdCountViewPut().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/posts/{id}/count-view`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiPostsIdCountViewPut(requestParameters: ApiPostsIdCountViewPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiPostsIdCountViewPutRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async apiPostsIdDeleteRaw(requestParameters: ApiPostsIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiPostsIdDelete().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/posts/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'DELETE',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiPostsIdDelete(requestParameters: ApiPostsIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiPostsIdDeleteRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async apiPostsIdGetRaw(requestParameters: ApiPostsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostResponse>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiPostsIdGet().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/posts/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => PostResponseFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiPostsIdGet(requestParameters: ApiPostsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostResponse> {
-        const response = await this.apiPostsIdGetRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiPostsIdHidePutRaw(requestParameters: ApiPostsIdHidePutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiPostsIdHidePut().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/posts/{id}/hide`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiPostsIdHidePut(requestParameters: ApiPostsIdHidePutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiPostsIdHidePutRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async apiPostsIdPublishPutRaw(requestParameters: ApiPostsIdPublishPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiPostsIdPublishPut().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/posts/{id}/publish`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiPostsIdPublishPut(requestParameters: ApiPostsIdPublishPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiPostsIdPublishPutRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async apiPostsIdPutRaw(requestParameters: ApiPostsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiPostsIdPut().'
-            );
-        }
-
-        if (requestParameters['updatePostRequest'] == null) {
-            throw new runtime.RequiredError(
-                'updatePostRequest',
-                'Required parameter "updatePostRequest" was null or undefined when calling apiPostsIdPut().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/api/posts/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-            body: UpdatePostRequestToJSON(requestParameters['updatePostRequest']),
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async apiPostsIdPut(requestParameters: ApiPostsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiPostsIdPutRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async apiPostsIdVotePutRaw(requestParameters: ApiPostsIdVotePutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<NoContent>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiPostsIdVotePut().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        if (requestParameters['direction'] != null) {
-            queryParameters['direction'] = requestParameters['direction'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/posts/{id}/vote`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => NoContentFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiPostsIdVotePut(requestParameters: ApiPostsIdVotePutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<NoContent> {
-        const response = await this.apiPostsIdVotePutRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiPostsPostRaw(requestParameters: ApiPostsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async createPostRaw(requestParameters: CreatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['createPostRequest'] == null) {
             throw new runtime.RequiredError(
                 'createPostRequest',
-                'Required parameter "createPostRequest" was null or undefined when calling apiPostsPost().'
+                'Required parameter "createPostRequest" was null or undefined when calling createPost().'
             );
         }
 
@@ -604,17 +319,137 @@ export class PostsApi extends runtime.BaseAPI implements PostsApiInterface {
 
     /**
      */
-    async apiPostsPost(requestParameters: ApiPostsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiPostsPostRaw(requestParameters, initOverrides);
+    async createPost(requestParameters: CreatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.createPostRaw(requestParameters, initOverrides);
     }
 
     /**
      */
-    async apiPostsSlugGetRaw(requestParameters: ApiPostsSlugGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetailedResponse>> {
+    async deletePostRaw(requestParameters: DeletePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling deletePost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/posts/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async deletePost(requestParameters: DeletePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deletePostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async getAllPostsRaw(requestParameters: GetAllPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PublishedPostResponse>>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/posts`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PublishedPostResponseFromJSON));
+    }
+
+    /**
+     */
+    async getAllPosts(requestParameters: GetAllPostsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PublishedPostResponse>> {
+        const response = await this.getAllPostsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getCommentsByPostIdRaw(requestParameters: GetCommentsByPostIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CommentResponse>>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getCommentsByPostId().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/posts/{id}/comments`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CommentResponseFromJSON));
+    }
+
+    /**
+     */
+    async getCommentsByPostId(requestParameters: GetCommentsByPostIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CommentResponse>> {
+        const response = await this.getCommentsByPostIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getPostByIdRaw(requestParameters: GetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostResponse>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getPostById().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/posts/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PostResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getPostById(requestParameters: GetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostResponse> {
+        const response = await this.getPostByIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getPostsBySlugRaw(requestParameters: GetPostsBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetailedResponse>> {
         if (requestParameters['slug'] == null) {
             throw new runtime.RequiredError(
                 'slug',
-                'Required parameter "slug" was null or undefined when calling apiPostsSlugGet().'
+                'Required parameter "slug" was null or undefined when calling getPostsBySlug().'
             );
         }
 
@@ -634,18 +469,18 @@ export class PostsApi extends runtime.BaseAPI implements PostsApiInterface {
 
     /**
      */
-    async apiPostsSlugGet(requestParameters: ApiPostsSlugGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetailedResponse> {
-        const response = await this.apiPostsSlugGetRaw(requestParameters, initOverrides);
+    async getPostsBySlug(requestParameters: GetPostsBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetailedResponse> {
+        const response = await this.getPostsBySlugRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async apiPostsTTagGetRaw(requestParameters: ApiPostsTTagGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PublishedPostResponse>>> {
+    async getPostsByTagRaw(requestParameters: GetPostsByTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PublishedPostResponse>>> {
         if (requestParameters['tag'] == null) {
             throw new runtime.RequiredError(
                 'tag',
-                'Required parameter "tag" was null or undefined when calling apiPostsTTagGet().'
+                'Required parameter "tag" was null or undefined when calling getPostsByTag().'
             );
         }
 
@@ -665,18 +500,18 @@ export class PostsApi extends runtime.BaseAPI implements PostsApiInterface {
 
     /**
      */
-    async apiPostsTTagGet(requestParameters: ApiPostsTTagGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PublishedPostResponse>> {
-        const response = await this.apiPostsTTagGetRaw(requestParameters, initOverrides);
+    async getPostsByTag(requestParameters: GetPostsByTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PublishedPostResponse>> {
+        const response = await this.getPostsByTagRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async apiPostsUserNamePostsGetRaw(requestParameters: ApiPostsUserNamePostsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserPostResponse>> {
+    async getPostsByUserNameRaw(requestParameters: GetPostsByUserNameRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserPostResponse>> {
         if (requestParameters['userName'] == null) {
             throw new runtime.RequiredError(
                 'userName',
-                'Required parameter "userName" was null or undefined when calling apiPostsUserNamePostsGet().'
+                'Required parameter "userName" was null or undefined when calling getPostsByUserName().'
             );
         }
 
@@ -700,8 +535,173 @@ export class PostsApi extends runtime.BaseAPI implements PostsApiInterface {
 
     /**
      */
-    async apiPostsUserNamePostsGet(requestParameters: ApiPostsUserNamePostsGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserPostResponse> {
-        const response = await this.apiPostsUserNamePostsGetRaw(requestParameters, initOverrides);
+    async getPostsByUserName(requestParameters: GetPostsByUserNameRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserPostResponse> {
+        const response = await this.getPostsByUserNameRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async hidePostRaw(requestParameters: HidePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling hidePost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/posts/{id}/hide`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async hidePost(requestParameters: HidePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.hidePostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async incrementViewCountRaw(requestParameters: IncrementViewCountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling incrementViewCount().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/posts/{id}/count-view`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async incrementViewCount(requestParameters: IncrementViewCountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.incrementViewCountRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async publishPostRaw(requestParameters: PublishPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling publishPost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/posts/{id}/publish`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async publishPost(requestParameters: PublishPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.publishPostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async updatePostRaw(requestParameters: UpdatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updatePost().'
+            );
+        }
+
+        if (requestParameters['updatePostRequest'] == null) {
+            throw new runtime.RequiredError(
+                'updatePostRequest',
+                'Required parameter "updatePostRequest" was null or undefined when calling updatePost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/posts/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdatePostRequestToJSON(requestParameters['updatePostRequest']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async updatePost(requestParameters: UpdatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updatePostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async votePostRaw(requestParameters: VotePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<NoContent>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling votePost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['direction'] != null) {
+            queryParameters['direction'] = requestParameters['direction'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/posts/{id}/vote`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => NoContentFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async votePost(requestParameters: VotePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<NoContent> {
+        const response = await this.votePostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -1,31 +1,12 @@
 /* eslint-disable @next/next/next-script-for-ga */
-import type { Metadata } from "next";
+import { LayoutClient } from "@/app/layout-client";
 import { Mulish } from "next/font/google";
-import { Layout } from "../components/layout/layout";
 
 const font = Mulish({
   weight: ["300", "400", "500", "600", "700"],
   subsets: ["latin"],
   variable: "--font-mulish",
 });
-
-export const metadata: Metadata = {
-  title: "!LAZY Blog | Лень под наблюдением",
-  description: "Технологии, дизайн, код и лень — всё в одном месте",
-  authors: [{ name: "!LAZY Blog", url: "https://notlazy.org" }],
-  openGraph: {
-    title: "!LAZY Blog | Лень под наблюдением",
-    description: "Технологии, дизайн, код и лень — всё в одном месте.",
-    url: "https://notlazy.org",
-    locale: "ru_RU",
-    type: "website",
-  },
-  twitter: {
-    title: "!LAZY Blog | Лень под наблюдением",
-    description: "Технологии, дизайн, код и лень — всё в одном месте.",
-  },
-  robots: "index, follow",
-};
 
 export default function RootLayout({
   children,
@@ -39,6 +20,7 @@ export default function RootLayout({
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-MJC16ETF2H"
         ></script>
+
         <script id="google-analytics">
           {`
             window.dataLayer = window.dataLayer || [];
@@ -47,10 +29,29 @@ export default function RootLayout({
             gtag('config', 'G-MJC16ETF2H');
           `}
         </script>
+
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
+        <link rel="manifest" href="site.webmanifest"></link>
       </head>
 
       <body className={font.className}>
-        <Layout>{children}</Layout>
+        <LayoutClient>{children}</LayoutClient>
       </body>
     </html>
   );

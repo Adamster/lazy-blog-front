@@ -1,92 +1,27 @@
-"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { generateMeta } from "@/components/meta/meta-data";
+import UserClient from "./page-client";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
-import { useParams } from "next/navigation";
-import { useEffect, useRef } from "react";
-
-import { apiClient } from "@/api/api-client";
-import ErrorMessage from "@/components/errorMessages/ErrorMessage";
-import Loading from "@/components/loading";
-import PostPreview from "@/components/post/PostPreview";
-import { UserDetails } from "@/components/user/UserDetails";
-
-const PAGE_SIZE = 24;
-
-export default function User() {
-  const observerRef = useRef(null);
-  const { data: auth } = useSession();
-  const params = useParams();
-  const userName = params?.user as string;
-
-  const {
-    data,
-    error,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["apiUsersIdPostsGet", userName],
-    queryFn: async ({ pageParam = 0 }) => {
-      const response = await apiClient.posts.apiPostsUserNamePostsGet({
-        userName,
-        offset: pageParam,
-      });
-
-      return {
-        postItems: response?.postItems || [],
-        user: response?.user || null,
-      };
-    },
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.postItems.length === PAGE_SIZE
-        ? allPages.flat().length
-        : undefined,
-    initialPageParam: 0,
-    enabled: !!userName, // Запрос выполняется только при наличии userName
-  });
-
-  useEffect(() => {
-    if (!observerRef.current || !hasNextPage) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => entry.isIntersecting && fetchNextPage(),
-      { threshold: 1.0 }
+export async function generateMetadata({ params }: any) {
+  try {
+    const { user } = await params;
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API}/api/posts/${user}/posts`
     );
+    const userData: any = await response.json();
 
-    observer.observe(observerRef.current);
-    return () => observer.disconnect();
-  }, [fetchNextPage, hasNextPage]);
+    return generateMeta({
+      title: `${userData.user.firstName} ${userData.user.lastName}`,
+      description: `Posts by ${userData.user.firstName} ${userData.user.lastName}`,
+      url: `/${userData.user.userName}`,
+    });
+  } catch {
+    return {
+      title: "Not Found | !LAZY Blog",
+    };
+  }
+}
 
-  if (error) return <ErrorMessage code={error.message || "Unknown error"} />;
-
-  const user = data?.pages?.[0]?.user;
-  const posts = data?.pages?.flatMap((page) => page.postItems) || [];
-
-  return (
-    <div className="wrapper p-8">
-      {(isLoading || isFetchingNextPage) && <Loading />}
-
-      {user && (
-        <div className="mb-8">
-          <UserDetails
-            user={user}
-            authUserId={auth?.user?.id}
-            postsNum={posts.length}
-          />
-        </div>
-      )}
-
-      <div className="postsGrid">
-        {posts.map((post) => (
-          <PostPreview key={post.id} post={post} author={user} />
-        ))}
-      </div>
-
-      <div ref={observerRef} className="h-10" />
-
-      {posts.length === 0 && <p className="text-center">Нет постов</p>}
-    </div>
-  );
+export default function UserPage() {
+  return <UserClient />;
 }
