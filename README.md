@@ -1,13 +1,12 @@
-# Lazy Blog
+## NotLazy Blog
 
-Lazy Blog — это минималистичный блог на Next.js, в котором публикуются случайные темы без строгих ограничений.
+NotLazy Blog — это минималистичный блог на Next.js, в котором публикуются случайные темы без строгих ограничений.
 
 ## Технологии
 
 - Next.js
 - React Query
-- TypeScript
-- Tailwind CSS
+- Hero UI + Tailwind
 - Markdown/MDX
 
 ## Лицензия

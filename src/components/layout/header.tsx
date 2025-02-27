@@ -62,21 +62,11 @@ export const Header = () => {
         </NavbarBrand>
 
         <NavbarContent justify="end" className="flex items-center gap-4">
-          <NavbarItem>
+          {/* <NavbarItem>
             <Tooltip content="Toggle Post Preview">
-              <Button
-                isIconOnly
-                variant="flat"
-                onPress={() => setShowPreviews((prev) => !prev)}
-              >
-                {showPreviews ? (
-                  <PhotoIconSolid className="w-5 h-5" />
-                ) : (
-                  <PhotoIconOutline className="w-5 h-5" />
-                )}
-              </Button>
+            
             </Tooltip>
-          </NavbarItem>
+          </NavbarItem> */}
 
           <NavbarItem>
             <Tooltip content="Toggle Theme">
@@ -102,11 +92,12 @@ export const Header = () => {
             <NavbarItem>
               <Tooltip content="Create a New Post">
                 <Button
+                  color="primary"
                   isIconOnly
-                  variant="flat"
+                  variant="solid"
                   onPress={() => router.push("/create")}
                 >
-                  <PencilSquareIcon className="w-5 h-5 text-primary" />
+                  <PencilSquareIcon className="w-5 h-5 " />
                 </Button>
               </Tooltip>
             </NavbarItem>
@@ -145,6 +136,24 @@ export const Header = () => {
 
                   <DropdownItem key="profile" onPress={onEditOpen}>
                     Edit Profile
+                  </DropdownItem>
+                  <DropdownItem
+                    shortcut={showPreviews ? "on" : "off"}
+                    key="toggle-previews"
+                    onPress={() => setShowPreviews((prev) => !prev)}
+                  >
+                    Post Previews
+                    {/* <Button
+                      isIconOnly
+                      variant="flat"
+                      onPress={() => }
+                    >
+                      {showPreviews ? (
+                        <PhotoIconSolid className="w-5 h-5" />
+                      ) : (
+                        <PhotoIconOutline className="w-5 h-5" />
+                      )}
+                    </Button> */}
                   </DropdownItem>
                   <DropdownItem
                     key="logout"

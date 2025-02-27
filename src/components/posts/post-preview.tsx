@@ -29,7 +29,7 @@ export default function PostPreview({
 
   return (
     <>
-      <div className="flex flex-col-reverse sm:flex-row gap-6">
+      <div className="flex  sm:flex-row gap-6">
         <div className="flex justify-center flex-col gap-3">
           <Link
             href={`/${author.userName}`}
@@ -88,20 +88,31 @@ export default function PostPreview({
 
         {showPreviews && post.coverUrl && (
           <Link
-            className="flex items-center sm:ms-auto"
+            className="flex items-center ms-auto"
             href={`/${author.userName}/${post.slug}`}
           >
             <Image
-              radius="none"
               removeWrapper
-              className="object-cover"
+              className="hidden sm:flex object-cover shadow-medium"
               src={post.coverUrl}
               alt={post.title}
-              width={150}
-              height={100}
+              width={"7rem"}
+              height={"7rem"}
               style={{
-                minWidth: "150px",
-                minHeight: "100px",
+                minWidth: "7rem",
+                minHeight: "7rem",
+              }}
+            />
+            <Image
+              removeWrapper
+              className="sm:hidden object-cover shadow-medium"
+              src={post.coverUrl}
+              alt={post.title}
+              width={"5rem"}
+              height={"5rem"}
+              style={{
+                minWidth: "5rem",
+                minHeight: "5rem",
               }}
             />
           </Link>

@@ -79,16 +79,17 @@ function CommentForm({ postId, commentsRefetch }: IProps) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div className="relative">
-        <Textarea
-          label="Too lazy to add a comment?"
-          required
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          className="input w-full"
-          size="md"
-        />
+      <Textarea
+        classNames={{ input: "text-base" }}
+        label="Too lazy to add a comment?"
+        required
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
+        className="input w-full"
+        size="md"
+      />
 
+      <div className="relative">
         {showEmoji && (
           <div
             ref={pickerRef}

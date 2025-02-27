@@ -87,7 +87,6 @@ export default function EditProfileForm({ onOpenChange }: LoginFormProps) {
         <label className="cursor-pointer">
           <User
             avatarProps={{
-              isBordered: true,
               size: "md",
               src: avatarPreview,
               fallback: <ArrowUpTrayIcon className="w-4 h-4" />,

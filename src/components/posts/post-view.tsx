@@ -49,18 +49,21 @@ export const PostView = ({ post, postRefetch }: IProps) => {
     post && (
       <div className="layout-page">
         <div className="layout-page-content">
-          {post?.coverUrl && (
-            <Image
-              className="mb-6"
-              removeWrapper
-              radius="none"
-              style={{
-                maxWidth: "100%",
-              }}
-              src={post.coverUrl}
-              alt={post.title}
-            />
-          )}
+          {/* {post?.coverUrl && (
+            <div className="flex w-full justify-center items-center bg-zinc-100 mb-6 rounded-2xl p-6">
+              <Image
+                isBlurred
+                className="self-center "
+                removeWrapper
+                // radius="lg"
+                style={{
+                  maxWidth: "100%",
+                }}
+                src={post.coverUrl}
+                alt={post.title}
+              />
+            </div>
+          )} */}
 
           <MDPreview source={post.body} />
           <Comments
@@ -132,6 +135,25 @@ export const PostView = ({ post, postRefetch }: IProps) => {
                   <span className="ml-1 text-sm">{postComments?.length}</span>
                 </div>
               </div>
+
+              {/* <div className="flex justify-center items-center mt-4">
+                <Image
+                  // isBlurred
+                  // isZoomed
+                  // radius="none"
+                  // shadow="md"
+                  // removeWrapper
+                  className="sm:flex object-cover "
+                  src={post.coverUrl || ""}
+                  alt={post.title}
+                  // width={180}
+                  // height={100}
+                  style={{
+                    // minWidth: "100px",
+                    maxHeight: "10rem",
+                  }}
+                />
+              </div> */}
             </div>
           </div>
         </div>
