@@ -21,12 +21,21 @@ const Picker = dynamic(
 );
 
 interface IProps {
-  postId: string;
-  commentsRefetch: () => Promise<QueryObserverResult<CommentResponse[], Error>>;
+  postId?: string;
+  postCommentsRefetch: () => Promise<
+    QueryObserverResult<CommentResponse[], Error>
+  >;
+  editComment?: CommentResponse;
+  setIsEditComment?: (param: boolean) => void;
 }
 
-function CommentForm({ postId, commentsRefetch }: IProps) {
-  const [body, setBody] = useState("");
+function CommentForm({
+  postId,
+  postCommentsRefetch,
+  editComment,
+  setIsEditComment,
+}: IProps) {
+  const [body, setBody] = useState(editComment?.body || "");
   const [showEmoji, setShowEmoji] = useState(false);
   const { isDarkTheme } = useTheme();
   const { user } = useAuth();
@@ -47,22 +56,22 @@ function CommentForm({ postId, commentsRefetch }: IProps) {
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
     }
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showEmoji]);
 
-  const handleSend = useMutation({
+  const postComment = useMutation({
     mutationFn: () =>
       apiClient.comments.addComment({
-        addCommentRequest: { postId, userId: user!.id!, body },
+        addCommentRequest: { postId: postId!, userId: user!.id!, body },
       }),
 
     onSuccess: () => {
-      commentsRefetch().then(() => {});
+      postCommentsRefetch().then(() => {});
       addToastSuccess("Comment has been posted");
     },
 
-    onError: (error: any) => {
-      console.log(error);
+    onError: () => {
       addToastError("Error posting comment");
     },
 
@@ -72,9 +81,43 @@ function CommentForm({ postId, commentsRefetch }: IProps) {
     },
   });
 
+  const postEditedComment = useMutation({
+    mutationFn: () =>
+      apiClient.comments.updateComment({
+        updateCommentRequest: {
+          userId: user ? user.id! : "",
+          body: body,
+          commentId: editComment ? editComment.id : "",
+        },
+      }),
+
+    onSuccess: () => {
+      postCommentsRefetch().then(() => {});
+      addToastSuccess("Comment has been updated");
+    },
+
+    onError: () => {
+      addToastError("Error updating comment");
+    },
+
+    onSettled: () => {
+      setBody("");
+      setShowEmoji(false);
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    handleSend.mutate();
+    if (postId) {
+      e.preventDefault();
+      postComment.mutate();
+    }
+
+    if (editComment) {
+      e.preventDefault();
+      postEditedComment.mutate();
+
+      if (setIsEditComment) setIsEditComment(false);
+    }
   };
 
   return (
@@ -89,11 +132,11 @@ function CommentForm({ postId, commentsRefetch }: IProps) {
         size="md"
       />
 
-      <div className="relative">
-        {showEmoji && (
+      {showEmoji && (
+        <div className="relative">
           <div
             ref={pickerRef}
-            className="absolute bottom-full right-0 mb-2 z-10"
+            className="absolute bottom-full right-0 mb-2 z-50"
           >
             <Picker
               theme={isDarkTheme ? Theme.DARK : Theme.LIGHT}
@@ -105,15 +148,15 @@ function CommentForm({ postId, commentsRefetch }: IProps) {
               emojiStyle={EmojiStyle.APPLE}
               searchDisabled
               height={300}
-              width={300}
+              width={400}
               skinTonesDisabled
               previewConfig={{
                 showPreview: false,
               }}
             />
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="flex gap-4 items-center justify-end">
         <Button

@@ -44,7 +44,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
     <form
       noValidate
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-6"
+      className="flex flex-col gap-4"
     >
       <Input
         classNames={{ input: "text-base" }}

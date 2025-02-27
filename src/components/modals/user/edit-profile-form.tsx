@@ -83,7 +83,7 @@ export default function EditProfileForm({ onOpenChange }: LoginFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
         <label className="cursor-pointer">
           <User
             avatarProps={{

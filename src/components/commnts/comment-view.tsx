@@ -2,7 +2,7 @@
 import { CommentResponse } from "@/api/apis";
 import { CalendarIcon } from "@heroicons/react/24/solid";
 import { Button, Divider, User } from "@heroui/react";
-import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { formatDate2 } from "@/utils/format-date";
 import { QueryObserverResult, useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
@@ -10,6 +10,7 @@ import { addToastError, addToastSuccess } from "@/helpers/toasts";
 import IsAuthor from "@/guards/is-author";
 import { useState } from "react";
 import ConfirmDeleteModal from "../modals/confirmation-modal";
+import CommentForm from "./comment-form";
 
 interface IProps {
   comment: CommentResponse;
@@ -20,6 +21,7 @@ interface IProps {
 
 const Comment = ({ comment, postCommentsRefetch }: IProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditComment, setIsEditComment] = useState(false);
 
   const handleDelete = useMutation({
     mutationFn: () =>
@@ -54,7 +56,7 @@ const Comment = ({ comment, postCommentsRefetch }: IProps) => {
   return (
     <div>
       <div className="">
-        <div className="mb-3 flex flex-row justify-between gap-4 items-end">
+        <div className="mb-4 flex flex-row justify-between gap-4 items-end">
           <User
             key={comment.user.id}
             avatarProps={{
@@ -72,13 +74,17 @@ const Comment = ({ comment, postCommentsRefetch }: IProps) => {
             <IsAuthor userId={comment.user.id || ""}>
               <>
                 <Button
-                  isDisabled
                   variant="light"
                   size="sm"
                   isIconOnly
                   className="h-5 w-5 min-w-5"
+                  onPress={() => setIsEditComment((prev) => !prev)}
                 >
-                  <PencilIcon className="w-3 h-3" />
+                  {isEditComment ? (
+                    <XMarkIcon className="w-3 h-3"></XMarkIcon>
+                  ) : (
+                    <PencilIcon className="w-3 h-3" />
+                  )}
                 </Button>
 
                 <Button
@@ -100,7 +106,15 @@ const Comment = ({ comment, postCommentsRefetch }: IProps) => {
           </div>
         </div>
 
-        <div style={{ whiteSpace: "pre-line" }}>{comment.body}</div>
+        {isEditComment ? (
+          <CommentForm
+            postCommentsRefetch={postCommentsRefetch}
+            editComment={comment}
+            setIsEditComment={setIsEditComment}
+          />
+        ) : (
+          <div style={{ whiteSpace: "pre-line" }}>{comment.body}</div>
+        )}
       </div>
 
       <Divider className="layout-page-divider my-8" />

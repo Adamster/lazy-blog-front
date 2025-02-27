@@ -56,7 +56,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       noValidate
       onSubmit={handleSubmit(onSubmit)}
       autoComplete="off"
-      className="flex flex-col gap-6"
+      className="flex flex-col gap-4"
     >
       <Input
         classNames={{ input: "text-base" }}

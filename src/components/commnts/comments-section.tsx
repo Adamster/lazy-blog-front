@@ -28,7 +28,7 @@ export function Comments({
           <div className="mb-8">
             <CommentForm
               postId={postId}
-              commentsRefetch={postCommentsRefetch}
+              postCommentsRefetch={postCommentsRefetch}
             />
           </div>
         </div>
