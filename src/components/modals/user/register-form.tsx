@@ -59,6 +59,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       className="flex flex-col gap-6"
     >
       <Input
+        classNames={{ input: "text-base" }}
         label="Email"
         type="email"
         isRequired
@@ -74,6 +75,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       />
 
       <Input
+        classNames={{ input: "text-base" }}
         label="Username"
         isRequired
         isInvalid={Boolean(errors.userName)}
@@ -88,6 +90,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       />
 
       <Input
+        classNames={{ input: "text-base" }}
         label="First Name"
         isRequired
         isInvalid={Boolean(errors.firstName)}
@@ -99,6 +102,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       />
 
       <Input
+        classNames={{ input: "text-base" }}
         label="Last Name"
         isRequired
         isInvalid={Boolean(errors.lastName)}
@@ -110,6 +114,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       />
 
       <Input
+        classNames={{ input: "text-base" }}
         label="Password"
         type="password"
         isRequired
@@ -127,6 +132,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       />
 
       <Input
+        classNames={{ input: "text-base" }}
         label="Repeat Password"
         type="password"
         isRequired
