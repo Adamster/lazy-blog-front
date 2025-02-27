@@ -64,6 +64,10 @@ export default function UserClient() {
                   description={"@" + user.userName}
                 />
 
+                <div className="text-zinc-500">
+                  <p>About:</p>
+                </div>
+
                 <div className="flex items-center gap-4 text-zinc-500">
                   <div className="flex items-center gap-1">
                     <CalendarIcon className="w-4 h-4" />

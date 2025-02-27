@@ -24,6 +24,7 @@ import {
 import { Comments } from "../commnts/comments-section";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
+import { useTheme } from "@/providers/theme-providers";
 
 const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
   ssr: false,
@@ -35,6 +36,8 @@ interface IProps {
 }
 
 export const PostView = ({ post, postRefetch }: IProps) => {
+  const { showPreviews } = useTheme();
+
   const {
     data: postComments,
     isLoading: postCommentsLoading,
@@ -49,22 +52,6 @@ export const PostView = ({ post, postRefetch }: IProps) => {
     post && (
       <div className="layout-page">
         <div className="layout-page-content">
-          {/* {post?.coverUrl && (
-            <div className="flex w-full justify-center items-center bg-zinc-100 mb-6 rounded-2xl p-6">
-              <Image
-                isBlurred
-                className="self-center "
-                removeWrapper
-                // radius="lg"
-                style={{
-                  maxWidth: "100%",
-                }}
-                src={post.coverUrl}
-                alt={post.title}
-              />
-            </div>
-          )} */}
-
           <MDPreview source={post.body} />
           <Comments
             postId={post.id}
@@ -99,12 +86,21 @@ export const PostView = ({ post, postRefetch }: IProps) => {
                 <p className="text-zinc-500">{post?.summary}</p>
               </div>
 
-              <div className="flex items-center gap-4 text-zinc-500">
+              <div className="flex flex-wrap items-center gap-4 text-zinc-500">
                 <div className="flex items-center gap-1">
                   <CalendarIcon className="w-4 h-4" />
                   <span className="text-sm">
                     {formatDate2(post.createdAtUtc)}
                   </span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  {postComments?.length || 0 > 0 ? (
+                    <ChatBubbleLeftIconSolid className="w-4 h-4" />
+                  ) : (
+                    <ChatBubbleLeftIconOutline className="w-4 h-4" />
+                  )}
+                  <span className="ml-1 text-sm">{postComments?.length}</span>
                 </div>
 
                 <IsAuth
@@ -125,37 +121,23 @@ export const PostView = ({ post, postRefetch }: IProps) => {
                     mutate={postRefetch}
                   />
                 </IsAuth>
-
-                <div className="flex items-center gap-1">
-                  {postComments?.length || 0 > 0 ? (
-                    <ChatBubbleLeftIconSolid className="w-4 h-4" />
-                  ) : (
-                    <ChatBubbleLeftIconOutline className="w-4 h-4" />
-                  )}
-                  <span className="ml-1 text-sm">{postComments?.length}</span>
-                </div>
               </div>
 
-              {/* <div className="flex justify-center items-center mt-4">
-                <Image
-                  // isBlurred
-                  // isZoomed
-                  // radius="none"
-                  // shadow="md"
-                  // removeWrapper
-                  className="sm:flex object-cover "
-                  src={post.coverUrl || ""}
-                  alt={post.title}
-                  // width={180}
-                  // height={100}
-                  style={{
-                    // minWidth: "100px",
-                    maxHeight: "10rem",
-                  }}
-                />
-              </div> */}
+              {showPreviews && post.coverUrl && (
+                <div className="flex mt-2">
+                  <Image
+                    className="max-h-72"
+                    removeWrapper
+                    src={post.coverUrl}
+                    alt={post.title}
+                    style={{ padding: "1px" }}
+                  />
+                </div>
+              )}
             </div>
           </div>
+
+          <Divider className="layout-page-divider md:hidden mt-6" />
         </div>
       </div>
     )

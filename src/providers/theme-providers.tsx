@@ -21,7 +21,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: ProvidersProps) {
   const [theme, setTheme] = useState<string>("light");
-  const [showPreviews, setShowPreviews] = useState(false);
+  const [showPreviews, setShowPreviews] = useState(true);
 
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme") || "light";

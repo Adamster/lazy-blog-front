@@ -67,15 +67,6 @@ export default function PostPreview({
             </div>
 
             <div className="flex items-center gap-1">
-              {post.rating > 0 ? (
-                <HeartIconSolid className={"w-4 h-4"} />
-              ) : (
-                <HeartIconOutline className={"w-4 h-4"} />
-              )}
-              <span className="ml-1 text-sm">{post.rating}</span>
-            </div>
-
-            <div className="flex items-center gap-1">
               {post.comments > 0 ? (
                 <ChatBubbleLeftIconSolid className="w-4 h-4" />
               ) : (
@@ -83,37 +74,29 @@ export default function PostPreview({
               )}
               <span className="ml-1 text-sm">{post.comments}</span>
             </div>
+
+            <div className="flex items-center gap-1">
+              {post.rating > 0 ? (
+                <HeartIconSolid className={"w-4 h-4"} />
+              ) : (
+                <HeartIconOutline className={"w-4 h-4"} />
+              )}
+              <span className="ml-1 text-sm">{post.rating}</span>
+            </div>
           </div>
         </div>
 
         {showPreviews && post.coverUrl && (
           <Link
             className="flex items-center ms-auto"
+            style={{}}
             href={`/${author.userName}/${post.slug}`}
           >
             <Image
-              removeWrapper
-              className="hidden sm:flex object-cover shadow-medium"
+              isZoomed
+              className="w-24 h-24 min-w-24 min-h-24 md:w-32 md:h-32 md:min-w-32 md:min-h-32 object-cover"
               src={post.coverUrl}
               alt={post.title}
-              width={"7rem"}
-              height={"7rem"}
-              style={{
-                minWidth: "7rem",
-                minHeight: "7rem",
-              }}
-            />
-            <Image
-              removeWrapper
-              className="sm:hidden object-cover shadow-medium"
-              src={post.coverUrl}
-              alt={post.title}
-              width={"5rem"}
-              height={"5rem"}
-              style={{
-                minWidth: "5rem",
-                minHeight: "5rem",
-              }}
             />
           </Link>
         )}
