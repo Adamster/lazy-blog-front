@@ -25,6 +25,7 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
 }) => {
   return (
     <Modal
+      placement="center"
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       size="sm"
@@ -33,11 +34,11 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader className="px-10">Confirmation</ModalHeader>
-            <ModalBody className="px-10">
+            <ModalHeader className="sm:px-10">Confirmation</ModalHeader>
+            <ModalBody className="sm:px-10">
               <p>{message}</p>
             </ModalBody>
-            <ModalFooter className="px-10">
+            <ModalFooter className="sm:px-10">
               <Button size="md" variant="light" onPress={onOpenChange}>
                 Cancel
               </Button>

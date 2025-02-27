@@ -105,6 +105,7 @@ export default function EditProfileForm({ onOpenChange }: LoginFormProps) {
         </label>
 
         <Input
+          classNames={{ input: "text-base" }}
           label="Username"
           isRequired
           isInvalid={Boolean(errors.username)}
@@ -119,6 +120,7 @@ export default function EditProfileForm({ onOpenChange }: LoginFormProps) {
         />
 
         <Input
+          classNames={{ input: "text-base" }}
           label="First Name"
           isRequired
           isInvalid={Boolean(errors.firstName)}
@@ -133,6 +135,7 @@ export default function EditProfileForm({ onOpenChange }: LoginFormProps) {
         />
 
         <Input
+          classNames={{ input: "text-base" }}
           label="Last Name"
           isRequired
           isInvalid={Boolean(errors.lastName)}

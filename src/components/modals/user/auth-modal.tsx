@@ -29,7 +29,7 @@ export function AuthModal({
 
   return (
     <Modal
-      placement="center"
+      placement="top-center"
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       size={"md"}
@@ -38,11 +38,11 @@ export function AuthModal({
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader className="px-10">
+            <ModalHeader className="sm:px-10">
               <p>{isLogin ? "Log In" : "Create an Account"}</p>
             </ModalHeader>
 
-            <ModalBody className="px-10">
+            <ModalBody className="sm:px-10">
               {isLogin ? (
                 <LoginForm onSuccess={onClose} />
               ) : (
@@ -50,7 +50,7 @@ export function AuthModal({
               )}
             </ModalBody>
 
-            <ModalFooter className="px-10">
+            <ModalFooter className="sm:px-10">
               <Button
                 size="md"
                 variant="light"
