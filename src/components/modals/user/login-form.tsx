@@ -47,7 +47,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       className="flex flex-col gap-6"
     >
       <Input
-        size="md"
+        classNames={{ input: "text-base" }}
         isRequired
         label="Email"
         type="email"
@@ -63,7 +63,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       />
 
       <Input
-        size="md"
+        classNames={{ input: "text-base" }}
         isRequired
         label="Password"
         type="password"
