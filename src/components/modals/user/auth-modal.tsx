@@ -29,6 +29,7 @@ export function AuthModal({
 
   return (
     <Modal
+      placement="top-center"
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       size={"md"}
