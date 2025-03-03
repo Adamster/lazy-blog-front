@@ -1,57 +1,68 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useState } from "react";
-import { CreateEdit } from "@/components/post/CreateEdit";
+import { useEffect } from "react";
 import { apiClient } from "@/api/api-client";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/providers/auth-provider";
 import { Loading } from "@/components/loading";
-import { addToastSuccess } from "@/helpers/toasts";
+import { addToastError, addToastSuccess } from "@/helpers/toasts";
 import { useRouter } from "next/navigation";
+import { UpdatePostRequest } from "@/api/apis";
+import { PostForm } from "@/components/posts/post-form";
 
 const CreatePageClient = () => {
   const { user } = useAuth();
   const router = useRouter();
 
-  const [requesting, setRequesting] = useState(false);
-
-  const form = useForm({ shouldFocusError: false });
-  const { reset } = form;
+  const form = useForm<UpdatePostRequest>({
+    defaultValues: {
+      title: "",
+      summary: "",
+      body: "",
+      coverUrl: "",
+      isPublished: true,
+    },
+    mode: "onChange",
+  });
 
   useEffect(() => {
     if (!user) {
       router.push("/");
     }
-  }, [user]);
+  }, [router, user]);
 
-  const onSubmit = useMutation({
-    mutationFn: (data: any) => {
+  const mutation = useMutation({
+    mutationFn: (data: UpdatePostRequest) => {
       return apiClient.posts.createPost({
-        createPostRequest: { userId: user?.id, ...data },
+        createPostRequest: { userId: user?.id || "", ...data },
       });
     },
-
     onSuccess: () => {
       addToastSuccess("Post has been added");
-      reset();
-    },
 
+      router.push("/");
+    },
     onError: (error: any) => {
-      addToastSuccess("Error adding post");
-      console.log(error);
-    },
-
-    onSettled: () => {
-      setRequesting(false);
+      addToastError("Error adding post", error);
     },
   });
 
+  const onSubmit = () => {
+    const data = form.getValues();
+
+    form.trigger().then((isValid) => {
+      if (isValid) {
+        mutation.mutate(data);
+      }
+    });
+  };
+
   return (
     <>
-      {requesting && <Loading />}
-      {user && <CreateEdit form={form} onSubmit={onSubmit.mutate} />}
+      {mutation.isPending && <Loading inline />}
+      {user && <PostForm form={form} onSubmit={onSubmit} create={true} />}
     </>
   );
 };

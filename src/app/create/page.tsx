@@ -8,6 +8,5 @@ export const metadata: Metadata = generateMeta({
 });
 
 export default function CreatePage() {
-  return <p>In progress</p>;
-  <CreatePageClient />;
+  return <CreatePageClient />;
 }

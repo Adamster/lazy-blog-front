@@ -1,5 +1,6 @@
 import { generateMeta } from "@/components/meta/meta-data";
 import { Metadata } from "next";
+import PageEditClient from "./page-client";
 
 export const metadata: Metadata = generateMeta({
   title: "Edit",
@@ -7,5 +8,5 @@ export const metadata: Metadata = generateMeta({
 });
 
 export default function PageEdit() {
-  return <p>In progress</p>; //<PageEditClient />;
+  return <PageEditClient />;
 }

@@ -2,6 +2,9 @@
 import { LayoutClient } from "@/app/layout-client";
 import { Mulish } from "next/font/google";
 
+// import "../assets/global.css";
+import "../assets/styles/global.scss";
+
 const font = Mulish({
   weight: ["300", "400", "500", "600", "700"],
   subsets: ["latin"],

@@ -1,0 +1,112 @@
+// @import "highlight.js/styles/github.css"; // стиль для подсветки
+
+#radix-\:r1o\: {
+  display: none;
+}
+
+[class^="_codeMirrorToolbar_"],
+[class^="_toolbarNodeKindSelectTrigger_"],
+[class^="_toolbarButtonSelectTrigger_"],
+[class^="_selectTrigger_"] {
+  @apply bg-default-100 !important;
+}
+
+.mdxeditor-rich-text-editor {
+  div[data-lexical-decorator] {
+    margin-bottom: 1rem !important;
+  }
+
+  > div > div *:last-child {
+    margin-bottom: 0rem !important;
+  }
+
+  table tbody {
+    th, td {
+      &:not([data-tool-cell="true"]){
+        border: 1px solid rgb(113 113 122 / var(--tw-text-opacity, 1)) !important;
+      }
+    }
+  }
+}
+
+.wmde-markdown {
+  a.anchor { display: none }
+
+  table {
+    display: table !important;
+    width: 100% !important;
+    min-width: 100% !important;
+
+    th, td {
+      text-align: left !important;
+      padding: 0.25rem 0.5rem !important; 
+      border: 1px solid rgb(113 113 122 / var(--tw-text-opacity, 1)) !important;
+      white-space: normal !important;
+      min-height: 1rem;
+      height: 2rem;
+    }
+
+    tr {
+      background: none !important
+    }
+  }
+
+}
+
+.mdxeditor-rich-text-editor,
+.wmde-markdown  {
+  background: transparent !important;
+  color: inherit !important;
+  font-size: inherit !important;
+
+  > * {
+    max-width: 100%;
+  }
+
+  blockquote, details, pre, 
+  table, dl, 
+  ol, ul, 
+  p, 
+  h1, h2, h3, h4, h5, h6 {
+    font-size: 1rem !important;
+    margin-top: 0 !important;
+    margin-bottom: 1rem !important;
+    font-family: inherit !important;
+  }
+  
+  h1, h2, h3, h4, h5, h6, b, strong, th  {
+    font-weight: 700 !important;
+  }
+ 
+  a {
+    @apply text-primary !important;
+  }
+
+  ul {
+    @apply list-disc;
+  }
+
+  ol {
+    @apply list-decimal;
+  }
+
+  ul, ol {
+    @apply ms-4 ps-0 !important;
+
+    > li {
+      margin: 0 !important;
+    }
+  }
+
+  blockquote {
+    margin: 0;
+    padding: 0 1em;
+    color: hsl(var(--heroui-deault)) !important;
+    border-left: 0.25em solid hsl(var(--heroui-primary)) !important;
+  }
+
+  pre {
+    @apply bg-zinc-100 dark:bg-zinc-800 !important
+  }
+  
+}

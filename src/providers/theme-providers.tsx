@@ -60,6 +60,8 @@ export function ThemeProvider({ children }: ProvidersProps) {
         />
 
         <div
+          data-theme={isDarkTheme ? "dark" : "light"}
+          data-color-mode={isDarkTheme ? "dark" : "light"}
           className={classNames(
             isDarkTheme ? "dark" : "light",
             "text-foreground bg-background"

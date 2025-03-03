@@ -6,11 +6,11 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 
 import { formatDate2 } from "@/utils/format-date";
-import "@uiw/react-markdown-preview/markdown.css";
+
 import IsAuth from "../../guards/is-auth";
 import { PostVote } from "../post/PostVote";
 import { PostDetailedResponse } from "@/api/apis";
-import { Divider, Image, User } from "@heroui/react";
+import { Button, Divider, Image, User } from "@heroui/react";
 
 import {
   HeartIcon as HeartIconOutline,
@@ -20,11 +20,13 @@ import {
   HeartIcon as HeartIconSolid,
   ChatBubbleLeftIcon as ChatBubbleLeftIconSolid,
   CalendarIcon,
+  PencilIcon,
 } from "@heroicons/react/24/solid";
-import { Comments } from "../commnts/comments-section";
+import { Comments } from "../comments/comments-section";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { useTheme } from "@/providers/theme-providers";
+import IsAuthor from "@/guards/is-author";
 
 const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
   ssr: false,
@@ -48,11 +50,23 @@ export const PostView = ({ post, postRefetch }: IProps) => {
     enabled: !!post?.id,
   });
 
+  const postRating = (rating: number) => (
+    <div className="flex items-center gap-1">
+      {rating > 0 ? (
+        <HeartIconSolid className={"w-4 h-4"} />
+      ) : (
+        <HeartIconOutline className={"w-4 h-4"} />
+      )}
+      <span className="ml-1 text-sm">{rating}</span>
+    </div>
+  );
+
   return (
     post && (
       <div className="layout-page">
         <div className="layout-page-content">
           <MDPreview source={post.body} />
+
           <Comments
             postId={post.id}
             postComments={postComments}
@@ -103,23 +117,26 @@ export const PostView = ({ post, postRefetch }: IProps) => {
                   <span className="ml-1 text-sm">{postComments?.length}</span>
                 </div>
 
-                <IsAuth
-                  fallback={
-                    <div className="flex items-center gap-1">
-                      {post?.rating > 0 ? (
-                        <HeartIconSolid className={"w-4 h-4"} />
-                      ) : (
-                        <HeartIconOutline className={"w-4 h-4"} />
-                      )}
-                      <span className="ml-1 text-sm">{post?.rating}</span>
-                    </div>
-                  }
-                >
-                  <PostVote
-                    rating={post.rating}
-                    postId={post.id}
-                    mutate={postRefetch}
-                  />
+                <IsAuth fallback={postRating(post.rating)}>
+                  <IsAuthor
+                    fallback={
+                      <PostVote
+                        rating={post.rating}
+                        postId={post.id}
+                        mutate={postRefetch}
+                      />
+                    }
+                    userId={post.author.id || ""}
+                  >
+                    {postRating(post.rating)}
+
+                    <Link
+                      className="flex items-center justify-center w-5 h-5 bg-default/40 rounded-md"
+                      href={`${post.slug}/edit`}
+                    >
+                      <PencilIcon className="w-3 h-3" />
+                    </Link>
+                  </IsAuthor>
                 </IsAuth>
               </div>
 
@@ -130,7 +147,6 @@ export const PostView = ({ post, postRefetch }: IProps) => {
                     removeWrapper
                     src={post.coverUrl}
                     alt={post.title}
-                    style={{ padding: "1px" }}
                   />
                 </div>
               )}

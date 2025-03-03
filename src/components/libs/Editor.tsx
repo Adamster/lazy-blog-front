@@ -1,20 +1,18 @@
-"use client";
 // ForwardRefEditor.tsx
 import dynamic from "next/dynamic";
 import { forwardRef } from "react";
 import { type MDXEditorMethods, type MDXEditorProps } from "@mdxeditor/editor";
+import { Loading } from "../loading";
 
-// This is the only place InitializedMDXEditor is imported directly.
 const Editor = dynamic(() => import("./InitializedMDXEditor"), {
-  // Make sure we turn SSR off
   ssr: false,
+  loading: () => <Loading inline />,
 });
 
-// This is what is imported by other components. Pre-initialized with plugins, and ready
-// to accept other props, including a ref.
+console.log(Editor);
+
 export const MarkEditor = forwardRef<MDXEditorMethods, MDXEditorProps>(
-  (props, ref) => <Editor {...props} editorRef={ref} />
+  ({ ...props }, ref) => <Editor {...props} editorRef={ref} />
 );
 
-// TS complains without the following line
 MarkEditor.displayName = "ForwardRefEditor";

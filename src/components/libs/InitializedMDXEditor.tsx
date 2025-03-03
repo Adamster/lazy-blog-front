@@ -1,5 +1,5 @@
 "use client";
-import { useState, type ForwardedRef } from "react";
+import React, { useState, type ForwardedRef } from "react";
 import {
   headingsPlugin,
   listsPlugin,
@@ -27,15 +27,34 @@ import {
   BlockTypeSelect,
   InsertTable,
   tablePlugin,
-  // directivesPlugin,
-  // AdmonitionDirectiveDescriptor,
   DiffSourceToggleWrapper,
   diffSourcePlugin,
 } from "@mdxeditor/editor";
 import { API_URL } from "@/utils/fetcher";
-
 import "@mdxeditor/editor/style.css";
 import { useAuth } from "@/providers/auth-provider";
+import { oneDark } from "@codemirror/theme-one-dark";
+
+// Компонент кнопки для вставки отступа (HTML-блока с margin)
+function InsertSpacingButton({
+  editorRef,
+}: {
+  editorRef: ForwardedRef<MDXEditorMethods> | null;
+}) {
+  const handleInsertSpacing = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    if (editorRef && "current" in editorRef && editorRef.current) {
+      const spacingHTML = "\n\n<div style='margin-bottom:2em;'></div>\n\n";
+      editorRef.current.insertMarkdown(spacingHTML);
+    }
+  };
+
+  return (
+    <button onClick={handleInsertSpacing} style={{ marginRight: "8px" }}>
+      Вставить отступ
+    </button>
+  );
+}
 
 export default function InitializedMDXEditor({
   editorRef,
@@ -104,22 +123,18 @@ export default function InitializedMDXEditor({
 
   return (
     <MDXEditor
-      className="dark-theme dark-editor"
       plugins={[
         headingsPlugin({ allowedHeadingLevels: [1, 2, 3, 4, 5] }),
         listsPlugin(),
         linkPlugin(),
         quotePlugin(),
-        markdownShortcutPlugin(),
         thematicBreakPlugin(),
         tablePlugin(),
         linkDialogPlugin(),
-        // directivesPlugin({
-        //   directiveDescriptors: [AdmonitionDirectiveDescriptor],
-        // }),
         codeBlockPlugin({ defaultCodeBlockLanguage: "js" }),
         codeMirrorPlugin({
           codeBlockLanguages,
+          codeMirrorExtensions: [oneDark],
         }),
         imagePlugin({
           imageUploadHandler,
@@ -129,27 +144,20 @@ export default function InitializedMDXEditor({
           viewMode: "rich-text",
         }),
         toolbarPlugin({
-          toolbarClassName: "mdx-toolbar",
           toolbarContents: () => (
             <>
               <DiffSourceToggleWrapper>
-                <UndoRedo />
-                <Separator />
+                {/* Добавляем нашу кастомную кнопку для вставки отступа */}
+                {/* <InsertSpacingButton editorRef={editorRef} /> */}
                 <BlockTypeSelect />
                 <BoldItalicUnderlineToggles />
                 <Separator />
+                <CreateLink />
+                <InsertCodeBlock />
                 <InsertImage />
                 <InsertTable />
-                <CreateLink />
+                <ListsToggle options={["bullet"]} />
                 <Separator />
-                <CodeToggle />
-                <InsertCodeBlock />
-                <Separator />
-                {/* <InsertAdmonition />
-                <Separator /> */}
-                <ListsToggle />
-                <Separator />
-                <InsertThematicBreak />
               </DiffSourceToggleWrapper>
             </>
           ),

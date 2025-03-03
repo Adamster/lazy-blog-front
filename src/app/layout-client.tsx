@@ -4,8 +4,6 @@ import { Header } from "@/components/layout/header";
 import { ErrorBoundary } from "@/providers/error-boundary";
 import { ReactQueryProvider } from "@/providers/query-provider";
 import { Analytics } from "@vercel/analytics/react";
-
-import "../assets/styles/global.scss";
 import { ThemeProvider } from "@/providers/theme-providers";
 import { AuthProvider } from "../providers/auth-provider";
 

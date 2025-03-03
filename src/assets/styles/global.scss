@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+
+@import "@milkdown/crepe/theme/common/style.css"; // Базовые стили Crepe
+@import "@milkdown/crepe/theme/frame.css"; // Тема Frame
+
 /* *** */
 
 body {
@@ -42,13 +46,12 @@ body {
    
     &-content {
       @apply w-full px-6 md:px-8 md:py-6;
-      // padding-top: 1.5rem;
 
       &-sticky {
         @apply sticky flex flex-col items-start gap-4;
         // top: 11.5rem;
-        // top: 5.5rem;
-        top: 10rem;
+        top: 5.5rem;
+        // top: 10rem;
       }
     }
   }
@@ -56,15 +59,4 @@ body {
 
 /* *** */
 
-.wmde-markdown {
-
-  background: transparent !important;
-
-  color: inherit !important;
-  font-size: inherit !important;
-
-  > * {
-    max-width: 100%;
-  }
-
-}
+@import './mark.scss';

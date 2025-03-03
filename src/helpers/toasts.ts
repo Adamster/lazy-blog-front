@@ -12,7 +12,7 @@ export const addToastSuccess = (message: string) => {
   });
 };
 
-export const addToastError = async (message: string, error?: any) => {
+export const addToastError = async (message: string, error?: Error) => {
   if (error && error instanceof ResponseError) {
     const errorBody = await error.response.json();
     message = errorBody.detail || message;
