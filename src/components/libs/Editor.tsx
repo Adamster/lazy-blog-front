@@ -1,6 +1,5 @@
-// ForwardRefEditor.tsx
 import dynamic from "next/dynamic";
-import { forwardRef } from "react";
+import { memo, forwardRef } from "react";
 import { type MDXEditorMethods, type MDXEditorProps } from "@mdxeditor/editor";
 import { Loading } from "../loading";
 
@@ -9,10 +8,10 @@ const Editor = dynamic(() => import("./InitializedMDXEditor"), {
   loading: () => <Loading inline />,
 });
 
-console.log(Editor);
-
-export const MarkEditor = forwardRef<MDXEditorMethods, MDXEditorProps>(
-  ({ ...props }, ref) => <Editor {...props} editorRef={ref} />
+export const MarkEditor = memo(
+  forwardRef<MDXEditorMethods, MDXEditorProps>(({ ...props }, ref) => (
+    <Editor {...props} editorRef={ref} />
+  ))
 );
 
-MarkEditor.displayName = "ForwardRefEditor";
+MarkEditor.displayName = "MarkEditor";

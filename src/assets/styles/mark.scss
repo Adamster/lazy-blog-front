@@ -11,7 +11,19 @@
   @apply bg-default-100 !important;
 }
 
+
+.mdxeditor {
+  div[role="toolbar"] {
+    top: 4rem;
+  }
+}
+
+.mdxeditor-diff-source-wrapper {
+  margin-top: 1.5rem;
+}
+
 .mdxeditor-rich-text-editor {
+
   div[data-lexical-decorator] {
     margin-bottom: 1rem !important;
   }
@@ -62,6 +74,7 @@
   > * {
     max-width: 100%;
   }
+  
 
   blockquote, details, pre, 
   table, dl, 
@@ -70,12 +83,30 @@
   h1, h2, h3, h4, h5, h6 {
     font-size: 1rem !important;
     margin-top: 0 !important;
+    padding-bottom: 0 !important;
     margin-bottom: 1rem !important;
     font-family: inherit !important;
+    border-bottom: none !important;
   }
   
   h1, h2, h3, h4, h5, h6, b, strong, th  {
-    font-weight: 700 !important;
+    font-weight: 600 !important;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif) !important;
+  }
+
+  h1 {
+    @apply text-3xl !important;
+  }
+
+  h2 {
+    @apply text-2xl !important
+  }
+
+  h3 {
+    @apply text-xl !important
   }
  
   a {

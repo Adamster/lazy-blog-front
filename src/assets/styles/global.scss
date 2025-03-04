@@ -2,14 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-
-@import "@milkdown/crepe/theme/common/style.css"; // Базовые стили Crepe
-@import "@milkdown/crepe/theme/frame.css"; // Тема Frame
-
 /* *** */
 
 body {
   font-size: 16px;
+  font-family: var(--font-sans) !important;
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+  }
 }
 
 /* *** */
@@ -60,3 +61,9 @@ body {
 /* *** */
 
 @import './mark.scss';
+
+// hui
+
+@import "@milkdown/crepe/theme/common/style.css"; 
+@import "@milkdown/crepe/theme/frame.css"; 
+@import './milk.scss';

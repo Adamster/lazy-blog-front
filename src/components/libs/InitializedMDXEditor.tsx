@@ -5,18 +5,14 @@ import {
   listsPlugin,
   quotePlugin,
   thematicBreakPlugin,
-  markdownShortcutPlugin,
   MDXEditor,
   type MDXEditorMethods,
   type MDXEditorProps,
   toolbarPlugin,
-  UndoRedo,
   BoldItalicUnderlineToggles,
-  CodeToggle,
   CreateLink,
   InsertCodeBlock,
   InsertImage,
-  InsertThematicBreak,
   ListsToggle,
   imagePlugin,
   codeBlockPlugin,
@@ -34,27 +30,6 @@ import { API_URL } from "@/utils/fetcher";
 import "@mdxeditor/editor/style.css";
 import { useAuth } from "@/providers/auth-provider";
 import { oneDark } from "@codemirror/theme-one-dark";
-
-// Компонент кнопки для вставки отступа (HTML-блока с margin)
-function InsertSpacingButton({
-  editorRef,
-}: {
-  editorRef: ForwardedRef<MDXEditorMethods> | null;
-}) {
-  const handleInsertSpacing = (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    if (editorRef && "current" in editorRef && editorRef.current) {
-      const spacingHTML = "\n\n<div style='margin-bottom:2em;'></div>\n\n";
-      editorRef.current.insertMarkdown(spacingHTML);
-    }
-  };
-
-  return (
-    <button onClick={handleInsertSpacing} style={{ marginRight: "8px" }}>
-      Вставить отступ
-    </button>
-  );
-}
 
 export default function InitializedMDXEditor({
   editorRef,
@@ -81,7 +56,6 @@ export default function InitializedMDXEditor({
 
   const imageUploadHandler = async (file: File) => {
     if (!user) {
-      console.error("Ошибка: пользователь не аутентифицирован.");
       return "";
     }
 
@@ -99,7 +73,7 @@ export default function InitializedMDXEditor({
 
       if (!response.ok) {
         throw new Error(
-          `Ошибка загрузки: ${response.status} ${response.statusText}`
+          `Uploading Error: ${response.status} ${response.statusText}`
         );
       }
 
@@ -113,18 +87,18 @@ export default function InitializedMDXEditor({
         imageUrl = await response.text();
       }
 
-      console.log("Загруженное изображение:", imageUrl);
       return imageUrl;
     } catch (error) {
-      console.error("Ошибка при загрузке изображения:", error);
+      console.error("Error uploading image:", error);
       return "";
     }
   };
 
   return (
     <MDXEditor
+      placeholder="Too lazy to write a post? Just start typing..."
       plugins={[
-        headingsPlugin({ allowedHeadingLevels: [1, 2, 3, 4, 5] }),
+        headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
         listsPlugin(),
         linkPlugin(),
         quotePlugin(),
@@ -146,18 +120,17 @@ export default function InitializedMDXEditor({
         toolbarPlugin({
           toolbarContents: () => (
             <>
-              <DiffSourceToggleWrapper>
-                {/* Добавляем нашу кастомную кнопку для вставки отступа */}
-                {/* <InsertSpacingButton editorRef={editorRef} /> */}
+              <DiffSourceToggleWrapper options={["source"]}>
                 <BlockTypeSelect />
                 <BoldItalicUnderlineToggles />
                 <Separator />
-                <CreateLink />
-                <InsertCodeBlock />
-                <InsertImage />
-                <InsertTable />
-                <ListsToggle options={["bullet"]} />
+                <ListsToggle options={["bullet", "number"]} />
                 <Separator />
+                <InsertImage />
+                <InsertCodeBlock />
+                <InsertTable />
+                <Separator />
+                <CreateLink />
               </DiffSourceToggleWrapper>
             </>
           ),

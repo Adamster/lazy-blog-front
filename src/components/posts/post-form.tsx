@@ -1,8 +1,18 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { MarkEditor } from "../libs/Editor";
 import { Button, Divider, Input } from "@heroui/react";
 import { TrashIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import { UpdatePostRequest } from "@/api/apis";
 import { Controller, UseFormReturn } from "react-hook-form";
+import { useCallback } from "react";
+import { debounce } from "lodash";
+import dynamic from "next/dynamic";
+import { Loading } from "../loading";
+
+// const Milk = dynamic(() => import("./milk-2"), {
+//   ssr: false,
+//   loading: () => <Loading inline />,
+// });
 
 interface IProps {
   form: UseFormReturn<UpdatePostRequest>;
@@ -14,24 +24,23 @@ interface IProps {
 export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
   const {
     register,
-    control,
     formState: { errors },
   } = form;
 
   return (
     <form className="layout-page" noValidate>
       <div className="layout-page-content">
-        <Controller
-          control={control}
-          name="body"
-          rules={{ required: "Field is required" }}
-          render={({ field: { value, onChange } }) => (
-            <MarkEditor markdown={value} onChange={onChange} />
-          )}
+        {/* <Milk
+          markdown={form.getValues("body")}
+          onChange={(value: string) =>
+            form.setValue("body", value, { shouldValidate: false })
+          }
+        /> */}
+
+        <MarkEditor
+          markdown={form.getValues("body")}
+          onChange={(value: string) => form.setValue("body", value)}
         />
-        {errors.body && (
-          <p className="text-danger text-tiny">{errors.body.message}</p>
-        )}
       </div>
 
       <div className="layout-page-aside">

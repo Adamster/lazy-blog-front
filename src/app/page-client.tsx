@@ -55,14 +55,14 @@ export const PageClient = () => {
     <>
       <div className="layout-page">
         <div className="layout-page-content">
-          <IsAuth>
+          {/* <IsAuth>
             <div className="flex justify-between items-center mb-12">
               <Tabs variant="solid">
                 <Tab key="latest" title="Latest" />
                 <Tab key="for_you" title="For You" />
               </Tabs>
             </div>
-          </IsAuth>
+          </IsAuth> */}
 
           {data?.pages?.flat && <PostsList posts={data?.pages?.flat()} />}
         </div>

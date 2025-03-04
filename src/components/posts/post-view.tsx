@@ -27,9 +27,11 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { useTheme } from "@/providers/theme-providers";
 import IsAuthor from "@/guards/is-author";
+import { Loading } from "../loading";
 
 const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
   ssr: false,
+  loading: () => <Loading inline />,
 });
 
 interface IProps {
