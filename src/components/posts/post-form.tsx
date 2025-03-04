@@ -6,13 +6,6 @@ import { UpdatePostRequest } from "@/api/apis";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { useCallback } from "react";
 import { debounce } from "lodash";
-import dynamic from "next/dynamic";
-import { Loading } from "../loading";
-
-// const Milk = dynamic(() => import("./milk-2"), {
-//   ssr: false,
-//   loading: () => <Loading inline />,
-// });
 
 interface IProps {
   form: UseFormReturn<UpdatePostRequest>;
@@ -24,23 +17,39 @@ interface IProps {
 export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
   const {
     register,
+    control,
     formState: { errors },
   } = form;
+
+  const handleChange = useCallback(
+    debounce((value: string, onChange: (v: string) => void) => {
+      onChange(value);
+    }, 300),
+    []
+  );
 
   return (
     <form className="layout-page" noValidate>
       <div className="layout-page-content">
-        {/* <Milk
-          markdown={form.getValues("body")}
-          onChange={(value: string) =>
-            form.setValue("body", value, { shouldValidate: false })
+        <Controller
+          name="body"
+          control={control}
+          rules={{ required: "Field is required" }}
+          render={({ field }) =>
+            (!create && field.value) || create ? (
+              <MarkEditor
+                placeholder="Too lazy to write a post? Just start typing..."
+                markdown={field.value || ""}
+                onChange={(value) => handleChange(value, field.onChange)}
+              />
+            ) : (
+              <> </>
+            )
           }
-        /> */}
-
-        <MarkEditor
-          markdown={form.getValues("body")}
-          onChange={(value: string) => form.setValue("body", value)}
         />
+        {errors.body && (
+          <p className="text-danger text-tiny ps-3">{errors.body.message}</p>
+        )}
       </div>
 
       <div className="layout-page-aside">

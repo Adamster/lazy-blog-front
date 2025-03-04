@@ -34,15 +34,6 @@ const PageEditClient = () => {
   const isAuthor = user?.id === postData?.author.id;
 
   const form = useForm<UpdatePostRequest>({
-    defaultValues: {
-      title: "",
-      summary: "",
-      slug: "",
-      body: "",
-      coverUrl: "",
-      isPublished: true,
-      tags: [],
-    },
     mode: "onChange",
   });
 
@@ -64,7 +55,7 @@ const PageEditClient = () => {
         isPublished: true,
       });
     }
-  }, [postData, form]);
+  }, [postData]);
 
   const editMutation = useMutation({
     mutationFn: ({ id, updatePostRequest }: UpdatePostOperationRequest) =>
@@ -129,6 +120,7 @@ const PageEditClient = () => {
   return (
     <>
       <PostForm
+        key={postData?.id}
         form={form}
         onSubmit={onSubmit}
         create={false}

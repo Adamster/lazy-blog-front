@@ -125,7 +125,7 @@
     @apply ms-4 ps-0 !important;
 
     > li {
-      margin: 0 !important;
+      margin: 0 0 .5rem !important;
     }
   }
 
@@ -138,6 +138,11 @@
 
   pre {
     @apply bg-zinc-100 dark:bg-zinc-800 !important
+  }
+  
+  iframe {
+    display: block;
+    margin-bottom: 1rem;
   }
   
 }

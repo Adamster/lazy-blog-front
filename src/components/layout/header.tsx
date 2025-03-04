@@ -62,12 +62,6 @@ export const Header = () => {
         </NavbarBrand>
 
         <NavbarContent justify="end" className="flex items-center gap-4">
-          {/* <NavbarItem>
-            <Tooltip content="Toggle Post Preview">
-            
-            </Tooltip>
-          </NavbarItem> */}
-
           <NavbarItem>
             <Tooltip content="Toggle Theme">
               <Button isIconOnly variant="flat" onPress={changeTheme}>
@@ -119,6 +113,9 @@ export const Header = () => {
                   <DropdownItem
                     key="user"
                     onPress={() => router.push(`/${user?.userName}`)}
+                    textValue={`${user?.firstName || ""} ${
+                      user?.lastName || ""
+                    }`}
                   >
                     <User
                       avatarProps={{

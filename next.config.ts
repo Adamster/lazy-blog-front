@@ -3,6 +3,11 @@ import removeImports from "next-remove-imports";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  transpilePackages: ["@mdxeditor/editor"],
+  // webpack: (config) => {
+  //   config.experiments = { ...config.experiments, topLevelAwait: true };
+  //   return config;
+  // },
   experimental: {
     scrollRestoration: true,
   },

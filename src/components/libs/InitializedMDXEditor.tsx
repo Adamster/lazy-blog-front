@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, type ForwardedRef } from "react";
+import React, { type ForwardedRef } from "react";
 import {
   headingsPlugin,
   listsPlugin,
@@ -36,7 +36,6 @@ export default function InitializedMDXEditor({
   ...props
 }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
   const { auth, user } = useAuth();
-  const [prevMark] = useState<string>(props.markdown);
 
   const codeBlockLanguages = {
     html: "HTML",
@@ -96,7 +95,6 @@ export default function InitializedMDXEditor({
 
   return (
     <MDXEditor
-      placeholder="Too lazy to write a post? Just start typing..."
       plugins={[
         headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
         listsPlugin(),
@@ -114,7 +112,6 @@ export default function InitializedMDXEditor({
           imageUploadHandler,
         }),
         diffSourcePlugin({
-          diffMarkdown: prevMark ? prevMark : props.markdown,
           viewMode: "rich-text",
         }),
         toolbarPlugin({
