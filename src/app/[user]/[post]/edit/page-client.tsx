@@ -27,7 +27,7 @@ const PageEditClient = () => {
     isLoading,
   } = useQuery({
     queryKey: ["getPostsBySlug", slugParam],
-    queryFn: () => apiClient.posts.getPostsBySlug({ slug: slugParam }),
+    queryFn: () => apiClient.posts.getPostBySlug({ slug: slugParam }),
     enabled: !!slugParam,
   });
 

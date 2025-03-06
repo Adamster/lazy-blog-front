@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { apiClient } from "@/api/api-client";
 import { Loading } from "@/components/loading";
@@ -10,26 +10,54 @@ import { ErrorMessage } from "@/components/errors/error-message";
 import { formatDate2 } from "@/utils/format-date";
 import { CalendarIcon } from "@heroicons/react/24/solid";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
+import { useEffect, useRef } from "react";
 
 export default function UserClient() {
   const { user: userName } = useParams<{ user: string }>();
+  const observerRef = useRef(null);
+  const PAGE_SIZE = 24;
 
-  const { data, error, isLoading } = useQuery({
+  const {
+    data,
+    error,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ["getPostsByUserName", userName],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 0 }) => {
       const response = await apiClient.posts.getPostsByUserName({
         userName,
+        offset: pageParam,
       });
       return response;
     },
+    getNextPageParam: (lastPage, pages) =>
+      lastPage.postItems.length === PAGE_SIZE
+        ? pages.length * PAGE_SIZE
+        : undefined,
+    initialPageParam: 0,
     enabled: !!userName,
   });
+
+  useEffect(() => {
+    if (!observerRef.current || !hasNextPage) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => entry.isIntersecting && fetchNextPage(),
+      { threshold: 1.0 }
+    );
+
+    observer.observe(observerRef.current);
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage]);
 
   if (isLoading) return <Loading />;
   if (error) return <ErrorMessage error={error} />;
 
-  const posts = data?.postItems || [];
-  const user = data?.user || null;
+  const posts = data?.pages.flatMap((page) => page.postItems) || [];
+  const user = data?.pages[0].user || null;
 
   return (
     <>
@@ -88,6 +116,9 @@ export default function UserClient() {
           <Divider className="layout-page-divider md:hidden mt-6" />
         </div>
       </div>
+
+      {isFetchingNextPage && <Loading inline />}
+      {hasNextPage && <div ref={observerRef} className="h-20" />}
     </>
   );
 }
