@@ -10,7 +10,7 @@ import { formatDate2 } from "@/utils/format-date";
 import IsAuth from "../../guards/is-auth";
 import { PostVote } from "../post/PostVote";
 import { PostDetailedResponse } from "@/api/apis";
-import { Button, Divider, Image, User } from "@heroui/react";
+import { Divider, Image, User } from "@heroui/react";
 
 import {
   HeartIcon as HeartIconOutline,
@@ -48,7 +48,8 @@ export const PostView = ({ post, postRefetch }: IProps) => {
     refetch: postCommentsRefetch,
   } = useQuery({
     queryKey: ["getCommentsByPostId", post?.id],
-    queryFn: () => apiClient.posts.getCommentsByPostId({ id: post?.id || "" }),
+    queryFn: () =>
+      apiClient.comments.getCommentsByPostId({ id: post?.id || "" }),
     enabled: !!post?.id,
   });
 

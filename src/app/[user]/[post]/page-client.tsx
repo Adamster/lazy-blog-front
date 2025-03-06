@@ -18,7 +18,7 @@ export default function PostClient() {
     refetch: postRefetch,
   } = useQuery({
     queryKey: ["getPostsBySlug", slug],
-    queryFn: () => apiClient.posts.getPostsBySlug({ slug }),
+    queryFn: () => apiClient.posts.getPostBySlug({ slug }),
     enabled: !!slug,
     retry: 1,
   });

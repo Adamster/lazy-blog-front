@@ -29,7 +29,7 @@ export default function EditProfileForm({ onOpenChange }: LoginFormProps) {
     defaultValues: {
       firstName: user?.firstName || "",
       lastName: user?.lastName || "",
-      username: user?.userName || "",
+      userName: user?.userName || "",
     },
     shouldUseNativeValidation: false,
   });
@@ -59,7 +59,7 @@ export default function EditProfileForm({ onOpenChange }: LoginFormProps) {
           updateUserRequest: {
             firstName: data.firstName,
             lastName: data.lastName,
-            username: data.username,
+            userName: data.userName,
           },
         });
 
@@ -92,7 +92,7 @@ export default function EditProfileForm({ onOpenChange }: LoginFormProps) {
               fallback: <ArrowUpTrayIcon className="w-4 h-4" />,
             }}
             name={`${watch("firstName") || ""} ${watch("lastName") || ""}`}
-            description={`@${watch("username") || ""}`}
+            description={`@${watch("userName") || ""}`}
           />
 
           <input
@@ -107,9 +107,9 @@ export default function EditProfileForm({ onOpenChange }: LoginFormProps) {
           classNames={{ input: "text-base" }}
           label="Username"
           isRequired
-          isInvalid={Boolean(errors.username)}
-          errorMessage={errors.username?.message}
-          {...register("username", {
+          isInvalid={Boolean(errors.userName)}
+          errorMessage={errors.userName?.message}
+          {...register("userName", {
             required: "Username is required",
             pattern: {
               value: /^[A-Za-z0-9_.-]+$/,
