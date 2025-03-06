@@ -72,6 +72,7 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
 
                 <div className="w-full">
                   <Input
+                    classNames={{ input: "text-base" }}
                     label="Slug"
                     isRequired
                     isInvalid={Boolean(errors.slug)}
@@ -90,6 +91,7 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
 
             <div className="w-full">
               <Input
+                classNames={{ input: "text-base" }}
                 isRequired
                 isInvalid={Boolean(errors.title)}
                 label="Title"
@@ -106,6 +108,7 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
 
             <div className="w-full">
               <Input
+                classNames={{ input: "text-base" }}
                 isRequired
                 isInvalid={Boolean(errors.summary)}
                 label="Summary"
@@ -118,6 +121,7 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
 
             <div className="w-full">
               <Input
+                classNames={{ input: "text-base" }}
                 description={"Temporary solution"}
                 isRequired
                 label="CoverUrl"
