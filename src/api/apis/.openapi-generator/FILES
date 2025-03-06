@@ -1,7 +1,9 @@
 .openapi-generator-ignore
 apis/CommentsApi.ts
+apis/ForgotPasswordApi.ts
 apis/MediaApi.ts
 apis/PostsApi.ts
+apis/ResetPasswordApi.ts
 apis/TagsApi.ts
 apis/UsersApi.ts
 apis/index.ts
@@ -9,6 +11,8 @@ index.ts
 models/AddCommentRequest.ts
 models/CommentResponse.ts
 models/CreatePostRequest.ts
+models/DisplayPostResponse.ts
+models/ForgotPasswordRequest.ts
 models/LoginRequest.ts
 models/LoginResponse.ts
 models/NoContent.ts
@@ -16,9 +20,9 @@ models/NullableOfVoteDirection.ts
 models/PostDetailedResponse.ts
 models/PostResponse.ts
 models/ProblemDetails.ts
-models/PublishedPostResponse.ts
 models/RefreshTokenRequest.ts
 models/RegisterUserRequest.ts
+models/ResetPasswordRequest.ts
 models/TagResponse.ts
 models/UpdateCommentRequest.ts
 models/UpdatePostRequest.ts
@@ -26,6 +30,5 @@ models/UpdateUserRequest.ts
 models/UserPostItem.ts
 models/UserPostResponse.ts
 models/UserResponse.ts
-models/VoteDirection.ts
 models/index.ts
 runtime.ts

@@ -3,10 +3,10 @@
 import { apiClient } from "@/api/api-client";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-import { addToast, Divider, Tab, Tabs, User } from "@heroui/react";
+import { addToast, Divider } from "@heroui/react";
 import { Loading } from "@/components/loading";
 import { PostsList } from "@/components/posts/posts-list";
-import IsAuth from "@/guards/is-auth";
+// import IsAuth from "@/guards/is-auth";
 
 export const PageClient = () => {
   const observerRef = useRef<HTMLDivElement>(null);
@@ -75,20 +75,129 @@ export const PageClient = () => {
 
           <div className="layout-page-aside-content">
             <aside className="layout-page-aside-content-sticky">
-              <User
-                avatarProps={{
-                  size: "sm",
-                  name: "!B",
-                  // src: "../images/logo.svg",
-                }}
-                name="!Lazy Blog"
-                description="@notlazy"
-              />
+              {/* <div className="flex flex-col">
+                <div>
+                  <Link
+                    href="/"
+                    underline="hover"
+                    color="foreground"
+                    onPress={() => {}}
+                  >
+                    Art
+                  </Link>
+
+                  <Chip size="sm" className="ms-2" variant="flat">
+                    2
+                  </Chip>
+                </div>
+                <div>
+                  <Link
+                    href="/"
+                    underline="hover"
+                    color="foreground"
+                    onPress={() => {}}
+                  >
+                    Food
+                  </Link>
+                  <Chip size="sm" className="ms-2" variant="bordered">
+                    15
+                  </Chip>
+                </div>
+                <div>
+                  <Link
+                    href="/"
+                    underline="hover"
+                    color="foreground"
+                    onPress={() => {}}
+                  >
+                    Movies
+                  </Link>
+                  <Chip size="sm" className="ms-2" variant="flat">
+                    5
+                  </Chip>
+                </div>
+                <div>
+                  <Link
+                    href="/"
+                    underline="hover"
+                    color="foreground"
+                    onPress={() => {}}
+                  >
+                    Music
+                  </Link>
+                  <Chip size="sm" className="ms-2" variant="flat">
+                    7
+                  </Chip>
+                </div>
+                <div>
+                  <Link
+                    href="/"
+                    underline="hover"
+                    color="foreground"
+                    onPress={() => {}}
+                  >
+                    News
+                  </Link>
+                  <Chip size="sm" className="ms-2" variant="flat">
+                    75
+                  </Chip>
+                </div>
+                <div>
+                  <Link
+                    href="/"
+                    underline="hover"
+                    color="foreground"
+                    onPress={() => {}}
+                  >
+                    Programming
+                  </Link>
+                  <Chip size="sm" className="ms-2" variant="flat">
+                    456
+                  </Chip>
+                </div>
+                <div>
+                  <Link
+                    href="/"
+                    underline="hover"
+                    color="foreground"
+                    onPress={() => {}}
+                  >
+                    Sport
+                  </Link>
+                  <Chip size="sm" className="ms-2" variant="flat">
+                    33
+                  </Chip>
+                </div>
+                <div>
+                  <Link
+                    href="/"
+                    underline="hover"
+                    color="foreground"
+                    onPress={() => {}}
+                  >
+                    Technology
+                  </Link>
+                  <Chip size="sm" className="ms-2" variant="flat">
+                    10
+                  </Chip>
+                </div>
+                <div>
+                  <Link
+                    href="/"
+                    underline="hover"
+                    color="foreground"
+                    onPress={() => {}}
+                  >
+                    Travel
+                  </Link>
+                  <Chip size="sm" className="ms-2" variant="flat">
+                    11
+                  </Chip>
+                </div>
+              </div> */}
 
               <div>
-                <h1 className="text-xl font-semibold mb-1">
-                  Random information
-                </h1>
+                <h3 className="font-semibold mb-1">Random information</h3>
 
                 <p className="text-zinc-500">
                   Welcome to the Not Lazy blog—where IT creativity is our
