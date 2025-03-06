@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiClient } from "@/api/api-client";
-import { VoteDirection } from "@/api/apis";
+import { VotePostDirectionEnum } from "@/api/apis";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
@@ -14,7 +15,7 @@ export const PostVote = ({ postId, rating, mutate }: IProps) => {
   // const { data: auth } = useSession();
 
   const handleVote = useMutation({
-    mutationFn: ({ direction }: { direction: VoteDirection }) => {
+    mutationFn: ({ direction }: { direction: VotePostDirectionEnum }) => {
       return apiClient.posts.votePost({
         id: postId,
         direction,
@@ -58,7 +59,7 @@ export const PostVote = ({ postId, rating, mutate }: IProps) => {
         className="btn btn--default btn--link"
         style={{ padding: ".1rem" }}
         onClick={() => {
-          handleVote.mutate({ direction: VoteDirection.Down });
+          handleVote.mutate({ direction: VotePostDirectionEnum.Down });
         }}
       >
         <ChevronDownIcon width={".9rem"}></ChevronDownIcon>
@@ -70,7 +71,7 @@ export const PostVote = ({ postId, rating, mutate }: IProps) => {
         className="btn btn--default btn--link"
         style={{ padding: ".1rem" }}
         onClick={() => {
-          handleVote.mutate({ direction: VoteDirection.Up });
+          handleVote.mutate({ direction: VotePostDirectionEnum.Up });
         }}
       >
         <ChevronUpIcon width={".9rem"}></ChevronUpIcon>

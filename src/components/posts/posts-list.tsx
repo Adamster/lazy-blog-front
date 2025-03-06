@@ -1,11 +1,11 @@
 /* PostsList.tsx */
 "use client";
 
-import { PublishedPostResponse, UserPostItem, UserResponse } from "@/api/apis";
+import { DisplayPostResponse, UserPostItem, UserResponse } from "@/api/apis";
 import PostPreview from "@/components/posts/post-preview";
 
 interface PostsListProps {
-  posts: PublishedPostResponse[] | UserPostItem[];
+  posts: DisplayPostResponse[] | UserPostItem[];
   author?: UserResponse | null;
   hideAuthor?: boolean;
 }
@@ -17,7 +17,7 @@ export function PostsList({ posts, author, hideAuthor }: PostsListProps) {
         <PostPreview
           key={post.id}
           post={post}
-          author={author || (post as PublishedPostResponse).author}
+          author={author || (post as DisplayPostResponse).author}
           hideAuthor={hideAuthor}
         />
       ))}

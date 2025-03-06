@@ -3,7 +3,7 @@
 import { formatDate2 } from "@/utils/format-date";
 import Link from "next/link";
 import { Divider, Image, User } from "@heroui/react";
-import { PublishedPostResponse, UserPostItem, UserResponse } from "@/api/apis";
+import { DisplayPostResponse, UserPostItem, UserResponse } from "@/api/apis";
 import { CalendarIcon } from "@heroicons/react/24/solid";
 import {
   HeartIcon as HeartIconOutline,
@@ -15,7 +15,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { useTheme } from "@/providers/theme-providers";
 interface IProps {
-  post: PublishedPostResponse | UserPostItem;
+  post: DisplayPostResponse | UserPostItem;
   author: UserResponse;
   hideAuthor?: boolean;
 }
