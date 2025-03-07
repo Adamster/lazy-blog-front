@@ -1,9 +1,5 @@
 // @import "highlight.js/styles/github.css"; // стиль для подсветки
 
-.mdxeditor-popup-container div[role="dialog"] > h2 {
-  display: none;
-}
-
 [class^="_codeMirrorToolbar_"],
 [class^="_toolbarNodeKindSelectTrigger_"],
 [class^="_toolbarButtonSelectTrigger_"],
@@ -11,11 +7,14 @@
   @apply bg-default-100 !important;
 }
 
-
 .mdxeditor {
   div[role="toolbar"] {
     top: 4rem;
   }
+}
+
+.mdxeditor-popup-container div[role="dialog"] > h2 {
+  display: none;
 }
 
 .mdxeditor-diff-source-wrapper {
@@ -38,6 +37,10 @@
         border: 1px solid rgb(113 113 122 / var(--tw-text-opacity, 1)) !important;
       }
     }
+  }
+
+  img {
+    padding: 5px;
   }
 }
 
