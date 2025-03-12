@@ -3,8 +3,7 @@ import { Metadata } from "next";
 import CreatePageClient from "./page-client";
 
 export const metadata: Metadata = generateMeta({
-  title: "Create",
-  description: "Create a new Post",
+  title: "New Post",
 });
 
 export default function CreatePage() {

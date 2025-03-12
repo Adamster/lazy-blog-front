@@ -3,23 +3,13 @@ import { generateMeta } from "@/components/meta/meta-data";
 import UserClient from "./page-client";
 
 export async function generateMetadata({ params }: any) {
-  try {
-    const { user } = await params;
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API}/api/posts/${user}/posts`
-    );
-    const userData: any = await response.json();
+  const { user } = await params;
 
-    return generateMeta({
-      title: `${userData.user.firstName} ${userData.user.lastName}`,
-      description: `Posts by ${userData.user.firstName} ${userData.user.lastName}`,
-      url: `/${userData.user.userName}`,
-    });
-  } catch {
-    return {
-      title: "Not Found | !LAZY Blog",
-    };
-  }
+  return generateMeta({
+    title: `${user}`,
+    description: `Proof that ${user} isn’t lazy (at least sometimes)`,
+    type: "profile",
+  });
 }
 
 export default function UserPage() {

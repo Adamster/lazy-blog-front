@@ -35,7 +35,7 @@ export default function PostPreview({
       <div className="flex  sm:flex-row gap-6">
         <div className="flex justify-center flex-col gap-3">
           <Link
-            href={`/${author.userName}`}
+            href={`/${author.userName?.toLowerCase()}`}
             className={hideAuthor ? "hidden" : ""}
           >
             <User
@@ -53,7 +53,10 @@ export default function PostPreview({
           </Link>
 
           <div>
-            <Link className="m-0" href={`/${author.userName}/${post.slug}`}>
+            <Link
+              className="m-0"
+              href={`/${author.userName?.toLowerCase()}/${post.slug}`}
+            >
               <h2 className="text-lg font-semibold hover:underline">
                 {post.title}
               </h2>
@@ -113,7 +116,7 @@ export default function PostPreview({
           <Link
             className="flex items-center ms-auto"
             style={{}}
-            href={`/${author.userName}/${post.slug}`}
+            href={`/${author.userName?.toLowerCase()}/${post.slug}`}
           >
             <Image
               className="w-24 h-24 min-w-24 min-h-24 md:w-32 md:h-32 md:min-w-32 md:min-h-32 object-cover"

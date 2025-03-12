@@ -4,7 +4,6 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = generateMeta({
   title: "Home",
-  description: "Somewhere between procrastination and inspiration",
 });
 
 export default function RootPage() {

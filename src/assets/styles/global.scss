@@ -22,6 +22,10 @@ body {
 
   &-divider {
     @apply bg-zinc-200 dark:bg-zinc-700;
+
+    &-mobile {
+      @apply bg-zinc-200 dark:bg-zinc-700 md:hidden mt-6;
+    }
   }
 
   &-content {

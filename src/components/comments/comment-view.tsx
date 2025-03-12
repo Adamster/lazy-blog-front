@@ -58,7 +58,7 @@ const Comment = ({ comment, postCommentsRefetch }: IProps) => {
     <div>
       <div className="">
         <div className="mb-4 flex flex-row justify-between gap-4 items-end">
-          <Link href={`/${comment.user.userName}`}>
+          <Link href={`/${comment.user.userName?.toLowerCase()}`}>
             <User
               key={comment.user.id}
               avatarProps={{

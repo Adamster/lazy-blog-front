@@ -12,12 +12,14 @@ import { useParams, useRouter } from "next/navigation";
 import { UpdatePostOperationRequest, UpdatePostRequest } from "@/api/apis";
 import { PostForm } from "@/components/posts/post-form";
 import ConfirmDeleteModal from "@/components/modals/confirmation-modal";
+import { ErrorMessage } from "@/components/errors/error-message";
+import IsAuthor from "@/guards/is-author";
 
 const PageEditClient = () => {
   const { user } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const slugParam = params?.post as string;
+  const slug = params?.post as string;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -26,9 +28,9 @@ const PageEditClient = () => {
     error,
     isLoading,
   } = useQuery({
-    queryKey: ["getPostsBySlug", slugParam],
-    queryFn: () => apiClient.posts.getPostBySlug({ slug: slugParam }),
-    enabled: !!slugParam,
+    queryKey: ["getPostBySlug", slug],
+    queryFn: () => apiClient.posts.getPostBySlug({ slug }),
+    enabled: !!slug,
   });
 
   const isAuthor = user?.id === postData?.author.id;
@@ -39,7 +41,7 @@ const PageEditClient = () => {
 
   useEffect(() => {
     if (user && postData && !isAuthor) {
-      router.push("/");
+      setTimeout(() => router.push("/"), 4000);
     }
   }, [user, postData, isAuthor, router]);
 
@@ -55,8 +57,6 @@ const PageEditClient = () => {
         isPublished: true,
       });
     }
-
-    console.log(form.getValues());
   }, [postData]);
 
   const editMutation = useMutation({
@@ -113,22 +113,25 @@ const PageEditClient = () => {
     deleteMutation.mutate();
   };
 
-  if (isLoading || !isAuthor) return <Loading />;
-
-  if (error) {
-    console.error("Error fetching post", error);
-    return <div>Error</div>;
-  }
+  if (isLoading) return <Loading />;
+  if (error) return <ErrorMessage error={error} />;
 
   return (
     <>
-      <PostForm
-        key={postData?.id}
-        form={form}
-        onSubmit={onSubmit}
-        create={false}
-        onDelete={onDelete}
-      />
+      <IsAuthor
+        userId={postData?.author.id || ""}
+        fallback={
+          <ErrorMessage error={"Nice try, but this isn’t your playground!"} />
+        }
+      >
+        <PostForm
+          key={postData?.id}
+          form={form}
+          onSubmit={onSubmit}
+          create={false}
+          onDelete={onDelete}
+        />
+      </IsAuthor>
 
       {isModalOpen && (
         <ConfirmDeleteModal

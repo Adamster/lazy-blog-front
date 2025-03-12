@@ -4,7 +4,7 @@ import CategoryPageClient from "./page-client";
 
 export async function generateMetadata({ params }: any) {
   const { id: category } = await params;
-  const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
+  const categoryName = `${category[0].toUpperCase()}${category.slice(1)}`;
 
   return generateMeta({
     title: `${categoryName} Category`,

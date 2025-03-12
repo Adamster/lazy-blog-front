@@ -4,6 +4,7 @@ import { apiClient } from "@/api/api-client";
 import { ErrorMessage } from "@/components/errors/error-message";
 import { Loading } from "@/components/loading";
 import { PostsList } from "@/components/posts/posts-list";
+import { PAGE_SIZE } from "@/utils/consts";
 import { Divider } from "@heroui/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
@@ -11,10 +12,9 @@ import { useParams } from "next/navigation";
 export default function CategoryPageClient() {
   const { id: category } = useParams<{ id: string }>();
   const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
-  const PAGE_SIZE = 24;
 
   const query = useInfiniteQuery({
-    queryKey: ["getPostsByUserName", category],
+    queryKey: ["getPostsByTag", category],
     queryFn: async ({ pageParam = 0 }) => {
       const response = await apiClient.posts.getPostsByTag({
         tag: category,
@@ -28,24 +28,21 @@ export default function CategoryPageClient() {
     enabled: !!category,
   });
 
-  if (query.isLoading) {
-    return <Loading />;
-  }
-
-  if (query.error) {
-    return <ErrorMessage />;
-  }
+  if (query.isLoading) return <Loading />;
+  if (query.error) return <ErrorMessage error={query.error} />;
 
   return (
     query.data && (
       <div className="layout-page">
         <div className="layout-page-content">
-          {query.data?.pages?.flat && (
+          {query.data?.pages?.flat().length > 0 ? (
             <PostsList
               query={query}
               posts={query.data?.pages?.flat()}
               hideCategory
             />
+          ) : (
+            <p>Still waiting for someone to break the silence!</p>
           )}
         </div>
 

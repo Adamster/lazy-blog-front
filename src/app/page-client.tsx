@@ -1,15 +1,15 @@
 "use client";
 
 import { apiClient } from "@/api/api-client";
+import { ErrorMessage } from "@/components/errors/error-message";
 import { Categories } from "@/components/layout/categories";
 import { Loading } from "@/components/loading";
 import { PostsList } from "@/components/posts/posts-list";
-import { addToast, Divider } from "@heroui/react";
+import { PAGE_SIZE } from "@/utils/consts";
+import { Divider } from "@heroui/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 export const PageClient = () => {
-  const PAGE_SIZE = 24;
-
   const query = useInfiniteQuery({
     queryKey: ["getAllPosts"],
     queryFn: ({ pageParam = 0 }) =>
@@ -19,21 +19,13 @@ export const PageClient = () => {
     initialPageParam: 0,
   });
 
-  if (query.error) {
-    addToast({
-      title: "Error",
-      description: query.error?.message || "Unknown error",
-      color: "danger",
-    });
-    return null;
-  }
-
   if (query.isLoading) return <Loading />;
+  if (query.error) return <ErrorMessage error={query.error} />;
 
   return (
     <div className="layout-page">
       <div className="layout-page-content">
-        {query.data?.pages?.flat && (
+        {query.data?.pages && (
           <PostsList query={query} posts={query.data?.pages?.flat()} />
         )}
       </div>

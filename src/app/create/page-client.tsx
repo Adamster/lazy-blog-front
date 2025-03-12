@@ -16,6 +16,12 @@ const CreatePageClient = () => {
   const { user } = useAuth();
   const router = useRouter();
 
+  useEffect(() => {
+    if (!user) {
+      router.push("/");
+    }
+  }, [router, user]);
+
   const form = useForm<UpdatePostRequest>({
     defaultValues: {
       title: "",
@@ -27,12 +33,6 @@ const CreatePageClient = () => {
     mode: "onChange",
   });
 
-  useEffect(() => {
-    if (!user) {
-      router.push("/");
-    }
-  }, [router, user]);
-
   const mutation = useMutation({
     mutationFn: (data: UpdatePostRequest) => {
       return apiClient.posts.createPost({
@@ -41,7 +41,6 @@ const CreatePageClient = () => {
     },
     onSuccess: () => {
       addToastSuccess("Post has been added");
-
       router.push("/");
     },
     onError: (error: any) => {

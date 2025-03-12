@@ -192,7 +192,7 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
           </aside>
         </div>
 
-        <Divider className="layout-page-divider md:hidden mt-6" />
+        <Divider className="layout-page-divider-mobile" />
       </div>
     </form>
   );

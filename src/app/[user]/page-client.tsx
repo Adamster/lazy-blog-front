@@ -4,6 +4,7 @@ import { apiClient } from "@/api/api-client";
 import { ErrorMessage } from "@/components/errors/error-message";
 import { Loading } from "@/components/loading";
 import { PostsList } from "@/components/posts/posts-list";
+import { PAGE_SIZE } from "@/utils/consts";
 import { formatDate2 } from "@/utils/format-date";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "@heroicons/react/24/solid";
@@ -13,7 +14,6 @@ import { useParams } from "next/navigation";
 
 export default function UserClient() {
   const { user: userName } = useParams<{ user: string }>();
-  const PAGE_SIZE = 24;
 
   const query = useInfiniteQuery({
     queryKey: ["getPostsByUserName", userName],
@@ -32,8 +32,8 @@ export default function UserClient() {
     enabled: !!userName,
   });
 
-  if (query.error) return <ErrorMessage error={query.error} />;
   if (query.isLoading) return <Loading />;
+  if (query.error) return <ErrorMessage error={query.error} />;
 
   const posts = query.data?.pages.flatMap((page) => page.postItems) || [];
   const user = query.data?.pages[0].user || null;
@@ -43,11 +43,12 @@ export default function UserClient() {
       <div className="layout-page">
         <div className="layout-page-content">
           {posts.length > 0 ? (
-            <>
-              <PostsList query={query} posts={posts} author={user} hideAuthor />
-            </>
+            <PostsList query={query} posts={posts} author={user} hideAuthor />
           ) : (
-            <p>No Posts</p>
+            <p>
+              No posts yet, probably <strong>{userName}</strong> lost in
+              procrastination
+            </p>
           )}
         </div>
 
@@ -71,10 +72,6 @@ export default function UserClient() {
                   description={"@" + user.userName}
                 />
 
-                {/* <div className="text-gray">
-                  <p>About:</p>
-                </div> */}
-
                 <div className="flex items-center gap-4 text-gray">
                   <div className="flex items-center gap-1">
                     <CalendarIcon className="w-4 h-4" />
@@ -92,7 +89,7 @@ export default function UserClient() {
             )}
           </div>
 
-          <Divider className="layout-page-divider md:hidden mt-6" />
+          <Divider className="layout-page-divider-mobile" />
         </div>
       </div>
     </>

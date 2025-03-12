@@ -83,7 +83,7 @@ export const PostView = ({ post, postRefetch }: IProps) => {
 
           <div className="layout-page-aside-content">
             <div className="layout-page-aside-content-sticky">
-              <Link href={`/${post.author.userName}`}>
+              <Link href={`/${post.author.userName?.toLowerCase()}`}>
                 <User
                   key={post?.author.id}
                   avatarProps={{
@@ -156,16 +156,9 @@ export const PostView = ({ post, postRefetch }: IProps) => {
             </div>
           </div>
 
-          <Divider className="layout-page-divider md:hidden mt-6" />
+          <Divider className="layout-page-divider-mobile" />
         </div>
       </div>
     )
   );
 };
-
-// <div>
-//   {/* <Markdown remarkPlugins={[remarkGfm]}>{post.body}</Markdown>
-//   <MarkdownHooks rehypePlugins={[rehypeStarryNight]}>
-//     {post.body}
-//   </MarkdownHooks> */}
-// </div>

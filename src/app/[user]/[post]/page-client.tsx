@@ -7,8 +7,9 @@ import { PostView } from "@/components/posts/post-view";
 import { Loading } from "@/components/loading";
 import { useParams } from "next/navigation";
 import { ErrorMessage } from "@/components/errors/error-message";
+import { PostDetailedResponse } from "@/api/apis";
 
-export default function PostClient() {
+export default function PostClient({ post }: { post: PostDetailedResponse }) {
   const { post: slug } = useParams<{ post: string }>();
 
   const {
@@ -17,28 +18,12 @@ export default function PostClient() {
     isLoading,
     refetch: postRefetch,
   } = useQuery({
-    queryKey: ["getPostsBySlug", slug],
+    queryKey: ["getPostBySlug", slug],
     queryFn: () => apiClient.posts.getPostBySlug({ slug }),
-    enabled: !!slug,
+    initialData: post,
+    enabled: !post,
     retry: 1,
   });
-
-  // useEffect(() => {
-  //   if (
-  //     !data?.id ||
-  //     !auth?.user?.id ||
-  //     data?.author?.id === auth?.user?.id ||
-  //     hasViewed.current
-  //   )
-  //     return;
-
-  //   hasViewed.current = true;
-  //   const timeout = setTimeout(() => {
-  //     axios.put(`/api/posts/${data.id}/count-view`);
-  //   }, 10000);
-
-  //   return () => clearTimeout(timeout);
-  // }, [data?.id, auth?.user?.id]);
 
   if (isLoading) return <Loading />;
   if (error) return <ErrorMessage error={error} />;
