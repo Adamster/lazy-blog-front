@@ -1,11 +1,20 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { MarkEditor } from "../libs/Editor";
-import { Button, Divider, Input } from "@heroui/react";
+import {
+  Button,
+  Divider,
+  Image,
+  Input,
+  Select,
+  SelectItem,
+} from "@heroui/react";
 import { TrashIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import { UpdatePostRequest } from "@/api/apis";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { useCallback } from "react";
 import { debounce } from "lodash";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/api/api-client";
 
 interface IProps {
   form: UseFormReturn<UpdatePostRequest>;
@@ -27,6 +36,12 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
     }, 300),
     []
   );
+
+  const { data: tags } = useQuery({
+    queryKey: ["getTags"],
+    queryFn: () => apiClient.tags.getTags(),
+    retry: 1,
+  });
 
   return (
     <form className="layout-page" noValidate>
@@ -57,20 +72,29 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
 
         <div className="layout-page-aside-content">
           <aside className="layout-page-aside-content-sticky">
-            {!create && (
+            {
               <>
-                {/* {form.getValues("coverUrl")?.length && (
-                  <div className="flex mb-2">
+                <div className="w-full flex flex-col bg-zinc-100 dark:bg-zinc-800 p-2 rounded-lg">
+                  {form.watch("coverUrl") && (
                     <Image
-                      className="max-h-72"
+                      className="max-h-72 mb-2 p-1"
                       removeWrapper
                       src={form.getValues("coverUrl") || undefined}
                       alt="Cover image"
                     />
-                  </div>
-                )} */}
+                  )}
 
-                <div className="w-full">
+                  <div className="w-full">
+                    <Input
+                      size="sm"
+                      classNames={{ input: "text-base" }}
+                      placeholder="Cover Image URL"
+                      {...register("coverUrl")}
+                    />
+                  </div>
+                </div>
+
+                {/* <div className="w-full">
                   <Input
                     classNames={{ input: "text-base" }}
                     label="Slug"
@@ -85,9 +109,9 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
                     })}
                     errorMessage={errors.slug?.message}
                   />
-                </div>
+                </div> */}
               </>
-            )}
+            }
 
             <div className="w-full">
               <Input
@@ -120,12 +144,27 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
             </div>
 
             <div className="w-full">
-              <Input
-                classNames={{ input: "text-base" }}
-                description={"Temporary solution"}
-                isRequired
-                label="CoverUrl"
-                {...register("coverUrl")}
+              <Controller
+                name="tags"
+                control={control}
+                rules={{ required: "Category is required" }}
+                render={({ field }) => (
+                  <Select
+                    selectedKeys={field.value}
+                    isRequired
+                    selectionMode="multiple"
+                    label="Select one or more categories"
+                    onSelectionChange={(keys) => field.onChange([...keys])}
+                    isInvalid={Boolean(errors.tags)}
+                    errorMessage={errors.tags?.message}
+                  >
+                    {tags
+                      ? tags.map((tag) => (
+                          <SelectItem key={tag.tagId}>{tag.tag}</SelectItem>
+                        ))
+                      : null}
+                  </Select>
+                )}
               />
             </div>
 

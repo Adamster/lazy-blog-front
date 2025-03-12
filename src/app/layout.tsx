@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-sync-scripts */
 /* eslint-disable @next/next/next-script-for-ga */
 import { LayoutClient } from "@/app/layout-client";
 import { Mulish, Literata } from "next/font/google";
@@ -24,6 +25,11 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <head>
+        {/* <script
+          crossOrigin="anonymous"
+          src="//unpkg.com/react-scan/dist/auto.global.js"
+        /> */}
+
         <script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-MJC16ETF2H"

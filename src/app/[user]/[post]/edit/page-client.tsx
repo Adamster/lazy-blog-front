@@ -51,10 +51,12 @@ const PageEditClient = () => {
         slug: postData.slug,
         body: postData.body,
         coverUrl: postData.coverUrl || undefined,
-        tags: postData.tags || [],
+        tags: [...postData.tags.map((tag) => tag.tagId)],
         isPublished: true,
       });
     }
+
+    console.log(form.getValues());
   }, [postData]);
 
   const editMutation = useMutation({
@@ -90,11 +92,12 @@ const PageEditClient = () => {
       apiClient.posts.deletePost({
         id: postData?.id || "",
       }),
+
     onSuccess: () => {
       addToastSuccess("Post has been deleted");
-
       router.push("/");
     },
+
     onError: (error: any) => {
       console.log(error);
       addToastError("Error deleting post", error);

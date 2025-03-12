@@ -1,30 +1,21 @@
 "use client";
 
+import { apiClient } from "@/api/api-client";
+import { ErrorMessage } from "@/components/errors/error-message";
+import { Loading } from "@/components/loading";
+import { PostsList } from "@/components/posts/posts-list";
+import { formatDate2 } from "@/utils/format-date";
+import { PencilSquareIcon } from "@heroicons/react/24/outline";
+import { CalendarIcon } from "@heroicons/react/24/solid";
+import { Divider, User } from "@heroui/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { apiClient } from "@/api/api-client";
-import { Loading } from "@/components/loading";
-import { Divider, User } from "@heroui/react";
-import { PostsList } from "@/components/posts/posts-list";
-import { ErrorMessage } from "@/components/errors/error-message";
-import { formatDate2 } from "@/utils/format-date";
-import { CalendarIcon } from "@heroicons/react/24/solid";
-import { PencilSquareIcon } from "@heroicons/react/24/outline";
-import { useEffect, useRef } from "react";
 
 export default function UserClient() {
   const { user: userName } = useParams<{ user: string }>();
-  const observerRef = useRef(null);
   const PAGE_SIZE = 24;
 
-  const {
-    data,
-    error,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
+  const query = useInfiniteQuery({
     queryKey: ["getPostsByUserName", userName],
     queryFn: async ({ pageParam = 0 }) => {
       const response = await apiClient.posts.getPostsByUserName({
@@ -41,23 +32,11 @@ export default function UserClient() {
     enabled: !!userName,
   });
 
-  useEffect(() => {
-    if (!observerRef.current || !hasNextPage) return;
+  if (query.error) return <ErrorMessage error={query.error} />;
+  if (query.isLoading) return <Loading />;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => entry.isIntersecting && fetchNextPage(),
-      { threshold: 1.0 }
-    );
-
-    observer.observe(observerRef.current);
-    return () => observer.disconnect();
-  }, [fetchNextPage, hasNextPage]);
-
-  if (isLoading) return <Loading />;
-  if (error) return <ErrorMessage error={error} />;
-
-  const posts = data?.pages.flatMap((page) => page.postItems) || [];
-  const user = data?.pages[0].user || null;
+  const posts = query.data?.pages.flatMap((page) => page.postItems) || [];
+  const user = query.data?.pages[0].user || null;
 
   return (
     <>
@@ -65,7 +44,7 @@ export default function UserClient() {
         <div className="layout-page-content">
           {posts.length > 0 ? (
             <>
-              <PostsList posts={posts} author={user} hideAuthor />
+              <PostsList query={query} posts={posts} author={user} hideAuthor />
             </>
           ) : (
             <p>No Posts</p>
@@ -92,11 +71,11 @@ export default function UserClient() {
                   description={"@" + user.userName}
                 />
 
-                <div className="text-zinc-500">
+                {/* <div className="text-gray">
                   <p>About:</p>
-                </div>
+                </div> */}
 
-                <div className="flex items-center gap-4 text-zinc-500">
+                <div className="flex items-center gap-4 text-gray">
                   <div className="flex items-center gap-1">
                     <CalendarIcon className="w-4 h-4" />
                     <span className="ml-1 text-sm">
@@ -116,9 +95,6 @@ export default function UserClient() {
           <Divider className="layout-page-divider md:hidden mt-6" />
         </div>
       </div>
-
-      {isFetchingNextPage && <Loading inline />}
-      {hasNextPage && <div ref={observerRef} className="h-20" />}
     </>
   );
 }

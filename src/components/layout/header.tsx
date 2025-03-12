@@ -17,7 +17,6 @@ import {
   NavbarBrand,
   NavbarContent,
   NavbarItem,
-  Tooltip,
   useDisclosure,
   User,
 } from "@heroui/react";
@@ -63,15 +62,13 @@ export const Header = () => {
 
         <NavbarContent justify="end" className="flex items-center gap-4">
           <NavbarItem>
-            <Tooltip content="Toggle Theme">
-              <Button isIconOnly variant="flat" onPress={changeTheme}>
-                {isDarkTheme ? (
-                  <SunIcon className="w-5 h-5" />
-                ) : (
-                  <MoonIcon className="w-4 h-4" />
-                )}
-              </Button>
-            </Tooltip>
+            <Button isIconOnly variant="flat" onPress={changeTheme}>
+              {isDarkTheme ? (
+                <SunIcon className="w-5 h-5" />
+              ) : (
+                <MoonIcon className="w-4 h-4" />
+              )}
+            </Button>
           </NavbarItem>
 
           <IsAuth
@@ -84,16 +81,14 @@ export const Header = () => {
             }
           >
             <NavbarItem>
-              <Tooltip content="Create a New Post">
-                <Button
-                  color="primary"
-                  isIconOnly
-                  variant="solid"
-                  onPress={() => router.push("/create")}
-                >
-                  <PencilSquareIcon className="w-5 h-5 " />
-                </Button>
-              </Tooltip>
+              <Button
+                color="primary"
+                isIconOnly
+                variant="solid"
+                onPress={() => router.push("/create")}
+              >
+                <PencilSquareIcon className="w-5 h-5 " />
+              </Button>
             </NavbarItem>
 
             <NavbarItem>

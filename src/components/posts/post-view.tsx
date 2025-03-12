@@ -7,26 +7,26 @@ import Link from "next/link";
 
 import { formatDate2 } from "@/utils/format-date";
 
-import IsAuth from "../../guards/is-auth";
-import { PostVote } from "../post/PostVote";
 import { PostDetailedResponse } from "@/api/apis";
 import { Divider, Image, User } from "@heroui/react";
+import IsAuth from "../../guards/is-auth";
+import { PostVote } from "../post/PostVote";
 
+import { apiClient } from "@/api/api-client";
+import IsAuthor from "@/guards/is-author";
+import { useTheme } from "@/providers/theme-providers";
 import {
-  HeartIcon as HeartIconOutline,
   ChatBubbleLeftIcon as ChatBubbleLeftIconOutline,
+  HeartIcon as HeartIconOutline,
 } from "@heroicons/react/24/outline";
 import {
-  HeartIcon as HeartIconSolid,
-  ChatBubbleLeftIcon as ChatBubbleLeftIconSolid,
   CalendarIcon,
+  ChatBubbleLeftIcon as ChatBubbleLeftIconSolid,
+  HeartIcon as HeartIconSolid,
   PencilIcon,
 } from "@heroicons/react/24/solid";
-import { Comments } from "../comments/comments-section";
 import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/api/api-client";
-import { useTheme } from "@/providers/theme-providers";
-import IsAuthor from "@/guards/is-author";
+import { Comments } from "../comments/comments-section";
 import { Loading } from "../loading";
 
 const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
@@ -100,10 +100,10 @@ export const PostView = ({ post, postRefetch }: IProps) => {
 
               <div>
                 <h1 className="text-xl font-semibold mb-1">{post?.title}</h1>
-                <p className="text-zinc-500">{post?.summary}</p>
+                <p className="text-gray">{post?.summary}</p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-4 text-zinc-500">
+              <div className="flex flex-wrap items-center gap-4 text-gray">
                 <div className="flex items-center gap-1">
                   <CalendarIcon className="w-4 h-4" />
                   <span className="text-sm">

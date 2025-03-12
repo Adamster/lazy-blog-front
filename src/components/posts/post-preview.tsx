@@ -1,29 +1,32 @@
 /* eslint-disable @next/next/no-img-element */
 
-import { formatDate2 } from "@/utils/format-date";
-import Link from "next/link";
-import { Divider, Image, User } from "@heroui/react";
 import { DisplayPostResponse, UserPostItem, UserResponse } from "@/api/apis";
-import { CalendarIcon } from "@heroicons/react/24/solid";
+import { useTheme } from "@/providers/theme-providers";
+import { formatDate2 } from "@/utils/format-date";
 import {
-  HeartIcon as HeartIconOutline,
   ChatBubbleLeftIcon as ChatBubbleLeftIconOutline,
+  HeartIcon as HeartIconOutline,
 } from "@heroicons/react/24/outline";
 import {
-  HeartIcon as HeartIconSolid,
+  CalendarIcon,
   ChatBubbleLeftIcon as ChatBubbleLeftIconSolid,
+  HeartIcon as HeartIconSolid,
+  TagIcon,
 } from "@heroicons/react/24/solid";
-import { useTheme } from "@/providers/theme-providers";
+import { Divider, Image, User } from "@heroui/react";
+import Link from "next/link";
 interface IProps {
   post: DisplayPostResponse | UserPostItem;
   author: UserResponse;
   hideAuthor?: boolean;
+  hideCategory?: boolean;
 }
 
 export default function PostPreview({
   post,
   author,
   hideAuthor = false,
+  hideCategory = false,
 }: IProps) {
   const { showPreviews } = useTheme();
 
@@ -36,6 +39,7 @@ export default function PostPreview({
             className={hideAuthor ? "hidden" : ""}
           >
             <User
+              className="hover:opacity-70 transition-opacity"
               avatarProps={{
                 size: "sm",
                 src: author.avatarUrl || undefined,
@@ -48,17 +52,19 @@ export default function PostPreview({
             />
           </Link>
 
-          <Link href={`/${author.userName}/${post.slug}`}>
-            <h2 className="text-lg font-semibold hover:text-primary transition-colors">
-              {post.title}
-            </h2>
+          <div>
+            <Link className="m-0" href={`/${author.userName}/${post.slug}`}>
+              <h2 className="text-lg font-semibold hover:underline">
+                {post.title}
+              </h2>
+            </Link>
 
             {post.summary && (
-              <p className="text-zinc-500 line-clamp-2 m-0">{post.summary}</p>
+              <p className="text-gray line-clamp-2 m-0">{post.summary}</p>
             )}
-          </Link>
+          </div>
 
-          <div className="flex items-center gap-4 text-zinc-500">
+          <div className="flex flex-wrap items-center gap-4 text-gray">
             <div className="flex items-center gap-1">
               <CalendarIcon className="w-4 h-4" />
               <span className="ml-1 text-sm">
@@ -83,6 +89,23 @@ export default function PostPreview({
               )}
               <span className="ml-1 text-sm">{post.rating}</span>
             </div>
+
+            {!hideCategory && post.tags?.length ? (
+              <div className="flex items-center gap-1 text-sky-600">
+                <TagIcon className={"w-4 h-4"} />
+                {post.tags.map((tag, id) => (
+                  <span key={tag.tagId}>
+                    <Link
+                      href={`/category/${tag.tag.toLowerCase()}`}
+                      className="ml-1 text-sm hover:underline"
+                    >
+                      {tag.tag}
+                    </Link>
+                    {++id < post.tags.length && ","}
+                  </span>
+                ))}
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -93,7 +116,6 @@ export default function PostPreview({
             href={`/${author.userName}/${post.slug}`}
           >
             <Image
-              isZoomed
               className="w-24 h-24 min-w-24 min-h-24 md:w-32 md:h-32 md:min-w-32 md:min-h-32 object-cover"
               src={post.coverUrl}
               alt={post.title}

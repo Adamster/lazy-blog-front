@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { apiClient } from "@/api/api-client";
 import { CommentResponse } from "@/api/apis";
+import IsAuthor from "@/guards/is-author";
+import { addToastError, addToastSuccess } from "@/helpers/toasts";
+import { formatDate2 } from "@/utils/format-date";
+import { PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "@heroicons/react/24/solid";
 import { Button, Divider, User } from "@heroui/react";
-import { PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { formatDate2 } from "@/utils/format-date";
 import { QueryObserverResult, useMutation } from "@tanstack/react-query";
-import { apiClient } from "@/api/api-client";
-import { addToastError, addToastSuccess } from "@/helpers/toasts";
-import IsAuthor from "@/guards/is-author";
+import Link from "next/link";
 import { useState } from "react";
 import ConfirmDeleteModal from "../modals/confirmation-modal";
 import CommentForm from "./comment-form";
-import Link from "next/link";
 
 interface IProps {
   comment: CommentResponse;
@@ -73,7 +73,7 @@ const Comment = ({ comment, postCommentsRefetch }: IProps) => {
             />
           </Link>
 
-          <div className="flex flex-row items-center gap-3 text-zinc-500">
+          <div className="flex flex-row items-center gap-3 text-gray">
             <IsAuthor userId={comment.user.id || ""}>
               <>
                 <Button
