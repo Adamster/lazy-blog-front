@@ -23,6 +23,7 @@ models/ProblemDetails.ts
 models/RefreshTokenRequest.ts
 models/RegisterUserRequest.ts
 models/ResetPasswordRequest.ts
+models/TagPostResponse.ts
 models/TagResponse.ts
 models/UpdateCommentRequest.ts
 models/UpdatePostRequest.ts

@@ -20,13 +20,13 @@ import {
     UserResponseToJSON,
     UserResponseToJSONTyped,
 } from './UserResponse';
-import type { TagResponse } from './TagResponse';
+import type { TagPostResponse } from './TagPostResponse';
 import {
-    TagResponseFromJSON,
-    TagResponseFromJSONTyped,
-    TagResponseToJSON,
-    TagResponseToJSONTyped,
-} from './TagResponse';
+    TagPostResponseFromJSON,
+    TagPostResponseFromJSONTyped,
+    TagPostResponseToJSON,
+    TagPostResponseToJSONTyped,
+} from './TagPostResponse';
 
 /**
  * 
@@ -78,10 +78,10 @@ export interface PostDetailedResponse {
     coverUrl: string | null;
     /**
      * 
-     * @type {Array<TagResponse>}
+     * @type {Array<TagPostResponse>}
      * @memberof PostDetailedResponse
      */
-    tags: Array<TagResponse>;
+    tags: Array<TagPostResponse>;
     /**
      * 
      * @type {number}
@@ -144,7 +144,7 @@ export function PostDetailedResponseFromJSONTyped(json: any, ignoreDiscriminator
         'slug': json['slug'],
         'body': json['body'],
         'coverUrl': json['coverUrl'],
-        'tags': ((json['tags'] as Array<any>).map(TagResponseFromJSON)),
+        'tags': ((json['tags'] as Array<any>).map(TagPostResponseFromJSON)),
         'rating': json['rating'],
         'views': json['views'],
         'isPublished': json['isPublished'],
@@ -170,7 +170,7 @@ export function PostDetailedResponseToJSONTyped(value?: PostDetailedResponse | n
         'slug': value['slug'],
         'body': value['body'],
         'coverUrl': value['coverUrl'],
-        'tags': ((value['tags'] as Array<any>).map(TagResponseToJSON)),
+        'tags': ((value['tags'] as Array<any>).map(TagPostResponseToJSON)),
         'rating': value['rating'],
         'views': value['views'],
         'isPublished': value['isPublished'],

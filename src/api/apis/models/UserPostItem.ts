@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { TagPostResponse } from './TagPostResponse';
+import {
+    TagPostResponseFromJSON,
+    TagPostResponseFromJSONTyped,
+    TagPostResponseToJSON,
+    TagPostResponseToJSONTyped,
+} from './TagPostResponse';
 import type { NullableOfVoteDirection } from './NullableOfVoteDirection';
 import {
     NullableOfVoteDirectionFromJSON,
@@ -89,6 +96,12 @@ export interface UserPostItem {
     isPublished: boolean;
     /**
      * 
+     * @type {Array<TagPostResponse>}
+     * @memberof UserPostItem
+     */
+    tags: Array<TagPostResponse>;
+    /**
+     * 
      * @type {Date}
      * @memberof UserPostItem
      */
@@ -111,6 +124,7 @@ export function instanceOfUserPostItem(value: object): value is UserPostItem {
     if (!('voteDirection' in value) || value['voteDirection'] === undefined) return false;
     if (!('coverUrl' in value) || value['coverUrl'] === undefined) return false;
     if (!('isPublished' in value) || value['isPublished'] === undefined) return false;
+    if (!('tags' in value) || value['tags'] === undefined) return false;
     if (!('createdAtUtc' in value) || value['createdAtUtc'] === undefined) return false;
     return true;
 }
@@ -135,6 +149,7 @@ export function UserPostItemFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'voteDirection': NullableOfVoteDirectionFromJSON(json['voteDirection']),
         'coverUrl': json['coverUrl'],
         'isPublished': json['isPublished'],
+        'tags': ((json['tags'] as Array<any>).map(TagPostResponseFromJSON)),
         'createdAtUtc': (new Date(json['createdAtUtc'])),
     };
 }
@@ -160,6 +175,7 @@ export function UserPostItemToJSONTyped(value?: UserPostItem | null, ignoreDiscr
         'voteDirection': NullableOfVoteDirectionToJSON(value['voteDirection']),
         'coverUrl': value['coverUrl'],
         'isPublished': value['isPublished'],
+        'tags': ((value['tags'] as Array<any>).map(TagPostResponseToJSON)),
         'createdAtUtc': ((value['createdAtUtc']).toISOString()),
     };
 }

@@ -13,14 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { TagResponse } from './TagResponse';
-import {
-    TagResponseFromJSON,
-    TagResponseFromJSONTyped,
-    TagResponseToJSON,
-    TagResponseToJSONTyped,
-} from './TagResponse';
-
 /**
  * 
  * @export
@@ -53,10 +45,10 @@ export interface CreatePostRequest {
     userId: string;
     /**
      * 
-     * @type {Array<TagResponse>}
+     * @type {Array<string>}
      * @memberof CreatePostRequest
      */
-    tags: Array<TagResponse> | null;
+    tags: Array<string>;
     /**
      * 
      * @type {string}
@@ -98,7 +90,7 @@ export function CreatePostRequestFromJSONTyped(json: any, ignoreDiscriminator: b
         'summary': json['summary'],
         'body': json['body'],
         'userId': json['userId'],
-        'tags': (json['tags'] == null ? null : (json['tags'] as Array<any>).map(TagResponseFromJSON)),
+        'tags': json['tags'],
         'coverUrl': json['coverUrl'],
         'isPublished': json['isPublished'] == null ? undefined : json['isPublished'],
     };
@@ -119,7 +111,7 @@ export function CreatePostRequestToJSONTyped(value?: CreatePostRequest | null, i
         'summary': value['summary'],
         'body': value['body'],
         'userId': value['userId'],
-        'tags': (value['tags'] == null ? null : (value['tags'] as Array<any>).map(TagResponseToJSON)),
+        'tags': value['tags'],
         'coverUrl': value['coverUrl'],
         'isPublished': value['isPublished'],
     };

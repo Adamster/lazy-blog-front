@@ -16,44 +16,37 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface TagResponse
+ * @interface TagPostResponse
  */
-export interface TagResponse {
+export interface TagPostResponse {
     /**
      * 
      * @type {string}
-     * @memberof TagResponse
+     * @memberof TagPostResponse
      */
     tagId: string;
     /**
      * 
      * @type {string}
-     * @memberof TagResponse
+     * @memberof TagPostResponse
      */
     tag: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof TagResponse
-     */
-    postCount: number;
 }
 
 /**
- * Check if a given object implements the TagResponse interface.
+ * Check if a given object implements the TagPostResponse interface.
  */
-export function instanceOfTagResponse(value: object): value is TagResponse {
+export function instanceOfTagPostResponse(value: object): value is TagPostResponse {
     if (!('tagId' in value) || value['tagId'] === undefined) return false;
     if (!('tag' in value) || value['tag'] === undefined) return false;
-    if (!('postCount' in value) || value['postCount'] === undefined) return false;
     return true;
 }
 
-export function TagResponseFromJSON(json: any): TagResponse {
-    return TagResponseFromJSONTyped(json, false);
+export function TagPostResponseFromJSON(json: any): TagPostResponse {
+    return TagPostResponseFromJSONTyped(json, false);
 }
 
-export function TagResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): TagResponse {
+export function TagPostResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): TagPostResponse {
     if (json == null) {
         return json;
     }
@@ -61,15 +54,14 @@ export function TagResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean
         
         'tagId': json['tagId'],
         'tag': json['tag'],
-        'postCount': json['postCount'],
     };
 }
 
-export function TagResponseToJSON(json: any): TagResponse {
-    return TagResponseToJSONTyped(json, false);
+export function TagPostResponseToJSON(json: any): TagPostResponse {
+    return TagPostResponseToJSONTyped(json, false);
 }
 
-export function TagResponseToJSONTyped(value?: TagResponse | null, ignoreDiscriminator: boolean = false): any {
+export function TagPostResponseToJSONTyped(value?: TagPostResponse | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -78,7 +70,6 @@ export function TagResponseToJSONTyped(value?: TagResponse | null, ignoreDiscrim
         
         'tagId': value['tagId'],
         'tag': value['tag'],
-        'postCount': value['postCount'],
     };
 }
 

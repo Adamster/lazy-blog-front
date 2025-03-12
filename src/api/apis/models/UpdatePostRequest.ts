@@ -13,14 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { TagResponse } from './TagResponse';
-import {
-    TagResponseFromJSON,
-    TagResponseFromJSONTyped,
-    TagResponseToJSON,
-    TagResponseToJSONTyped,
-} from './TagResponse';
-
 /**
  * 
  * @export
@@ -59,10 +51,10 @@ export interface UpdatePostRequest {
     coverUrl: string | null;
     /**
      * 
-     * @type {Array<TagResponse>}
+     * @type {Array<string>}
      * @memberof UpdatePostRequest
      */
-    tags: Array<TagResponse>;
+    tags: Array<string>;
     /**
      * 
      * @type {boolean}
@@ -100,7 +92,7 @@ export function UpdatePostRequestFromJSONTyped(json: any, ignoreDiscriminator: b
         'body': json['body'],
         'slug': json['slug'],
         'coverUrl': json['coverUrl'],
-        'tags': ((json['tags'] as Array<any>).map(TagResponseFromJSON)),
+        'tags': json['tags'],
         'isPublished': json['isPublished'],
     };
 }
@@ -121,7 +113,7 @@ export function UpdatePostRequestToJSONTyped(value?: UpdatePostRequest | null, i
         'body': value['body'],
         'slug': value['slug'],
         'coverUrl': value['coverUrl'],
-        'tags': ((value['tags'] as Array<any>).map(TagResponseToJSON)),
+        'tags': value['tags'],
         'isPublished': value['isPublished'],
     };
 }

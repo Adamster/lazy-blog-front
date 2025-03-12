@@ -43,6 +43,18 @@ export interface UpdateTagRequest {
 export interface TagsApiInterface {
     /**
      * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TagsApiInterface
+     */
+    getTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagResponse>>>;
+
+    /**
+     */
+    getTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagResponse>>;
+
+    /**
+     * 
      * @param {string} searchTerm 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -74,6 +86,30 @@ export interface TagsApiInterface {
  * 
  */
 export class TagsApi extends runtime.BaseAPI implements TagsApiInterface {
+
+    /**
+     */
+    async getTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagResponse>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/tags`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagResponseFromJSON));
+    }
+
+    /**
+     */
+    async getTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagResponse>> {
+        const response = await this.getTagsRaw(initOverrides);
+        return await response.value();
+    }
 
     /**
      */

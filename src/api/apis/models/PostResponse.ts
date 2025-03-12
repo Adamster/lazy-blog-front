@@ -20,13 +20,13 @@ import {
     UserResponseToJSON,
     UserResponseToJSONTyped,
 } from './UserResponse';
-import type { TagResponse } from './TagResponse';
+import type { TagPostResponse } from './TagPostResponse';
 import {
-    TagResponseFromJSON,
-    TagResponseFromJSONTyped,
-    TagResponseToJSON,
-    TagResponseToJSONTyped,
-} from './TagResponse';
+    TagPostResponseFromJSON,
+    TagPostResponseFromJSONTyped,
+    TagPostResponseToJSON,
+    TagPostResponseToJSONTyped,
+} from './TagPostResponse';
 
 /**
  * 
@@ -78,10 +78,10 @@ export interface PostResponse {
     author: UserResponse;
     /**
      * 
-     * @type {Array<TagResponse>}
+     * @type {Array<TagPostResponse>}
      * @memberof PostResponse
      */
-    tags: Array<TagResponse>;
+    tags: Array<TagPostResponse>;
     /**
      * 
      * @type {string}
@@ -123,7 +123,7 @@ export function PostResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'slug': json['slug'],
         'isPublished': json['isPublished'],
         'author': UserResponseFromJSON(json['author']),
-        'tags': ((json['tags'] as Array<any>).map(TagResponseFromJSON)),
+        'tags': ((json['tags'] as Array<any>).map(TagPostResponseFromJSON)),
         'coverUrl': json['coverUrl'],
     };
 }
@@ -146,7 +146,7 @@ export function PostResponseToJSONTyped(value?: PostResponse | null, ignoreDiscr
         'slug': value['slug'],
         'isPublished': value['isPublished'],
         'author': UserResponseToJSON(value['author']),
-        'tags': ((value['tags'] as Array<any>).map(TagResponseToJSON)),
+        'tags': ((value['tags'] as Array<any>).map(TagPostResponseToJSON)),
         'coverUrl': value['coverUrl'],
     };
 }

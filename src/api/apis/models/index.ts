@@ -15,6 +15,7 @@ export * from './ProblemDetails';
 export * from './RefreshTokenRequest';
 export * from './RegisterUserRequest';
 export * from './ResetPasswordRequest';
+export * from './TagPostResponse';
 export * from './TagResponse';
 export * from './UpdateCommentRequest';
 export * from './UpdatePostRequest';

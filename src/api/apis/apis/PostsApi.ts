@@ -65,6 +65,7 @@ export interface GetPostBySlugRequest {
 
 export interface GetPostsByTagRequest {
     tag: string;
+    offset?: number;
 }
 
 export interface GetPostsByUserNameRequest {
@@ -169,6 +170,7 @@ export interface PostsApiInterface {
     /**
      * 
      * @param {string} tag 
+     * @param {number} [offset] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PostsApiInterface
@@ -431,6 +433,10 @@ export class PostsApi extends runtime.BaseAPI implements PostsApiInterface {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

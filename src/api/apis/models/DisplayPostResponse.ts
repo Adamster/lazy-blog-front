@@ -20,13 +20,13 @@ import {
     UserResponseToJSON,
     UserResponseToJSONTyped,
 } from './UserResponse';
-import type { TagResponse } from './TagResponse';
+import type { TagPostResponse } from './TagPostResponse';
 import {
-    TagResponseFromJSON,
-    TagResponseFromJSONTyped,
-    TagResponseToJSON,
-    TagResponseToJSONTyped,
-} from './TagResponse';
+    TagPostResponseFromJSON,
+    TagPostResponseFromJSONTyped,
+    TagPostResponseToJSON,
+    TagPostResponseToJSONTyped,
+} from './TagPostResponse';
 import type { NullableOfVoteDirection } from './NullableOfVoteDirection';
 import {
     NullableOfVoteDirectionFromJSON,
@@ -109,10 +109,10 @@ export interface DisplayPostResponse {
     coverUrl: string | null;
     /**
      * 
-     * @type {Array<TagResponse>}
+     * @type {Array<TagPostResponse>}
      * @memberof DisplayPostResponse
      */
-    tags: Array<TagResponse>;
+    tags: Array<TagPostResponse>;
     /**
      * 
      * @type {Date}
@@ -164,7 +164,7 @@ export function DisplayPostResponseFromJSONTyped(json: any, ignoreDiscriminator:
         'rating': json['rating'],
         'voteDirection': NullableOfVoteDirectionFromJSON(json['voteDirection']),
         'coverUrl': json['coverUrl'],
-        'tags': ((json['tags'] as Array<any>).map(TagResponseFromJSON)),
+        'tags': ((json['tags'] as Array<any>).map(TagPostResponseFromJSON)),
         'createdAtUtc': (new Date(json['createdAtUtc'])),
     };
 }
@@ -191,7 +191,7 @@ export function DisplayPostResponseToJSONTyped(value?: DisplayPostResponse | nul
         'rating': value['rating'],
         'voteDirection': NullableOfVoteDirectionToJSON(value['voteDirection']),
         'coverUrl': value['coverUrl'],
-        'tags': ((value['tags'] as Array<any>).map(TagResponseToJSON)),
+        'tags': ((value['tags'] as Array<any>).map(TagPostResponseToJSON)),
         'createdAtUtc': ((value['createdAtUtc']).toISOString()),
     };
 }
