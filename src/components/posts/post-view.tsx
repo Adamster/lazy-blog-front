@@ -91,7 +91,7 @@ export const PostView = ({ post, postRefetch }: IProps) => {
                   isIconOnly
                   href={`${post.slug}/edit`}
                 >
-                  <PencilIcon className="w-4 h-4" />
+                  <PencilIcon className="w-3 h-3" />
                 </Button>
               </IsAuthor>
 

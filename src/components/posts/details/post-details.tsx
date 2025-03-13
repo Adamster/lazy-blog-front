@@ -66,13 +66,13 @@ export const PostDetailsRating = ({ rating }: { rating: number }) => {
 
 export const PostDetailsTags = ({ tags }: { tags: TagPostResponse[] }) => {
   return tags?.length ? (
-    <div className="flex flex-wrap items-center gap-1 text-slate-500">
+    <div className="flex flex-wrap items-center gap-1 text-secondary">
       <TagIcon className={"w-4 h-4"} />
       {tags.map((tag, id) => (
         <span key={tag.tagId}>
           <Link
             href={`/tag/${titleToSnake(tag.tag)}`}
-            className="text-slate-500 ml-1 text-sm hover:underline"
+            className="text-secondary ml-1 text-sm hover:underline"
           >
             {tag.tag}
           </Link>

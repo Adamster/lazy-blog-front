@@ -24,9 +24,8 @@ export default {
       themes: {
         light: {
           colors: {
-            // primary: "#60A4A9", // "#569A9F", //"#569A9F", //"#469B9B",
-            primary: "#8EAF9D",
-            secondary: "#FFA400",
+            primary: "#7A9E9F",
+            secondary: "#4F6367",
             background: "#fafafa",
             foreground: "#2e3035",
             focus: "#83AFA0",
@@ -34,9 +33,8 @@ export default {
         },
         dark: {
           colors: {
-            // primary: "#488286",
-            primary: "#709983",
-            secondary: "#FFA400",
+            primary: "#7A9E9F",
+            secondary: "#6A858A",
             background: "#2e3035",
             foreground: "#dedede",
             content1: "#2e3035",
@@ -47,3 +45,5 @@ export default {
     }),
   ],
 } satisfies Config;
+
+//https://coolors.co/2e3035-fafafa-7a9e9f-6a858a-ecc30b
