@@ -14,7 +14,7 @@ export const Loading = ({
     <div
       className={
         inline
-          ? "flex justify-center my-8"
+          ? "flex justify-center my-6"
           : `min-h-screen flex items-center justify-center ${
               compensateHeader ? "-mt-16" : ""
             }`

@@ -117,6 +117,18 @@ export const PostView = ({ post, postRefetch }: IProps) => {
                 <p className="text-gray">{post?.summary}</p>
               </div>
 
+              {showPreviews && post.coverUrl && (
+                <div className="flex w-full mt-2">
+                  <Image
+                    radius="sm"
+                    className="max-w-full w-full"
+                    removeWrapper
+                    src={post.coverUrl}
+                    alt={post.title}
+                  />
+                </div>
+              )}
+
               <div className="flex flex-wrap items-center gap-4 text-gray">
                 <PostDetailsData date={post.createdAtUtc} />
                 <div className="flex flex-wrap items-center gap-4 text-gray">
@@ -127,18 +139,6 @@ export const PostView = ({ post, postRefetch }: IProps) => {
               </div>
 
               <PostDetailsTags tags={post.tags} />
-
-              {showPreviews && post.coverUrl && (
-                <div className="flex mt-2">
-                  <Image
-                    radius="sm"
-                    className="max-h-72"
-                    removeWrapper
-                    src={post.coverUrl}
-                    alt={post.title}
-                  />
-                </div>
-              )}
             </div>
           </div>
 

@@ -9,10 +9,29 @@ import { snakeToTitle } from "@/utils/utils";
 import { Divider } from "@heroui/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
+import { useMemo } from "react";
+
+const categoryMessages = [
+  "Welcome to the ultimate collection of posts on this topic. We promise it's more exciting than your last internet rabbit hole.",
+  "Looking for something interesting? You’re in the right place. Dive in before your coffee gets cold.",
+  "A carefully curated selection of posts just for you. Or at least that’s what we like to think.",
+  "New posts, same great content. Unlike your fridge, this place always has something fresh.",
+  "You’ve unlocked a treasure trove of posts. No map required, just your curiosity.",
+  "This category has more content than your group chat on a Monday morning. Proceed with caution.",
+  "You’re about to discover posts so good, you might forget why you came here in the first place.",
+  "The content here is top-tier, but don’t just take our word for it. Read and judge for yourself.",
+  "If scrolling through this page was an Olympic sport, you’d be a gold medalist by now. Keep going.",
+  "Some say knowledge is power. We say reading these posts is at least a step in the right direction.",
+];
 
 export default function TagPageClient() {
   const { id: tag } = useParams<{ id: string }>();
   const tagName = snakeToTitle(tag);
+
+  const randomMessage = useMemo(
+    () => categoryMessages[Math.floor(Math.random() * categoryMessages.length)],
+    []
+  );
 
   const query = useInfiniteQuery({
     queryKey: ["getPostsByTag", tag],
@@ -56,11 +75,7 @@ export default function TagPageClient() {
           <div className="layout-page-aside-content">
             <aside className="layout-page-aside-content-sticky">
               <h3 className="text-lg font-semibold">{tagName}</h3>
-              <p>
-                Discover a wide range of posts related to{" "}
-                <strong>{tagName}</strong>. Stay tuned for more updates and
-                happy reading!
-              </p>
+              <p>{randomMessage}</p>
             </aside>
           </div>
         </div>
