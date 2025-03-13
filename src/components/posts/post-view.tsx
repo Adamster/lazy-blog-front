@@ -10,7 +10,7 @@ import { formatDate2 } from "@/utils/format-date";
 import { PostDetailedResponse } from "@/api/apis";
 import { Button, Divider, Image, User } from "@heroui/react";
 import IsAuth from "../../guards/is-auth";
-import { PostVote } from "../post/PostVote";
+import { PostVote } from "./post-vote";
 
 import { apiClient } from "@/api/api-client";
 import IsAuthor from "@/guards/is-author";

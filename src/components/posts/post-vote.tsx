@@ -33,7 +33,6 @@ export const PostVote = ({ postId, rating, postRefetch }: IProps) => {
       <div className="flex flex-col gap-0">
         <button
           className="btn btn--default btn--link"
-          // style={{ padding: ".1rem" }}
           onClick={() => {
             handleVote.mutate({ direction: VotePostDirectionEnum.Up });
           }}
@@ -42,7 +41,6 @@ export const PostVote = ({ postId, rating, postRefetch }: IProps) => {
         </button>
         <button
           className="btn btn--default btn--link"
-          // style={{ padding: ".1rem" }}
           onClick={() => {
             handleVote.mutate({ direction: VotePostDirectionEnum.Down });
           }}

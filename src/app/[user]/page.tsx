@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { generateMeta } from "@/components/meta/meta-data";
+import { generateMeta } from "@/utils/meta-data";
 import UserClient from "./page-client";
 
 export async function generateMetadata({ params }: any) {

@@ -1,4 +1,4 @@
-import { generateMeta } from "@/components/meta/meta-data";
+import { generateMeta } from "@/utils/meta-data";
 import { Metadata } from "next";
 import PageEditClient from "./page-client";
 
