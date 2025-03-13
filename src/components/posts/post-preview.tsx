@@ -3,6 +3,7 @@
 import { DisplayPostResponse, UserPostItem, UserResponse } from "@/api/apis";
 import { useTheme } from "@/providers/theme-providers";
 import { formatDate2 } from "@/utils/format-date";
+import { titleToSnake } from "@/utils/utils";
 import {
   ChatBubbleLeftIcon as ChatBubbleLeftIconOutline,
   HeartIcon as HeartIconOutline,
@@ -99,7 +100,7 @@ export default function PostPreview({
                 {post.tags.map((tag, id) => (
                   <span key={tag.tagId}>
                     <Link
-                      href={`/category/${tag.tag.toLowerCase()}`}
+                      href={`/category/${titleToSnake(tag.tag)}`}
                       className="ml-1 text-sm hover:underline"
                     >
                       {tag.tag}

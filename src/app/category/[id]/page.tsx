@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { generateMeta } from "@/components/meta/meta-data";
 import CategoryPageClient from "./page-client";
+import { snakeToTitle } from "@/utils/utils";
 
 export async function generateMetadata({ params }: any) {
   const { id: category } = await params;
-  const categoryName = `${category[0].toUpperCase()}${category.slice(1)}`;
+  const categoryName = snakeToTitle(category);
 
   return generateMeta({
     title: `${categoryName} Category`,

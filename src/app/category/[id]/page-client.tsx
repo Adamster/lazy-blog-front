@@ -5,19 +5,20 @@ import { ErrorMessage } from "@/components/errors/error-message";
 import { Loading } from "@/components/loading";
 import { PostsList } from "@/components/posts/posts-list";
 import { PAGE_SIZE } from "@/utils/consts";
+import { snakeToTitle } from "@/utils/utils";
 import { Divider } from "@heroui/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
 export default function CategoryPageClient() {
   const { id: category } = useParams<{ id: string }>();
-  const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
+  const categoryName = snakeToTitle(category);
 
   const query = useInfiniteQuery({
     queryKey: ["getPostsByTag", category],
     queryFn: async ({ pageParam = 0 }) => {
       const response = await apiClient.posts.getPostsByTag({
-        tag: category,
+        tag: category.replace(/_/g, " "),
         offset: pageParam,
       });
       return response;
