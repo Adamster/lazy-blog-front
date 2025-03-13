@@ -24,7 +24,7 @@ const usePostIncrementView = (postId: string, postAuthorId: string) => {
     const timeout = setTimeout(() => {
       mutation.mutate();
       sessionStorage.setItem(`hasViewed-${postId}`, "true");
-    }, 5000);
+    }, 3000);
 
     return () => clearTimeout(timeout);
   }, [postId, postAuthorId, user?.id, mutation]);

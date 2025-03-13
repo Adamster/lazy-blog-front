@@ -2,8 +2,11 @@
 import { apiClient } from "@/api/api-client";
 import { VotePostDirectionEnum } from "@/api/apis";
 import { addToastError } from "@/utils/toasts";
-import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import { useMutation } from "@tanstack/react-query";
+
+import { HandThumbDownIcon, HandThumbUpIcon } from "@heroicons/react/24/solid";
+import { Button, Divider } from "@heroui/react";
+import { useMemo } from "react";
 
 interface IProps {
   postId: string;
@@ -11,7 +14,25 @@ interface IProps {
   rating: number;
 }
 
-export const PostVote = ({ postId, rating, postRefetch }: IProps) => {
+const voteMessages = [
+  "Liking this post burns 0 calories — no excuses!",
+  "Liking this post grants +1 to your charisma!",
+  "Liking this post makes you 37% cooler. It's science.",
+  "Tap like and receive +1 internet karma instantly.",
+  "Like now, or forever hold your regrets.",
+  "One like = one virtual cookie.",
+  "Every time you like a post, a pixel smiles.",
+  "Liking this is easier than deciding what to watch on Netflix.",
+  "The like button is lonely. Be a friend.",
+  "Just one like can change the world. Well, maybe this post.",
+];
+
+export const PostVote = ({ postId, postRefetch }: IProps) => {
+  const randomMessage = useMemo(
+    () => voteMessages[Math.floor(Math.random() * voteMessages.length)],
+    []
+  );
+
   const handleVote = useMutation({
     mutationFn: ({ direction }: { direction: VotePostDirectionEnum }) => {
       return apiClient.posts.votePost({
@@ -29,27 +50,33 @@ export const PostVote = ({ postId, rating, postRefetch }: IProps) => {
   });
 
   return (
-    <div className="flex items-center justify-center">
-      <div className="flex flex-col gap-0">
-        <button
-          className="btn btn--default btn--link"
-          onClick={() => {
-            handleVote.mutate({ direction: VotePostDirectionEnum.Up });
-          }}
-        >
-          <ChevronUpIcon width={".9rem"}></ChevronUpIcon>
-        </button>
-        <button
-          className="btn btn--default btn--link"
-          onClick={() => {
-            handleVote.mutate({ direction: VotePostDirectionEnum.Down });
-          }}
-        >
-          <ChevronDownIcon width={".9rem"}></ChevronDownIcon>
-        </button>
+    <div className="flex w-full flex-col gap-4 mt-4">
+      <Divider className="layout-page-divider" />
+      <div className="flex flex-wrap justify-between items-center gap-4 text-gray">
+        <p>{randomMessage}</p>
+        <div className="flex items-center  gap-4 justify-center">
+          <Button
+            size="sm"
+            isIconOnly
+            variant="flat"
+            onPress={() => {
+              handleVote.mutate({ direction: VotePostDirectionEnum.Down });
+            }}
+          >
+            <HandThumbDownIcon width={"1rem"}></HandThumbDownIcon>
+          </Button>
+          <Button
+            size="sm"
+            isIconOnly
+            variant="flat"
+            onPress={() => {
+              handleVote.mutate({ direction: VotePostDirectionEnum.Up });
+            }}
+          >
+            <HandThumbUpIcon width={"1rem"}></HandThumbUpIcon>
+          </Button>
+        </div>
       </div>
-
-      <div className="mx-2">{rating}</div>
     </div>
   );
 };

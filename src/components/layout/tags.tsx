@@ -18,7 +18,7 @@ export const Tags = () => {
             tag.postCount > 0 && (
               <div key={tag.tagId} className="flex items-start">
                 <Link
-                  className="text-gray mb-0.5 hover:underline"
+                  className="text-foreground mb-0.5 hover:underline"
                   href={`/tag/${titleToSnake(tag.tag)}`}
                 >
                   {tag.tag}

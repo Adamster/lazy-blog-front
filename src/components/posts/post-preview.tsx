@@ -2,22 +2,15 @@
 
 import { DisplayPostResponse, UserPostItem, UserResponse } from "@/api/apis";
 import { useTheme } from "@/providers/theme-providers";
-import { formatDate2 } from "@/utils/format-date";
-import { titleToSnake } from "@/utils/utils";
-import {
-  ChatBubbleLeftIcon as ChatBubbleLeftIconOutline,
-  EyeIcon as EyeIconOutline,
-  HeartIcon as HeartIconOutline,
-} from "@heroicons/react/24/outline";
-import {
-  CalendarIcon,
-  ChatBubbleLeftIcon as ChatBubbleLeftIconSolid,
-  EyeIcon as EyeIconSolid,
-  HeartIcon as HeartIconSolid,
-  TagIcon,
-} from "@heroicons/react/24/solid";
 import { Divider, Image, User } from "@heroui/react";
 import Link from "next/link";
+import {
+  PostDetailsComments,
+  PostDetailsData,
+  PostDetailsRating,
+  PostDetailsTags,
+  PostDetailsViews,
+} from "./details/post-details";
 interface IProps {
   post: DisplayPostResponse | UserPostItem;
   author: UserResponse;
@@ -35,11 +28,11 @@ export default function PostPreview({
 
   return (
     <>
-      <div className="flex  sm:flex-row gap-6">
+      <div className="relative flex w-full sm:flex-row gap-6">
         <div className="flex justify-center flex-col gap-3">
           <Link
             href={`/${author.userName?.toLowerCase()}`}
-            className={hideAuthor ? "hidden" : ""}
+            className={hideAuthor ? "hidden" : "pe-24 md:pe-0"}
           >
             <User
               className="hover:opacity-70 transition-opacity"
@@ -55,7 +48,7 @@ export default function PostPreview({
             />
           </Link>
 
-          <div>
+          <div className="pe-24 md:pe-0">
             <Link
               className="m-0"
               href={`/${author.userName?.toLowerCase()}/${post.slug}`}
@@ -71,67 +64,24 @@ export default function PostPreview({
           </div>
 
           <div className="flex flex-wrap items-center gap-4 text-gray">
-            <div className="flex items-center gap-1">
-              <CalendarIcon className="w-4 h-4" />
-              <span className="ml-1 text-sm">
-                {formatDate2(post.createdAtUtc)}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-1">
-              {post.views > 0 ? (
-                <EyeIconSolid className={"w-4 h-4"} />
-              ) : (
-                <EyeIconOutline className={"w-4 h-4"} />
-              )}
-              <span className="ml-1 text-sm">{post.views}</span>
-            </div>
-
-            <div className="flex items-center gap-1">
-              {post.comments > 0 ? (
-                <ChatBubbleLeftIconSolid className="w-4 h-4" />
-              ) : (
-                <ChatBubbleLeftIconOutline className="w-4 h-4" />
-              )}
-              <span className="ml-1 text-sm">{post.comments}</span>
-            </div>
-
-            <div className="flex items-center gap-1">
-              {post.rating > 0 ? (
-                <HeartIconSolid className={"w-4 h-4"} />
-              ) : (
-                <HeartIconOutline className={"w-4 h-4"} />
-              )}
-              <span className="ml-1 text-sm">{post.rating}</span>
-            </div>
+            <PostDetailsData date={post.createdAtUtc} />
+            <PostDetailsViews views={post.views} />
+            <PostDetailsComments comments={post.comments} />
+            <PostDetailsRating rating={post.rating} />
           </div>
 
-          {!hideTags && post.tags?.length ? (
-            <div className="flex items-center gap-1 text-sky-600">
-              <TagIcon className={"w-4 h-4"} />
-              {post.tags.map((tag, id) => (
-                <span key={tag.tagId}>
-                  <Link
-                    href={`/tag/${titleToSnake(tag.tag)}`}
-                    className="ml-1 text-sm hover:underline"
-                  >
-                    {tag.tag}
-                  </Link>
-                  {++id < post.tags.length && ","}
-                </span>
-              ))}
-            </div>
-          ) : null}
+          {!hideTags && <PostDetailsTags tags={post.tags} />}
         </div>
 
         {showPreviews && post.coverUrl && (
           <Link
-            className="flex items-center ms-auto"
+            className="flex items-center ms-auto absolute right-0 md:static"
             style={{}}
             href={`/${author.userName?.toLowerCase()}/${post.slug}`}
           >
             <Image
-              className="w-24 h-24 min-w-24 min-h-24 md:w-32 md:h-32 md:min-w-32 md:min-h-32 object-cover"
+              radius="sm"
+              className="w-20 h-20 min-w-20 min-h-20 md:w-28 md:h-28 md:min-w-28 md:min-h-28 object-cover"
               src={post.coverUrl}
               alt={post.title}
             />

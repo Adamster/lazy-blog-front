@@ -1,20 +1,14 @@
 /* eslint-disable @next/next/no-sync-scripts */
 /* eslint-disable @next/next/next-script-for-ga */
 import { LayoutClient } from "@/app/layout-client";
-import { Mulish, Literata } from "next/font/google";
+import { Mulish } from "next/font/google";
 
 import "../assets/styles/global.scss";
 
 const font = Mulish({
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800"],
   subsets: ["latin"],
   variable: "--font-sans",
-});
-
-const font_serif = Literata({
-  weight: ["400", "600", "700"],
-  subsets: ["latin"],
-  variable: "--font-serif",
 });
 
 export default function RootLayout({
@@ -65,7 +59,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
 
-      <body className={`${font.variable} ${font_serif.variable}`}>
+      <body className={`${font.variable}`}>
         <LayoutClient>{children}</LayoutClient>
       </body>
     </html>

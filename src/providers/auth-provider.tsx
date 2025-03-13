@@ -11,14 +11,8 @@ import {
   getAuthState,
   saveAuthState,
   clearAuthState,
+  AuthState,
 } from "@/utils/auth-storage";
-
-interface AuthState {
-  userId: string | null;
-  accessToken: string | null;
-  refreshToken: string | null;
-  accessTokenExpires: number | null;
-}
 
 interface AuthContextType {
   auth: AuthState;
@@ -64,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     queryKey: ["user", auth?.userId],
     queryFn: async () => {
       if (!auth.userId) {
-        return Promise.resolve(null as unknown as UserResponse);
+        return undefined;
       }
       return apiClient.users.getUserById({ id: auth.userId });
     },
@@ -105,15 +99,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const refreshToken = async () => {
-    if (!auth.refreshToken) return;
+    const currentAuth = getAuthState();
+    if (!currentAuth.refreshToken) return;
 
     try {
       const response = await apiClient.users.refreshToken({
-        refreshTokenRequest: { refreshToken: auth.refreshToken },
+        refreshTokenRequest: { refreshToken: currentAuth.refreshToken },
       });
 
       const updatedAuth: AuthState = {
-        ...auth,
+        ...currentAuth,
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
         accessTokenExpires: Date.now() + 30 * 60 * 1000,
@@ -121,7 +116,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       saveAuthState(updatedAuth);
       queryClient.setQueryData(["auth"], updatedAuth);
-    } catch {
+    } catch (error) {
+      console.error("Refresh Token Error:", error);
       logout();
     }
   };

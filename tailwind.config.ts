@@ -24,7 +24,8 @@ export default {
       themes: {
         light: {
           colors: {
-            primary: "#8FB7AA",
+            // primary: "#60A4A9", // "#569A9F", //"#569A9F", //"#469B9B",
+            primary: "#8EAF9D",
             secondary: "#FFA400",
             background: "#fafafa",
             foreground: "#2e3035",
@@ -33,9 +34,11 @@ export default {
         },
         dark: {
           colors: {
-            primary: "#6AA08E",
+            // primary: "#488286",
+            primary: "#709983",
             secondary: "#FFA400",
             background: "#2e3035",
+            foreground: "#dedede",
             content1: "#2e3035",
             focus: "#5B8E7D",
           },

@@ -5,31 +5,24 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
-import { formatDate2 } from "@/utils/format-date";
-
 import { PostDetailedResponse } from "@/api/apis";
 import { Button, Divider, Image, User } from "@heroui/react";
 import IsAuth from "../../guards/is-auth";
 import { PostVote } from "./post-vote";
-
 import { apiClient } from "@/api/api-client";
 import IsAuthor from "@/guards/is-author";
 import { useTheme } from "@/providers/theme-providers";
-import {
-  ChatBubbleLeftIcon as ChatBubbleLeftIconOutline,
-  HeartIcon as HeartIconOutline,
-  EyeIcon as EyeIconOutline,
-} from "@heroicons/react/24/outline";
-import {
-  CalendarIcon,
-  ChatBubbleLeftIcon as ChatBubbleLeftIconSolid,
-  HeartIcon as HeartIconSolid,
-  EyeIcon as EyeIconSolid,
-  PencilIcon,
-} from "@heroicons/react/24/solid";
+import { PencilIcon } from "@heroicons/react/24/solid";
 import { useQuery } from "@tanstack/react-query";
 import { Comments } from "../comments/comments-section";
 import { Loading } from "../loading";
+import {
+  PostDetailsComments,
+  PostDetailsData,
+  PostDetailsRating,
+  PostDetailsTags,
+  PostDetailsViews,
+} from "./details/post-details";
 
 const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
   ssr: false,
@@ -55,22 +48,26 @@ export const PostView = ({ post, postRefetch }: IProps) => {
     enabled: !!post?.id,
   });
 
-  const postRating = (rating: number) => (
-    <div className="flex items-center gap-1">
-      {rating > 0 ? (
-        <HeartIconSolid className={"w-4 h-4"} />
-      ) : (
-        <HeartIconOutline className={"w-4 h-4"} />
-      )}
-      <span className="ml-1 text-sm">{rating}</span>
-    </div>
-  );
-
   return (
     post && (
       <div className="layout-page">
         <div className="layout-page-content">
           <MDPreview source={post.body} />
+
+          <IsAuth>
+            <IsAuthor
+              fallback={
+                <PostVote
+                  rating={post.rating}
+                  postId={post.id}
+                  postRefetch={postRefetch}
+                />
+              }
+              userId={post.author.id || ""}
+            >
+              <></>
+            </IsAuthor>
+          </IsAuth>
 
           <Comments
             postId={post.id}
@@ -85,19 +82,18 @@ export const PostView = ({ post, postRefetch }: IProps) => {
 
           <div className="layout-page-aside-content">
             <div className="layout-page-aside-content-sticky">
-              <IsAuth>
-                <IsAuthor userId={post.author.id || ""}>
-                  <Button
-                    as={Link}
-                    variant="flat"
-                    size="sm"
-                    isIconOnly
-                    href={`${post.slug}/edit`}
-                  >
-                    <PencilIcon className="w-3 h-3" />
-                  </Button>
-                </IsAuthor>
-              </IsAuth>
+              <IsAuthor userId={post?.author.id || ""}>
+                <Button
+                  className="absolute -top-0 -right-0 ms-2"
+                  as={Link}
+                  variant="flat"
+                  size="sm"
+                  isIconOnly
+                  href={`${post.slug}/edit`}
+                >
+                  <PencilIcon className="w-4 h-4" />
+                </Button>
+              </IsAuthor>
 
               <Link href={`/${post.author.userName?.toLowerCase()}`}>
                 <User
@@ -115,53 +111,27 @@ export const PostView = ({ post, postRefetch }: IProps) => {
               </Link>
 
               <div>
-                <h1 className="text-xl font-semibold mb-1">{post?.title}</h1>
+                <h1 className="text-xl font-semibold mb-1 relative">
+                  {post?.title}
+                </h1>
                 <p className="text-gray">{post?.summary}</p>
               </div>
 
               <div className="flex flex-wrap items-center gap-4 text-gray">
-                <div className="flex items-center gap-1">
-                  <CalendarIcon className="w-4 h-4" />
-                  <span className="text-sm">
-                    {formatDate2(post.createdAtUtc)}
-                  </span>
+                <PostDetailsData date={post.createdAtUtc} />
+                <div className="flex flex-wrap items-center gap-4 text-gray">
+                  <PostDetailsViews views={post.views} />
+                  <PostDetailsComments comments={postComments?.length || 0} />
+                  <PostDetailsRating rating={post.rating} />
                 </div>
-
-                <div className="flex items-center gap-1">
-                  {post.views > 0 ? (
-                    <EyeIconSolid className={"w-4 h-4"} />
-                  ) : (
-                    <EyeIconOutline className={"w-4 h-4"} />
-                  )}
-                  <span className="ml-1 text-sm">{post.views}</span>
-                </div>
-
-                <div className="flex items-center gap-1">
-                  {postComments?.length || 0 > 0 ? (
-                    <ChatBubbleLeftIconSolid className="w-4 h-4" />
-                  ) : (
-                    <ChatBubbleLeftIconOutline className="w-4 h-4" />
-                  )}
-                  <span className="ml-1 text-sm">{postComments?.length}</span>
-                </div>
-
-                <IsAuthor
-                  fallback={
-                    <PostVote
-                      rating={post.rating}
-                      postId={post.id}
-                      postRefetch={postRefetch}
-                    />
-                  }
-                  userId={post.author.id || ""}
-                >
-                  {postRating(post.rating)}
-                </IsAuthor>
               </div>
+
+              <PostDetailsTags tags={post.tags} />
 
               {showPreviews && post.coverUrl && (
                 <div className="flex mt-2">
                   <Image
+                    radius="sm"
                     className="max-h-72"
                     removeWrapper
                     src={post.coverUrl}
