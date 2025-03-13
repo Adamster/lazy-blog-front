@@ -2,7 +2,7 @@
 
 import { apiClient } from "@/api/api-client";
 import { ErrorMessage } from "@/components/errors/error-message";
-import { Categories } from "@/components/layout/categories";
+import { Tags } from "@/components/layout/tags";
 import { Loading } from "@/components/loading";
 import { PostsList } from "@/components/posts/posts-list";
 import { PAGE_SIZE } from "@/utils/consts";
@@ -36,7 +36,7 @@ export const PageClient = () => {
         <div className="layout-page-aside-content">
           <aside className="layout-page-aside-content-sticky">
             <div className="flex flex-col">
-              <Categories />
+              <Tags />
             </div>
           </aside>
         </div>

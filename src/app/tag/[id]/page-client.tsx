@@ -10,15 +10,15 @@ import { Divider } from "@heroui/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
-export default function CategoryPageClient() {
-  const { id: category } = useParams<{ id: string }>();
-  const categoryName = snakeToTitle(category);
+export default function TagPageClient() {
+  const { id: tag } = useParams<{ id: string }>();
+  const tagName = snakeToTitle(tag);
 
   const query = useInfiniteQuery({
-    queryKey: ["getPostsByTag", category],
+    queryKey: ["getPostsByTag", tag],
     queryFn: async ({ pageParam = 0 }) => {
       const response = await apiClient.posts.getPostsByTag({
-        tag: category.replace(/_/g, " "),
+        tag: tag.replace(/_/g, " "),
         offset: pageParam,
       });
       return response;
@@ -26,7 +26,7 @@ export default function CategoryPageClient() {
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === PAGE_SIZE ? allPages.flat().length : undefined,
     initialPageParam: 0,
-    enabled: !!category,
+    enabled: !!tag,
   });
 
   if (query.isLoading) return <Loading />;
@@ -40,7 +40,7 @@ export default function CategoryPageClient() {
             <PostsList
               query={query}
               posts={query.data?.pages?.flat()}
-              hideCategory
+              hideTags
             />
           ) : (
             <p>Still waiting for someone to break the silence!</p>
@@ -55,10 +55,10 @@ export default function CategoryPageClient() {
 
           <div className="layout-page-aside-content">
             <aside className="layout-page-aside-content-sticky">
-              <h3 className="text-lg font-semibold">{categoryName}</h3>
+              <h3 className="text-lg font-semibold">{tagName}</h3>
               <p>
                 Discover a wide range of posts related to{" "}
-                <strong>{categoryName}</strong>. Stay tuned for more updates and
+                <strong>{tagName}</strong>. Stay tuned for more updates and
                 happy reading!
               </p>
             </aside>

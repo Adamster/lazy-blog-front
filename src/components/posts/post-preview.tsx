@@ -20,14 +20,14 @@ interface IProps {
   post: DisplayPostResponse | UserPostItem;
   author: UserResponse;
   hideAuthor?: boolean;
-  hideCategory?: boolean;
+  hideTags?: boolean;
 }
 
 export default function PostPreview({
   post,
   author,
   hideAuthor = false,
-  hideCategory = false,
+  hideTags = false,
 }: IProps) {
   const { showPreviews } = useTheme();
 
@@ -93,24 +93,24 @@ export default function PostPreview({
               )}
               <span className="ml-1 text-sm">{post.rating}</span>
             </div>
-
-            {!hideCategory && post.tags?.length ? (
-              <div className="flex items-center gap-1 text-sky-600">
-                <TagIcon className={"w-4 h-4"} />
-                {post.tags.map((tag, id) => (
-                  <span key={tag.tagId}>
-                    <Link
-                      href={`/category/${titleToSnake(tag.tag)}`}
-                      className="ml-1 text-sm hover:underline"
-                    >
-                      {tag.tag}
-                    </Link>
-                    {++id < post.tags.length && ","}
-                  </span>
-                ))}
-              </div>
-            ) : null}
           </div>
+
+          {!hideTags && post.tags?.length ? (
+            <div className="flex items-center gap-1 text-sky-600">
+              <TagIcon className={"w-4 h-4"} />
+              {post.tags.map((tag, id) => (
+                <span key={tag.tagId}>
+                  <Link
+                    href={`/tag/${titleToSnake(tag.tag)}`}
+                    className="ml-1 text-sm hover:underline"
+                  >
+                    {tag.tag}
+                  </Link>
+                  {++id < post.tags.length && ","}
+                </span>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         {showPreviews && post.coverUrl && (

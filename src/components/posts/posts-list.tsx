@@ -12,7 +12,7 @@ interface PostsListProps {
   posts: DisplayPostResponse[] | UserPostItem[];
   author?: UserResponse | null;
   hideAuthor?: boolean;
-  hideCategory?: boolean;
+  hideTags?: boolean;
   query: UseInfiniteQueryResult<InfiniteData<any, unknown>, Error>;
 }
 
@@ -21,7 +21,7 @@ export function PostsList({
   posts,
   author,
   hideAuthor,
-  hideCategory,
+  hideTags,
 }: PostsListProps) {
   const observerRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +48,7 @@ export function PostsList({
             post={post}
             author={author || (post as DisplayPostResponse).author}
             hideAuthor={hideAuthor}
-            hideCategory={hideCategory}
+            hideTags={hideTags}
           />
         ))}
       </div>

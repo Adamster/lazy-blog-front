@@ -3,7 +3,7 @@ import { titleToSnake } from "@/utils/utils";
 import { Chip, Link } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
 
-export const Categories = () => {
+export const Tags = () => {
   const { data } = useQuery({
     queryKey: ["getTags"],
     queryFn: () => apiClient.tags.getTags(),
@@ -19,7 +19,7 @@ export const Categories = () => {
               <div key={tag.tagId} className="flex items-start">
                 <Link
                   className="text-gray mb-0.5 hover:underline"
-                  href={`/category/${titleToSnake(tag.tag)}`}
+                  href={`/tag/${titleToSnake(tag.tag)}`}
                 >
                   {tag.tag}
                 </Link>
