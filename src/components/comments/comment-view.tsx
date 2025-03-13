@@ -120,7 +120,7 @@ const Comment = ({ comment, postCommentsRefetch }: IProps) => {
         )}
       </div>
 
-      <Divider className="layout-page-divider my-8" />
+      <Divider className="layout-page-divider my-6" />
 
       <ConfirmDeleteModal
         message="Are you sure?"

@@ -28,11 +28,11 @@ export default function PostPreview({
 
   return (
     <>
-      <div className="relative flex w-full sm:flex-row gap-6">
+      <div className="flex w-full flex-col gap-6">
         <div className="flex justify-center flex-col gap-3">
           <Link
             href={`/${author.userName?.toLowerCase()}`}
-            className={hideAuthor ? "hidden" : "pe-24 md:pe-0"}
+            className={hideAuthor ? "hidden" : ""}
           >
             <User
               className="hover:opacity-70 transition-opacity"
@@ -48,7 +48,7 @@ export default function PostPreview({
             />
           </Link>
 
-          <div className="pe-24 md:pe-0">
+          <div>
             <Link
               className="m-0"
               href={`/${author.userName?.toLowerCase()}/${post.slug}`}
@@ -58,10 +58,25 @@ export default function PostPreview({
               </h2>
             </Link>
 
-            {post.summary && (
-              <p className="text-gray line-clamp-2 m-0">{post.summary}</p>
-            )}
+            {post.summary && <p className="text-gray m-0">{post.summary}</p>}
           </div>
+
+          {showPreviews && post.coverUrl && (
+            <Link
+              className="flex items-center w-full"
+              style={{}}
+              href={`/${author.userName?.toLowerCase()}/${post.slug}`}
+            >
+              <Image
+                removeWrapper
+                radius="sm"
+                // className="w-20 h-20 min-w-20 min-h-20 md:w-28 md:h-28 md:min-w-28 md:min-h-28 object-cover"
+                className="max-w-full w-full"
+                src={post.coverUrl}
+                alt={post.title}
+              />
+            </Link>
+          )}
 
           <div className="flex flex-wrap items-center gap-4 text-gray">
             <PostDetailsData date={post.createdAtUtc} />
@@ -72,21 +87,6 @@ export default function PostPreview({
 
           {!hideTags && <PostDetailsTags tags={post.tags} />}
         </div>
-
-        {showPreviews && post.coverUrl && (
-          <Link
-            className="flex items-center ms-auto absolute right-0 md:static"
-            style={{}}
-            href={`/${author.userName?.toLowerCase()}/${post.slug}`}
-          >
-            <Image
-              radius="sm"
-              className="w-20 h-20 min-w-20 min-h-20 md:w-28 md:h-28 md:min-w-28 md:min-h-28 object-cover"
-              src={post.coverUrl}
-              alt={post.title}
-            />
-          </Link>
-        )}
       </div>
 
       <Divider className="layout-page-divider" />

@@ -38,7 +38,7 @@ export function Comments({
 
       {postComments?.length ? (
         <div>
-          <Divider className="layout-page-divider my-8" />
+          <Divider className="layout-page-divider my-6" />
 
           <div className="flex flex-col">
             {postComments?.map((comment: CommentResponse) => (

@@ -50,11 +50,11 @@ export const PostVote = ({ postId, postRefetch }: IProps) => {
   });
 
   return (
-    <div className="flex w-full flex-col gap-4 mt-4">
+    <div className="flex w-full flex-col gap-6 mt-6">
       <Divider className="layout-page-divider" />
       <div className="flex flex-wrap justify-between items-center gap-4 text-gray">
         <p>{randomMessage}</p>
-        <div className="flex items-center  gap-4 justify-center">
+        <div className="flex items-center ms-auto gap-4 justify-center">
           <Button
             size="sm"
             isIconOnly
