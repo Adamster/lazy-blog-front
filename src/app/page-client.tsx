@@ -35,7 +35,7 @@ export const PageClient = () => {
 
         <div className="layout-page-aside-content">
           <aside className="layout-page-aside-content-sticky">
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-1">
               <Tags />
             </div>
           </aside>
