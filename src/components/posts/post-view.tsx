@@ -8,7 +8,7 @@ import Link from "next/link";
 import { formatDate2 } from "@/utils/format-date";
 
 import { PostDetailedResponse } from "@/api/apis";
-import { Divider, Image, User } from "@heroui/react";
+import { Button, Divider, Image, User } from "@heroui/react";
 import IsAuth from "../../guards/is-auth";
 import { PostVote } from "../post/PostVote";
 
@@ -85,6 +85,20 @@ export const PostView = ({ post, postRefetch }: IProps) => {
 
           <div className="layout-page-aside-content">
             <div className="layout-page-aside-content-sticky">
+              <IsAuth>
+                <IsAuthor userId={post.author.id || ""}>
+                  <Button
+                    as={Link}
+                    variant="flat"
+                    size="sm"
+                    isIconOnly
+                    href={`${post.slug}/edit`}
+                  >
+                    <PencilIcon className="w-3 h-3" />
+                  </Button>
+                </IsAuthor>
+              </IsAuth>
+
               <Link href={`/${post.author.userName?.toLowerCase()}`}>
                 <User
                   key={post?.author.id}
@@ -131,27 +145,18 @@ export const PostView = ({ post, postRefetch }: IProps) => {
                   <span className="ml-1 text-sm">{postComments?.length}</span>
                 </div>
 
-                <IsAuth fallback={postRating(post.rating)}>
-                  <IsAuthor
-                    fallback={
-                      <PostVote
-                        rating={post.rating}
-                        postId={post.id}
-                        postRefetch={postRefetch}
-                      />
-                    }
-                    userId={post.author.id || ""}
-                  >
-                    {postRating(post.rating)}
-
-                    <Link
-                      className="flex items-center justify-center w-5 h-5 bg-default/40 rounded-md"
-                      href={`${post.slug}/edit`}
-                    >
-                      <PencilIcon className="w-3 h-3" />
-                    </Link>
-                  </IsAuthor>
-                </IsAuth>
+                <IsAuthor
+                  fallback={
+                    <PostVote
+                      rating={post.rating}
+                      postId={post.id}
+                      postRefetch={postRefetch}
+                    />
+                  }
+                  userId={post.author.id || ""}
+                >
+                  {postRating(post.rating)}
+                </IsAuthor>
               </div>
 
               {showPreviews && post.coverUrl && (
