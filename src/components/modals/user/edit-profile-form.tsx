@@ -8,7 +8,7 @@ import { useAuth } from "@/providers/auth-provider";
 import { UpdateUserRequest } from "@/api/apis";
 import { apiClient } from "@/api/api-client";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/solid";
-import { addToastError, addToastSuccess } from "@/helpers/toasts";
+import { addToastError, addToastSuccess } from "@/utils/toasts";
 
 interface LoginFormProps {
   onOpenChange: () => void;

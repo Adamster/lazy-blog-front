@@ -8,6 +8,7 @@ import { Loading } from "@/components/loading";
 import { useParams } from "next/navigation";
 import { ErrorMessage } from "@/components/errors/error-message";
 import { PostDetailedResponse } from "@/api/apis";
+import usePostIncrementView from "@/hooks/usePostIncrementView";
 
 export default function PostClient({ post }: { post: PostDetailedResponse }) {
   const { post: slug } = useParams<{ post: string }>();
@@ -24,6 +25,8 @@ export default function PostClient({ post }: { post: PostDetailedResponse }) {
     enabled: !post,
     retry: 1,
   });
+
+  usePostIncrementView(data?.id || "", data?.author?.id || "");
 
   if (isLoading) return <Loading />;
   if (error) return <ErrorMessage error={error} />;

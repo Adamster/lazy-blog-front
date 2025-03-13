@@ -6,11 +6,13 @@ import { formatDate2 } from "@/utils/format-date";
 import { titleToSnake } from "@/utils/utils";
 import {
   ChatBubbleLeftIcon as ChatBubbleLeftIconOutline,
+  EyeIcon as EyeIconOutline,
   HeartIcon as HeartIconOutline,
 } from "@heroicons/react/24/outline";
 import {
   CalendarIcon,
   ChatBubbleLeftIcon as ChatBubbleLeftIconSolid,
+  EyeIcon as EyeIconSolid,
   HeartIcon as HeartIconSolid,
   TagIcon,
 } from "@heroicons/react/24/solid";
@@ -74,6 +76,15 @@ export default function PostPreview({
               <span className="ml-1 text-sm">
                 {formatDate2(post.createdAtUtc)}
               </span>
+            </div>
+
+            <div className="flex items-center gap-1">
+              {post.views > 0 ? (
+                <EyeIconSolid className={"w-4 h-4"} />
+              ) : (
+                <EyeIconOutline className={"w-4 h-4"} />
+              )}
+              <span className="ml-1 text-sm">{post.views}</span>
             </div>
 
             <div className="flex items-center gap-1">

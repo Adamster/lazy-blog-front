@@ -2,7 +2,7 @@
 import { apiClient } from "@/api/api-client";
 import { CommentResponse } from "@/api/apis";
 import IsAuthor from "@/guards/is-author";
-import { addToastError, addToastSuccess } from "@/helpers/toasts";
+import { addToastError, addToastSuccess } from "@/utils/toasts";
 import { formatDate2 } from "@/utils/format-date";
 import { PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "@heroicons/react/24/solid";

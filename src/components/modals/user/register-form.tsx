@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { Input, Button, Spinner } from "@heroui/react";
 import { useAuth } from "@/providers/auth-provider";
 import { RegisterUserRequest } from "@/api/apis";
-import { addToastError, addToastSuccess } from "@/helpers/toasts";
+import { addToastError, addToastSuccess } from "@/utils/toasts";
 
 interface RegisterFormProps {
   onSuccess: () => void;

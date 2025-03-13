@@ -18,11 +18,13 @@ import { useTheme } from "@/providers/theme-providers";
 import {
   ChatBubbleLeftIcon as ChatBubbleLeftIconOutline,
   HeartIcon as HeartIconOutline,
+  EyeIcon as EyeIconOutline,
 } from "@heroicons/react/24/outline";
 import {
   CalendarIcon,
   ChatBubbleLeftIcon as ChatBubbleLeftIconSolid,
   HeartIcon as HeartIconSolid,
+  EyeIcon as EyeIconSolid,
   PencilIcon,
 } from "@heroicons/react/24/solid";
 import { useQuery } from "@tanstack/react-query";
@@ -112,6 +114,15 @@ export const PostView = ({ post, postRefetch }: IProps) => {
                 </div>
 
                 <div className="flex items-center gap-1">
+                  {post.views > 0 ? (
+                    <EyeIconSolid className={"w-4 h-4"} />
+                  ) : (
+                    <EyeIconOutline className={"w-4 h-4"} />
+                  )}
+                  <span className="ml-1 text-sm">{post.views}</span>
+                </div>
+
+                <div className="flex items-center gap-1">
                   {postComments?.length || 0 > 0 ? (
                     <ChatBubbleLeftIconSolid className="w-4 h-4" />
                   ) : (
@@ -126,7 +137,7 @@ export const PostView = ({ post, postRefetch }: IProps) => {
                       <PostVote
                         rating={post.rating}
                         postId={post.id}
-                        mutate={postRefetch}
+                        postRefetch={postRefetch}
                       />
                     }
                     userId={post.author.id || ""}

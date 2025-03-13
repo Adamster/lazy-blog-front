@@ -7,7 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/providers/auth-provider";
 import { Loading } from "@/components/loading";
-import { addToastError, addToastSuccess } from "@/helpers/toasts";
+import { addToastError, addToastSuccess } from "@/utils/toasts";
 import { useRouter } from "next/navigation";
 import { UpdatePostRequest } from "@/api/apis";
 import { PostForm } from "@/components/posts/post-form";

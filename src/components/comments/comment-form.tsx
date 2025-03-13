@@ -10,7 +10,7 @@ import dynamic from "next/dynamic";
 import { QueryObserverResult, useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
 import { useAuth } from "@/providers/auth-provider";
-import { addToastError, addToastSuccess } from "@/helpers/toasts";
+import { addToastError, addToastSuccess } from "@/utils/toasts";
 import { CommentResponse } from "@/api/apis";
 
 const Picker = dynamic(
