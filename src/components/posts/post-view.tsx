@@ -69,14 +69,13 @@ export const PostView = ({ post, postRefetch }: IProps) => {
             </IsAuthor>
           </IsAuth>
 
-          {post.isPublished && (
-            <Comments
-              postId={post.id}
-              postComments={postComments}
-              postCommentsLoading={postCommentsLoading}
-              postCommentsRefetch={postCommentsRefetch}
-            />
-          )}
+          <Comments
+            postId={post.id}
+            postComments={postComments}
+            postCommentsLoading={postCommentsLoading}
+            postCommentsRefetch={postCommentsRefetch}
+            isPostPublished={post.isPublished}
+          />
         </div>
 
         <div className="layout-page-aside">
@@ -119,7 +118,7 @@ export const PostView = ({ post, postRefetch }: IProps) => {
                       color="warning"
                       size="lg"
                       content="Draft"
-                      placement="top-left"
+                      placement="top-right"
                     >
                       {post.title}
                     </Badge>

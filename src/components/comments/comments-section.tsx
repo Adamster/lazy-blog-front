@@ -13,6 +13,7 @@ interface IProps {
   postCommentsRefetch: () => Promise<
     QueryObserverResult<CommentResponse[], Error>
   >;
+  isPostPublished: boolean;
 }
 
 export function Comments({
@@ -20,19 +21,20 @@ export function Comments({
   postComments,
   postCommentsLoading,
   postCommentsRefetch,
+  isPostPublished,
 }: IProps) {
   return (
-    <>
-      <IsAuth>
-        <div className="mt-20">
-          <div className="mb-8">
+    <div className="mt-20">
+      {isPostPublished && (
+        <IsAuth>
+          <div className="mb-6">
             <CommentForm
               postId={postId}
               postCommentsRefetch={postCommentsRefetch}
             />
           </div>
-        </div>
-      </IsAuth>
+        </IsAuth>
+      )}
 
       {postCommentsLoading && <Loading inline />}
 
@@ -51,6 +53,6 @@ export function Comments({
           </div>
         </div>
       ) : null}
-    </>
+    </div>
   );
 }

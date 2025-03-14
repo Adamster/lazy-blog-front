@@ -83,7 +83,6 @@ export default function PostPreview({
               <Image
                 removeWrapper
                 radius="sm"
-                // className="w-20 h-20 min-w-20 min-h-20 md:w-28 md:h-28 md:min-w-28 md:min-h-28 object-cover"
                 className="max-w-full w-full"
                 src={post.coverUrl}
                 alt={post.title}
