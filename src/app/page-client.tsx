@@ -30,16 +30,18 @@ export const PageClient = () => {
         )}
       </div>
 
-      <div className="layout-page-aside hidden">
+      <div className="layout-page-aside">
         <Divider className="layout-page-aside-divider" orientation="vertical" />
 
         <div className="layout-page-aside-content">
           <aside className="layout-page-aside-content-sticky">
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-wrap md:flex-col gap-1">
               <Tags />
             </div>
           </aside>
         </div>
+
+        <Divider className="layout-page-divider-mobile" />
       </div>
     </div>
   );

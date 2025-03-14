@@ -66,7 +66,7 @@ export default function TagPageClient() {
           )}
         </div>
 
-        <div className="layout-page-aside hidden">
+        <div className="layout-page-aside">
           <Divider
             className="layout-page-aside-divider"
             orientation="vertical"
@@ -78,6 +78,8 @@ export default function TagPageClient() {
               <p>{randomMessage}</p>
             </aside>
           </div>
+
+          <Divider className="layout-page-divider-mobile" />
         </div>
       </div>
     )
