@@ -11,6 +11,10 @@
   div[role="toolbar"] {
     top: 4rem;
   }
+
+  .mdxeditor-toolbar button[role="combobox"] {
+    width: auto!important;
+  }
 }
 
 .mdxeditor-popup-container div[role="dialog"] > h2 {

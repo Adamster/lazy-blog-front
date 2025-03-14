@@ -120,13 +120,13 @@ export default function InitializedMDXEditor({
               <DiffSourceToggleWrapper options={["source"]}>
                 <BlockTypeSelect />
                 <BoldItalicUnderlineToggles />
-                <Separator />
+                {/* <Separator /> */}
                 <ListsToggle options={["bullet", "number"]} />
-                <Separator />
+                {/* <Separator /> */}
                 <InsertImage />
                 <InsertCodeBlock />
                 <InsertTable />
-                <Separator />
+                {/* <Separator /> */}
                 <CreateLink />
               </DiffSourceToggleWrapper>
             </>
