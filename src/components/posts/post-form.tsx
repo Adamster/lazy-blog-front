@@ -7,8 +7,9 @@ import {
   Input,
   Select,
   SelectItem,
+  Switch,
 } from "@heroui/react";
-import { TrashIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import { UpdatePostRequest } from "@/api/apis";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { useCallback } from "react";
@@ -168,7 +169,27 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
               />
             </div>
 
-            <div className="flex w-full justify-end gap-4">
+            <div className="flex w-full items-center justify-end gap-4">
+              <Controller
+                name="isPublished"
+                control={control}
+                render={({ field }) => (
+                  <Switch
+                    className="me-auto"
+                    isSelected={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
+
+              <Button
+                variant="solid"
+                color={form.watch("isPublished") ? "primary" : "default"}
+                onPress={onSubmit}
+              >
+                {form.watch("isPublished") ? "Publish" : "Save Draft"}
+              </Button>
+
               {!create && (
                 <Button
                   isIconOnly
@@ -179,15 +200,6 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
                   <TrashIcon className="h-4 w-4" />
                 </Button>
               )}
-
-              <Button
-                isIconOnly
-                variant="solid"
-                color="primary"
-                onPress={onSubmit}
-              >
-                <PaperAirplaneIcon className="h-4 w-4" />
-              </Button>
             </div>
           </aside>
         </div>

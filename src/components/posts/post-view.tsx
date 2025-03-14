@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 
 import { PostDetailedResponse } from "@/api/apis";
-import { Button, Divider, Image, User } from "@heroui/react";
+import { Badge, Button, Divider, Image, User } from "@heroui/react";
 import IsAuth from "../../guards/is-auth";
 import { PostVote } from "./post-vote";
 import { apiClient } from "@/api/api-client";
@@ -69,12 +69,14 @@ export const PostView = ({ post, postRefetch }: IProps) => {
             </IsAuthor>
           </IsAuth>
 
-          <Comments
-            postId={post.id}
-            postComments={postComments}
-            postCommentsLoading={postCommentsLoading}
-            postCommentsRefetch={postCommentsRefetch}
-          />
+          {post.isPublished && (
+            <Comments
+              postId={post.id}
+              postComments={postComments}
+              postCommentsLoading={postCommentsLoading}
+              postCommentsRefetch={postCommentsRefetch}
+            />
+          )}
         </div>
 
         <div className="layout-page-aside">
@@ -112,7 +114,18 @@ export const PostView = ({ post, postRefetch }: IProps) => {
 
               <div>
                 <h1 className="text-xl font-semibold mb-1 relative">
-                  {post?.title}
+                  {!post.isPublished ? (
+                    <Badge
+                      color="warning"
+                      size="lg"
+                      content="Draft"
+                      placement="top-left"
+                    >
+                      {post.title}
+                    </Badge>
+                  ) : (
+                    post.title
+                  )}
                 </h1>
                 <p className="text-gray">{post?.summary}</p>
               </div>

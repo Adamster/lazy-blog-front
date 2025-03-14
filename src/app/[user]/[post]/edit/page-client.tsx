@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { apiClient } from "@/api/api-client";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/providers/auth-provider";
 import { Loading } from "@/components/loading";
@@ -19,6 +19,7 @@ const PageEditClient = () => {
   const { user } = useAuth();
   const router = useRouter();
   const params = useParams();
+  const queryClient = useQueryClient();
   const slug = params?.post as string;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -54,7 +55,7 @@ const PageEditClient = () => {
         body: postData.body,
         coverUrl: postData.coverUrl || undefined,
         tags: [...postData.tags.map((tag) => tag.tagId)],
-        isPublished: true,
+        isPublished: postData.isPublished,
       });
     }
   }, [postData]);
@@ -67,6 +68,10 @@ const PageEditClient = () => {
       }),
     onSuccess: () => {
       addToastSuccess("Post has been updated");
+
+      queryClient.invalidateQueries({
+        queryKey: ["getPostBySlug", postData?.slug],
+      });
     },
     onError: (error: any) => {
       console.log(error);

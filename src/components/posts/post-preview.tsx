@@ -2,7 +2,7 @@
 
 import { DisplayPostResponse, UserPostItem, UserResponse } from "@/api/apis";
 import { useTheme } from "@/providers/theme-providers";
-import { Divider, Image, User } from "@heroui/react";
+import { Badge, Divider, Image, User } from "@heroui/react";
 import Link from "next/link";
 import {
   PostDetailsComments,
@@ -49,14 +49,27 @@ export default function PostPreview({
           </Link>
 
           <div>
-            <Link
-              className="m-0"
-              href={`/${author.userName?.toLowerCase()}/${post.slug}`}
-            >
-              <h2 className="text-lg font-semibold hover:underline">
-                {post.title}
-              </h2>
-            </Link>
+            <div>
+              <Link
+                className="m-0"
+                href={`/${author.userName?.toLowerCase()}/${post.slug}`}
+              >
+                <h2 className="text-lg font-semibold hover:underline">
+                  {!post.isPublished ? (
+                    <Badge
+                      color="warning"
+                      size="lg"
+                      content="Draft"
+                      placement="top-right"
+                    >
+                      {post.title}
+                    </Badge>
+                  ) : (
+                    post.title
+                  )}
+                </h2>
+              </Link>
+            </div>
 
             {post.summary && <p className="text-gray m-0">{post.summary}</p>}
           </div>

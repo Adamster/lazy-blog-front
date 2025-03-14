@@ -28,7 +28,7 @@ const CreatePageClient = () => {
       summary: "",
       body: "",
       coverUrl: "",
-      isPublished: true,
+      isPublished: false,
     },
     mode: "onChange",
   });
