@@ -23,7 +23,7 @@ export function EditProfileModal({
       placement="top-center"
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      size="md"
+      size={window.innerWidth < 640 ? "full" : "md"}
     >
       <ModalContent>
         <ModalHeader className="sm:px-10">Edit Profile</ModalHeader>
