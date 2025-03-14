@@ -33,7 +33,7 @@ export function AuthModal({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       size={"md"}
-      classNames={{ backdrop: "z-40" }}
+      // classNames={{ backdrop: "z-40" }}
     >
       <ModalContent>
         {(onClose) => (
