@@ -53,9 +53,7 @@ export function ThemeProvider({ children }: ProvidersProps) {
           toastOffset={"top-right".includes("top") ? 60 : 0}
           placement="top-right"
           toastProps={{
-            classNames: {
-              base: "z-50",
-            },
+            shouldShowTimeoutProgress: true,
           }}
         />
 

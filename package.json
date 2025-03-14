@@ -10,9 +10,8 @@
     "gen:api": "rm -rf src/api/apis && openapi-generator-cli generate -c openapi-config.json && prettier --write 'src/api/**/*.ts'"
   },
   "dependencies": {
-    "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
-    "@heroui/react": "^2.7.2",
+    "@heroui/react": "^2.7.5",
     "@mdxeditor/editor": "^3.23.2",
     "@milkdown/crepe": "^7.6.3",
     "@milkdown/kit": "^7.6.3",
