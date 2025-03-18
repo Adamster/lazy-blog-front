@@ -47,6 +47,10 @@ export interface CheckUserAvailabilityRequest {
     username: string;
 }
 
+export interface DeleteUserAvatarRequest {
+    id: string;
+}
+
 export interface GetPostsByUserIdRequest {
     id: string;
     offset?: number;
@@ -97,6 +101,19 @@ export interface UsersApiInterface {
     /**
      */
     checkUserAvailability(requestParameters: CheckUserAvailabilityRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<boolean>;
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApiInterface
+     */
+    deleteUserAvatarRaw(requestParameters: DeleteUserAvatarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     */
+    deleteUserAvatar(requestParameters: DeleteUserAvatarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
     /**
      * 
@@ -232,6 +249,36 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
     async checkUserAvailability(requestParameters: CheckUserAvailabilityRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<boolean> {
         const response = await this.checkUserAvailabilityRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async deleteUserAvatarRaw(requestParameters: DeleteUserAvatarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling deleteUserAvatar().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/users/{id}/avatar`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async deleteUserAvatar(requestParameters: DeleteUserAvatarRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteUserAvatarRaw(requestParameters, initOverrides);
     }
 
     /**

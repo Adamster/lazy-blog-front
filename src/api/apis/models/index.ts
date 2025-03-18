@@ -24,3 +24,4 @@ export * from './UpdateUserRequest';
 export * from './UserPostItem';
 export * from './UserPostResponse';
 export * from './UserResponse';
+export * from './VoteDirection';

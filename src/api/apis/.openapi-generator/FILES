@@ -33,5 +33,6 @@ models/UpdateUserRequest.ts
 models/UserPostItem.ts
 models/UserPostResponse.ts
 models/UserResponse.ts
+models/VoteDirection.ts
 models/index.ts
 runtime.ts

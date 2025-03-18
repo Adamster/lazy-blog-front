@@ -23,6 +23,7 @@ import type {
   ProblemDetails,
   UpdatePostRequest,
   UserPostResponse,
+  VoteDirection,
 } from '../models/index';
 import {
     CreatePostRequestFromJSON,
@@ -41,6 +42,8 @@ import {
     UpdatePostRequestToJSON,
     UserPostResponseFromJSON,
     UserPostResponseToJSON,
+    VoteDirectionFromJSON,
+    VoteDirectionToJSON,
 } from '../models/index';
 
 export interface CreatePostOperationRequest {
@@ -92,7 +95,7 @@ export interface UpdatePostOperationRequest {
 
 export interface VotePostRequest {
     id: string;
-    direction?: VotePostDirectionEnum;
+    direction?: VoteDirection;
 }
 
 /**
@@ -251,7 +254,7 @@ export interface PostsApiInterface {
     /**
      * 
      * @param {string} id 
-     * @param {'Up' | 'Down'} [direction] 
+     * @param {VoteDirection} [direction] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PostsApiInterface
@@ -658,12 +661,3 @@ export class PostsApi extends runtime.BaseAPI implements PostsApiInterface {
     }
 
 }
-
-/**
- * @export
- */
-export const VotePostDirectionEnum = {
-    Up: 'Up',
-    Down: 'Down'
-} as const;
-export type VotePostDirectionEnum = typeof VotePostDirectionEnum[keyof typeof VotePostDirectionEnum];
