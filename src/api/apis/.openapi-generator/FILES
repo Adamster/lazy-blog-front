@@ -1,4 +1,5 @@
 .openapi-generator-ignore
+apis/ChangePasswordApi.ts
 apis/CommentsApi.ts
 apis/ForgotPasswordApi.ts
 apis/MediaApi.ts
@@ -9,6 +10,7 @@ apis/UsersApi.ts
 apis/index.ts
 index.ts
 models/AddCommentRequest.ts
+models/ChangePasswordRequest.ts
 models/CommentResponse.ts
 models/CreatePostRequest.ts
 models/DisplayPostResponse.ts

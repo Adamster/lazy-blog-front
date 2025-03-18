@@ -44,7 +44,7 @@ export interface CommentResponse {
      * @type {string}
      * @memberof CommentResponse
      */
-    userAvatarUrl: string;
+    userAvatarUrl: string | null;
     /**
      * 
      * @type {string}

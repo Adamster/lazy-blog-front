@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './AddCommentRequest';
+export * from './ChangePasswordRequest';
 export * from './CommentResponse';
 export * from './CreatePostRequest';
 export * from './DisplayPostResponse';
