@@ -48,6 +48,12 @@ export interface RegisterUserRequest {
      * @type {string}
      * @memberof RegisterUserRequest
      */
+    biography: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterUserRequest
+     */
     password: string;
 }
 
@@ -59,6 +65,7 @@ export function instanceOfRegisterUserRequest(value: object): value is RegisterU
     if (!('firstName' in value) || value['firstName'] === undefined) return false;
     if (!('lastName' in value) || value['lastName'] === undefined) return false;
     if (!('userName' in value) || value['userName'] === undefined) return false;
+    if (!('biography' in value) || value['biography'] === undefined) return false;
     if (!('password' in value) || value['password'] === undefined) return false;
     return true;
 }
@@ -77,6 +84,7 @@ export function RegisterUserRequestFromJSONTyped(json: any, ignoreDiscriminator:
         'firstName': json['firstName'],
         'lastName': json['lastName'],
         'userName': json['userName'],
+        'biography': json['biography'],
         'password': json['password'],
     };
 }
@@ -96,6 +104,7 @@ export function RegisterUserRequestToJSONTyped(value?: RegisterUserRequest | nul
         'firstName': value['firstName'],
         'lastName': value['lastName'],
         'userName': value['userName'],
+        'biography': value['biography'],
         'password': value['password'],
     };
 }

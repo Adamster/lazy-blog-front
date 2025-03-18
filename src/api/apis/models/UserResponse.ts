@@ -54,6 +54,12 @@ export interface UserResponse {
      * @type {string}
      * @memberof UserResponse
      */
+    biography?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResponse
+     */
     avatarUrl?: string | null;
     /**
      * 
@@ -85,6 +91,7 @@ export function UserResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'firstName': json['firstName'] == null ? undefined : json['firstName'],
         'lastName': json['lastName'] == null ? undefined : json['lastName'],
         'userName': json['userName'] == null ? undefined : json['userName'],
+        'biography': json['biography'] == null ? undefined : json['biography'],
         'avatarUrl': json['avatarUrl'] == null ? undefined : json['avatarUrl'],
         'createdOnUtc': json['createdOnUtc'] == null ? undefined : (new Date(json['createdOnUtc'])),
     };
@@ -106,6 +113,7 @@ export function UserResponseToJSONTyped(value?: UserResponse | null, ignoreDiscr
         'firstName': value['firstName'],
         'lastName': value['lastName'],
         'userName': value['userName'],
+        'biography': value['biography'],
         'avatarUrl': value['avatarUrl'],
         'createdOnUtc': value['createdOnUtc'] == null ? undefined : ((value['createdOnUtc']).toISOString()),
     };

@@ -37,6 +37,12 @@ export interface UpdateUserRequest {
      * @memberof UpdateUserRequest
      */
     userName: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateUserRequest
+     */
+    biography: string | null;
 }
 
 /**
@@ -46,6 +52,7 @@ export function instanceOfUpdateUserRequest(value: object): value is UpdateUserR
     if (!('firstName' in value) || value['firstName'] === undefined) return false;
     if (!('lastName' in value) || value['lastName'] === undefined) return false;
     if (!('userName' in value) || value['userName'] === undefined) return false;
+    if (!('biography' in value) || value['biography'] === undefined) return false;
     return true;
 }
 
@@ -62,6 +69,7 @@ export function UpdateUserRequestFromJSONTyped(json: any, ignoreDiscriminator: b
         'firstName': json['firstName'],
         'lastName': json['lastName'],
         'userName': json['userName'],
+        'biography': json['biography'],
     };
 }
 
@@ -79,6 +87,7 @@ export function UpdateUserRequestToJSONTyped(value?: UpdateUserRequest | null, i
         'firstName': value['firstName'],
         'lastName': value['lastName'],
         'userName': value['userName'],
+        'biography': value['biography'],
     };
 }
 
