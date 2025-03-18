@@ -117,14 +117,6 @@ export const UpdateAvatar = ({ userData }: IProps) => {
         </div>
       ) : (
         <div className="flex flex-col items-start gap-3">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleAvatarChange}
-          />
-
           <User
             avatarProps={{
               size: "md",
@@ -159,6 +151,14 @@ export const UpdateAvatar = ({ userData }: IProps) => {
               </Button>
             </ButtonGroup>
           </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleAvatarChange}
+          />
         </div>
       )}
     </>

@@ -29,7 +29,7 @@ const PageEditClient = () => {
     <IsAuth fallback={<ErrorMessage error={"Not Found"} />}>
       <div className="layout-page">
         <div className="layout-page-content">
-          <Tabs variant="light">
+          <Tabs variant="solid" classNames={{ panel: "p-0 pt-4" }}>
             <Tab key="profile" title="Edit Profile">
               <UpdateProfile userData={userData} />
             </Tab>
@@ -49,12 +49,12 @@ const PageEditClient = () => {
             <aside className="layout-page-aside-content-sticky">
               <UpdateAvatar userData={userData} />
 
-              <div>
+              <div className="hidden md:block">
                 <p className="text-sm text-gray">About:</p>
                 <p className="whitespace-pre-line">{userData?.biography}</p>
               </div>
 
-              <div className="flex items-center gap-4 text-gray">
+              <div className="hidden md:flex items-center gap-4 text-gray">
                 <div className="flex items-center gap-1">
                   <CalendarIcon className="w-4 h-4" />
                   <span className="ml-1 text-sm">
