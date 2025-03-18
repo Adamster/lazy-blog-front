@@ -51,9 +51,7 @@ const PageEditClient = () => {
 
               <div>
                 <p className="text-sm text-gray">About:</p>
-                <p className="text-sm whitespace-pre-line">
-                  {userData?.biography}
-                </p>
+                <p className="whitespace-pre-line">{userData?.biography}</p>
               </div>
 
               <div className="flex items-center gap-4 text-gray">
