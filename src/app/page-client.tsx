@@ -36,7 +36,7 @@ export const PageClient = () => {
         <div className="layout-page-aside-content">
           <aside className="layout-page-aside-content-sticky">
             <div className="overflow-auto max-w-full">
-              <div className="flex md:flex-col mb-2 md:mb-0 whitespace-nowrap gap-1">
+              <div className="flex md:flex-col mb-1 md:mb-0 whitespace-nowrap gap-1">
                 <Tags />
               </div>
             </div>

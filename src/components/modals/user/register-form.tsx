@@ -39,6 +39,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
         lastName: data.lastName,
         userName: data.userName,
         password: data.password,
+        biography: null,
       };
 
       await register(registerData);
@@ -133,7 +134,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
       <Input
         classNames={{ input: "text-base" }}
-        label="Repeat Password"
+        label="Confirm new password"
         type="password"
         isRequired
         isInvalid={Boolean(errors.confirmPassword)}

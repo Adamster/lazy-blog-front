@@ -116,7 +116,7 @@ const Comment = ({ comment, postCommentsRefetch }: IProps) => {
             setIsEditComment={setIsEditComment}
           />
         ) : (
-          <div style={{ whiteSpace: "pre-line" }}>{comment.body}</div>
+          <div className="whitespace-pre-line">{comment.body}</div>
         )}
       </div>
 

@@ -6,7 +6,7 @@ import { Loading } from "@/components/loading";
 import { PostsList } from "@/components/posts/posts-list";
 import { PAGE_SIZE } from "@/utils/consts";
 import { formatDate2 } from "@/utils/format-date";
-import { PencilSquareIcon } from "@heroicons/react/24/outline";
+import { PencilSquareIcon, UserIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "@heroicons/react/24/solid";
 import { Divider, User } from "@heroui/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -71,6 +71,13 @@ export default function UserClient() {
                   name={`${user.firstName} ${user.lastName}`}
                   description={"@" + user.userName}
                 />
+
+                {user?.biography && (
+                  <div>
+                    <p className="text-sm text-gray">About:</p>
+                    <p className="whitespace-pre-line">{user?.biography}</p>
+                  </div>
+                )}
 
                 <div className="flex items-center gap-4 text-gray">
                   <div className="flex items-center gap-1">

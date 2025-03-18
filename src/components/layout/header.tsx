@@ -24,9 +24,6 @@ import { useAuth } from "@/providers/auth-provider";
 import { useTheme } from "@/providers/theme-providers";
 import IsAuth from "@/guards/is-auth";
 import { useRouter } from "next/navigation";
-import { EditProfileModal } from "@/components/modals/user/edit-profile-modal";
-import { PhotoIcon as PhotoIconOutline } from "@heroicons/react/24/outline";
-import { PhotoIcon as PhotoIconSolid } from "@heroicons/react/24/solid";
 
 export const Header = () => {
   const { user, logout } = useAuth();
@@ -38,12 +35,6 @@ export const Header = () => {
     isOpen: isAuthOpen,
     onOpen: onAuthOpen,
     onOpenChange: onAuthOpenChange,
-  } = useDisclosure();
-
-  const {
-    isOpen: isEditOpen,
-    onOpen: onEditOpen,
-    onOpenChange: onEditOpenChange,
   } = useDisclosure();
 
   return (
@@ -126,7 +117,12 @@ export const Header = () => {
                     />
                   </DropdownItem>
 
-                  <DropdownItem key="profile" onPress={onEditOpen}>
+                  <DropdownItem
+                    key="profile"
+                    onPress={() => {
+                      router.push("/profile");
+                    }}
+                  >
                     Edit Profile
                   </DropdownItem>
                   <DropdownItem
@@ -135,17 +131,6 @@ export const Header = () => {
                     onPress={() => setShowPreviews((prev) => !prev)}
                   >
                     Post Previews
-                    {/* <Button
-                      isIconOnly
-                      variant="flat"
-                      onPress={() => }
-                    >
-                      {showPreviews ? (
-                        <PhotoIconSolid className="w-5 h-5" />
-                      ) : (
-                        <PhotoIconOutline className="w-5 h-5" />
-                      )}
-                    </Button> */}
                   </DropdownItem>
                   <DropdownItem
                     key="logout"
@@ -162,7 +147,6 @@ export const Header = () => {
       </div>
 
       <AuthModal isOpen={isAuthOpen} onOpenChange={onAuthOpenChange} />
-      <EditProfileModal isOpen={isEditOpen} onOpenChange={onEditOpenChange} />
     </Navbar>
   );
 };

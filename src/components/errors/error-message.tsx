@@ -6,7 +6,7 @@ import { useTheme } from "@/providers/theme-providers";
 import LogoDark from "../../assets/icons/logo-dark.svg";
 import LogoLight from "../../assets/icons/logo-light.svg";
 import Image from "next/image";
-import { Link } from "@heroui/react";
+import { Button, Link } from "@heroui/react";
 
 export const ErrorMessage = ({ error }: { error: unknown }) => {
   const { isDarkTheme } = useTheme();
@@ -46,9 +46,9 @@ export const ErrorMessage = ({ error }: { error: unknown }) => {
       />
       <h2 className="text-3xl font-bold">A glitch in the Lazyverse...</h2>
       <p>{errorMessage}</p>
-      <Link className="underline" href="/">
-        Home
-      </Link>
+      <Button as={Link} href="/">
+        Go Home
+      </Button>
     </div>
   );
 };

@@ -17,7 +17,6 @@ import {
 interface AuthContextType {
   auth: AuthState;
   user: UserResponse | undefined;
-  refetchUserData: () => void;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   refreshToken: () => Promise<void>;
@@ -50,12 +49,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       staleTime: Infinity,
     });
 
-  const {
-    data: userData,
-    isLoading: isUserLoading,
-    refetch: refetchUserData,
-  } = useQuery<UserResponse | undefined>({
-    queryKey: ["user", auth?.userId],
+  const { data: userData, isLoading: isUserLoading } = useQuery<
+    UserResponse | undefined
+  >({
+    queryKey: ["getUserById", auth?.userId],
     queryFn: async () => {
       if (!auth.userId) {
         return undefined;
@@ -80,7 +77,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       saveAuthState(authState);
       queryClient.setQueryData(["auth"], authState);
-      queryClient.setQueryData(["user", response.user.id], response.user);
+
+      queryClient.setQueryData(
+        ["getUserById", response.user.id],
+        response.user
+      );
     } catch (error) {
       clearAuthState();
       queryClient.setQueryData(["auth"], getAuthState());
@@ -95,7 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     clearAuthState();
     queryClient.setQueryData(["auth"], getAuthState());
-    queryClient.removeQueries({ queryKey: ["user"] });
+    queryClient.removeQueries({ queryKey: ["getUserById"] });
   };
 
   const refreshToken = async () => {
@@ -136,6 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const isAuthenticated = !!auth.userId && !!userData;
+
   const status =
     isAuthLoading || isUserLoading
       ? "loading"
@@ -152,7 +154,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         auth,
         user: userData,
-        refetchUserData,
         login,
         logout,
         refreshToken,
