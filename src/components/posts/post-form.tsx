@@ -2,6 +2,7 @@
 import { MarkEditor } from "../libs/Editor";
 import {
   Button,
+  ButtonGroup,
   Divider,
   Image,
   Input,
@@ -9,13 +10,18 @@ import {
   SelectItem,
   Switch,
 } from "@heroui/react";
-import { TrashIcon } from "@heroicons/react/24/outline";
+import {
+  PencilSquareIcon,
+  RocketLaunchIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 import { UpdatePostRequest } from "@/api/apis";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { useCallback } from "react";
 import { debounce } from "lodash";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
+import { PostImageUploader } from "./post-image-uploader";
 
 interface IProps {
   form: UseFormReturn<UpdatePostRequest>;
@@ -51,17 +57,13 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
           name="body"
           control={control}
           rules={{ required: "Field is required" }}
-          render={({ field }) =>
-            (!create && field.value) || create ? (
-              <MarkEditor
-                placeholder="Too lazy to write a post? Just start typing..."
-                markdown={field.value || ""}
-                onChange={(value) => handleChange(value, field.onChange)}
-              />
-            ) : (
-              <> </>
-            )
-          }
+          render={({ field }) => (
+            <MarkEditor
+              placeholder="Too lazy to write a post? Just start typing..."
+              markdown={form.watch("body")}
+              onChange={(value) => handleChange(value, field.onChange)}
+            />
+          )}
         />
         {errors.body && (
           <p className="text-danger text-tiny ps-3">{errors.body.message}</p>
@@ -75,42 +77,18 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
           <aside className="layout-page-aside-content-sticky">
             {
               <>
-                <div className="w-full flex flex-col bg-zinc-100 dark:bg-zinc-800 p-2 rounded-lg">
-                  {form.watch("coverUrl") && (
-                    <Image
-                      className="max-h-72 mb-2 p-1"
-                      removeWrapper
-                      src={form.getValues("coverUrl") || undefined}
-                      alt="Cover image"
-                    />
-                  )}
-
-                  <div className="w-full">
-                    <Input
-                      size="sm"
-                      classNames={{ input: "text-base" }}
-                      placeholder="Cover Image URL"
-                      {...register("coverUrl")}
-                    />
-                  </div>
-                </div>
-
-                {/* <div className="w-full">
-                  <Input
-                    classNames={{ input: "text-base" }}
-                    label="Slug"
-                    isRequired
-                    isInvalid={Boolean(errors.slug)}
-                    {...register("slug", {
-                      required: "Slug is required",
-                      minLength: {
-                        value: 3,
-                        message: "At least 3 characters",
-                      },
-                    })}
-                    errorMessage={errors.slug?.message}
+                {form.watch("coverUrl") && (
+                  <Image
+                    className="max-h-72 p-1"
+                    removeWrapper
+                    src={form.getValues("coverUrl") || undefined}
+                    alt="Cover image"
                   />
-                </div> */}
+                )}
+
+                <PostImageUploader
+                  onUploadSuccess={(value) => form.setValue("coverUrl", value)}
+                />
               </>
             }
 
@@ -182,24 +160,29 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
                 )}
               />
 
-              <Button
-                variant="solid"
-                color={form.watch("isPublished") ? "primary" : "default"}
-                onPress={onSubmit}
-              >
-                {form.watch("isPublished") ? "Publish" : "Save Draft"}
-              </Button>
-
-              {!create && (
+              <ButtonGroup>
                 <Button
-                  isIconOnly
                   variant="solid"
-                  color="danger"
-                  onPress={onDelete}
+                  color={form.watch("isPublished") ? "primary" : "default"}
+                  onPress={onSubmit}
                 >
-                  <TrashIcon className="h-4 w-4" />
+                  {form.watch("isPublished") ? (
+                    <>
+                      <RocketLaunchIcon className="w-4 h-4" /> Publish
+                    </>
+                  ) : (
+                    <>
+                      <PencilSquareIcon className="w-4 h-4" /> Save
+                    </>
+                  )}
                 </Button>
-              )}
+
+                {!create && (
+                  <Button isIconOnly color="danger" onPress={onDelete}>
+                    <TrashIcon className="h-4 w-4" />
+                  </Button>
+                )}
+              </ButtonGroup>
             </div>
           </aside>
         </div>

@@ -6,7 +6,7 @@ import { Loading } from "@/components/loading";
 import { PostsList } from "@/components/posts/posts-list";
 import { PAGE_SIZE } from "@/utils/consts";
 import { formatDate2 } from "@/utils/format-date";
-import { PencilSquareIcon } from "@heroicons/react/24/outline";
+import { DocumentTextIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "@heroicons/react/24/solid";
 import { Divider, User } from "@heroui/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -62,7 +62,7 @@ export default function UserClient() {
                   className="mb-1"
                   key={user.id}
                   avatarProps={{
-                    size: "md",
+                    size: "lg",
                     src: user.avatarUrl || undefined,
                     name: `${user.firstName?.charAt(0)}${user.lastName?.charAt(
                       0
@@ -88,7 +88,7 @@ export default function UserClient() {
                   </div>
 
                   <div className="flex items-center gap-1">
-                    <PencilSquareIcon className="w-4 h-4" />
+                    <DocumentTextIcon className="w-4 h-4" />
                     <span className="ml-1 text-sm">{posts.length}</span>
                   </div>
                 </div>

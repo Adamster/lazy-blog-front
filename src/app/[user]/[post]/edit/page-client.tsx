@@ -129,13 +129,15 @@ const PageEditClient = () => {
           <ErrorMessage error={"Nice try, but this isn’t your playground!"} />
         }
       >
-        <PostForm
-          key={postData?.id}
-          form={form}
-          onSubmit={onSubmit}
-          create={false}
-          onDelete={onDelete}
-        />
+        {form.getValues("slug") && isAuthor && (
+          <PostForm
+            key={postData?.id}
+            form={form}
+            onSubmit={onSubmit}
+            create={false}
+            onDelete={onDelete}
+          />
+        )}
       </IsAuthor>
 
       {isModalOpen && (
