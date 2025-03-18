@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiClient } from "@/api/api-client";
-import { VotePostDirectionEnum } from "@/api/apis";
+import { VoteDirection } from "@/api/apis";
 import { addToastError } from "@/utils/toasts";
 import { useMutation } from "@tanstack/react-query";
 
@@ -34,7 +34,7 @@ export const PostVote = ({ postId, postRefetch }: IProps) => {
   );
 
   const handleVote = useMutation({
-    mutationFn: ({ direction }: { direction: VotePostDirectionEnum }) => {
+    mutationFn: ({ direction }: { direction: VoteDirection }) => {
       return apiClient.posts.votePost({
         id: postId,
         direction,
@@ -60,7 +60,7 @@ export const PostVote = ({ postId, postRefetch }: IProps) => {
             isIconOnly
             variant="flat"
             onPress={() => {
-              handleVote.mutate({ direction: VotePostDirectionEnum.Down });
+              handleVote.mutate({ direction: VoteDirection.Down });
             }}
           >
             <HandThumbDownIcon width={"1rem"}></HandThumbDownIcon>
@@ -70,7 +70,7 @@ export const PostVote = ({ postId, postRefetch }: IProps) => {
             isIconOnly
             variant="flat"
             onPress={() => {
-              handleVote.mutate({ direction: VotePostDirectionEnum.Up });
+              handleVote.mutate({ direction: VoteDirection.Up });
             }}
           >
             <HandThumbUpIcon width={"1rem"}></HandThumbUpIcon>

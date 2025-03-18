@@ -6,7 +6,7 @@ import { Loading } from "@/components/loading";
 import { PostsList } from "@/components/posts/posts-list";
 import { PAGE_SIZE } from "@/utils/consts";
 import { formatDate2 } from "@/utils/format-date";
-import { PencilSquareIcon, UserIcon } from "@heroicons/react/24/outline";
+import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "@heroicons/react/24/solid";
 import { Divider, User } from "@heroui/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
