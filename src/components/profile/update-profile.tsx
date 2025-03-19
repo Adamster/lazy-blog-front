@@ -1,6 +1,6 @@
 import { apiClient } from "@/api/api-client";
 import { UpdateUserRequest, UserResponse } from "@/api/apis";
-import { addToastSuccess, addToastError } from "@/utils/toasts";
+import { addToastSuccess, addToastError } from "@/components/toasts/toasts";
 import { Button, Input, Textarea } from "@heroui/react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";

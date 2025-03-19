@@ -126,16 +126,12 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
               <Controller
                 name="tags"
                 control={control}
-                rules={{ required: "Tag(s) is required" }}
                 render={({ field }) => (
                   <Select
                     selectedKeys={field.value}
-                    isRequired
                     selectionMode="multiple"
                     label="Select Tag(s)"
                     onSelectionChange={(keys) => field.onChange([...keys])}
-                    isInvalid={Boolean(errors.tags)}
-                    errorMessage={errors.tags?.message}
                   >
                     {tags
                       ? tags.map((tag) => (

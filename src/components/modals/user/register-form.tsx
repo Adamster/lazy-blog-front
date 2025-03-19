@@ -4,9 +4,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Input, Button, Spinner } from "@heroui/react";
-import { useAuth } from "@/providers/auth-provider";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { RegisterUserRequest } from "@/api/apis";
-import { addToastError, addToastSuccess } from "@/utils/toasts";
+import { addToastError, addToastSuccess } from "@/components/toasts/toasts";
 
 interface RegisterFormProps {
   onSuccess: () => void;

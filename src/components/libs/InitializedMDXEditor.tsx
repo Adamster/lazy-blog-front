@@ -1,41 +1,42 @@
 "use client";
-import React, { type ForwardedRef } from "react";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { useUser } from "@/providers/user-provider";
+import { API_URL } from "@/utils/fetcher";
+import { oneDark } from "@codemirror/theme-one-dark";
 import {
-  headingsPlugin,
-  listsPlugin,
-  quotePlugin,
-  thematicBreakPlugin,
+  BlockTypeSelect,
+  BoldItalicUnderlineToggles,
+  CreateLink,
+  DiffSourceToggleWrapper,
+  InsertCodeBlock,
+  InsertImage,
+  InsertTable,
+  ListsToggle,
   MDXEditor,
   type MDXEditorMethods,
   type MDXEditorProps,
-  toolbarPlugin,
-  BoldItalicUnderlineToggles,
-  CreateLink,
-  InsertCodeBlock,
-  InsertImage,
-  ListsToggle,
-  imagePlugin,
   codeBlockPlugin,
   codeMirrorPlugin,
-  Separator,
-  linkPlugin,
-  linkDialogPlugin,
-  BlockTypeSelect,
-  InsertTable,
-  tablePlugin,
-  DiffSourceToggleWrapper,
   diffSourcePlugin,
+  headingsPlugin,
+  imagePlugin,
+  linkDialogPlugin,
+  linkPlugin,
+  listsPlugin,
+  quotePlugin,
+  tablePlugin,
+  thematicBreakPlugin,
+  toolbarPlugin,
 } from "@mdxeditor/editor";
-import { API_URL } from "@/utils/fetcher";
 import "@mdxeditor/editor/style.css";
-import { useAuth } from "@/providers/auth-provider";
-import { oneDark } from "@codemirror/theme-one-dark";
+import { type ForwardedRef } from "react";
 
 export default function InitializedMDXEditor({
   editorRef,
   ...props
 }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
-  const { auth, user } = useAuth();
+  const { auth } = useAuth();
+  const { user } = useUser();
 
   const codeBlockLanguages = {
     html: "HTML",

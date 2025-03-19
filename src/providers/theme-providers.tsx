@@ -1,10 +1,10 @@
 "use client";
 
-import * as React from "react";
-import { HeroUIProvider } from "@heroui/system";
-import { createContext, useContext, useState, useEffect } from "react";
-import classNames from "classnames";
 import { ToastProvider } from "@heroui/react";
+import { HeroUIProvider } from "@heroui/system";
+import classNames from "classnames";
+import * as React from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -18,6 +18,14 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error("useTheme must be used within an ThemeProvider");
+  }
+  return context;
+};
 
 export function ThemeProvider({ children }: ProvidersProps) {
   const [theme, setTheme] = useState<string>("light");
@@ -70,12 +78,4 @@ export function ThemeProvider({ children }: ProvidersProps) {
       </HeroUIProvider>
     </ThemeContext.Provider>
   );
-}
-
-export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useTheme must be used within an ThemeProvider");
-  }
-  return context;
 }

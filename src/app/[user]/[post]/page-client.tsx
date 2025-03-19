@@ -3,12 +3,12 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { apiClient } from "@/api/api-client";
-import { PostView } from "@/components/posts/post-view";
-import { Loading } from "@/components/loading";
-import { useParams } from "next/navigation";
-import { ErrorMessage } from "@/components/errors/error-message";
 import { PostDetailedResponse } from "@/api/apis";
-import usePostIncrementView from "@/hooks/usePostIncrementView";
+import { ErrorMessage } from "@/components/errors/error-message";
+import { Loading } from "@/components/loading";
+import { PostView } from "@/components/posts/post-view";
+import usePostIncrementView from "@/hooks/use-post-increment-view";
+import { useParams } from "next/navigation";
 
 export default function PostClient({ post }: { post: PostDetailedResponse }) {
   const { post: slug } = useParams<{ post: string }>();

@@ -1,19 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect } from "react";
 import { apiClient } from "@/api/api-client";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useAuth } from "@/providers/auth-provider";
-import { Loading } from "@/components/loading";
-import { addToastError, addToastSuccess } from "@/utils/toasts";
-import { useRouter } from "next/navigation";
+
 import { UpdatePostRequest } from "@/api/apis";
+import { Loading } from "@/components/loading";
 import { PostForm } from "@/components/posts/post-form";
+import { addToastError, addToastSuccess } from "@/components/toasts/toasts";
+import { useUser } from "@/providers/user-provider";
+import { useRouter } from "next/navigation";
 
 const CreatePageClient = () => {
-  const { user } = useAuth();
+  const { user } = useUser();
   const router = useRouter();
 
   useEffect(() => {

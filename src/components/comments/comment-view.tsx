@@ -2,7 +2,7 @@
 import { apiClient } from "@/api/api-client";
 import { CommentResponse } from "@/api/apis";
 import IsAuthor from "@/guards/is-author";
-import { addToastError, addToastSuccess } from "@/utils/toasts";
+import { addToastError, addToastSuccess } from "@/components/toasts/toasts";
 import { formatDate2 } from "@/utils/format-date";
 import { PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "@heroicons/react/24/solid";
@@ -36,7 +36,6 @@ const Comment = ({ comment, postCommentsRefetch }: IProps) => {
     },
 
     onError: (error: any) => {
-      console.log(error);
       addToastError("Error deleting comment");
     },
   });

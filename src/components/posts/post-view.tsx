@@ -5,15 +5,14 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
-import { PostDetailedResponse } from "@/api/apis";
-import { Badge, Button, Divider, Image, User } from "@heroui/react";
-import IsAuth from "../../guards/is-auth";
-import { PostVote } from "./post-vote";
 import { apiClient } from "@/api/api-client";
+import { PostDetailedResponse } from "@/api/apis";
 import IsAuthor from "@/guards/is-author";
 import { useTheme } from "@/providers/theme-providers";
 import { PencilIcon } from "@heroicons/react/24/solid";
+import { Badge, Button, Divider, Image, User } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
+import IsAuth from "../../guards/is-auth";
 import { Comments } from "../comments/comments-section";
 import { Loading } from "../loading";
 import {
@@ -23,6 +22,7 @@ import {
   PostDetailsTags,
   PostDetailsViews,
 } from "./details/post-details";
+import { PostVote } from "./post-vote";
 
 const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
   ssr: false,
@@ -52,6 +52,18 @@ export const PostView = ({ post, postRefetch }: IProps) => {
     post && (
       <div className="layout-page">
         <div className="layout-page-content">
+          {showPreviews && post.coverUrl && (
+            <div className="flex w-full mb-4">
+              <Image
+                radius="sm"
+                className="max-w-full w-full"
+                removeWrapper
+                src={post.coverUrl}
+                alt={post.title}
+              />
+            </div>
+          )}
+
           <MDPreview source={post.body} />
 
           <IsAuth>
@@ -129,17 +141,7 @@ export const PostView = ({ post, postRefetch }: IProps) => {
                 <p className="text-gray">{post?.summary}</p>
               </div>
 
-              {showPreviews && post.coverUrl && (
-                <div className="flex w-full mt-2">
-                  <Image
-                    radius="sm"
-                    className="max-w-full w-full"
-                    removeWrapper
-                    src={post.coverUrl}
-                    alt={post.title}
-                  />
-                </div>
-              )}
+              <Divider />
 
               <div className="flex flex-wrap items-center gap-4 text-gray">
                 <PostDetailsData date={post.createdAtUtc} />

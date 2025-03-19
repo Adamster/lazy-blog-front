@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Input, Button, Spinner } from "@heroui/react";
-import { useAuth } from "@/providers/auth-provider";
-import { addToastError } from "@/utils/toasts";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { addToastError } from "@/components/toasts/toasts";
 
 interface LoginFormProps {
   onSuccess?: () => void;

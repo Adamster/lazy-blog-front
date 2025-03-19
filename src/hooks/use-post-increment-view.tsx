@@ -1,10 +1,10 @@
-import { useEffect } from "react";
-import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
-import { useAuth } from "@/providers/auth-provider";
+import { useUser } from "@/providers/user-provider";
+import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 const usePostIncrementView = (postId: string, postAuthorId: string) => {
-  const { user } = useAuth();
+  const { user } = useUser();
 
   const mutation = useMutation({
     mutationFn: () => apiClient.posts.incrementViewCount({ id: postId }),

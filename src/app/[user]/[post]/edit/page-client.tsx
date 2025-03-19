@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useState } from "react";
 import { apiClient } from "@/api/api-client";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { useAuth } from "@/providers/auth-provider";
-import { Loading } from "@/components/loading";
-import { addToastError, addToastSuccess } from "@/utils/toasts";
-import { useParams, useRouter } from "next/navigation";
 import { UpdatePostOperationRequest, UpdatePostRequest } from "@/api/apis";
-import { PostForm } from "@/components/posts/post-form";
-import ConfirmDeleteModal from "@/components/modals/confirmation-modal";
 import { ErrorMessage } from "@/components/errors/error-message";
+import { Loading } from "@/components/loading";
+import ConfirmDeleteModal from "@/components/modals/confirmation-modal";
+import { PostForm } from "@/components/posts/post-form";
+import { addToastError, addToastSuccess } from "@/components/toasts/toasts";
 import IsAuthor from "@/guards/is-author";
+import { useUser } from "@/providers/user-provider";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 
 const PageEditClient = () => {
-  const { user } = useAuth();
+  const { user } = useUser();
   const router = useRouter();
   const params = useParams();
   const queryClient = useQueryClient();
@@ -74,7 +74,6 @@ const PageEditClient = () => {
       });
     },
     onError: (error: any) => {
-      console.log(error);
       addToastError("Error updating post", error);
     },
   });
@@ -104,7 +103,6 @@ const PageEditClient = () => {
     },
 
     onError: (error: any) => {
-      console.log(error);
       addToastError("Error deleting post", error);
     },
   });

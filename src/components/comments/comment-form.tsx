@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { Button, Textarea } from "@heroui/react";
-import { FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/solid";
-import { useEffect, useRef, useState } from "react";
-import { EmojiStyle, Theme } from "emoji-picker-react";
-import { useTheme } from "@/providers/theme-providers";
-import dynamic from "next/dynamic";
-import { QueryObserverResult, useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/api/api-client";
-import { useAuth } from "@/providers/auth-provider";
-import { addToastError, addToastSuccess } from "@/utils/toasts";
 import { CommentResponse } from "@/api/apis";
+import { addToastError, addToastSuccess } from "@/components/toasts/toasts";
+import { useTheme } from "@/providers/theme-providers";
+import { useUser } from "@/providers/user-provider";
+import { FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/solid";
+import { Button, Textarea } from "@heroui/react";
+import { QueryObserverResult, useMutation } from "@tanstack/react-query";
+import { EmojiStyle, Theme } from "emoji-picker-react";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 
 const Picker = dynamic(
   () => {
@@ -38,7 +38,7 @@ function CommentForm({
   const [body, setBody] = useState(editComment?.body || "");
   const [showEmoji, setShowEmoji] = useState(false);
   const { isDarkTheme } = useTheme();
-  const { user } = useAuth();
+  const { user } = useUser();
   const pickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

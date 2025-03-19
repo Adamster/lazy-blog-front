@@ -1,4 +1,4 @@
-import { useAuth } from "@/providers/auth-provider";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { ReactNode } from "react";
 
 interface IProps {

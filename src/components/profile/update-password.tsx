@@ -1,10 +1,10 @@
 import { apiClient } from "@/api/api-client";
-import { addToastSuccess, addToastError } from "@/utils/toasts";
+import { addToastSuccess, addToastError } from "@/components/toasts/toasts";
 import { Button, Input } from "@heroui/react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { ChangePasswordRequest } from "@/api/apis";
-import { useAuth } from "@/providers/auth-provider";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { RocketLaunchIcon } from "@heroicons/react/24/outline";
 

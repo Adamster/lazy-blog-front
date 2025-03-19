@@ -7,18 +7,9 @@ export interface AuthState {
   accessTokenExpires: number | null;
 }
 
-export const isBrowser = typeof window !== "undefined";
-
 export const getAuthState = (): AuthState => {
-  if (!isBrowser)
-    return {
-      userId: null,
-      accessToken: null,
-      refreshToken: null,
-      accessTokenExpires: null,
-    };
-
   const storedAuth = localStorage.getItem(AUTH_STORAGE_KEY);
+
   return storedAuth
     ? JSON.parse(storedAuth)
     : {
@@ -30,13 +21,9 @@ export const getAuthState = (): AuthState => {
 };
 
 export const saveAuthState = (authState: AuthState) => {
-  if (isBrowser) {
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authState));
-  }
+  localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authState));
 };
 
 export const clearAuthState = () => {
-  if (isBrowser) {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
-  }
+  localStorage.removeItem(AUTH_STORAGE_KEY);
 };

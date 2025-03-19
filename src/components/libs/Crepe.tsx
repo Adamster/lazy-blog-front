@@ -1,12 +1,13 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
-import { Crepe } from "@milkdown/crepe";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useTheme } from "@/providers/theme-providers";
+import { useUser } from "@/providers/user-provider";
+import { API_URL } from "@/utils/fetcher";
+import { Crepe } from "@milkdown/crepe";
 import { listener, listenerCtx } from "@milkdown/kit/plugin/listener";
 import throttle from "lodash.throttle";
-import { API_URL } from "@/utils/fetcher";
-import { useAuth } from "@/providers/auth-provider";
+import { useLayoutEffect, useRef } from "react";
 
 interface MilkdownCrepeViewerProps {
   markdown?: string;
@@ -21,7 +22,8 @@ export const CrepeEditor: React.FC<MilkdownCrepeViewerProps> = ({
   const divRef = useRef<HTMLDivElement>(null);
   const loading = useRef(false);
   const { isDarkTheme } = useTheme();
-  const { user, auth } = useAuth();
+  const { auth } = useAuth();
+  const { user } = useUser();
 
   // ((file: File) => Promise<string>)
   const imageUploadHandler = async (file: File) => {

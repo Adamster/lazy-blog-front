@@ -1,24 +1,24 @@
+import { apiClient } from "@/api/api-client";
+import { addToastError, addToastSuccess } from "@/components/toasts/toasts";
+import { useUser } from "@/providers/user-provider";
+import {
+  NoSymbolIcon,
+  PencilIcon,
+  RocketLaunchIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
+import { Button, ButtonGroup } from "@heroui/react";
+import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { Cropper, CropperRef } from "react-advanced-cropper";
 import "react-advanced-cropper/dist/style.css";
-import { useMutation } from "@tanstack/react-query";
-import { apiClient } from "@/api/api-client";
-import { Button, ButtonGroup } from "@heroui/react";
-import {
-  RocketLaunchIcon,
-  NoSymbolIcon,
-  PencilIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
-import { addToastError, addToastSuccess } from "@/utils/toasts";
-import { useAuth } from "@/providers/auth-provider";
 
 interface Props {
   onUploadSuccess: (url: string) => void;
 }
 
 export const PostImageUploader = ({ onUploadSuccess }: Props) => {
-  const { user } = useAuth();
+  const { user } = useUser();
   const [imagePreview, setImagePreview] = useState("");
   const [cropVisible, setCropVisible] = useState(false);
   const cropperRef = useRef<CropperRef>(null);

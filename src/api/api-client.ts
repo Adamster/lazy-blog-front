@@ -1,5 +1,6 @@
 "use client";
 
+import { getAuthState } from "@/utils/auth-storage";
 import {
   ChangePasswordApi,
   CommentsApi,
@@ -11,20 +12,32 @@ import {
   UsersApi,
 } from "./apis/apis";
 import { Configuration } from "./apis/runtime";
-import { authorizedFetch } from "./authorized-fetch";
 
-const apiConfig = new Configuration({
+const configuration = new Configuration({
   basePath: process.env.NEXT_PUBLIC_API,
-  fetchApi: authorizedFetch,
+  middleware: [
+    {
+      async pre(context) {
+        const auth = getAuthState();
+
+        if (auth?.accessToken) {
+          context.init.headers = {
+            ...context.init.headers,
+            Authorization: `Bearer ${auth.accessToken}`,
+          };
+        }
+      },
+    },
+  ],
 });
 
 export const apiClient = {
-  users: new UsersApi(apiConfig),
-  posts: new PostsApi(apiConfig),
-  comments: new CommentsApi(apiConfig),
-  tags: new TagsApi(apiConfig),
-  media: new MediaApi(apiConfig),
-  changePassword: new ChangePasswordApi(apiConfig),
-  forgotPassword: new ForgotPasswordApi(apiConfig),
-  resetPassword: new ResetPasswordApi(apiConfig),
+  users: new UsersApi(configuration),
+  posts: new PostsApi(configuration),
+  comments: new CommentsApi(configuration),
+  tags: new TagsApi(configuration),
+  media: new MediaApi(configuration),
+  changePassword: new ChangePasswordApi(configuration),
+  forgotPassword: new ForgotPasswordApi(configuration),
+  resetPassword: new ResetPasswordApi(configuration),
 };

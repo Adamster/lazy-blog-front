@@ -1,20 +1,20 @@
 "use client";
 
 import { apiClient } from "@/api/api-client";
-import { useAuth } from "@/providers/auth-provider";
-import { CalendarIcon } from "@heroicons/react/24/solid";
-import { Divider, Tabs, Tab } from "@heroui/react";
-import { useQuery } from "@tanstack/react-query";
-import { Loading } from "@/components/loading";
-import IsAuth from "@/guards/is-auth";
 import { ErrorMessage } from "@/components/errors/error-message";
-import { formatDate2 } from "@/utils/format-date";
-import { UpdateProfile } from "@/components/profile/update-profile";
-import { UpdatePassword } from "@/components/profile/update-password";
+import { Loading } from "@/components/loading";
 import { UpdateAvatar } from "@/components/profile/update-avatar";
+import { UpdatePassword } from "@/components/profile/update-password";
+import { UpdateProfile } from "@/components/profile/update-profile";
+import IsAuth from "@/guards/is-auth";
+import { useUser } from "@/providers/user-provider";
+import { formatDate2 } from "@/utils/format-date";
+import { CalendarIcon } from "@heroicons/react/24/solid";
+import { Divider, Tab, Tabs } from "@heroui/react";
+import { useQuery } from "@tanstack/react-query";
 
 const PageEditClient = () => {
-  const { user } = useAuth();
+  const { user } = useUser();
   const userId = user?.id || "";
 
   const { data: userData, isLoading } = useQuery({

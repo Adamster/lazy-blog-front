@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiClient } from "@/api/api-client";
 import { VoteDirection } from "@/api/apis";
-import { addToastError } from "@/utils/toasts";
+import { addToastError } from "@/components/toasts/toasts";
 import { useMutation } from "@tanstack/react-query";
 
 import { HandThumbDownIcon, HandThumbUpIcon } from "@heroicons/react/24/solid";

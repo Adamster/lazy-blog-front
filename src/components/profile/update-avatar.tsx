@@ -1,6 +1,6 @@
 import { apiClient } from "@/api/api-client";
 import { UserResponse } from "@/api/apis";
-import { addToastError, addToastSuccess } from "@/utils/toasts";
+import { addToastError, addToastSuccess } from "@/components/toasts/toasts";
 import {
   NoSymbolIcon,
   PencilIcon,

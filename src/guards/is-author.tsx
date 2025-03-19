@@ -1,4 +1,4 @@
-import { useAuth } from "@/providers/auth-provider";
+import { useUser } from "@/providers/user-provider";
 import { ReactNode } from "react";
 
 interface IProps {
@@ -8,7 +8,7 @@ interface IProps {
 }
 
 const IsAuthor = ({ children, userId, fallback = null }: IProps) => {
-  const { user } = useAuth();
+  const { user } = useUser();
   return user?.id === userId ? children : fallback;
 };
 

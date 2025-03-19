@@ -1,11 +1,10 @@
 "use client";
 
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import IsAuth from "@/guards/is-auth";
+import { useTheme } from "@/providers/theme-providers";
+import { useUser } from "@/providers/user-provider";
 import { MoonIcon, PencilSquareIcon, SunIcon } from "@heroicons/react/24/solid";
-import Image from "next/image";
-import Link from "next/link";
-import { AuthModal } from "../modals/user/auth-modal";
-import LogoDark from "../../assets/icons/logo-dark.svg";
-import LogoLight from "../../assets/icons/logo-light.svg";
 import {
   Avatar,
   Button,
@@ -20,13 +19,16 @@ import {
   useDisclosure,
   User,
 } from "@heroui/react";
-import { useAuth } from "@/providers/auth-provider";
-import { useTheme } from "@/providers/theme-providers";
-import IsAuth from "@/guards/is-auth";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import LogoDark from "../../assets/icons/logo-dark.svg";
+import LogoLight from "../../assets/icons/logo-light.svg";
+import { AuthModal } from "../modals/user/auth-modal";
 
 export const Header = () => {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
+  const { user } = useUser();
   const { isDarkTheme, changeTheme, showPreviews, setShowPreviews } =
     useTheme();
   const router = useRouter();
