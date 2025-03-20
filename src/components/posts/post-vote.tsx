@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiClient } from "@/api/api-client";
-import { VoteDirection } from "@/api/apis";
 import { addToastError } from "@/components/toasts/toasts";
 import { useMutation } from "@tanstack/react-query";
 
 import { HandThumbDownIcon, HandThumbUpIcon } from "@heroicons/react/24/solid";
 import { Button, Divider } from "@heroui/react";
 import { useMemo } from "react";
+import { VotePostDirectionEnum } from "@/api/apis";
 
 interface IProps {
   postId: string;
@@ -34,7 +34,7 @@ export const PostVote = ({ postId, postRefetch }: IProps) => {
   );
 
   const handleVote = useMutation({
-    mutationFn: ({ direction }: { direction: VoteDirection }) => {
+    mutationFn: ({ direction }: { direction: VotePostDirectionEnum }) => {
       return apiClient.posts.votePost({
         id: postId,
         direction,
@@ -60,7 +60,7 @@ export const PostVote = ({ postId, postRefetch }: IProps) => {
             isIconOnly
             variant="flat"
             onPress={() => {
-              handleVote.mutate({ direction: VoteDirection.Down });
+              handleVote.mutate({ direction: VotePostDirectionEnum.Down });
             }}
           >
             <HandThumbDownIcon width={"1rem"}></HandThumbDownIcon>
@@ -70,7 +70,7 @@ export const PostVote = ({ postId, postRefetch }: IProps) => {
             isIconOnly
             variant="flat"
             onPress={() => {
-              handleVote.mutate({ direction: VoteDirection.Up });
+              handleVote.mutate({ direction: VotePostDirectionEnum.Up });
             }}
           >
             <HandThumbUpIcon width={"1rem"}></HandThumbUpIcon>
