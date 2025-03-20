@@ -29,7 +29,7 @@ body {
   }
 
   &-content {
-    @apply w-full min-h-96 md:w-content p-6 pe-8 ms-auto;
+    @apply w-full min-h-96 md:w-content p-6 md:pe-8 ms-auto;
   }
 
   &-aside {
