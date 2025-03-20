@@ -17,6 +17,7 @@ models/DisplayPostResponse.ts
 models/ForgotPasswordRequest.ts
 models/LoginRequest.ts
 models/LoginResponse.ts
+models/MediaItemResponse.ts
 models/NoContent.ts
 models/NullableOfVoteDirection.ts
 models/PostDetailedResponse.ts
@@ -33,6 +34,5 @@ models/UpdateUserRequest.ts
 models/UserPostItem.ts
 models/UserPostResponse.ts
 models/UserResponse.ts
-models/VoteDirection.ts
 models/index.ts
 runtime.ts

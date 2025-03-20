@@ -46,6 +46,12 @@ export interface UserPostResponse {
      * @memberof UserPostResponse
      */
     postItems: Array<UserPostItem>;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserPostResponse
+     */
+    totalPostCount: number;
 }
 
 /**
@@ -54,6 +60,7 @@ export interface UserPostResponse {
 export function instanceOfUserPostResponse(value: object): value is UserPostResponse {
     if (!('user' in value) || value['user'] === undefined) return false;
     if (!('postItems' in value) || value['postItems'] === undefined) return false;
+    if (!('totalPostCount' in value) || value['totalPostCount'] === undefined) return false;
     return true;
 }
 
@@ -69,6 +76,7 @@ export function UserPostResponseFromJSONTyped(json: any, ignoreDiscriminator: bo
         
         'user': UserResponseFromJSON(json['user']),
         'postItems': ((json['postItems'] as Array<any>).map(UserPostItemFromJSON)),
+        'totalPostCount': json['totalPostCount'],
     };
 }
 
@@ -85,6 +93,7 @@ export function UserPostResponseToJSONTyped(value?: UserPostResponse | null, ign
         
         'user': UserResponseToJSON(value['user']),
         'postItems': ((value['postItems'] as Array<any>).map(UserPostItemToJSON)),
+        'totalPostCount': value['totalPostCount'],
     };
 }
 

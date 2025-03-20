@@ -15,12 +15,19 @@
 
 import * as runtime from '../runtime';
 import type {
+  MediaItemResponse,
   ProblemDetails,
 } from '../models/index';
 import {
+    MediaItemResponseFromJSON,
+    MediaItemResponseToJSON,
     ProblemDetailsFromJSON,
     ProblemDetailsToJSON,
 } from '../models/index';
+
+export interface ListMediaRequest {
+    userId: string;
+}
 
 export interface UploadMediaRequest {
     id: string;
@@ -34,6 +41,19 @@ export interface UploadMediaRequest {
  * @interface MediaApiInterface
  */
 export interface MediaApiInterface {
+    /**
+     * 
+     * @param {string} userId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MediaApiInterface
+     */
+    listMediaRaw(requestParameters: ListMediaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<MediaItemResponse>>>;
+
+    /**
+     */
+    listMedia(requestParameters: ListMediaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<MediaItemResponse>>;
+
     /**
      * 
      * @param {string} id 
@@ -54,6 +74,37 @@ export interface MediaApiInterface {
  * 
  */
 export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
+
+    /**
+     */
+    async listMediaRaw(requestParameters: ListMediaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<MediaItemResponse>>> {
+        if (requestParameters['userId'] == null) {
+            throw new runtime.RequiredError(
+                'userId',
+                'Required parameter "userId" was null or undefined when calling listMedia().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/media/{userId}/list`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters['userId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(MediaItemResponseFromJSON));
+    }
+
+    /**
+     */
+    async listMedia(requestParameters: ListMediaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<MediaItemResponse>> {
+        const response = await this.listMediaRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      */
