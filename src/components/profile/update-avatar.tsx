@@ -143,7 +143,7 @@ export const UpdateAvatar = ({ userData }: IProps) => {
                 onPress={() => fileInputRef.current?.click()}
               >
                 <PencilIcon className="w-4 h-4" />
-                Change Avatar
+                Avatar
               </Button>
 
               <Button

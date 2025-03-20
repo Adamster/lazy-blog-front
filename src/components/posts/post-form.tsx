@@ -52,7 +52,7 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
   return (
     <form className="layout-page" noValidate>
       <div className="layout-page-content">
-        <div className="mb-8 flex flex-col w-full gap-2">
+        <div className="mb-8">
           <PostImageUploader
             currentImage={form.getValues("coverUrl") || undefined}
             onUploadSuccess={(value) => form.setValue("coverUrl", value)}
@@ -117,6 +117,7 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
                 control={control}
                 render={({ field }) => (
                   <Select
+                    classNames={{ value: "text-base" }}
                     selectedKeys={field.value}
                     selectionMode="multiple"
                     label="Select Tag(s)"

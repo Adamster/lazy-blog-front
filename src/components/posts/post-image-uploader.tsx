@@ -69,7 +69,7 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
   return (
     <>
       {cropVisible ? (
-        <div className="flex flex-col gap-2 max-w-full">
+        <div className="flex flex-col gap-4 max-w-full">
           <Cropper
             ref={cropperRef}
             src={imagePreview}
@@ -113,7 +113,7 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
           </div>
         </div>
       ) : (
-        <>
+        <div className="flex flex-col w-full gap-4">
           {currentImage && (
             <Image removeWrapper src={currentImage} alt="Cover image" />
           )}
@@ -125,7 +125,7 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
               onPress={() => fileInputRef.current?.click()}
             >
               <PencilIcon className="w-4 h-4" />
-              Image
+              Cover Image
             </Button>
             <Button
               isIconOnly
@@ -145,7 +145,7 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
             className="hidden"
             onChange={handleFileChange}
           />
-        </>
+        </div>
       )}
     </>
   );
