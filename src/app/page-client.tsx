@@ -31,7 +31,7 @@ export const PageClient = () => {
       </div>
 
       <div className="layout-page-aside">
-        <Divider className="layout-page-aside-divider" orientation="vertical" />
+        <Divider className="layout-page-divider" orientation="vertical" />
 
         <div className="layout-page-aside-content">
           <aside className="layout-page-aside-content-sticky">
