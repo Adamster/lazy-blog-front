@@ -1,6 +1,6 @@
 "use client";
 
-import { getAuthState } from "@/utils/auth-storage";
+import { getAuthState } from "@/features/auth/utlis/auth-storage";
 import {
   ChangePasswordApi,
   CommentsApi,

@@ -1,10 +1,10 @@
 "use client";
 
+import { addToastError } from "@/components/toasts/toasts";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { Button, Input, Link, Spinner } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Input, Button, Spinner } from "@heroui/react";
-import { useAuth } from "@/features/auth/hooks/use-auth";
-import { addToastError } from "@/components/toasts/toasts";
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -73,6 +73,15 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
           required: "Password is required",
         })}
       />
+
+      <div className="flex justify-end">
+        <Link
+          className="text-sm text-gray hover:underline"
+          href="/forgot-password"
+        >
+          Forgot Password ?
+        </Link>
+      </div>
 
       <Button
         type="submit"

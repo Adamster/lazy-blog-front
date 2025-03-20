@@ -1,16 +1,17 @@
 "use client";
 
+import {
+  Divider,
+  Link,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from "@heroui/react";
 import { useEffect, useState } from "react";
 import LoginForm from "./login-form";
 import RegisterForm from "./register-form";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-} from "@heroui/react";
 
 export function AuthModal({
   isOpen,
@@ -33,12 +34,11 @@ export function AuthModal({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       size={"md"}
-      // classNames={{ backdrop: "z-40" }}
     >
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader className="sm:px-10">
+            <ModalHeader className="sm:px-10 sm:pt-10">
               <p>{isLogin ? "Log In" : "Create an Account"}</p>
             </ModalHeader>
 
@@ -50,14 +50,18 @@ export function AuthModal({
               )}
             </ModalBody>
 
-            <ModalFooter className="sm:px-10">
-              <Button
-                size="md"
-                variant="light"
-                onPress={() => setIsLogin(!isLogin)}
-              >
-                {isLogin ? "Create an Account" : "Log In"}
-              </Button>
+            <ModalFooter className="flex flex-col items-center gap-4 sm:px-10 sm:pb-10">
+              <Divider />
+
+              <div className="text-sm text-gray">
+                {isLogin ? "Not a member yet ? " : "Already a member? "}
+                <Link
+                  className="text-sm cursor-pointer hover:underline"
+                  onPress={() => setIsLogin(!isLogin)}
+                >
+                  {isLogin ? "Create an Account" : "Log In"}
+                </Link>
+              </div>
             </ModalFooter>
           </>
         )}

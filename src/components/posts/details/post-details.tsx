@@ -5,6 +5,7 @@ import {
   ChatBubbleLeftIcon as ChatBubbleLeftIconOutline,
   EyeIcon as EyeIconOutline,
   HeartIcon as HeartIconOutline,
+  StarIcon as StarIconOutline,
 } from "@heroicons/react/24/outline";
 
 import {
@@ -12,6 +13,7 @@ import {
   ChatBubbleLeftIcon as ChatBubbleLeftIconSolid,
   EyeIcon as EyeIconSolid,
   HeartIcon as HeartIconSolid,
+  StarIcon as StarIconSolid,
   TagIcon,
 } from "@heroicons/react/24/solid";
 import { Link } from "@heroui/react";
@@ -55,9 +57,11 @@ export const PostDetailsRating = ({ rating }: { rating: number }) => {
   return (
     <div className="flex items-center gap-1">
       {rating > 0 ? (
-        <HeartIconSolid className="w-4 h-4" />
+        <StarIconSolid className="w-4 h-4 text-teal-600" />
+      ) : rating < 0 ? (
+        <StarIconSolid className="w-4 h-4 text-danger-600" />
       ) : (
-        <HeartIconOutline className="w-4 h-4" />
+        <StarIconOutline className="w-4 h-4" />
       )}
       <span className="ml-1 text-sm">{rating}</span>
     </div>

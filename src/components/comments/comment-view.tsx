@@ -31,7 +31,7 @@ const Comment = ({ comment, postCommentsRefetch }: IProps) => {
       }),
 
     onSuccess: () => {
-      postCommentsRefetch().then(() => {});
+      // postCommentsRefetch().then(() => {});
       addToastSuccess("Comment has been deleted");
     },
 

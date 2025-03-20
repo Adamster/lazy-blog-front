@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { RegisterUserRequest } from "@/api/apis";
 import { Loading } from "@/components/loading";
-import { useAuthActions, useAuthState } from "@/hooks/use-auth";
-import { AuthState } from "@/utils/auth-storage";
+import { useAuthActions, useAuthState } from "@/features/auth/hooks/use-auth";
 import React, { createContext } from "react";
-import { UserProvider } from "./user-provider";
+import { UserProvider } from "../../../providers/user-provider";
+import { AuthState } from "../utlis/auth-storage";
 
 interface AuthContextType {
   auth: AuthState;
@@ -14,7 +13,6 @@ interface AuthContextType {
   logout: () => void;
   register: (registerData: RegisterUserRequest) => Promise<void>;
   isAuthenticated: boolean;
-  status: "loading" | "authenticated" | "unauthenticated";
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -27,13 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const isAuthenticated = !!auth?.userId;
 
-  const status = isAuthLoading
-    ? "loading"
-    : isAuthenticated
-    ? "authenticated"
-    : "unauthenticated";
-
-  if (status === "loading") {
+  if (isAuthLoading) {
     return <Loading compensateHeader={false} />;
   }
 
@@ -45,7 +37,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         register,
         isAuthenticated,
-        status,
       }}
     >
       <UserProvider userId={auth?.userId ?? null}>{children}</UserProvider>

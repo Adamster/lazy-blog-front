@@ -1,18 +1,23 @@
 import { apiClient } from "@/api/api-client";
 import { RegisterUserRequest, ResponseError } from "@/api/apis";
-import { AuthContext } from "@/providers/auth-provider";
+import { AuthContext } from "@/features/auth/provider/auth-provider";
+
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useContext } from "react";
 import {
   AuthState,
   clearAuthState,
   getAuthState,
   saveAuthState,
-} from "@/utils/auth-storage";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useContext } from "react";
+} from "../utlis/auth-storage";
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}
 
 export const useAuthState = () => {
   const queryClient = useQueryClient();
@@ -53,6 +58,7 @@ export const useAuthActions = () => {
       };
 
       saveAuthState(authState);
+
       queryClient.setQueryData(["auth"], authState);
       queryClient.setQueryData(
         ["getUserById", response.user.id],
@@ -60,7 +66,9 @@ export const useAuthActions = () => {
       );
     } catch (error) {
       clearAuthState();
+
       queryClient.setQueryData(["auth"], getAuthState());
+
       throw new Error(
         error instanceof ResponseError
           ? (await error.response.json()).detail || "Login failed"
@@ -71,6 +79,7 @@ export const useAuthActions = () => {
 
   const logout = () => {
     clearAuthState();
+
     queryClient.setQueryData(["auth"], getAuthState());
     queryClient.removeQueries({ queryKey: ["getUserById"] });
   };
@@ -91,7 +100,9 @@ export const useAuthActions = () => {
   return { login, logout, register };
 };
 
-const refreshToken = async (queryClient: ReturnType<typeof useQueryClient>) => {
+export const refreshToken = async (
+  queryClient: ReturnType<typeof useQueryClient>
+) => {
   const currentAuth = getAuthState();
   if (!currentAuth.refreshToken) return;
 
@@ -108,10 +119,12 @@ const refreshToken = async (queryClient: ReturnType<typeof useQueryClient>) => {
     };
 
     saveAuthState(updatedAuth);
+
     queryClient.setQueryData(["auth"], updatedAuth);
   } catch (error) {
     console.error("Refresh Token Error:", error);
     clearAuthState();
+
     queryClient.setQueryData(["auth"], getAuthState());
     queryClient.removeQueries({ queryKey: ["getUserById"] });
   }
