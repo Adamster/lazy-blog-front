@@ -54,7 +54,7 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
       <div className="layout-page-content">
         <div className="mb-8">
           <PostImageUploader
-            currentImage={form.getValues("coverUrl") || undefined}
+            currentImage={form.watch("coverUrl") || undefined}
             onUploadSuccess={(value) => form.setValue("coverUrl", value)}
           />
         </div>
@@ -158,7 +158,7 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
                     </>
                   ) : (
                     <>
-                      <PencilSquareIcon className="w-4 h-4" /> Draft
+                      <PencilSquareIcon className="w-4 h-4" /> In Drafts
                     </>
                   )}
                 </Button>
