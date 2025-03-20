@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { ResponseError } from "@/api/apis";
@@ -14,8 +15,7 @@ export const ErrorMessage = ({ error }: { error: unknown }) => {
 
   useEffect(() => {
     const fetchErrorMessage = async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((error as any)?.response.status === 404) {
+      if ((error as any)?.response?.status === 404) {
         setErrorMessage("Not Found.");
       } else if (error instanceof ResponseError) {
         try {

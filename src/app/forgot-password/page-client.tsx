@@ -99,10 +99,11 @@ export default function ForgotPasswordClient() {
             <User
               avatarProps={{
                 size: "md",
+                src: "https://notlazy.org/images/notlazy.png",
                 fallback: <UserIcon className="w-4 h-4" />,
               }}
-              name={`Memory Not Found`}
-              description={"@404"}
+              name={`!Lazy Blog`}
+              description={"@notlazy"}
             />
 
             <p className="text-gray text-sm">{randomMessage}</p>
