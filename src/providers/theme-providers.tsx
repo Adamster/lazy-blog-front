@@ -13,8 +13,6 @@ export interface ProvidersProps {
 interface ThemeContextType {
   changeTheme: () => void;
   isDarkTheme: boolean;
-  showPreviews: boolean;
-  setShowPreviews: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -29,7 +27,6 @@ export const useTheme = () => {
 
 export function ThemeProvider({ children }: ProvidersProps) {
   const [theme, setTheme] = useState<string>("light");
-  const [showPreviews, setShowPreviews] = useState(true);
 
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme") || "light";
@@ -50,8 +47,6 @@ export function ThemeProvider({ children }: ProvidersProps) {
   const value: ThemeContextType = {
     isDarkTheme,
     changeTheme,
-    showPreviews,
-    setShowPreviews,
   };
 
   return (

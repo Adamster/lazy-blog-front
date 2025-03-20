@@ -4,7 +4,6 @@ import {
   Button,
   ButtonGroup,
   Divider,
-  Image,
   Input,
   Select,
   SelectItem,
@@ -53,6 +52,13 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
   return (
     <form className="layout-page" noValidate>
       <div className="layout-page-content">
+        <div className="mb-8 flex flex-col w-full gap-2">
+          <PostImageUploader
+            currentImage={form.getValues("coverUrl") || undefined}
+            onUploadSuccess={(value) => form.setValue("coverUrl", value)}
+          />
+        </div>
+
         <Controller
           name="body"
           control={control}
@@ -75,23 +81,6 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
 
         <div className="layout-page-aside-content">
           <aside className="layout-page-aside-content-sticky">
-            {
-              <>
-                {form.watch("coverUrl") && (
-                  <Image
-                    className="max-h-72 p-1"
-                    removeWrapper
-                    src={form.getValues("coverUrl") || undefined}
-                    alt="Cover image"
-                  />
-                )}
-
-                <PostImageUploader
-                  onUploadSuccess={(value) => form.setValue("coverUrl", value)}
-                />
-              </>
-            }
-
             <div className="w-full">
               <Input
                 classNames={{ input: "text-base" }}
@@ -168,7 +157,7 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
                     </>
                   ) : (
                     <>
-                      <PencilSquareIcon className="w-4 h-4" /> Save
+                      <PencilSquareIcon className="w-4 h-4" /> Draft
                     </>
                   )}
                 </Button>

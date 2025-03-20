@@ -7,7 +7,7 @@ import {
   RocketLaunchIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import { Button, ButtonGroup } from "@heroui/react";
+import { Button, ButtonGroup, Image } from "@heroui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { Cropper, CropperRef } from "react-advanced-cropper";
@@ -15,9 +15,10 @@ import "react-advanced-cropper/dist/style.css";
 
 interface Props {
   onUploadSuccess: (url: string) => void;
+  currentImage: string | undefined;
 }
 
-export const PostImageUploader = ({ onUploadSuccess }: Props) => {
+export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
   const { user } = useUser();
   const [imagePreview, setImagePreview] = useState("");
   const [cropVisible, setCropVisible] = useState(false);
@@ -47,7 +48,7 @@ export const PostImageUploader = ({ onUploadSuccess }: Props) => {
   };
 
   const handleCropAndUpload = () => {
-    const canvas = cropperRef.current?.getCanvas({ width: 600, height: 400 });
+    const canvas = cropperRef.current?.getCanvas({ width: 1000, height: 1000 });
 
     canvas?.toBlob((blob) => {
       if (blob) {
@@ -68,15 +69,28 @@ export const PostImageUploader = ({ onUploadSuccess }: Props) => {
   return (
     <>
       {cropVisible ? (
-        <div className="flex flex-col gap-4 max-w-full">
+        <div className="flex flex-col gap-2 max-w-full">
           <Cropper
             ref={cropperRef}
             src={imagePreview}
-            stencilProps={{ aspectRatio: 3 / 2, minWidth: 600, minHeight: 400 }}
+            stencilProps={{
+              aspectRatio: {
+                minimum: 1 / 1,
+                maximum: 3 / 2,
+              },
+              grid: true,
+            }}
+            sizeRestrictions={{
+              minWidth: 1000,
+              minHeight: 300,
+              maxWidth: 4000,
+              maxHeight: 4000,
+            }}
           />
-          <div className="flex justify-end">
+          <div className="flex justify-center">
             <ButtonGroup>
               <Button
+                size="sm"
                 variant="solid"
                 color="primary"
                 onPress={handleCropAndUpload}
@@ -85,6 +99,7 @@ export const PostImageUploader = ({ onUploadSuccess }: Props) => {
                 Upload
               </Button>
               <Button
+                size="sm"
                 variant="flat"
                 isIconOnly
                 onPress={() => {
@@ -99,6 +114,10 @@ export const PostImageUploader = ({ onUploadSuccess }: Props) => {
         </div>
       ) : (
         <>
+          {currentImage && (
+            <Image removeWrapper src={currentImage} alt="Cover image" />
+          )}
+
           <ButtonGroup>
             <Button
               size="sm"

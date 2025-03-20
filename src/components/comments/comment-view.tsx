@@ -72,7 +72,7 @@ const Comment = ({ comment, postCommentsRefetch }: IProps) => {
             />
           </Link>
 
-          <div className="flex flex-row items-center gap-3 text-gray">
+          <div className="flex flex-row items-center gap-4 text-gray">
             <IsAuthor userId={comment.user.id || ""}>
               <>
                 <Button

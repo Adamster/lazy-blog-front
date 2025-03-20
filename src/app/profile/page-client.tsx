@@ -8,8 +8,6 @@ import { UpdatePassword } from "@/components/profile/update-password";
 import { UpdateProfile } from "@/components/profile/update-profile";
 import IsAuth from "@/guards/is-auth";
 import { useUser } from "@/providers/user-provider";
-import { formatDate2 } from "@/utils/format-date";
-import { CalendarIcon } from "@heroicons/react/24/solid";
 import { Divider, Tab, Tabs } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -45,20 +43,6 @@ const PageEditClient = () => {
           <div className="layout-page-aside-content">
             <aside className="layout-page-aside-content-sticky">
               <UpdateAvatar userData={userData} />
-
-              <div className="hidden md:block">
-                <p className="text-sm text-gray">About:</p>
-                <p className="whitespace-pre-line">{userData?.biography}</p>
-              </div>
-
-              <div className="hidden md:flex items-center gap-4 text-gray">
-                <div className="flex items-center gap-1">
-                  <CalendarIcon className="w-4 h-4" />
-                  <span className="ml-1 text-sm">
-                    {formatDate2(userData?.createdOnUtc || "")}
-                  </span>
-                </div>
-              </div>
             </aside>
           </div>
 

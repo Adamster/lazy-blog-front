@@ -8,7 +8,6 @@ import Link from "next/link";
 import { apiClient } from "@/api/api-client";
 import { PostDetailedResponse } from "@/api/apis";
 import IsAuthor from "@/guards/is-author";
-import { useTheme } from "@/providers/theme-providers";
 import { PencilIcon } from "@heroicons/react/24/solid";
 import { Badge, Button, Divider, Image, User } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
@@ -35,8 +34,6 @@ interface IProps {
 }
 
 export const PostView = ({ post, postRefetch }: IProps) => {
-  const { showPreviews } = useTheme();
-
   const {
     data: postComments,
     isLoading: postCommentsLoading,
@@ -52,7 +49,7 @@ export const PostView = ({ post, postRefetch }: IProps) => {
     post && (
       <div className="layout-page">
         <div className="layout-page-content">
-          {showPreviews && post.coverUrl && (
+          {post.coverUrl && (
             <div className="flex w-full mb-4">
               <Image
                 radius="sm"

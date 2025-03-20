@@ -57,9 +57,7 @@ export const PostDetailsRating = ({ rating }: { rating: number }) => {
   return (
     <div className="flex items-center gap-1">
       {rating > 0 ? (
-        <StarIconSolid className="w-4 h-4 text-teal-600" />
-      ) : rating < 0 ? (
-        <StarIconSolid className="w-4 h-4 text-danger-600" />
+        <StarIconSolid className="w-4 h-4" />
       ) : (
         <StarIconOutline className="w-4 h-4" />
       )}

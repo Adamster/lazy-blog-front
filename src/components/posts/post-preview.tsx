@@ -1,7 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { DisplayPostResponse, UserPostItem, UserResponse } from "@/api/apis";
-import { useTheme } from "@/providers/theme-providers";
 import { Badge, Divider, Image, User } from "@heroui/react";
 import Link from "next/link";
 import {
@@ -24,12 +23,10 @@ export default function PostPreview({
   hideAuthor = false,
   hideTags = false,
 }: IProps) {
-  const { showPreviews } = useTheme();
-
   return (
     <>
       <div className="flex w-full flex-col gap-6">
-        <div className="flex justify-center flex-col gap-3">
+        <div className="flex justify-center flex-col gap-4">
           <Link
             href={`/${author.userName}`}
             className={hideAuthor ? "hidden" : ""}
@@ -49,29 +46,27 @@ export default function PostPreview({
           </Link>
 
           <div>
-            <div>
-              <Link className="m-0" href={`/${author.userName}/${post.slug}`}>
-                <h2 className="text-lg font-semibold hover:underline">
-                  {!post.isPublished ? (
-                    <Badge
-                      color="warning"
-                      size="lg"
-                      content="Draft"
-                      placement="top-right"
-                    >
-                      {post.title}
-                    </Badge>
-                  ) : (
-                    post.title
-                  )}
-                </h2>
-              </Link>
-            </div>
+            <Link className="m-0" href={`/${author.userName}/${post.slug}`}>
+              <h2 className="text-lg font-semibold hover:underline">
+                {!post.isPublished ? (
+                  <Badge
+                    color="warning"
+                    size="lg"
+                    content="Draft"
+                    placement="top-right"
+                  >
+                    {post.title}
+                  </Badge>
+                ) : (
+                  post.title
+                )}
+              </h2>
+            </Link>
 
             {post.summary && <p className="text-gray m-0">{post.summary}</p>}
           </div>
 
-          {showPreviews && post.coverUrl && (
+          {post.coverUrl ? (
             <Link
               className="flex items-center w-full"
               style={{}}
@@ -85,6 +80,8 @@ export default function PostPreview({
                 alt={post.title}
               />
             </Link>
+          ) : (
+            <span></span>
           )}
 
           <div className="flex flex-wrap items-center gap-4 text-gray">

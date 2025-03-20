@@ -64,7 +64,7 @@ export const UpdateAvatar = ({ userData }: IProps) => {
   };
 
   const handleCropAndUpload = () => {
-    const canvas = cropperRef.current?.getCanvas({ width: 200, height: 200 });
+    const canvas = cropperRef.current?.getCanvas({ width: 150, height: 150 });
 
     canvas?.toBlob((blob) => {
       if (blob) {
@@ -91,7 +91,13 @@ export const UpdateAvatar = ({ userData }: IProps) => {
             ref={cropperRef}
             src={avatarPreview}
             stencilComponent={CircleStencil}
-            stencilProps={{ aspectRatio: 1, minWidth: 100, minHeight: 100 }}
+            stencilProps={{ aspectRatio: 1 }}
+            sizeRestrictions={{
+              minWidth: 150,
+              minHeight: 150,
+              maxWidth: 4000,
+              maxHeight: 4000,
+            }}
           />
           <div className="flex justify-end">
             <ButtonGroup>
@@ -116,7 +122,7 @@ export const UpdateAvatar = ({ userData }: IProps) => {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-start gap-3">
+        <div className="flex flex-col items-start gap-4">
           <User
             avatarProps={{
               size: "md",

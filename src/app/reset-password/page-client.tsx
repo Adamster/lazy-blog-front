@@ -43,7 +43,11 @@ export default function ResetPasswordClient() {
   });
 
   const onSubmit = (data: ResetPasswordRequest) => {
-    mutation.mutate(data);
+    if (token || user?.id) {
+      mutation.mutate(data);
+    } else {
+      addToastError("Very Funny :)");
+    }
   };
 
   return (
@@ -100,22 +104,24 @@ export default function ResetPasswordClient() {
 
         <div className="layout-page-aside-content">
           {isLoading && <Loading inline />}
-          {user && (
+          {
             <aside className="layout-page-aside-content-sticky">
               <User
-                key={user.id}
+                key={user?.id || ""}
                 avatarProps={{
                   size: "md",
-                  src: user.avatarUrl || undefined,
-                  name: `${user.firstName?.charAt(0)}${user.lastName?.charAt(
-                    0
-                  )}`,
+                  src: user?.avatarUrl || undefined,
+                  name: user
+                    ? `${user.firstName?.charAt(0)}${user.lastName?.charAt(0)}`
+                    : "404",
                 }}
-                name={`${user.firstName} ${user.lastName}`}
-                description={"@" + user.userName}
+                name={
+                  user ? `${user.firstName} ${user.lastName}` : "User Not Found"
+                }
+                description={"@" + user?.userName}
               />
             </aside>
-          )}
+          }
         </div>
 
         <Divider className="layout-page-divider-mobile" />

@@ -29,8 +29,7 @@ import { AuthModal } from "../modals/user/auth-modal";
 export const Header = () => {
   const { logout } = useAuth();
   const { user } = useUser();
-  const { isDarkTheme, changeTheme, showPreviews, setShowPreviews } =
-    useTheme();
+  const { isDarkTheme, changeTheme } = useTheme();
   const router = useRouter();
 
   const {
@@ -42,8 +41,8 @@ export const Header = () => {
   return (
     <Navbar maxWidth="full">
       <div className="max-w-none mx-auto flex justify-between items-center w-full">
-        <NavbarBrand className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-3">
+        <NavbarBrand className="flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-4">
             <Image
               src={isDarkTheme ? LogoLight : LogoDark}
               width={40}
@@ -126,13 +125,6 @@ export const Header = () => {
                     }}
                   >
                     Edit Profile
-                  </DropdownItem>
-                  <DropdownItem
-                    shortcut={showPreviews ? "on" : "off"}
-                    key="toggle-previews"
-                    onPress={() => setShowPreviews((prev) => !prev)}
-                  >
-                    Post Previews
                   </DropdownItem>
                   <DropdownItem
                     key="logout"
