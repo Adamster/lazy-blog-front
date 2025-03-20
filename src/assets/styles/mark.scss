@@ -70,6 +70,7 @@
     }
   }
 
+
 }
 
 .mdxeditor-rich-text-editor,
@@ -148,6 +149,14 @@
   iframe {
     display: block;
     margin-bottom: 1rem;
+  }
+
+
+  hr {
+    @apply bg-zinc-200 dark:bg-zinc-700;
+    margin: 2rem !important;
+    height: 1px !important;
+    border: none !important;
   }
   
 }
