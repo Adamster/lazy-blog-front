@@ -125,7 +125,7 @@ export const UpdateAvatar = ({ userData }: IProps) => {
         <div className="flex flex-col items-start gap-4">
           <User
             avatarProps={{
-              size: "md",
+              size: "lg",
               src: userData?.avatarUrl || "",
               name: `${userData?.firstName?.charAt(
                 0
