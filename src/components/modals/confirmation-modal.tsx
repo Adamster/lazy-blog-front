@@ -30,7 +30,6 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
       onOpenChange={onOpenChange}
       size="sm"
       backdrop="blur"
-      // classNames={{ backdrop: "z-40" }}
     >
       <ModalContent>
         {(onClose) => (

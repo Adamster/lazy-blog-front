@@ -36,6 +36,7 @@ export default function UserClient() {
   if (query.error) return <ErrorMessage error={query.error} />;
 
   const posts = query.data?.pages.flatMap((page) => page.postItems) || [];
+  const totalPosts = query.data?.pages[0].totalPostCount || null;
   const user = query.data?.pages[0].user || null;
 
   return (
@@ -91,7 +92,7 @@ export default function UserClient() {
 
                   <div className="flex items-center gap-1">
                     <DocumentTextIcon className="w-4 h-4" />
-                    <span className="ml-1 text-sm">{posts.length}</span>
+                    <span className="ml-1 text-sm">{totalPosts}</span>
                   </div>
                 </div>
               </aside>
