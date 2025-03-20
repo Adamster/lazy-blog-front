@@ -13,7 +13,10 @@ export const addToastSuccess = (message: string) => {
 export const addToastError = async (message: string, error?: Error) => {
   // const errors: string[] = [];
 
-  if (error && error instanceof ResponseError) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if ((error as any)?.response.status === 404) {
+    message = "Not Found.";
+  } else if (error && error instanceof ResponseError) {
     const errorBody = await error.response.json();
     message = errorBody.detail || message;
 

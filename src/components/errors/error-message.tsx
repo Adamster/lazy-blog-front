@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { ResponseError } from "@/api/apis";
 import { useTheme } from "@/providers/theme-providers";
+import { Button, Link } from "@heroui/react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import LogoDark from "../../assets/icons/logo-dark.svg";
 import LogoLight from "../../assets/icons/logo-light.svg";
-import Image from "next/image";
-import { Button, Link } from "@heroui/react";
 
 export const ErrorMessage = ({ error }: { error: unknown }) => {
   const { isDarkTheme } = useTheme();
@@ -14,7 +14,10 @@ export const ErrorMessage = ({ error }: { error: unknown }) => {
 
   useEffect(() => {
     const fetchErrorMessage = async () => {
-      if (error instanceof ResponseError) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((error as any)?.response.status === 404) {
+        setErrorMessage("Not Found.");
+      } else if (error instanceof ResponseError) {
         try {
           const clonedResponse = error.response.clone();
           const errorBody = await clonedResponse.json();

@@ -108,7 +108,7 @@ export const PostView = ({ post, postRefetch }: IProps) => {
                 </Button>
               </IsAuthor>
 
-              <Link href={`/${post.author.userName?.toLowerCase()}`}>
+              <Link href={`/${post.author.userName}`}>
                 <User
                   key={post?.author.id}
                   avatarProps={{

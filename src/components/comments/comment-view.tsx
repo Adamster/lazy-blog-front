@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiClient } from "@/api/api-client";
 import { CommentResponse } from "@/api/apis";
-import IsAuthor from "@/guards/is-author";
 import { addToastError, addToastSuccess } from "@/components/toasts/toasts";
+import IsAuthor from "@/guards/is-author";
 import { formatDate2 } from "@/utils/format-date";
 import { PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "@heroicons/react/24/solid";
@@ -35,7 +35,7 @@ const Comment = ({ comment, postCommentsRefetch }: IProps) => {
       addToastSuccess("Comment has been deleted");
     },
 
-    onError: (error: any) => {
+    onError: () => {
       addToastError("Error deleting comment");
     },
   });
@@ -57,7 +57,7 @@ const Comment = ({ comment, postCommentsRefetch }: IProps) => {
     <div>
       <div className="">
         <div className="mb-4 flex flex-row justify-between gap-4 items-end">
-          <Link href={`/${comment.user.userName?.toLowerCase()}`}>
+          <Link href={`/${comment.user.userName}`}>
             <User
               key={comment.user.id}
               avatarProps={{

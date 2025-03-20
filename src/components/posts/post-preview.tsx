@@ -31,7 +31,7 @@ export default function PostPreview({
       <div className="flex w-full flex-col gap-6">
         <div className="flex justify-center flex-col gap-3">
           <Link
-            href={`/${author.userName?.toLowerCase()}`}
+            href={`/${author.userName}`}
             className={hideAuthor ? "hidden" : ""}
           >
             <User
@@ -50,10 +50,7 @@ export default function PostPreview({
 
           <div>
             <div>
-              <Link
-                className="m-0"
-                href={`/${author.userName?.toLowerCase()}/${post.slug}`}
-              >
+              <Link className="m-0" href={`/${author.userName}/${post.slug}`}>
                 <h2 className="text-lg font-semibold hover:underline">
                   {!post.isPublished ? (
                     <Badge
@@ -78,7 +75,7 @@ export default function PostPreview({
             <Link
               className="flex items-center w-full"
               style={{}}
-              href={`/${author.userName?.toLowerCase()}/${post.slug}`}
+              href={`/${author.userName}/${post.slug}`}
             >
               <Image
                 removeWrapper

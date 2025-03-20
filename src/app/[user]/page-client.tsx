@@ -47,7 +47,7 @@ export default function UserClient() {
           ) : (
             <p>
               No posts yet, probably <strong>{userName}</strong> lost in
-              procrastination
+              procrastination.
             </p>
           )}
         </div>
@@ -78,6 +78,8 @@ export default function UserClient() {
                     <p className="whitespace-pre-line">{user?.biography}</p>
                   </div>
                 )}
+
+                <Divider />
 
                 <div className="flex items-center gap-4 text-gray">
                   <div className="flex items-center gap-1">
