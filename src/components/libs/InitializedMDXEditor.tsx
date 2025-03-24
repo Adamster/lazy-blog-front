@@ -52,6 +52,7 @@ export default function InitializedMDXEditor({
     graphql: "GraphQL",
     sql: "SQL",
     md: "Markdown",
+    sh: "Shell",
   };
 
   const imageUploadHandler = async (file: File) => {

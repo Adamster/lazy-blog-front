@@ -34,11 +34,7 @@ interface IProps {
 }
 
 export const PostView = ({ post, postRefetch }: IProps) => {
-  const {
-    data: postComments,
-    isLoading: postCommentsLoading,
-    refetch: postCommentsRefetch,
-  } = useQuery({
+  const { data: postComments, isLoading: postCommentsLoading } = useQuery({
     queryKey: ["getCommentsByPostId", post?.id],
     queryFn: () =>
       apiClient.comments.getCommentsByPostId({ id: post?.id || "" }),
@@ -82,7 +78,6 @@ export const PostView = ({ post, postRefetch }: IProps) => {
             postId={post.id}
             postComments={postComments}
             postCommentsLoading={postCommentsLoading}
-            postCommentsRefetch={postCommentsRefetch}
             isPostPublished={post.isPublished}
           />
         </div>

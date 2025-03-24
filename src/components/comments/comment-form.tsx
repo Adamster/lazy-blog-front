@@ -8,7 +8,7 @@ import { useTheme } from "@/providers/theme-providers";
 import { useUser } from "@/providers/user-provider";
 import { FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import { Button, Textarea } from "@heroui/react";
-import { QueryObserverResult, useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EmojiStyle, Theme } from "emoji-picker-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
@@ -22,19 +22,12 @@ const Picker = dynamic(
 
 interface IProps {
   postId?: string;
-  postCommentsRefetch: () => Promise<
-    QueryObserverResult<CommentResponse[], Error>
-  >;
   editComment?: CommentResponse;
   setIsEditComment?: (param: boolean) => void;
 }
 
-function CommentForm({
-  postId,
-  postCommentsRefetch,
-  editComment,
-  setIsEditComment,
-}: IProps) {
+function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
+  const queryClient = useQueryClient();
   const [body, setBody] = useState(editComment?.body || "");
   const [showEmoji, setShowEmoji] = useState(false);
   const { isDarkTheme } = useTheme();
@@ -67,7 +60,10 @@ function CommentForm({
       }),
 
     onSuccess: () => {
-      postCommentsRefetch().then(() => {});
+      queryClient.invalidateQueries({
+        queryKey: ["getCommentsByPostId", postId],
+      });
+
       addToastSuccess("Comment has been posted");
     },
 
@@ -92,7 +88,10 @@ function CommentForm({
       }),
 
     onSuccess: () => {
-      postCommentsRefetch().then(() => {});
+      queryClient.invalidateQueries({
+        queryKey: ["getCommentsByPostId", postId],
+      });
+
       addToastSuccess("Comment has been updated");
     },
 
@@ -107,16 +106,14 @@ function CommentForm({
   });
 
   const handleSubmit = (e: React.FormEvent) => {
-    if (postId) {
-      e.preventDefault();
-      postComment.mutate();
-    }
-
     if (editComment) {
       e.preventDefault();
       postEditedComment.mutate();
 
       if (setIsEditComment) setIsEditComment(false);
+    } else {
+      e.preventDefault();
+      postComment.mutate();
     }
   };
 
@@ -170,12 +167,21 @@ function CommentForm({
           <FaceSmileIcon width="1rem" height="1.5rem" />
         </Button>
 
-        <Button type="submit" variant="flat" size="sm" isIconOnly>
-          <PaperAirplaneIcon
-            color="color-primary"
-            width="1rem"
-            height="1.5rem"
-          />
+        <Button
+          type="submit"
+          variant="flat"
+          size="sm"
+          isIconOnly
+          disabled={postEditedComment.isPending || postComment.isPending}
+          isLoading={postEditedComment.isPending || postComment.isPending}
+        >
+          {!(postEditedComment.isPending || postComment.isPending) && (
+            <PaperAirplaneIcon
+              color="color-primary"
+              width="1rem"
+              height="1.5rem"
+            />
+          )}
         </Button>
       </div>
     </form>

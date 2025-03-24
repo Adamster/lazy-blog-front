@@ -7,7 +7,7 @@ import { formatDate2 } from "@/utils/format-date";
 import { PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "@heroicons/react/24/solid";
 import { Button, Divider, User } from "@heroui/react";
-import { QueryObserverResult, useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
 import ConfirmDeleteModal from "../modals/confirmation-modal";
@@ -15,14 +15,13 @@ import CommentForm from "./comment-form";
 
 interface IProps {
   comment: CommentResponse;
-  postCommentsRefetch: () => Promise<
-    QueryObserverResult<CommentResponse[], Error>
-  >;
+  postId: string;
 }
 
-const Comment = ({ comment, postCommentsRefetch }: IProps) => {
+const Comment = ({ comment, postId }: IProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditComment, setIsEditComment] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleDelete = useMutation({
     mutationFn: () =>
@@ -31,7 +30,10 @@ const Comment = ({ comment, postCommentsRefetch }: IProps) => {
       }),
 
     onSuccess: () => {
-      // postCommentsRefetch().then(() => {});
+      queryClient.invalidateQueries({
+        queryKey: ["getCommentsByPostId", postId],
+      });
+
       addToastSuccess("Comment has been deleted");
     },
 
@@ -110,7 +112,7 @@ const Comment = ({ comment, postCommentsRefetch }: IProps) => {
 
         {isEditComment ? (
           <CommentForm
-            postCommentsRefetch={postCommentsRefetch}
+            postId={postId}
             editComment={comment}
             setIsEditComment={setIsEditComment}
           />

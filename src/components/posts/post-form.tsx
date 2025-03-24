@@ -81,6 +81,25 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
 
         <div className="layout-page-aside-content">
           <aside className="layout-page-aside-content-sticky">
+            {!create && (
+              <div className="w-full">
+                <Input
+                  classNames={{ input: "text-base" }}
+                  isRequired
+                  isInvalid={Boolean(errors.slug)}
+                  label="Slug"
+                  {...register("slug", {
+                    required: "Slug is required",
+                    minLength: {
+                      value: 2,
+                      message: "At least 2 characters",
+                    },
+                  })}
+                  errorMessage={errors.slug?.message}
+                />
+              </div>
+            )}
+
             <div className="w-full">
               <Input
                 classNames={{ input: "text-base" }}
