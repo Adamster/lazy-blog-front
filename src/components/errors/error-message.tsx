@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
 
 import { ResponseError } from "@/shared/api/openapi";
 import { useTheme } from "@/shared/providers/theme-providers";

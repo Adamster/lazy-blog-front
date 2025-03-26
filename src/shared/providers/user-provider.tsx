@@ -1,5 +1,3 @@
-"use client";
-
 import { apiClient } from "@/shared/api/api-client";
 import { UserResponse } from "@/shared/api/openapi";
 import { Loading } from "@/shared/ui/loading";

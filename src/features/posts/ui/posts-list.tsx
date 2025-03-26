@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* PostsList.tsx */
-"use client";
 
 import {
   DisplayPostResponse,

@@ -1,5 +1,3 @@
-"use client";
-
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { API_URL } from "@/shared/consts";
 import { useTheme } from "@/shared/providers/theme-providers";

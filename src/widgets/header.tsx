@@ -1,5 +1,3 @@
-"use client";
-
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import IsAuth from "@/features/auth/guards/is-auth";
 import { useTheme } from "@/shared/providers/theme-providers";

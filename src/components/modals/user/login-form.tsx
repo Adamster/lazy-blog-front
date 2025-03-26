@@ -1,5 +1,3 @@
-"use client";
-
 import { addToastError } from "@/components/toasts/toasts";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { Button, Input, Link, Spinner } from "@heroui/react";

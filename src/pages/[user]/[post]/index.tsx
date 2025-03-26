@@ -1,5 +1,3 @@
-"use client";
-
 import { PostDetailedResponse } from "@/shared/api/openapi";
 import { ErrorMessage } from "@/components/errors/error-message";
 import { Loading } from "@/shared/ui/loading";
