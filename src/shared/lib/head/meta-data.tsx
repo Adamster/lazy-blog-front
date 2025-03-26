@@ -45,9 +45,9 @@ export const GenerateMeta = ({
         content={description}
       />
       <meta key="twitter:image" name="twitter:image" content={image} />
-      <meta name="twitter:card" content={card} />
+      <meta key="twitter:card" name="twitter:card" content={card} />
 
-      <link rel="canonical" href={fullUrl} />
+      <link key="canonical" rel="canonical" href={url} />
     </Head>
   );
 };
