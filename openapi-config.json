@@ -1,7 +1,7 @@
 {
   "generatorName": "typescript-fetch",
   "inputSpec": "https://blog-api-prod.notlazy.org/openapi/v1.json",
-  "outputDir": "src/api/apis",
+  "outputDir": "src/shared/api/openapi",
   "additionalProperties": {
     "supportsES6": true,
     "withInterfaces": true,

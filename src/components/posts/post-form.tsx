@@ -14,12 +14,12 @@ import {
   RocketLaunchIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import { UpdatePostRequest } from "@/api/apis";
+import { UpdatePostRequest } from "@/shared/api/openapi";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { useCallback } from "react";
 import { debounce } from "lodash";
 import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/api/api-client";
+import { apiClient } from "@/shared/api/api-client";
 import { PostImageUploader } from "./post-image-uploader";
 
 interface IProps {

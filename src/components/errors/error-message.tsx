@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { ResponseError } from "@/api/apis";
-import { useTheme } from "@/providers/theme-providers";
+import { ResponseError } from "@/shared/api/openapi";
+import { useTheme } from "@/shared/providers/theme-providers";
 import { Button, Link } from "@heroui/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import LogoDark from "../../assets/icons/logo-dark.svg";
-import LogoLight from "../../assets/icons/logo-light.svg";
+import LogoDark from "@/assets/icons/logo-dark.svg";
+import LogoLight from "@/assets/icons/logo-light.svg";
 
 export const ErrorMessage = ({ error }: { error: unknown }) => {
   const { isDarkTheme } = useTheme();

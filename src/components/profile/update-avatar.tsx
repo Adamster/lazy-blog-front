@@ -1,5 +1,5 @@
-import { apiClient } from "@/api/api-client";
-import { UserResponse } from "@/api/apis";
+import { apiClient } from "@/shared/api/api-client";
+import { UserResponse } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/components/toasts/toasts";
 import {
   NoSymbolIcon,

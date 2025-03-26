@@ -1,11 +1,11 @@
 "use client";
 
-import { RegisterUserRequest } from "@/api/apis";
-import { Loading } from "@/components/loading";
+import { RegisterUserRequest } from "@/shared/api/openapi";
+import { Loading } from "@/shared/ui/loading";
 import { useAuthActions, useAuthState } from "@/features/auth/hooks/use-auth";
 import React, { createContext } from "react";
-import { UserProvider } from "../../../providers/user-provider";
-import { AuthState } from "../utlis/auth-storage";
+import { UserProvider } from "../../../shared/providers/user-provider";
+import { AuthState } from "../lib/auth-storage";
 
 interface AuthContextType {
   auth: AuthState;

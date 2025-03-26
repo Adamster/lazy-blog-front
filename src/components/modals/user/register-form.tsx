@@ -5,14 +5,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Input, Button, Spinner } from "@heroui/react";
 import { useAuth } from "@/features/auth/hooks/use-auth";
-import { RegisterUserRequest } from "@/api/apis";
+import { RegisterUserRequest } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/components/toasts/toasts";
 
 interface RegisterFormProps {
-  onSuccess: () => void;
+  closeModal: () => void;
 }
 
-export default function RegisterForm({ onSuccess }: RegisterFormProps) {
+export default function RegisterForm({ closeModal }: RegisterFormProps) {
   const { register } = useAuth();
   const [loading, setLoading] = useState(false);
 
@@ -44,7 +44,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
       await register(registerData);
       addToastSuccess("You have successfully Registered!");
-      onSuccess();
+      closeModal();
     } catch (error: any) {
       addToastError("Registration Failed", error);
     } finally {

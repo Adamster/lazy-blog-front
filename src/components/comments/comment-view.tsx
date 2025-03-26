@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { apiClient } from "@/api/api-client";
-import { CommentResponse } from "@/api/apis";
+import { apiClient } from "@/shared/api/api-client";
+import { CommentResponse } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/components/toasts/toasts";
-import IsAuthor from "@/guards/is-author";
-import { formatDate2 } from "@/utils/format-date";
+import IsAuthor from "@/features/auth/guards/is-author";
 import { PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "@heroicons/react/24/solid";
 import { Button, Divider, User } from "@heroui/react";
@@ -12,6 +11,7 @@ import Link from "next/link";
 import { useState } from "react";
 import ConfirmDeleteModal from "../modals/confirmation-modal";
 import CommentForm from "./comment-form";
+import { formatDate2 } from "@/shared/lib/utils";
 
 interface IProps {
   comment: CommentResponse;
