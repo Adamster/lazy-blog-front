@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiClient } from "@/shared/api/api-client";
 import { addToastError } from "@/components/toasts/toasts";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { HandThumbDownIcon, HandThumbUpIcon } from "@heroicons/react/24/solid";
 import { Button, Divider } from "@heroui/react";
@@ -10,6 +10,7 @@ import { VotePostDirectionEnum } from "@/shared/api/openapi";
 
 interface IProps {
   postId: string;
+  postSlug: string;
   rating: number;
 }
 
@@ -26,7 +27,9 @@ const voteMessages = [
   "Just one like can change the world. Well, maybe this post.",
 ];
 
-export const PostVote = ({ postId }: IProps) => {
+export const PostVote = ({ postId, postSlug }: IProps) => {
+  const queryClient = useQueryClient();
+
   const randomMessage = useMemo(
     () => voteMessages[Math.floor(Math.random() * voteMessages.length)],
     []
@@ -40,7 +43,9 @@ export const PostVote = ({ postId }: IProps) => {
       });
     },
     onError: (error: any) => {
-      postRefetch();
+      queryClient.invalidateQueries({
+        queryKey: ["getPostBySlug", postSlug],
+      });
 
       if (error?.response.status === 400) {
         addToastError("Error", error);

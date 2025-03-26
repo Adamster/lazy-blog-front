@@ -48,7 +48,7 @@ export interface CreatePostRequest {
      * @type {Array<string>}
      * @memberof CreatePostRequest
      */
-    tags: Array<string>;
+    tags: Array<string> | null;
     /**
      * 
      * @type {string}
@@ -90,7 +90,7 @@ export function CreatePostRequestFromJSONTyped(json: any, ignoreDiscriminator: b
         'summary': json['summary'],
         'body': json['body'],
         'userId': json['userId'],
-        'tags': json['tags'],
+        'tags': json['tags'] == null ? null : json['tags'],
         'coverUrl': json['coverUrl'],
         'isPublished': json['isPublished'] == null ? undefined : json['isPublished'],
     };

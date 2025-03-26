@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/ChangePasswordApi.ts
 apis/CommentsApi.ts
 apis/ForgotPasswordApi.ts
@@ -24,6 +23,7 @@ models/PostDetailedResponse.ts
 models/PostResponse.ts
 models/ProblemDetails.ts
 models/RefreshTokenRequest.ts
+models/RefreshTokenResponse.ts
 models/RegisterUserRequest.ts
 models/ResetPasswordRequest.ts
 models/TagPostResponse.ts
@@ -31,6 +31,7 @@ models/TagResponse.ts
 models/UpdateCommentRequest.ts
 models/UpdatePostRequest.ts
 models/UpdateUserRequest.ts
+models/UserCommentResponse.ts
 models/UserPostItem.ts
 models/UserPostResponse.ts
 models/UserResponse.ts

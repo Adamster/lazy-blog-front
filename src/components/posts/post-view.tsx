@@ -60,7 +60,13 @@ export const PostView = ({ post }: IProps) => {
 
           <IsAuth>
             <IsAuthor
-              fallback={<PostVote rating={post.rating} postId={post.id} />}
+              fallback={
+                <PostVote
+                  rating={post.rating}
+                  postId={post.id}
+                  postSlug={post.slug}
+                />
+              }
               userId={post.author.id || ""}
             >
               <></>

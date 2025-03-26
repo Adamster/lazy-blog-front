@@ -13,13 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
-import type { UserResponse } from './UserResponse';
+import type { UserCommentResponse } from './UserCommentResponse';
 import {
-    UserResponseFromJSON,
-    UserResponseFromJSONTyped,
-    UserResponseToJSON,
-    UserResponseToJSONTyped,
-} from './UserResponse';
+    UserCommentResponseFromJSON,
+    UserCommentResponseFromJSONTyped,
+    UserCommentResponseToJSON,
+    UserCommentResponseToJSONTyped,
+} from './UserCommentResponse';
 
 /**
  * 
@@ -35,16 +35,10 @@ export interface CommentResponse {
     id: string;
     /**
      * 
-     * @type {UserResponse}
+     * @type {UserCommentResponse}
      * @memberof CommentResponse
      */
-    user: UserResponse;
-    /**
-     * 
-     * @type {string}
-     * @memberof CommentResponse
-     */
-    userAvatarUrl: string | null;
+    user: UserCommentResponse;
     /**
      * 
      * @type {string}
@@ -65,7 +59,6 @@ export interface CommentResponse {
 export function instanceOfCommentResponse(value: object): value is CommentResponse {
     if (!('id' in value) || value['id'] === undefined) return false;
     if (!('user' in value) || value['user'] === undefined) return false;
-    if (!('userAvatarUrl' in value) || value['userAvatarUrl'] === undefined) return false;
     if (!('body' in value) || value['body'] === undefined) return false;
     if (!('createdAtUtc' in value) || value['createdAtUtc'] === undefined) return false;
     return true;
@@ -82,8 +75,7 @@ export function CommentResponseFromJSONTyped(json: any, ignoreDiscriminator: boo
     return {
         
         'id': json['id'],
-        'user': UserResponseFromJSON(json['user']),
-        'userAvatarUrl': json['userAvatarUrl'],
+        'user': UserCommentResponseFromJSON(json['user']),
         'body': json['body'],
         'createdAtUtc': (new Date(json['createdAtUtc'])),
     };
@@ -101,8 +93,7 @@ export function CommentResponseToJSONTyped(value?: CommentResponse | null, ignor
     return {
         
         'id': value['id'],
-        'user': UserResponseToJSON(value['user']),
-        'userAvatarUrl': value['userAvatarUrl'],
+        'user': UserCommentResponseToJSON(value['user']),
         'body': value['body'],
         'createdAtUtc': ((value['createdAtUtc']).toISOString()),
     };

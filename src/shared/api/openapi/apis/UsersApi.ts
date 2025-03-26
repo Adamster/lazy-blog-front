@@ -19,6 +19,7 @@ import type {
   LoginResponse,
   ProblemDetails,
   RefreshTokenRequest,
+  RefreshTokenResponse,
   RegisterUserRequest,
   UpdateUserRequest,
   UserPostResponse,
@@ -33,6 +34,8 @@ import {
     ProblemDetailsToJSON,
     RefreshTokenRequestFromJSON,
     RefreshTokenRequestToJSON,
+    RefreshTokenResponseFromJSON,
+    RefreshTokenResponseToJSON,
     RegisterUserRequestFromJSON,
     RegisterUserRequestToJSON,
     UpdateUserRequestFromJSON,
@@ -162,11 +165,11 @@ export interface UsersApiInterface {
      * @throws {RequiredError}
      * @memberof UsersApiInterface
      */
-    refreshTokenRaw(requestParameters: RefreshTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LoginResponse>>;
+    refreshTokenRaw(requestParameters: RefreshTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RefreshTokenResponse>>;
 
     /**
      */
-    refreshToken(requestParameters: RefreshTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginResponse>;
+    refreshToken(requestParameters: RefreshTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RefreshTokenResponse>;
 
     /**
      * 
@@ -383,7 +386,7 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
 
     /**
      */
-    async refreshTokenRaw(requestParameters: RefreshTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<LoginResponse>> {
+    async refreshTokenRaw(requestParameters: RefreshTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RefreshTokenResponse>> {
         if (requestParameters['refreshTokenRequest'] == null) {
             throw new runtime.RequiredError(
                 'refreshTokenRequest',
@@ -405,12 +408,12 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
             body: RefreshTokenRequestToJSON(requestParameters['refreshTokenRequest']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => LoginResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => RefreshTokenResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async refreshToken(requestParameters: RefreshTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginResponse> {
+    async refreshToken(requestParameters: RefreshTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RefreshTokenResponse> {
         const response = await this.refreshTokenRaw(requestParameters, initOverrides);
         return await response.value();
     }
