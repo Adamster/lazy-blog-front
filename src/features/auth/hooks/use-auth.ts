@@ -1,5 +1,5 @@
-import { apiClient } from "@/api/api-client";
-import { RegisterUserRequest, ResponseError } from "@/api/apis";
+import { apiClient } from "@/shared/api/api-client";
+import { RegisterUserRequest, ResponseError } from "@/shared/api/openapi";
 import { AuthContext } from "@/features/auth/provider/auth-provider";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -9,7 +9,7 @@ import {
   clearAuthState,
   getAuthState,
   saveAuthState,
-} from "../utlis/auth-storage";
+} from "../lib/auth-storage";
 
 export function useAuth() {
   const context = useContext(AuthContext);

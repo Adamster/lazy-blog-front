@@ -1,9 +1,9 @@
 "use client";
 
 import { useAuth } from "@/features/auth/hooks/use-auth";
-import { useTheme } from "@/providers/theme-providers";
-import { useUser } from "@/providers/user-provider";
-import { API_URL } from "@/utils/fetcher";
+import { API_URL } from "@/shared/consts";
+import { useTheme } from "@/shared/providers/theme-providers";
+import { useUser } from "@/shared/providers/user-provider";
 import { Crepe } from "@milkdown/crepe";
 import { listener, listenerCtx } from "@milkdown/kit/plugin/listener";
 import throttle from "lodash.throttle";

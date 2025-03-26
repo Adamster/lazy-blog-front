@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { apiClient } from "@/api/api-client";
+import { apiClient } from "@/shared/api/api-client";
 import { addToastError } from "@/components/toasts/toasts";
 import { useMutation } from "@tanstack/react-query";
 
 import { HandThumbDownIcon, HandThumbUpIcon } from "@heroicons/react/24/solid";
 import { Button, Divider } from "@heroui/react";
 import { useMemo } from "react";
-import { VotePostDirectionEnum } from "@/api/apis";
+import { VotePostDirectionEnum } from "@/shared/api/openapi";
 
 interface IProps {
   postId: string;
-  postRefetch: () => void;
   rating: number;
 }
 
@@ -27,7 +26,7 @@ const voteMessages = [
   "Just one like can change the world. Well, maybe this post.",
 ];
 
-export const PostVote = ({ postId, postRefetch }: IProps) => {
+export const PostVote = ({ postId }: IProps) => {
   const randomMessage = useMemo(
     () => voteMessages[Math.floor(Math.random() * voteMessages.length)],
     []

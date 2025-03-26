@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "@/features/auth/hooks/use-auth";
-import { useUser } from "@/providers/user-provider";
-import { API_URL } from "@/utils/fetcher";
+import { API_URL } from "@/shared/consts";
+import { useUser } from "@/shared/providers/user-provider";
 import { oneDark } from "@codemirror/theme-one-dark";
 import {
   BlockTypeSelect,

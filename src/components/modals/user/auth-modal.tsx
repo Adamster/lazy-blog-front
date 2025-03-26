@@ -44,9 +44,9 @@ export function AuthModal({
 
             <ModalBody className="sm:px-10">
               {isLogin ? (
-                <LoginForm onSuccess={onClose} />
+                <LoginForm closeModal={onClose} />
               ) : (
-                <RegisterForm onSuccess={onClose} />
+                <RegisterForm closeModal={onClose} />
               )}
             </ModalBody>
 

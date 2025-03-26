@@ -4,6 +4,7 @@ import type { Config } from "tailwindcss";
 export default {
   content: [
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/features/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/shared/**/*.{js,ts,jsx,tsx,mdx}",
@@ -12,9 +13,9 @@ export default {
   theme: {
     extend: {
       width: {
-        'content': '60%', 
-        'aside': '40%'
-      }
+        content: "60%",
+        aside: "40%",
+      },
     },
   },
   darkMode: "class",

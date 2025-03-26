@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { apiClient } from "@/api/api-client";
-import { CommentResponse } from "@/api/apis";
+import { apiClient } from "@/shared/api/api-client";
+import { CommentResponse } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/components/toasts/toasts";
-import { useTheme } from "@/providers/theme-providers";
-import { useUser } from "@/providers/user-provider";
+import { useTheme } from "@/shared/providers/theme-providers";
+import { useUser } from "@/shared/providers/user-provider";
 import { FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import { Button, Textarea } from "@heroui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

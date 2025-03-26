@@ -1,5 +1,5 @@
-import { apiClient } from "@/api/api-client";
-import { UpdateUserRequest, UserResponse } from "@/api/apis";
+import { apiClient } from "@/shared/api/api-client";
+import { UpdateUserRequest, UserResponse } from "@/shared/api/openapi";
 import { addToastSuccess, addToastError } from "@/components/toasts/toasts";
 import { Button, Input, Textarea } from "@heroui/react";
 import { useEffect } from "react";

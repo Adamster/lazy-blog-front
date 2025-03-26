@@ -1,7 +1,7 @@
-import { CommentResponse } from "@/api/apis";
-import IsAuth from "../../guards/is-auth";
+import { CommentResponse } from "@/shared/api/openapi";
+import IsAuth from "../../features/auth/guards/is-auth";
 import Comment from "./comment-view";
-import { Loading } from "../loading";
+import { Loading } from "../../shared/ui/loading";
 import { Divider } from "@heroui/react";
 import CommentForm from "./comment-form";
 

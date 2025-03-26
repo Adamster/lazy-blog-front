@@ -1,4 +1,4 @@
-import { ResponseError } from "@/api/apis";
+import { ResponseError } from "@/shared/api/openapi";
 import { addToast } from "@heroui/react";
 
 export const addToastSuccess = (message: string) => {

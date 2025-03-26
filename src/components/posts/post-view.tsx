@@ -5,22 +5,22 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
-import { apiClient } from "@/api/api-client";
-import { PostDetailedResponse } from "@/api/apis";
-import IsAuthor from "@/guards/is-author";
+import { apiClient } from "@/shared/api/api-client";
+import { PostDetailedResponse } from "@/shared/api/openapi";
+import IsAuthor from "@/features/auth/guards/is-author";
 import { PencilIcon } from "@heroicons/react/24/solid";
 import { Badge, Button, Divider, Image, User } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
-import IsAuth from "../../guards/is-auth";
+import IsAuth from "../../features/auth/guards/is-auth";
 import { Comments } from "../comments/comments-section";
-import { Loading } from "../loading";
+import { Loading } from "../../shared/ui/loading";
 import {
   PostDetailsComments,
   PostDetailsData,
   PostDetailsRating,
   PostDetailsTags,
   PostDetailsViews,
-} from "./details/post-details";
+} from "../../features/posts/ui/post-details";
 import { PostVote } from "./post-vote";
 
 const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
@@ -30,10 +30,9 @@ const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
 
 interface IProps {
   post: PostDetailedResponse | undefined;
-  postRefetch: () => void;
 }
 
-export const PostView = ({ post, postRefetch }: IProps) => {
+export const PostView = ({ post }: IProps) => {
   const { data: postComments, isLoading: postCommentsLoading } = useQuery({
     queryKey: ["getCommentsByPostId", post?.id],
     queryFn: () =>
@@ -61,13 +60,7 @@ export const PostView = ({ post, postRefetch }: IProps) => {
 
           <IsAuth>
             <IsAuthor
-              fallback={
-                <PostVote
-                  rating={post.rating}
-                  postId={post.id}
-                  postRefetch={postRefetch}
-                />
-              }
+              fallback={<PostVote rating={post.rating} postId={post.id} />}
               userId={post.author.id || ""}
             >
               <></>
@@ -94,7 +87,7 @@ export const PostView = ({ post, postRefetch }: IProps) => {
                   variant="flat"
                   size="sm"
                   isIconOnly
-                  href={`${post.slug}/edit`}
+                  href={`/${post.author.userName}/${post.slug}/edit`}
                 >
                   <PencilIcon className="w-3 h-3" />
                 </Button>

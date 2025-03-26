@@ -7,20 +7,18 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface LoginFormProps {
-  onSuccess?: () => void;
+  closeModal: () => void;
 }
 
-export default function LoginForm({ onSuccess }: LoginFormProps) {
+export default function LoginForm({ closeModal }: LoginFormProps) {
   const { auth, login, isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
-      if (onSuccess) {
-        onSuccess();
-      }
+      closeModal();
     }
-  }, [auth, onSuccess]);
+  }, [auth]);
 
   const {
     register,
@@ -77,7 +75,8 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
       <div className="flex justify-end">
         <Link
           className="text-sm text-gray hover:underline"
-          href="/forgot-password"
+          href="/auth/forgot-password"
+          onPress={() => closeModal()}
         >
           Forgot Password ?
         </Link>
