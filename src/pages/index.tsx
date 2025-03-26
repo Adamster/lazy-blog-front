@@ -16,8 +16,10 @@ export default function Home() {
   return (
     <>
       <Head>
-        <GenerateMeta />
+        <title>Hm</title>
       </Head>
+
+      <GenerateMeta />
 
       <div className="layout-page">
         <div className="layout-page-content">

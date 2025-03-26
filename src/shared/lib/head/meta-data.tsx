@@ -21,7 +21,7 @@ export const GenerateMeta = ({
   const fullUrl = url ? `https://notlazy.org${url}` : "https://notlazy.org";
 
   return (
-    <>
+    <Head>
       <title>{fullTitle}</title>
       <meta key="description" name="description" content={description} />
       <meta name="robots" content="index, follow" />
@@ -47,7 +47,7 @@ export const GenerateMeta = ({
       <meta key="twitter:image" name="twitter:image" content={image} />
       <meta key="twitter:card" name="twitter:card" content={card} />
 
-      <link key="canonical" rel="canonical" href={url} />
-    </>
+      <link key="twitter:card" rel="canonical" href={url} />
+    </Head>
   );
 };
