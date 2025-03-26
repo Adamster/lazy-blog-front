@@ -1,5 +1,3 @@
-"use client";
-
 import { AuthProvider } from "@/features/auth/provider/auth-provider";
 import { ErrorBoundary } from "@/shared/providers/error-boundary";
 import { ReactQueryProvider } from "@/shared/providers/query-provider";

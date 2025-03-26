@@ -1,5 +1,3 @@
-"use client";
-
 import { getAuthState } from "@/features/auth/lib/auth-storage";
 import {
   ChangePasswordApi,

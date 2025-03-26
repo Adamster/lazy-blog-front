@@ -1,5 +1,3 @@
-"use client";
-
 import { ErrorMessage } from "@/components/errors/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { Divider } from "@heroui/react";

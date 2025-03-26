@@ -1,5 +1,3 @@
-"use client";
-
 import { RegisterUserRequest } from "@/shared/api/openapi";
 import { Loading } from "@/shared/ui/loading";
 import { useAuthActions, useAuthState } from "@/features/auth/hooks/use-auth";

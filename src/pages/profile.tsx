@@ -1,5 +1,3 @@
-"use client";
-
 import { apiClient } from "@/shared/api/api-client";
 import { ErrorMessage } from "@/components/errors/error-message";
 import { Loading } from "@/shared/ui/loading";
