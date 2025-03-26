@@ -8,8 +8,6 @@ export async function generateMetadata({ params }: any) {
   const { post: slug } = await params;
   const postData: PostDetailedResponse = await getPostSSR(slug);
 
-  console.log(postData);
-
   if (postData) {
     return generateMeta({
       title: postData.title,
