@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: any) {
   }
 }
 
-export default function Page({ params }: { params: { user: string } }) {
-  const { user: userName } = params;
+export default async function Page({ params }: any) {
+  const { user: userName } = await params;
   return <UserPage userName={userName} />;
 }

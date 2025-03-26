@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: any) {
   }
 }
 
-export default function Page({ params }: { params: { post: string } }) {
-  const { post: slug } = params;
+export default async function Page({ params }: any) {
+  const { post: slug } = await params;
   return <PostPage slug={slug} />;
 }

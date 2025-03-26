@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: any) {
   });
 }
 
-export default function Page({ params }: { params: { id: string } }) {
-  const { id: tag } = params;
+export default async function Page({ params }: any) {
+  const { id: tag } = await params;
   return <TagPage tag={tag} />;
 }
