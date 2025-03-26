@@ -1,4 +1,4 @@
-export const getUserDataSSR = async (userName: string) => {
+export const getUserSSR = async (userName: string) => {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API}/api/posts/${userName}/posts`,
@@ -6,7 +6,7 @@ export const getUserDataSSR = async (userName: string) => {
     );
 
     if (!response.ok) {
-      return { userName };
+      return null;
     }
 
     const data = await response.json();
@@ -15,6 +15,6 @@ export const getUserDataSSR = async (userName: string) => {
       ...data.user,
     };
   } catch {
-    return { userName };
+    return null;
   }
 };

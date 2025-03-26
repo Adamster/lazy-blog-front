@@ -1,13 +1,13 @@
+"use client";
+
 import { ErrorMessage } from "@/components/errors/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { Divider } from "@heroui/react";
 import { PostsList } from "@/features/posts/ui/posts-list";
 import { useAllPosts } from "@/features/posts/model/use-all-posts";
 import { TagsList } from "@/features/tags/ui/tags-list";
-import Head from "next/head";
-import { GenerateMeta } from "@/shared/lib/head/meta-data";
 
-export default function Home() {
+export default function HomePage() {
   const query = useAllPosts();
 
   if (query.isLoading) return <Loading />;
@@ -15,12 +15,6 @@ export default function Home() {
 
   return (
     <>
-      <Head>
-        <title>Hm</title>
-      </Head>
-
-      <GenerateMeta />
-
       <div className="layout-page">
         <div className="layout-page-content">
           <PostsList query={query} posts={query.data?.pages?.flat() || []} />

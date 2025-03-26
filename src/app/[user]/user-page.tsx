@@ -1,3 +1,5 @@
+"use client";
+
 import { ErrorMessage } from "@/components/errors/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { DocumentTextIcon } from "@heroicons/react/24/outline";
@@ -5,22 +7,10 @@ import { CalendarIcon } from "@heroicons/react/24/solid";
 import { Divider, User } from "@heroui/react";
 import { formatDate2 } from "@/shared/lib/utils";
 import { PostsList } from "@/features/posts/ui/posts-list";
-import { GenerateMeta } from "@/shared/lib/head/meta-data";
-import { GetServerSideProps } from "next";
 import { usePostsByUser } from "@/features/user/model/use-posts-by-user";
-import { UserResponse } from "@/shared/api/openapi";
-import { getUserDataSSR } from "@/features/user/model/get-user-data.ssr";
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  const { user } = params as { user: string };
-  const userServer = await getUserDataSSR(user);
-  return {
-    props: userServer,
-  };
-};
-
-export default function UserClient(userServer: UserResponse) {
-  const query = usePostsByUser(userServer.userName || "");
+export default function UserPage({ userName }: { userName: string }) {
+  const query = usePostsByUser(userName);
 
   const posts = query.data?.pages.flatMap((page) => page.postItems) || [];
   const totalPosts = query.data?.pages[0].totalPostCount || null;
@@ -31,17 +21,6 @@ export default function UserClient(userServer: UserResponse) {
 
   return (
     <>
-      <GenerateMeta
-        title={userServer.userName}
-        description={`Explore articles and stories shared by ${
-          userServer.userName
-        }. ${userServer.biography ? userServer.biography : ""}`}
-        url={`/${userServer.userName}`}
-        image={userServer.avatarUrl ? userServer.avatarUrl : ""}
-        type="profile"
-        card="summary"
-      />
-
       <div className="layout-page">
         <div className="layout-page-content">
           <PostsList query={query} posts={posts} author={user} hideAuthor />

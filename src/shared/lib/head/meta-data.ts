@@ -3,29 +3,36 @@ interface Props {
   description?: string;
   image?: string;
   type?: string;
+  card?: string;
+  url?: string;
 }
 
 export const generateMeta = ({
   title,
   description = "The fine art of not being lazy… most of the time",
   image = "https://notlazy.org/images/preview.jpg",
-  type,
+  type = "website",
+  card = "summary_large_image",
+  url,
 }: Props) => {
-  const title_mod = `${title} | !Lazy Blog`;
+  const fullTitle = title ? `${title} | !Lazy Blog` : "!Lazy Blog";
+  const fullUrl = url ? `https://notlazy.org${url}` : "https://notlazy.org";
+
   return {
-    title: title_mod,
+    title: fullTitle,
     description: description,
     openGraph: {
-      title: title_mod,
+      title: fullTitle,
       description: description,
       images: [{ url: image }],
-      type: type || "website",
+      type: type,
+      url: fullUrl,
     },
     twitter: {
-      title: title_mod,
+      title: fullTitle,
       description: description,
       images: [image],
-      card: "summary_large_image",
+      card: { card },
     },
     robots: "index, follow",
   };

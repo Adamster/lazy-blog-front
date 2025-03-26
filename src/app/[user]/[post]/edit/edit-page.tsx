@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
 
 import { apiClient } from "@/shared/api/api-client";
 import {
@@ -16,10 +17,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { GenerateMeta } from "@/shared/lib/head/meta-data";
 import IsAuth from "@/features/auth/guards/is-auth";
 
-const PageEditClient = () => {
+const EditPage = () => {
   const { user } = useUser();
   const router = useRouter();
   const params = useParams();
@@ -131,8 +131,6 @@ const PageEditClient = () => {
           <ErrorMessage error={"Nice try, but this isn’t your playground!"} />
         }
       >
-        <GenerateMeta title="Edit" />
-
         {form.getValues("slug") && isAuthor && (
           <PostForm
             key={postData?.id}
@@ -156,4 +154,4 @@ const PageEditClient = () => {
   );
 };
 
-export default PageEditClient;
+export default EditPage;

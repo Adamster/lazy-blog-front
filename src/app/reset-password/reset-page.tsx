@@ -1,3 +1,5 @@
+"use client";
+
 import { apiClient } from "@/shared/api/api-client";
 import { ResetPasswordRequest } from "@/shared/api/openapi";
 import { Loading } from "@/shared/ui/loading";
@@ -7,9 +9,8 @@ import { Button, Divider, Input, User } from "@heroui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { GenerateMeta } from "@/shared/lib/head/meta-data";
 
-export default function ResetPasswordClient() {
+export default function ResetPage() {
   const searchParams = useSearchParams();
   const userId = searchParams?.get("id") || "";
   const token = searchParams?.get("token") || "";
@@ -51,8 +52,6 @@ export default function ResetPasswordClient() {
 
   return (
     <>
-      <GenerateMeta title="Reset Password" />
-
       <div className="layout-page">
         <div className="layout-page-content">
           <form

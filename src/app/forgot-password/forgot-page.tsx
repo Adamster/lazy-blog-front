@@ -1,3 +1,5 @@
+"use client";
+
 import { apiClient } from "@/shared/api/api-client";
 import { addToastError, addToastSuccess } from "@/components/toasts/toasts";
 import { RocketLaunchIcon } from "@heroicons/react/24/outline";
@@ -6,7 +8,6 @@ import { Button, Divider, Input, User } from "@heroui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { GenerateMeta } from "@/shared/lib/head/meta-data";
 
 interface FormData {
   email: string;
@@ -25,7 +26,7 @@ const messages = [
   "Did You Try ‘Password123’?",
 ];
 
-export default function ForgotPasswordClient() {
+export default function ForgotPage() {
   const {
     register,
     handleSubmit,
@@ -57,8 +58,6 @@ export default function ForgotPasswordClient() {
 
   return (
     <>
-      <GenerateMeta title="Forgot Password" />
-
       <div className="layout-page">
         <div className="layout-page-content">
           <form

@@ -31,11 +31,11 @@ export class ErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center p-in">
-          <h2 className="text-2xl font-bold mb-2">Что-то пошло не так 😢</h2>
-          <p className="color-gray">
-            {this.state.error?.message || "Неизвестная ошибка"}
-          </p>
+        <div className="min-h-screen -mt-16 flex flex-col gap-4 items-center justify-center">
+          <h2 className="text-3xl font-bold">
+            A glitch in the Lazyverse... 😢
+          </h2>
+          <p>{this.state.error?.message || "Unknown Error"}</p>
         </div>
       );
     }

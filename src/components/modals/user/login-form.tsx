@@ -73,7 +73,7 @@ export default function LoginForm({ closeModal }: LoginFormProps) {
       <div className="flex justify-end">
         <Link
           className="text-sm text-gray hover:underline"
-          href="/auth/forgot-password"
+          href="/forgot-password"
           onPress={() => closeModal()}
         >
           Forgot Password ?

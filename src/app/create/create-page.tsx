@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
 
 import { apiClient } from "@/shared/api/api-client";
 import { useMutation } from "@tanstack/react-query";
@@ -9,12 +10,11 @@ import { Loading } from "@/shared/ui/loading";
 import { PostForm } from "@/components/posts/post-form";
 import { addToastError, addToastSuccess } from "@/components/toasts/toasts";
 import { useRouter } from "next/navigation";
-import { GenerateMeta } from "@/shared/lib/head/meta-data";
 import IsAuth from "@/features/auth/guards/is-auth";
 import { ErrorMessage } from "@/components/errors/error-message";
 import { useUser } from "@/shared/providers/user-provider";
 
-const CreatePageClient = () => {
+const CreatePage = () => {
   const router = useRouter();
   const { user } = useUser();
 
@@ -56,12 +56,10 @@ const CreatePageClient = () => {
 
   return (
     <IsAuth fallback={<ErrorMessage error={"Not Found."} />}>
-      <GenerateMeta title="Create" />
-
       {mutation.isPending && <Loading inline />}
       {<PostForm form={form} onSubmit={onSubmit} create={true} />}
     </IsAuth>
   );
 };
 
-export default CreatePageClient;
+export default CreatePage;

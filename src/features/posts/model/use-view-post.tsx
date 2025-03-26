@@ -3,7 +3,7 @@ import { useUser } from "@/shared/providers/user-provider";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-const usePostViews = (postId: string, postAuthorId: string) => {
+const useViewPost = (postId: string, postAuthorId: string) => {
   const { user } = useUser();
 
   const mutation = useMutation({
@@ -30,4 +30,4 @@ const usePostViews = (postId: string, postAuthorId: string) => {
   }, [postId, postAuthorId, user?.id, mutation]);
 };
 
-export default usePostViews;
+export default useViewPost;

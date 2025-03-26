@@ -1,4 +1,4 @@
-export const getPostBySlugSSR = async (slug: string) => {
+export const getPostSSR = async (slug: string) => {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API}/api/posts/${slug}`,
@@ -8,7 +8,7 @@ export const getPostBySlugSSR = async (slug: string) => {
     );
 
     if (!response.ok) {
-      return { slug };
+      return null;
     }
 
     const data = await response.json();
@@ -17,6 +17,6 @@ export const getPostBySlugSSR = async (slug: string) => {
       ...data,
     };
   } catch {
-    return { slug };
+    return null;
   }
 };
