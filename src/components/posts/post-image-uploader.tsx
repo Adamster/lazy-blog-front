@@ -44,31 +44,43 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
     if (!file) return;
 
     const imageUrl = URL.createObjectURL(file);
-
-    const image = new window.Image();
-    image.src = imageUrl;
-
-    image.onload = () => {
-      if (image.width > 800 || image.height > 533) {
-        setImagePreview(imageUrl);
-        setCropVisible(true);
-      } else {
-        uploadMutation.mutate(file);
-      }
-    };
+    setImagePreview(imageUrl);
+    setCropVisible(true);
   };
 
   const handleCropAndUpload = () => {
-    const canvas = cropperRef.current?.getCanvas({ width: 800, height: 533 });
+    const canvas = cropperRef.current?.getCanvas();
 
     canvas?.toBlob((blob) => {
-      if (blob) {
-        const croppedFile = new File([blob], `post-${Date.now()}.png`, {
-          type: "image/png",
-        });
-        uploadMutation.mutate(croppedFile);
-      }
-    });
+      if (!blob) return;
+
+      const image = new window.Image();
+      const blobUrl = URL.createObjectURL(blob);
+      image.src = blobUrl;
+
+      image.onload = () => {
+        const shouldResize = image.width > 800;
+
+        const targetWidth = shouldResize ? 800 : image.width;
+        const targetHeight = shouldResize ? 533 : image.height;
+
+        const resizeCanvas = document.createElement("canvas");
+        resizeCanvas.width = targetWidth;
+        resizeCanvas.height = targetHeight;
+
+        const ctx = resizeCanvas.getContext("2d");
+        ctx?.drawImage(image, 0, 0, targetWidth, targetHeight);
+
+        resizeCanvas.toBlob((finalBlob) => {
+          if (finalBlob) {
+            const finalFile = new File([finalBlob], `post-${Date.now()}.png`, {
+              type: "image/png",
+            });
+            uploadMutation.mutate(finalFile);
+          }
+        }, "image/png");
+      };
+    }, "image/png");
   };
 
   const handleRemove = () => {
