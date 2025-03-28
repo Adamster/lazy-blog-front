@@ -43,12 +43,23 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setImagePreview(URL.createObjectURL(file));
-    setCropVisible(true);
+    const imageUrl = URL.createObjectURL(file);
+
+    const image = new window.Image();
+    image.src = imageUrl;
+
+    image.onload = () => {
+      if (image.width > 800 || image.height > 533) {
+        setImagePreview(imageUrl);
+        setCropVisible(true);
+      } else {
+        uploadMutation.mutate(file);
+      }
+    };
   };
 
   const handleCropAndUpload = () => {
-    const canvas = cropperRef.current?.getCanvas({ width: 1000, height: 1000 });
+    const canvas = cropperRef.current?.getCanvas({ width: 800, height: 533 });
 
     canvas?.toBlob((blob) => {
       if (blob) {
@@ -74,15 +85,12 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
             ref={cropperRef}
             src={imagePreview}
             stencilProps={{
-              aspectRatio: {
-                minimum: 3 / 2,
-                maximum: 16 / 9,
-              },
+              aspectRatio: 3 / 2,
               grid: true,
             }}
             sizeRestrictions={{
-              minWidth: 1000,
-              minHeight: 300,
+              minWidth: 800,
+              minHeight: 533,
               maxWidth: 4000,
               maxHeight: 4000,
             }}
