@@ -10,6 +10,7 @@
 .mdxeditor {
   div[role="toolbar"] {
     top: 4rem;
+    background-color: hsl(var(--heroui-default-100));
   }
 
   .mdxeditor-toolbar button[role="combobox"] {

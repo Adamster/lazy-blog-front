@@ -3,6 +3,7 @@ import { formatDate2, titleToSnake } from "@/shared/lib/utils";
 import {
   ChatBubbleLeftIcon as ChatBubbleLeftIconOutline,
   EyeIcon as EyeIconOutline,
+  HashtagIcon,
   HeartIcon as HeartIconOutline,
   StarIcon as StarIconOutline,
 } from "@heroicons/react/24/outline";
@@ -13,9 +14,8 @@ import {
   EyeIcon as EyeIconSolid,
   HeartIcon as HeartIconSolid,
   StarIcon as StarIconSolid,
-  TagIcon,
 } from "@heroicons/react/24/solid";
-import { Link } from "@heroui/react";
+import { Chip, Link } from "@heroui/react";
 
 export const PostDetailsData = ({ date }: { date: Date }) => {
   return (
@@ -67,18 +67,17 @@ export const PostDetailsRating = ({ rating }: { rating: number }) => {
 
 export const PostDetailsTags = ({ tags }: { tags: TagPostResponse[] }) => {
   return tags?.length ? (
-    <div className="flex flex-wrap items-center gap-1 text-foreground">
-      <TagIcon className={"w-4 h-4"} />
-      {tags.map((tag, id) => (
-        <span key={tag.tagId}>
-          <Link
-            href={`/tag/${titleToSnake(tag.tag)}`}
-            className="text-foreground ml-1 text-sm hover:underline"
-          >
+    <div className="flex flex-wrap items-center gap-4 text-foreground">
+      {tags.map((tag) => (
+        <Link
+          key={tag.tagId}
+          href={`/tag/${titleToSnake(tag.tag)}`}
+          className="text-foreground text-sm hover:opacity-70"
+        >
+          <Chip variant="flat" className="text-gray">
             {tag.tag}
-          </Link>
-          {++id < tags.length && ","}
-        </span>
+          </Chip>
+        </Link>
       ))}
     </div>
   ) : null;

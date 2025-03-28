@@ -32,7 +32,7 @@ export const generateMeta = ({
       title: fullTitle,
       description: description,
       images: [image],
-      card: { card },
+      card: card,
     },
     robots: "index, follow",
   };

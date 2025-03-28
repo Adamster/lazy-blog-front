@@ -55,7 +55,11 @@ export function ThemeProvider({ children }: ProvidersProps) {
 
   return (
     <ThemeContext.Provider value={value}>
-      <div className={theme} data-theme={theme} data-color-mode={theme}>
+      <div
+        className={"min-h-screen" + " " + theme}
+        data-theme={theme}
+        data-color-mode={theme}
+      >
         {children}
       </div>
     </ThemeContext.Provider>

@@ -167,7 +167,7 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
 
               <ButtonGroup>
                 <Button
-                  variant="solid"
+                  variant={form.watch("isPublished") ? "solid" : "flat"}
                   color={form.watch("isPublished") ? "primary" : "default"}
                   onPress={onSubmit}
                 >
