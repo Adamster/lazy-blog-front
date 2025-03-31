@@ -5,13 +5,14 @@ import {
   RocketLaunchIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import { Button, ButtonGroup, User } from "@heroui/react";
+import { Button, ButtonGroup } from "@heroui/react";
 import { useRef, useState } from "react";
 import { CircleStencil, Cropper, CropperRef } from "react-advanced-cropper";
 import { useUploadAvatar } from "../model/use-upload-avatar";
 import { useDeleteAvatar } from "../model/use-delete-avatar";
 
 import "react-advanced-cropper/dist/style.css";
+import { UserAvatar } from "./user-avatar";
 
 interface IProps {
   userData: UserResponse | undefined;
@@ -96,17 +97,7 @@ export const UpdateAvatar = ({ userData }: IProps) => {
         </div>
       ) : (
         <div className="flex flex-col items-start gap-4">
-          <User
-            avatarProps={{
-              size: "lg",
-              src: userData?.avatarUrl || "",
-              name: `${userData?.firstName?.charAt(
-                0
-              )}${userData?.lastName?.charAt(0)}`,
-            }}
-            name={`${userData?.firstName} ${userData?.lastName}`}
-            description={`@${userData?.userName}`}
-          />
+          <UserAvatar user={userData} isProfile />
 
           <div className="flex flex-wrap gap-4">
             <ButtonGroup>

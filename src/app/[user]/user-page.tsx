@@ -4,10 +4,11 @@ import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { DocumentTextIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "@heroicons/react/24/solid";
-import { Divider, User } from "@heroui/react";
+import { Divider } from "@heroui/react";
 import { formatDate2 } from "@/shared/lib/utils";
 import { PostsList } from "@/features/post/ui/posts-list";
 import { usePostsByUserName } from "@/features/post/model/use-posts-by-username";
+import { UserAvatar } from "@/features/user/ui/user-avatar";
 
 export default function UserPage({ userName }: { userName: string }) {
   const query = usePostsByUserName(userName);
@@ -39,19 +40,7 @@ export default function UserPage({ userName }: { userName: string }) {
           <div className="layout-page-aside-content">
             {user && (
               <aside className="layout-page-aside-content-sticky">
-                <User
-                  className="mb-1"
-                  key={user.id}
-                  avatarProps={{
-                    className: "w-20 h-20 text-large",
-                    src: user.avatarUrl || undefined,
-                    name: `${user.firstName?.charAt(0)}${user.lastName?.charAt(
-                      0
-                    )}`,
-                  }}
-                  name={`${user.firstName} ${user.lastName}`}
-                  description={"@" + user.userName}
-                />
+                <UserAvatar user={user} isProfile />
 
                 {user?.biography && (
                   <div>

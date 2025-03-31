@@ -1,4 +1,4 @@
-export const SIGNUP_MESSAGES = [
+export const CREATE_ACCOUNT_MESSAGES = [
   "Ready to join the cool side of the internet?",
   "Welcome aboard! We saved you the best seat.",
   "Creating an account? Bold move. We like it.",

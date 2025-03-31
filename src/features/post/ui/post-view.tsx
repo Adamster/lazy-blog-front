@@ -6,7 +6,7 @@ import Link from "next/link";
 import { PostDetailedResponse } from "@/shared/api/openapi";
 import IsAuthor from "@/features/auth/guards/is-author";
 import { PencilIcon } from "@heroicons/react/24/solid";
-import { Badge, Button, Divider, Image, User } from "@heroui/react";
+import { Badge, Button, Divider, Image } from "@heroui/react";
 import IsAuth from "@/features/auth/guards/is-auth";
 import { Loading } from "@/shared/ui/loading";
 import {
@@ -19,6 +19,7 @@ import {
 import { PostVote } from "./post-vote";
 import { useCommentsById } from "@/features/comment/model/use-comments-by-id";
 import { Comments } from "@/features/comment/ui/comments-section";
+import { UserAvatar } from "@/features/user/ui/user-avatar";
 
 const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
   ssr: false,
@@ -86,20 +87,7 @@ export const PostView = ({ post }: IProps) => {
                 </Button>
               </IsAuthor>
 
-              <Link href={`/${post.author.userName}`}>
-                <User
-                  key={post?.author.id}
-                  avatarProps={{
-                    size: "sm",
-                    src: post?.author.avatarUrl || undefined,
-                    name: `${post?.author.firstName?.charAt(
-                      0
-                    )}${post?.author.lastName?.charAt(0)}`,
-                  }}
-                  name={`${post?.author.firstName} ${post?.author.lastName}`}
-                  description={"@" + post?.author.userName}
-                />
-              </Link>
+              <UserAvatar user={post.author} isLink />
 
               <div>
                 <h1 className="text-xl font-semibold mb-1 relative">

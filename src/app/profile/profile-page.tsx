@@ -10,7 +10,7 @@ import { useUser } from "@/shared/providers/user-provider";
 import { Divider, Tab, Tabs } from "@heroui/react";
 import { useUserById } from "@/features/user/model/use-user-by-id";
 
-export default function ProfilePage() {
+export default function Profile() {
   const { user } = useUser();
   const userId = user?.id || "";
 

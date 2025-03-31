@@ -5,13 +5,13 @@ import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import IsAuthor from "@/features/auth/guards/is-author";
 import { PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "@heroicons/react/24/solid";
-import { Button, Divider, User } from "@heroui/react";
+import { Button, Divider } from "@heroui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Link from "next/link";
 import { useState } from "react";
 import CommentForm from "@/features/comment/ui/comment-form";
 import { formatDate2 } from "@/shared/lib/utils";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
+import { UserAvatar } from "@/features/user/ui/user-avatar";
 
 interface IProps {
   comment: CommentResponse;
@@ -59,20 +59,7 @@ const Comment = ({ comment, postId }: IProps) => {
     <div>
       <div className="">
         <div className="mb-4 flex flex-row justify-between gap-4 items-end">
-          <Link href={`/${comment.user.userName}`}>
-            <User
-              key={comment.user.id}
-              avatarProps={{
-                size: "sm",
-                src: comment.user.avatarUrl || undefined,
-                name: `${comment.user.firstName?.charAt(
-                  0
-                )}${comment.user.lastName?.charAt(0)}`,
-              }}
-              name={`${comment.user.firstName} ${comment.user.lastName}`}
-              description={"@" + comment.user.userName}
-            />
-          </Link>
+          <UserAvatar user={comment.user} isLink />
 
           <div className="flex flex-row items-center gap-4 text-gray">
             <IsAuthor userId={comment.user.id || ""}>
