@@ -1,11 +1,11 @@
 "use client";
 
-import { ErrorMessage } from "@/components/errors/error-message";
+import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { Divider } from "@heroui/react";
-import { PostsList } from "@/features/posts/ui/posts-list";
-import { useAllPosts } from "@/features/posts/model/use-all-posts";
-import { TagsList } from "@/features/tags/ui/tags-list";
+import { PostsList } from "@/features/post/ui/posts-list";
+import { useAllPosts } from "@/features/post/model/use-all-posts";
+import { TagsList } from "@/features/tag/ui/tags-list";
 
 export default function HomePage() {
   const query = useAllPosts();

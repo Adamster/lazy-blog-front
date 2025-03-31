@@ -7,11 +7,11 @@ import { useForm } from "react-hook-form";
 
 import { UpdatePostRequest } from "@/shared/api/openapi";
 import { Loading } from "@/shared/ui/loading";
-import { PostForm } from "@/components/posts/post-form";
-import { addToastError, addToastSuccess } from "@/components/toasts/toasts";
+import { PostForm } from "@/features/post/ui/post-form";
+import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { useRouter } from "next/navigation";
 import IsAuth from "@/features/auth/guards/is-auth";
-import { ErrorMessage } from "@/components/errors/error-message";
+import { ErrorMessage } from "@/shared/ui/error-message";
 import { useUser } from "@/shared/providers/user-provider";
 
 const CreatePage = () => {

@@ -23,7 +23,6 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => {
                   shouldShowTimeoutProgress: true,
                 }}
               />
-
               {children}
             </HeroUIProvider>
           </ThemeProvider>

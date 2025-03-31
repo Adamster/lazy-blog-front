@@ -2,7 +2,7 @@
 import { PostDetailedResponse } from "@/shared/api/openapi";
 import { generateMeta } from "@/shared/lib/head/meta-data";
 import PostPage from "./post-page";
-import { getPostSSR } from "@/features/posts/model/get-post.ssr";
+import { getPostSSR } from "@/features/post/model/get-post.ssr";
 
 export async function generateMetadata({ params }: any) {
   const { post: slug } = await params;
