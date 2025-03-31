@@ -1,4 +1,4 @@
-export const FORGOT_MESSAGES = [
+export const FORGOT_PASSWORD_MESSAGES = [
   "Forgot again? Passwords aren’t Pokémon, you don’t need to catch them all!",
   "Even Sherlock would struggle to remember all these passwords.",
   "Oops… looks like your brain did a factory reset.",

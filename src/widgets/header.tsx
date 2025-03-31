@@ -17,7 +17,6 @@ import {
   NavbarContent,
   NavbarItem,
   useDisclosure,
-  User,
 } from "@heroui/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -25,6 +24,7 @@ import { useRouter } from "next/navigation";
 import LogoDark from "@/assets/icons/logo-dark.svg";
 import LogoLight from "@/assets/icons/logo-light.svg";
 import { AuthModal } from "../features/auth/ui/auth-modal";
+import { UserAvatar } from "@/features/user/ui/user-avatar";
 
 export const Header = () => {
   const { logout } = useAuth();
@@ -104,18 +104,7 @@ export const Header = () => {
                       user?.lastName || ""
                     }`}
                   >
-                    <User
-                      avatarProps={{
-                        size: "sm",
-                        src: user?.avatarUrl || undefined,
-                        name: `${user?.firstName?.charAt(
-                          0
-                        )}${user?.lastName?.charAt(0)}`,
-                        className: "cursor-pointer",
-                      }}
-                      name={`${user?.firstName || ""} ${user?.lastName || ""}`}
-                      description={`@${user?.userName}`}
-                    />
+                    <UserAvatar user={user} />
                   </DropdownItem>
 
                   <DropdownItem

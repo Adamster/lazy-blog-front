@@ -3,7 +3,7 @@ import {
   UserPostItem,
   UserResponse,
 } from "@/shared/api/openapi";
-import { Badge, Divider, Image, User } from "@heroui/react";
+import { Badge, Divider, Image } from "@heroui/react";
 import Link from "next/link";
 import {
   PostDetailsComments,
@@ -12,6 +12,7 @@ import {
   PostDetailsTags,
   PostDetailsViews,
 } from "@/features/post/ui/post-details";
+import { UserAvatar } from "@/features/user/ui/user-avatar";
 interface IProps {
   post: DisplayPostResponse | UserPostItem;
   author: UserResponse;
@@ -29,23 +30,7 @@ export default function PostCard({
     <>
       <div className="flex w-full flex-col gap-6">
         <div className="flex justify-center flex-col gap-4">
-          <Link
-            href={`/${author.userName}`}
-            className={hideAuthor ? "hidden" : ""}
-          >
-            <User
-              className="hover:opacity-70 transition-opacity"
-              avatarProps={{
-                size: "sm",
-                src: author.avatarUrl || undefined,
-                name: `${author.firstName?.charAt(0)}${author.lastName?.charAt(
-                  0
-                )}`,
-              }}
-              name={`${author.firstName} ${author.lastName}`}
-              description={"@" + author.userName}
-            />
-          </Link>
+          {!hideAuthor && <UserAvatar user={author} isLink />}
 
           <div>
             <Link className="m-0" href={`/${author.userName}/${post.slug}`}>

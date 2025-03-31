@@ -10,31 +10,27 @@ import { useMemo, useState } from "react";
 import { useAuth } from "@/features/auth/model/use-auth";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { randomMessageFromList } from "@/shared/lib/utils";
-import { SIGNUP_MESSAGES } from "./types";
+import { CREATE_ACCOUNT_MESSAGES } from "./types";
 
 export default function CreateAccount() {
   const { register } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const randomMessage = useMemo(
-    () => randomMessageFromList(SIGNUP_MESSAGES),
+    () => randomMessageFromList(CREATE_ACCOUNT_MESSAGES),
     []
   );
-
-  interface FormData extends RegisterUserRequest {
-    confirmPassword: string;
-  }
 
   const {
     register: formRegister,
     handleSubmit,
     formState: { errors },
     getValues,
-  } = useForm<FormData>({
+  } = useForm<RegisterUserRequest & { confirmPassword: string }>({
     shouldUseNativeValidation: false,
   });
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: RegisterUserRequest) => {
     setLoading(true);
 
     try {

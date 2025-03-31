@@ -7,14 +7,14 @@ import { randomMessageFromList } from "@/shared/lib/utils";
 import { RocketLaunchIcon } from "@heroicons/react/24/outline";
 import { Button, Divider, Input } from "@heroui/react";
 import { useForm } from "react-hook-form";
-import { FORGOT_MESSAGES } from "./types";
+import { FORGOT_PASSWORD_MESSAGES } from "./types";
 import { useMemo } from "react";
 
 export default function ForgotPassword() {
   const forgotPasswordMutation = useForgotPassword();
 
   const randomMessage = useMemo(
-    () => randomMessageFromList(FORGOT_MESSAGES),
+    () => randomMessageFromList(FORGOT_PASSWORD_MESSAGES),
     []
   );
 
