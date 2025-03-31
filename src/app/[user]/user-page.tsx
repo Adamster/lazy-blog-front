@@ -1,16 +1,16 @@
 "use client";
 
-import { ErrorMessage } from "@/components/errors/error-message";
+import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { DocumentTextIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "@heroicons/react/24/solid";
 import { Divider, User } from "@heroui/react";
 import { formatDate2 } from "@/shared/lib/utils";
-import { PostsList } from "@/features/posts/ui/posts-list";
-import { usePostsByUser } from "@/features/user/model/use-posts-by-user";
+import { PostsList } from "@/features/post/ui/posts-list";
+import { usePostsByUserName } from "@/features/post/model/use-posts-by-username";
 
 export default function UserPage({ userName }: { userName: string }) {
-  const query = usePostsByUser(userName);
+  const query = usePostsByUserName(userName);
 
   const posts = query.data?.pages.flatMap((page) => page.postItems) || [];
   const totalPosts = query.data?.pages[0].totalPostCount || null;
@@ -43,7 +43,7 @@ export default function UserPage({ userName }: { userName: string }) {
                   className="mb-1"
                   key={user.id}
                   avatarProps={{
-                    size: "lg",
+                    className: "w-20 h-20 text-large",
                     src: user.avatarUrl || undefined,
                     name: `${user.firstName?.charAt(0)}${user.lastName?.charAt(
                       0

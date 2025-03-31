@@ -1,14 +1,12 @@
 "use client";
 
-import { apiClient } from "@/shared/api/api-client";
+import { useUserById } from "@/features/user/model/use-user-by-id";
 import { UserResponse } from "@/shared/api/openapi";
 import { Loading } from "@/shared/ui/loading";
-import { useQuery } from "@tanstack/react-query";
 import React, { createContext, useContext } from "react";
 
 interface UserContextType {
   user: UserResponse | undefined;
-  isLoading: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -28,27 +26,11 @@ export function UserProvider({
   userId: string | null;
   children: React.ReactNode;
 }) {
-  const { data: user, isLoading } = useQuery({
-    queryKey: ["getUserById", userId],
-    queryFn: async () => {
-      if (!userId) return undefined;
-      return apiClient.users.getUserById({ id: userId });
-    },
-    enabled: !!userId,
-  });
+  const { data: user, isLoading } = useUserById(userId || "");
 
-  if (isLoading) {
-    return <Loading compensateHeader={false} />;
-  }
-
-  return (
-    <UserContext.Provider
-      value={{
-        user,
-        isLoading,
-      }}
-    >
-      {children}
-    </UserContext.Provider>
+  return isLoading ? (
+    <Loading compensateHeader={false} />
+  ) : (
+    <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>
   );
 }

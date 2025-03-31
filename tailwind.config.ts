@@ -35,7 +35,7 @@ export default {
             // secondary: "#535C8D",
             background: "#fafafa",
             foreground: "#2e3035",
-            focus: "#83AFA0",
+            focus: "#8AADD0",
           },
         },
         dark: {
@@ -45,7 +45,7 @@ export default {
             background: "#2e3035",
             foreground: "#dedede",
             content1: "#2e3035",
-            focus: "#5B8E7D",
+            focus: "#3C6997",
           },
         },
       },

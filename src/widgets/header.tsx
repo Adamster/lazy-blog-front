@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/features/auth/hooks/use-auth";
+import { useAuth } from "@/features/auth/model/use-auth";
 import IsAuth from "@/features/auth/guards/is-auth";
 import { useTheme } from "@/shared/providers/theme-providers";
 import { useUser } from "@/shared/providers/user-provider";
@@ -24,7 +24,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import LogoDark from "@/assets/icons/logo-dark.svg";
 import LogoLight from "@/assets/icons/logo-light.svg";
-import { AuthModal } from "../components/modals/user/auth-modal";
+import { AuthModal } from "../features/auth/ui/auth-modal";
 
 export const Header = () => {
   const { logout } = useAuth();

@@ -1,10 +1,10 @@
 "use client";
 
-import { ErrorMessage } from "@/components/errors/error-message";
+import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
-import { UpdateAvatar } from "@/components/profile/update-avatar";
-import { UpdatePassword } from "@/components/profile/update-password";
-import { UpdateProfile } from "@/components/profile/update-profile";
+import { UpdateAvatar } from "@/features/user/ui/update-avatar";
+import { UpdatePasswordForm } from "@/features/user/ui/update-pass-form";
+import { UpdateUserForm } from "@/features/user/ui/update-user-form";
 import IsAuth from "@/features/auth/guards/is-auth";
 import { useUser } from "@/shared/providers/user-provider";
 import { Divider, Tab, Tabs } from "@heroui/react";
@@ -24,10 +24,10 @@ export default function ProfilePage() {
         <div className="layout-page-content">
           <Tabs variant="solid" classNames={{ panel: "p-0 pt-4" }}>
             <Tab key="profile" title="Edit Profile">
-              <UpdateProfile userData={userData} />
+              <UpdateUserForm userData={userData} />
             </Tab>
             <Tab key="password" title="Change Password">
-              <UpdatePassword />
+              <UpdatePasswordForm />
             </Tab>
           </Tabs>
         </div>

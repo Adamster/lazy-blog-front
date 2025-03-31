@@ -1,11 +1,11 @@
 "use client";
 
-import { ErrorMessage } from "@/components/errors/error-message";
+import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { snakeToTitle } from "@/shared/lib/utils";
 import { Divider } from "@heroui/react";
-import { PostsList } from "@/features/posts/ui/posts-list";
-import { usePostsByTag } from "@/features/tags/model/use-posts-by-tag";
+import { PostsList } from "@/features/post/ui/posts-list";
+import { usePostsByTag } from "@/features/post/model/use-posts-by-tag";
 
 export default function TagPage({ tag }: { tag: string }) {
   const tagName = snakeToTitle(tag);
