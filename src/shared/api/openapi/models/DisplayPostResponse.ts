@@ -13,13 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { UserResponse } from './UserResponse';
-import {
-    UserResponseFromJSON,
-    UserResponseFromJSONTyped,
-    UserResponseToJSON,
-    UserResponseToJSONTyped,
-} from './UserResponse';
 import type { TagPostResponse } from './TagPostResponse';
 import {
     TagPostResponseFromJSON,
@@ -27,6 +20,13 @@ import {
     TagPostResponseToJSON,
     TagPostResponseToJSONTyped,
 } from './TagPostResponse';
+import type { AuthorPostResponse } from './AuthorPostResponse';
+import {
+    AuthorPostResponseFromJSON,
+    AuthorPostResponseFromJSONTyped,
+    AuthorPostResponseToJSON,
+    AuthorPostResponseToJSONTyped,
+} from './AuthorPostResponse';
 import type { NullableOfVoteDirection } from './NullableOfVoteDirection';
 import {
     NullableOfVoteDirectionFromJSON,
@@ -73,10 +73,10 @@ export interface DisplayPostResponse {
     isPublished: boolean;
     /**
      * 
-     * @type {UserResponse}
+     * @type {AuthorPostResponse}
      * @memberof DisplayPostResponse
      */
-    author: UserResponse;
+    author: AuthorPostResponse;
     /**
      * 
      * @type {number}
@@ -158,7 +158,7 @@ export function DisplayPostResponseFromJSONTyped(json: any, ignoreDiscriminator:
         'summary': json['summary'],
         'slug': json['slug'],
         'isPublished': json['isPublished'],
-        'author': UserResponseFromJSON(json['author']),
+        'author': AuthorPostResponseFromJSON(json['author']),
         'views': json['views'],
         'comments': json['comments'],
         'rating': json['rating'],
@@ -185,7 +185,7 @@ export function DisplayPostResponseToJSONTyped(value?: DisplayPostResponse | nul
         'summary': value['summary'],
         'slug': value['slug'],
         'isPublished': value['isPublished'],
-        'author': UserResponseToJSON(value['author']),
+        'author': AuthorPostResponseToJSON(value['author']),
         'views': value['views'],
         'comments': value['comments'],
         'rating': value['rating'],

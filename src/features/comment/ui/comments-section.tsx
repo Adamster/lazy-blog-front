@@ -1,5 +1,5 @@
 import { CommentResponse } from "@/shared/api/openapi";
-import IsAuth from "@/features/auth/guards/is-auth";
+import { IsAuth } from "@/features/auth/guards/is-auth";
 import Comment from "./comment-view";
 import { Loading } from "@/shared/ui/loading";
 import { Divider } from "@heroui/react";

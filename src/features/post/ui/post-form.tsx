@@ -4,12 +4,13 @@ import {
   ButtonGroup,
   Divider,
   Input,
+  Link,
   Select,
   SelectItem,
   Switch,
 } from "@heroui/react";
 import {
-  PencilSquareIcon,
+  ArrowTopRightOnSquareIcon,
   RocketLaunchIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
@@ -19,16 +20,25 @@ import { useCallback } from "react";
 import { debounce } from "lodash";
 import { PostImageUploader } from "./post-image-uploader";
 import { useTags } from "@/features/tag/model/use-tags";
+import { useUser } from "@/shared/providers/user-provider";
 
 interface IProps {
   form: UseFormReturn<UpdatePostRequest>;
   onSubmit: () => void;
   onDelete?: () => void;
-  create: boolean;
+  isCreate: boolean;
+  isPending: boolean;
 }
 
-export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
+export const PostForm = ({
+  form,
+  onSubmit,
+  onDelete,
+  isCreate,
+  isPending,
+}: IProps) => {
   const { data: tags } = useTags();
+  const { user } = useUser();
 
   const {
     register,
@@ -44,7 +54,7 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
   );
 
   return (
-    <form className="layout-page" noValidate>
+    <form noValidate className="layout-page">
       <div className="layout-page-content">
         <div className="mb-8">
           <PostImageUploader
@@ -75,7 +85,7 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
 
         <div className="layout-page-aside-content">
           <aside className="layout-page-aside-content-sticky">
-            {!create && (
+            {!isCreate && (
               <div className="w-full">
                 <Input
                   classNames={{ input: "text-base" }}
@@ -90,6 +100,17 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
                     },
                   })}
                   errorMessage={errors.slug?.message}
+                  endContent={
+                    <Button
+                      target="_blank"
+                      variant="flat"
+                      href={`/${user?.userName}/${form.getValues("slug")}`}
+                      as={Link}
+                      isIconOnly
+                    >
+                      <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                    </Button>
+                  }
                 />
               </div>
             )}
@@ -151,37 +172,35 @@ export const PostForm = ({ form, onSubmit, onDelete, create }: IProps) => {
                 name="isPublished"
                 control={control}
                 render={({ field }) => (
-                  <Switch
-                    className="me-auto"
-                    isSelected={field.value}
-                    onChange={field.onChange}
-                  />
+                  <>
+                    <Switch
+                      size="sm"
+                      className="me-auto"
+                      isSelected={field.value}
+                      onChange={field.onChange}
+                    />
+
+                    <ButtonGroup>
+                      <Button
+                        variant={field.value ? "solid" : "flat"}
+                        color={field.value ? "primary" : "default"}
+                        onPress={onSubmit}
+                        disabled={isPending}
+                        isLoading={isPending}
+                      >
+                        {!isPending && <RocketLaunchIcon className="w-4 h-4" />}
+                        {field.value ? "Publish" : "in Drafts"}
+                      </Button>
+
+                      {!isCreate && (
+                        <Button isIconOnly color="danger" onPress={onDelete}>
+                          <TrashIcon className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </ButtonGroup>
+                  </>
                 )}
               />
-
-              <ButtonGroup>
-                <Button
-                  variant={form.watch("isPublished") ? "solid" : "flat"}
-                  color={form.watch("isPublished") ? "primary" : "default"}
-                  onPress={onSubmit}
-                >
-                  {form.watch("isPublished") ? (
-                    <>
-                      <RocketLaunchIcon className="w-4 h-4" /> Publish
-                    </>
-                  ) : (
-                    <>
-                      <PencilSquareIcon className="w-4 h-4" /> In Drafts
-                    </>
-                  )}
-                </Button>
-
-                {!create && (
-                  <Button isIconOnly color="danger" onPress={onDelete}>
-                    <TrashIcon className="h-4 w-4" />
-                  </Button>
-                )}
-              </ButtonGroup>
             </div>
           </aside>
         </div>

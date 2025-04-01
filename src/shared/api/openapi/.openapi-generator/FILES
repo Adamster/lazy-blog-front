@@ -4,11 +4,13 @@ apis/ForgotPasswordApi.ts
 apis/MediaApi.ts
 apis/PostsApi.ts
 apis/ResetPasswordApi.ts
+apis/RoleApi.ts
 apis/TagsApi.ts
 apis/UsersApi.ts
 apis/index.ts
 index.ts
 models/AddCommentRequest.ts
+models/AuthorPostResponse.ts
 models/ChangePasswordRequest.ts
 models/CommentResponse.ts
 models/CreatePostRequest.ts
@@ -19,6 +21,7 @@ models/LoginResponse.ts
 models/MediaItemResponse.ts
 models/NoContent.ts
 models/NullableOfVoteDirection.ts
+models/PostCreatedResponse.ts
 models/PostDetailedResponse.ts
 models/PostResponse.ts
 models/ProblemDetails.ts

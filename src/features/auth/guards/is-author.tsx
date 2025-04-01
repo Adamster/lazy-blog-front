@@ -7,9 +7,7 @@ interface IProps {
   fallback?: ReactNode;
 }
 
-const IsAuthor = ({ children, userId, fallback = null }: IProps) => {
+export const IsAuthor = ({ children, userId, fallback = null }: IProps) => {
   const { user } = useUser();
   return user?.id === userId ? children : fallback;
 };
-
-export default IsAuthor;

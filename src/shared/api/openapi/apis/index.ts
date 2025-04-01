@@ -6,5 +6,6 @@ export * from './ForgotPasswordApi';
 export * from './MediaApi';
 export * from './PostsApi';
 export * from './ResetPasswordApi';
+export * from './RoleApi';
 export * from './TagsApi';
 export * from './UsersApi';

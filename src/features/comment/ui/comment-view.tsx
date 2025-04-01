@@ -2,7 +2,7 @@
 import { apiClient } from "@/shared/api/api-client";
 import { CommentResponse } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
-import IsAuthor from "@/features/auth/guards/is-author";
+import { IsAuthor } from "@/features/auth/guards/is-author";
 import { PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { CalendarIcon } from "@heroicons/react/24/solid";
 import { Button, Divider } from "@heroui/react";
