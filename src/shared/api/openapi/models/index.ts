@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './AddCommentRequest';
+export * from './AuthorPostResponse';
 export * from './ChangePasswordRequest';
 export * from './CommentResponse';
 export * from './CreatePostRequest';
@@ -11,6 +12,7 @@ export * from './LoginResponse';
 export * from './MediaItemResponse';
 export * from './NoContent';
 export * from './NullableOfVoteDirection';
+export * from './PostCreatedResponse';
 export * from './PostDetailedResponse';
 export * from './PostResponse';
 export * from './ProblemDetails';

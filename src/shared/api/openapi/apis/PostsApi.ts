@@ -18,6 +18,7 @@ import type {
   CreatePostRequest,
   DisplayPostResponse,
   NoContent,
+  PostCreatedResponse,
   PostDetailedResponse,
   PostResponse,
   ProblemDetails,
@@ -31,6 +32,8 @@ import {
     DisplayPostResponseToJSON,
     NoContentFromJSON,
     NoContentToJSON,
+    PostCreatedResponseFromJSON,
+    PostCreatedResponseToJSON,
     PostDetailedResponseFromJSON,
     PostDetailedResponseToJSON,
     PostResponseFromJSON,
@@ -109,11 +112,11 @@ export interface PostsApiInterface {
      * @throws {RequiredError}
      * @memberof PostsApiInterface
      */
-    createPostRaw(requestParameters: CreatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    createPostRaw(requestParameters: CreatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostCreatedResponse>>;
 
     /**
      */
-    createPost(requestParameters: CreatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    createPost(requestParameters: CreatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostCreatedResponse>;
 
     /**
      * 
@@ -271,7 +274,7 @@ export class PostsApi extends runtime.BaseAPI implements PostsApiInterface {
 
     /**
      */
-    async createPostRaw(requestParameters: CreatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async createPostRaw(requestParameters: CreatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostCreatedResponse>> {
         if (requestParameters['createPostRequest'] == null) {
             throw new runtime.RequiredError(
                 'createPostRequest',
@@ -293,13 +296,14 @@ export class PostsApi extends runtime.BaseAPI implements PostsApiInterface {
             body: CreatePostRequestToJSON(requestParameters['createPostRequest']),
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PostCreatedResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async createPost(requestParameters: CreatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.createPostRaw(requestParameters, initOverrides);
+    async createPost(requestParameters: CreatePostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostCreatedResponse> {
+        const response = await this.createPostRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**

@@ -13,13 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { UserResponse } from './UserResponse';
-import {
-    UserResponseFromJSON,
-    UserResponseFromJSONTyped,
-    UserResponseToJSON,
-    UserResponseToJSONTyped,
-} from './UserResponse';
 import type { TagPostResponse } from './TagPostResponse';
 import {
     TagPostResponseFromJSON,
@@ -27,6 +20,13 @@ import {
     TagPostResponseToJSON,
     TagPostResponseToJSONTyped,
 } from './TagPostResponse';
+import type { AuthorPostResponse } from './AuthorPostResponse';
+import {
+    AuthorPostResponseFromJSON,
+    AuthorPostResponseFromJSONTyped,
+    AuthorPostResponseToJSON,
+    AuthorPostResponseToJSONTyped,
+} from './AuthorPostResponse';
 
 /**
  * 
@@ -54,10 +54,10 @@ export interface PostDetailedResponse {
     summary: string | null;
     /**
      * 
-     * @type {UserResponse}
+     * @type {AuthorPostResponse}
      * @memberof PostDetailedResponse
      */
-    author: UserResponse;
+    author: AuthorPostResponse;
     /**
      * 
      * @type {string}
@@ -140,7 +140,7 @@ export function PostDetailedResponseFromJSONTyped(json: any, ignoreDiscriminator
         'id': json['id'],
         'title': json['title'],
         'summary': json['summary'],
-        'author': UserResponseFromJSON(json['author']),
+        'author': AuthorPostResponseFromJSON(json['author']),
         'slug': json['slug'],
         'body': json['body'],
         'coverUrl': json['coverUrl'],
@@ -166,7 +166,7 @@ export function PostDetailedResponseToJSONTyped(value?: PostDetailedResponse | n
         'id': value['id'],
         'title': value['title'],
         'summary': value['summary'],
-        'author': UserResponseToJSON(value['author']),
+        'author': AuthorPostResponseToJSON(value['author']),
         'slug': value['slug'],
         'body': value['body'],
         'coverUrl': value['coverUrl'],

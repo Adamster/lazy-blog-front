@@ -13,13 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { UserResponse } from './UserResponse';
-import {
-    UserResponseFromJSON,
-    UserResponseFromJSONTyped,
-    UserResponseToJSON,
-    UserResponseToJSONTyped,
-} from './UserResponse';
 import type { TagPostResponse } from './TagPostResponse';
 import {
     TagPostResponseFromJSON,
@@ -27,6 +20,13 @@ import {
     TagPostResponseToJSON,
     TagPostResponseToJSONTyped,
 } from './TagPostResponse';
+import type { AuthorPostResponse } from './AuthorPostResponse';
+import {
+    AuthorPostResponseFromJSON,
+    AuthorPostResponseFromJSONTyped,
+    AuthorPostResponseToJSON,
+    AuthorPostResponseToJSONTyped,
+} from './AuthorPostResponse';
 
 /**
  * 
@@ -72,10 +72,10 @@ export interface PostResponse {
     isPublished: boolean;
     /**
      * 
-     * @type {UserResponse}
+     * @type {AuthorPostResponse}
      * @memberof PostResponse
      */
-    author: UserResponse;
+    author: AuthorPostResponse;
     /**
      * 
      * @type {Array<TagPostResponse>}
@@ -122,7 +122,7 @@ export function PostResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'body': json['body'],
         'slug': json['slug'],
         'isPublished': json['isPublished'],
-        'author': UserResponseFromJSON(json['author']),
+        'author': AuthorPostResponseFromJSON(json['author']),
         'tags': ((json['tags'] as Array<any>).map(TagPostResponseFromJSON)),
         'coverUrl': json['coverUrl'],
     };
@@ -145,7 +145,7 @@ export function PostResponseToJSONTyped(value?: PostResponse | null, ignoreDiscr
         'body': value['body'],
         'slug': value['slug'],
         'isPublished': value['isPublished'],
-        'author': UserResponseToJSON(value['author']),
+        'author': AuthorPostResponseToJSON(value['author']),
         'tags': ((value['tags'] as Array<any>).map(TagPostResponseToJSON)),
         'coverUrl': value['coverUrl'],
     };
