@@ -1,14 +1,14 @@
-## NotLazy Blog
+## 📝 !Lazy Blog
 
-NotLazy Blog — это минималистичный блог на Next.js, в котором публикуются случайные темы без строгих ограничений.
+**!Lazy Blog** is a minimalist blog for writing about anything — tech, thoughts, life, and everything in between.  
+No strict themes. Just content that matters (or doesn’t).
 
-## Технологии
+---
 
-- Next.js
-- React Query
-- Hero UI + Tailwind
-- Markdown/MDX
+### ⚙️ Stack
 
-## Лицензия
-
-MIT
+- **FSD architecture** — organized, scalable structure
+- **Next.js** — Mainly for **SEO** (meta tags)
+- **React Query** — data fetching and caching
+- **Hero UI + Tailwind CSS** — modern and flexible UI
+- **MDX/Markdown** — write posts with rich formatting
