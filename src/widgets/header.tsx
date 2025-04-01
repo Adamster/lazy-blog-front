@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/features/auth/model/use-auth";
-import IsAuth from "@/features/auth/guards/is-auth";
+import { IsAuth } from "@/features/auth/guards/is-auth";
 import { useTheme } from "@/shared/providers/theme-providers";
 import { useUser } from "@/shared/providers/user-provider";
 import { MoonIcon, PencilSquareIcon, SunIcon } from "@heroicons/react/24/solid";

@@ -4,10 +4,10 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 
 import { PostDetailedResponse } from "@/shared/api/openapi";
-import IsAuthor from "@/features/auth/guards/is-author";
+import { IsAuthor } from "@/features/auth/guards/is-author";
 import { PencilIcon } from "@heroicons/react/24/solid";
 import { Badge, Button, Divider, Image } from "@heroui/react";
-import IsAuth from "@/features/auth/guards/is-auth";
+import { IsAuth } from "@/features/auth/guards/is-auth";
 import { Loading } from "@/shared/ui/loading";
 import {
   PostDetailsComments,

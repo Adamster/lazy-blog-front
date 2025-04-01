@@ -2,53 +2,36 @@
 "use client";
 
 import { apiClient } from "@/shared/api/api-client";
-import {
-  UpdatePostOperationRequest,
-  UpdatePostRequest,
-} from "@/shared/api/openapi";
+import { UpdatePostRequest } from "@/shared/api/openapi";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
 import { PostForm } from "@/features/post/ui/post-form";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
-import IsAuthor from "@/features/auth/guards/is-author";
+import { IsAuthor } from "@/features/auth/guards/is-author";
 import { useUser } from "@/shared/providers/user-provider";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import IsAuth from "@/features/auth/guards/is-auth";
+import { IsAuth } from "@/features/auth/guards/is-auth";
+import { useUpdatePost } from "@/features/post/model/use-update-post";
+import { usePostBySlug } from "@/features/post/model/use-post-by-slug";
 
 const EditPage = () => {
   const { user } = useUser();
   const router = useRouter();
   const params = useParams();
-  const queryClient = useQueryClient();
   const slug = params?.post as string;
+  const { data: postData, error, isLoading } = usePostBySlug(slug);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const {
-    data: postData,
-    error,
-    isLoading,
-  } = useQuery({
-    queryKey: ["getPostBySlug", slug],
-    queryFn: () => apiClient.posts.getPostBySlug({ slug }),
-    enabled: !!slug,
-  });
 
   const isAuthor = user?.id === postData?.author.id;
 
   const form = useForm<UpdatePostRequest>({
     mode: "onChange",
   });
-
-  useEffect(() => {
-    if (user && postData && !isAuthor) {
-      setTimeout(() => router.push("/"), 4000);
-    }
-  }, [user, postData, isAuthor, router]);
 
   useEffect(() => {
     if (postData) {
@@ -64,36 +47,14 @@ const EditPage = () => {
     }
   }, [postData]);
 
-  const editMutation = useMutation({
-    mutationFn: ({ id, updatePostRequest }: UpdatePostOperationRequest) =>
-      apiClient.posts.updatePost({
-        id,
-        updatePostRequest,
-      }),
-    onSuccess: () => {
-      addToastSuccess("Post has been updated");
+  const updatePostMutation = useUpdatePost();
 
-      queryClient.invalidateQueries({
-        queryKey: ["getPostBySlug", postData?.slug],
-      });
-    },
-    onError: (error: any) => {
-      addToastError("Error updating post", error);
-    },
-  });
-
-  const onSubmit = () => {
-    const data = form.getValues();
-
-    form.trigger().then((isValid) => {
-      if (isValid) {
-        editMutation.mutate({
-          id: postData?.id ?? "",
-          updatePostRequest: data,
-        });
-      }
+  const onSubmit = form.handleSubmit((data) => {
+    updatePostMutation.mutate({
+      id: postData?.id ?? "",
+      updatePostRequest: data,
     });
-  };
+  });
 
   const deleteMutation = useMutation({
     mutationFn: () =>
@@ -136,7 +97,8 @@ const EditPage = () => {
             key={postData?.id}
             form={form}
             onSubmit={onSubmit}
-            create={false}
+            isCreate={false}
+            isPending={updatePostMutation.isPending}
             onDelete={onDelete}
           />
         )}

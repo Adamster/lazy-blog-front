@@ -6,9 +6,7 @@ interface IProps {
   fallback?: ReactNode;
 }
 
-const IsAuth = ({ children, fallback = null }: IProps) => {
+export const IsAuth = ({ children, fallback = null }: IProps) => {
   const { isAuthenticated } = useAuth();
   return isAuthenticated ? children : fallback;
 };
-
-export default IsAuth;

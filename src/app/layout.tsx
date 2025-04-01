@@ -7,6 +7,7 @@ import { AppProviders } from "@/shared/providers/app-providers";
 import { Header } from "@/widgets/header";
 import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const font = Mulish({
   weight: ["300", "400", "500", "600", "700", "800"],
@@ -37,6 +38,7 @@ export default function RootLayout({
           <Header />
           <main className="max-w-4xl mx-auto">{children}</main>
         </AppProviders>
+        <SpeedInsights />
       </body>
     </html>
   );

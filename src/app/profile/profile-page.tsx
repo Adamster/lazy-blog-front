@@ -5,7 +5,7 @@ import { Loading } from "@/shared/ui/loading";
 import { UpdateAvatar } from "@/features/user/ui/update-avatar";
 import { UpdatePasswordForm } from "@/features/user/ui/update-pass-form";
 import { UpdateUserForm } from "@/features/user/ui/update-user-form";
-import IsAuth from "@/features/auth/guards/is-auth";
+import { IsAuth } from "@/features/auth/guards/is-auth";
 import { useUser } from "@/shared/providers/user-provider";
 import { Divider, Tab, Tabs } from "@heroui/react";
 import { useUserById } from "@/features/user/model/use-user-by-id";
