@@ -3,13 +3,14 @@ import { Button, Divider } from "@heroui/react";
 import { VotePostDirectionEnum } from "@/shared/api/openapi";
 import { useVotePost } from "../model/use-vote-post";
 import { randomMessageFromList } from "@/shared/lib/utils";
+import { useMemo } from "react";
 
 interface IProps {
   postId: string;
   postSlug: string;
 }
 
-const voteMessages = [
+const POST_VOTE_MESSAGE = [
   "Liking this post burns 0 calories — no excuses!",
   "Liking this post grants +1 to your charisma!",
   "Liking this post makes you 37% cooler. It's science.",
@@ -23,7 +24,10 @@ const voteMessages = [
 ];
 
 export const PostVote = ({ postId, postSlug }: IProps) => {
-  const randomMessage = randomMessageFromList(voteMessages);
+  const randomMessage = useMemo(
+    () => randomMessageFromList(POST_VOTE_MESSAGE),
+    []
+  );
   const handleVote = useVotePost(postId, postSlug);
 
   return (

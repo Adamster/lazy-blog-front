@@ -73,8 +73,8 @@ export default function ForgotPassword() {
         <div className="layout-page-aside">
           <Divider className="layout-page-divider" orientation="vertical" />
 
-          <div className="layout-page-aside-content">
-            <aside className="layout-page-aside-content-sticky">
+          <div className="layout-page-aside-wrapper">
+            <aside className="layout-page-aside-sticky">
               <NotLazyAvatar />
               <p className="text-gray text-sm">{randomMessage}</p>
             </aside>

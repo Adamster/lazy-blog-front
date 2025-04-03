@@ -13,8 +13,8 @@ export default {
   theme: {
     extend: {
       width: {
-        content: "60%",
-        aside: "40%",
+        content: "62%",
+        aside: "38%",
       },
     },
   },
@@ -31,7 +31,7 @@ export default {
       themes: {
         light: {
           colors: {
-            primary: "#8AADD0",
+            // primary: "#EC9F05",
             // secondary: "#535C8D",
             background: "#fafafa",
             foreground: "#2e3035",
@@ -40,7 +40,7 @@ export default {
         },
         dark: {
           colors: {
-            primary: "#3C6997",
+            // primary: "#EC9F05",
             // secondary: "#535C8D",
             background: "#2e3035",
             foreground: "#dedede",

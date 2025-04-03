@@ -2,6 +2,7 @@ import { MarkdownWrapper } from "./markdown-wrapper";
 import {
   Button,
   ButtonGroup,
+  cn,
   Divider,
   Input,
   Link,
@@ -16,11 +17,12 @@ import {
 } from "@heroicons/react/24/outline";
 import { UpdatePostRequest } from "@/shared/api/openapi";
 import { Controller, UseFormReturn } from "react-hook-form";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { debounce } from "lodash";
 import { PostImageUploader } from "./post-image-uploader";
 import { useTags } from "@/features/tag/model/use-tags";
 import { useUser } from "@/shared/providers/user-provider";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 
 interface IProps {
   form: UseFormReturn<UpdatePostRequest>;
@@ -40,6 +42,8 @@ export const PostForm = ({
   const { data: tags } = useTags();
   const { user } = useUser();
 
+  const [fullView, setFullView] = useState(false);
+
   const {
     register,
     control,
@@ -54,7 +58,7 @@ export const PostForm = ({
   );
 
   return (
-    <form noValidate className="layout-page">
+    <form noValidate className={cn("layout-page", fullView ? "full" : "")}>
       <div className="layout-page-content">
         <div className="mb-8">
           <PostImageUploader
@@ -69,8 +73,9 @@ export const PostForm = ({
           rules={{ required: "Field is required" }}
           render={({ field }) => (
             <MarkdownWrapper
+              key={form.getValues("slug")}
               placeholder="Too lazy to write a post? Just start typing..."
-              markdown={form.watch("body")}
+              markdown={field.value || ""}
               onChange={(value) => handleChange(value, field.onChange)}
             />
           )}
@@ -83,8 +88,23 @@ export const PostForm = ({
       <div className="layout-page-aside">
         <Divider className="layout-page-divider" orientation="vertical" />
 
-        <div className="layout-page-aside-content">
-          <aside className="layout-page-aside-content-sticky">
+        <div className="layout-page-aside-wrapper">
+          <aside className="layout-page-aside-sticky">
+            <Button
+              className="layout-page-view-toggle bg-background border-1 min-w-6 w-6 h-6"
+              size="sm"
+              isIconOnly
+              variant="bordered"
+              radius="full"
+              onPress={() => setFullView((view) => !view)}
+            >
+              {fullView ? (
+                <ChevronLeftIcon className="w-4 h-4" />
+              ) : (
+                <ChevronRightIcon className="w-4 h-4" />
+              )}
+            </Button>
+
             {!isCreate && (
               <div className="w-full">
                 <Input
@@ -102,11 +122,13 @@ export const PostForm = ({
                   errorMessage={errors.slug?.message}
                   endContent={
                     <Button
+                      size="sm"
                       target="_blank"
                       variant="flat"
                       href={`/${user?.userName}/${form.getValues("slug")}`}
                       as={Link}
                       isIconOnly
+                      style={{ marginBottom: "0.125rem" }}
                     >
                       <ArrowTopRightOnSquareIcon className="w-4 h-4" />
                     </Button>
@@ -172,35 +194,49 @@ export const PostForm = ({
                 name="isPublished"
                 control={control}
                 render={({ field }) => (
-                  <>
-                    <Switch
-                      size="sm"
-                      className="me-auto"
-                      isSelected={field.value}
-                      onChange={field.onChange}
-                    />
-
-                    <ButtonGroup>
-                      <Button
-                        variant={field.value ? "solid" : "flat"}
-                        color={field.value ? "primary" : "default"}
-                        onPress={onSubmit}
-                        disabled={isPending}
-                        isLoading={isPending}
-                      >
-                        {!isPending && <RocketLaunchIcon className="w-4 h-4" />}
-                        {field.value ? "Publish" : "in Drafts"}
-                      </Button>
-
-                      {!isCreate && (
-                        <Button isIconOnly color="danger" onPress={onDelete}>
-                          <TrashIcon className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </ButtonGroup>
-                  </>
+                  <div className="flex flex-col gap-4 w-full items-end">
+                    <div
+                      className="w-full flex flex-row items-center gap-4 min-h-10 h-14 px-3 py-2 rounded-medium cursor-pointer shadow-sm bg-default-100 hover:bg-default-200"
+                      onClick={() => field.onChange(!field.value)}
+                    >
+                      <Switch
+                        color="success"
+                        isSelected={field.value}
+                        onChange={field.onChange}
+                        size="sm"
+                        classNames={{ wrapper: "bg-default-300" }}
+                      />
+                      <span>{field.value ? "Published" : "Draft"}</span>
+                    </div>
+                  </div>
                 )}
               />
+            </div>
+
+            <div className="flex w-full items-center justify-end">
+              <ButtonGroup>
+                <Button
+                  variant="flat"
+                  color="primary"
+                  onPress={onSubmit}
+                  disabled={isPending}
+                  isLoading={isPending}
+                >
+                  {!isPending && <RocketLaunchIcon className="w-4 h-4" />}
+                  Go
+                </Button>
+
+                {!isCreate && (
+                  <Button
+                    isIconOnly
+                    color="danger"
+                    variant="flat"
+                    onPress={onDelete}
+                  >
+                    <TrashIcon className="h-4 w-4" />
+                  </Button>
+                )}
+              </ButtonGroup>
             </div>
           </aside>
         </div>

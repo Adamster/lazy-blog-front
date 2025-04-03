@@ -100,14 +100,14 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
             src={imagePreview}
             stencilProps={{
               aspectRatio: {
-                minimum: 1 / 1,
+                minimum: 3 / 2,
                 maximum: 16 / 9,
               },
               grid: true,
             }}
             sizeRestrictions={{
-              minWidth: 800,
-              minHeight: 533,
+              minWidth: 1000,
+              minHeight: 500,
               maxWidth: 4000,
               maxHeight: 4000,
             }}

@@ -24,8 +24,8 @@ export default function TagPage({ tag }: { tag: string }) {
       <div className="layout-page-aside">
         <Divider className="layout-page-divider" orientation="vertical" />
 
-        <div className="layout-page-aside-content">
-          <aside className="layout-page-aside-content-sticky">
+        <div className="layout-page-aside-wrapper">
+          <aside className="layout-page-aside-sticky">
             <h3 className="text-lg font-semibold">{tagName}</h3>
             <p>
               Looking for something interesting? You’re in the right place. Dive
