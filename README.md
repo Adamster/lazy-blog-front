@@ -9,11 +9,11 @@ No strict themes. Just content that matters (or doesn’t).
 
 - [**FSD architecture**](https://feature-sliced.github.io/documentation) — organized, scalable structure
 - [**Next.js**](https://nextjs.org) — mainly for **SEO** (meta tags) & routing
-- **Tanstack React Query** — [`@tanstack/react-query`](https://tanstack.com/query/latest) — data fetching and caching
-- **React Hook Form** — [`react-hook-form`](https://react-hook-form.com) — form management and validation
-- **Hero UI + Tailwind CSS** — [`@heroui/react`](https://www.heroui.com) — modern and flexible UI
-- **Markdown Editor** — [`@mdxeditor/editor`](https://mdxeditor.dev) — powerful wysiwyg markdown editor
-- **Markdown Preview** — [`@uiw/react-markdown-preview`](https://github.com/uiwjs/react-markdown-preview)
-- **Image cropping** — [`react-advanced-cropper`](https://advanced-cropper.github.io/react-advanced-cropper)
-- **Emoji picker** — [`emoji-picker-react`](https://github.com/ealush/emoji-picker-react)
-- **Animations** — [`framer-motion`](https://www.framer.com/motion)
+- [**Tanstack React Query**](https://tanstack.com/query/latest) — data fetching and caching
+- [**React Hook Form**](https://react-hook-form.com) — form management and validation
+- [**Haiku**](https://github.com/DavidHDev/haiku) — A clean & lightweight collection of React Hooks
+- [**Hero UI + Tailwind CSS**](https://www.heroui.com) — modern and flexible UI
+- [**MDX Markdown Editor**](https://mdxeditor.dev) — powerful wysiwyg markdown editor
+- [**Markdown Preview**](https://github.com/uiwjs/react-markdown-preview) - unfortunately MDX doesn't support preview mode
+- [**Image cropping**](https://advanced-cropper.github.io/react-advanced-cropper) - nice react cropper library
+- [**Emoji picker**](https://github.com/ealush/emoji-picker-react) - :)
