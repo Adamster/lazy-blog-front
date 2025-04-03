@@ -37,9 +37,9 @@ export default function UserPage({ userName }: { userName: string }) {
         <div className="layout-page-aside">
           <Divider className="layout-page-divider" orientation="vertical" />
 
-          <div className="layout-page-aside-content">
+          <div className="layout-page-aside-wrapper">
             {user && (
-              <aside className="layout-page-aside-content-sticky">
+              <aside className="layout-page-aside-sticky">
                 <UserAvatar user={user} isProfile />
 
                 {user?.biography && (

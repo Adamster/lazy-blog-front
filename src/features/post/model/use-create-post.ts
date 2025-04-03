@@ -16,7 +16,7 @@ export const useCreatePost = () => {
         createPostRequest: { userId: user?.id || "", ...data },
       }),
     onSuccess: (data, variables) => {
-      addToastSuccess("Post has been added");
+      addToastSuccess("Post has been created");
 
       if (variables.isPublished) {
         router.push(`/${user?.userName}/${data.slug}`);

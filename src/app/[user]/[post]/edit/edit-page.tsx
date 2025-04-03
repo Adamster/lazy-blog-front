@@ -1,31 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { apiClient } from "@/shared/api/api-client";
 import { UpdatePostRequest } from "@/shared/api/openapi";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
 import { PostForm } from "@/features/post/ui/post-form";
-import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { IsAuthor } from "@/features/auth/guards/is-author";
 import { useUser } from "@/shared/providers/user-provider";
-import { useMutation } from "@tanstack/react-query";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IsAuth } from "@/features/auth/guards/is-auth";
 import { useUpdatePost } from "@/features/post/model/use-update-post";
 import { usePostBySlug } from "@/features/post/model/use-post-by-slug";
+import { useDeletePost } from "@/features/post/model/use-delete-post";
 
 const EditPage = () => {
-  const { user } = useUser();
-  const router = useRouter();
   const params = useParams();
   const slug = params?.post as string;
-  const { data: postData, error, isLoading } = usePostBySlug(slug);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { data: postData, error, isLoading } = usePostBySlug(slug);
+  const { user } = useUser();
+  const deletePostMutation = useDeletePost();
 
   const isAuthor = user?.id === postData?.author.id;
 
@@ -45,7 +43,7 @@ const EditPage = () => {
         isPublished: postData.isPublished,
       });
     }
-  }, [postData]);
+  }, [postData?.id]);
 
   const updatePostMutation = useUpdatePost();
 
@@ -56,29 +54,13 @@ const EditPage = () => {
     });
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: () =>
-      apiClient.posts.deletePost({
-        id: postData?.id || "",
-      }),
-
-    onSuccess: () => {
-      addToastSuccess("Post has been deleted");
-      router.push("/");
-    },
-
-    onError: (error: any) => {
-      addToastError("Error deleting post", error);
-    },
-  });
-
   const onDelete = () => {
     setIsModalOpen(true);
   };
 
   const confirmedDelete = () => {
     setIsModalOpen(false);
-    deleteMutation.mutate();
+    deletePostMutation.mutate(postData?.id || "");
   };
 
   if (isLoading) return <Loading />;
@@ -92,7 +74,7 @@ const EditPage = () => {
           <ErrorMessage error={"Nice try, but this isn’t your playground!"} />
         }
       >
-        {form.getValues("slug") && isAuthor && (
+        {form && isAuthor && (
           <PostForm
             key={postData?.id}
             form={form}

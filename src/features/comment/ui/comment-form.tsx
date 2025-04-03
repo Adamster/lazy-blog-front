@@ -6,18 +6,16 @@ import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { useTheme } from "@/shared/providers/theme-providers";
 import { useUser } from "@/shared/providers/user-provider";
 import { FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/solid";
-import { Button, Textarea } from "@heroui/react";
+import { Button, cn, Textarea } from "@heroui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EmojiStyle, Theme } from "emoji-picker-react";
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useClickOutside } from "react-haiku";
 
-const Picker = dynamic(
-  () => {
-    return import("emoji-picker-react");
-  },
-  { ssr: false }
-);
+const Picker = dynamic(() => import("emoji-picker-react"), {
+  ssr: false,
+});
 
 interface IProps {
   postId?: string;
@@ -33,24 +31,9 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
   const { user } = useUser();
   const pickerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        pickerRef.current &&
-        !pickerRef.current.contains(event.target as Node)
-      ) {
-        setShowEmoji(false);
-      }
-    }
-
-    if (showEmoji) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showEmoji]);
+  useClickOutside(pickerRef, () => {
+    setShowEmoji(false);
+  });
 
   const postComment = useMutation({
     mutationFn: () =>
@@ -118,41 +101,42 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <Textarea
-        classNames={{ input: "text-base" }}
-        label="Too lazy to add a comment?"
-        required
-        value={body}
-        onChange={(e) => setBody(e.target.value)}
-        className="input w-full"
-        size="md"
-      />
+      <div className="relative">
+        <Textarea
+          classNames={{ input: "text-base" }}
+          label="Too lazy to add a comment?"
+          required
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          className="input w-full"
+          size="md"
+        />
 
-      {showEmoji && (
-        <div className="relative">
-          <div
-            ref={pickerRef}
-            className="absolute bottom-full right-0 mb-2 z-50"
-          >
-            <Picker
-              theme={isDarkTheme ? Theme.DARK : Theme.LIGHT}
-              onEmojiClick={(e) => {
-                setBody((prevBody) => prevBody + e.emoji);
-                setShowEmoji(false);
-              }}
-              autoFocusSearch={false}
-              emojiStyle={EmojiStyle.APPLE}
-              searchDisabled
-              height={300}
-              width={400}
-              skinTonesDisabled
-              previewConfig={{
-                showPreview: false,
-              }}
-            />
-          </div>
+        <div
+          ref={pickerRef}
+          className={cn(
+            "absolute right-0 bottom-0 z-50",
+            showEmoji ? "" : "hidden"
+          )}
+        >
+          <Picker
+            theme={isDarkTheme ? Theme.DARK : Theme.LIGHT}
+            onEmojiClick={(e) => {
+              setBody((prevBody) => prevBody + e.emoji);
+              setShowEmoji(false);
+            }}
+            autoFocusSearch={false}
+            emojiStyle={EmojiStyle.NATIVE}
+            searchDisabled
+            height={300}
+            width={400}
+            skinTonesDisabled
+            previewConfig={{
+              showPreview: false,
+            }}
+          />
         </div>
-      )}
+      </div>
 
       <div className="flex gap-4 items-center justify-end">
         <Button
@@ -169,6 +153,7 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
         <Button
           type="submit"
           variant="flat"
+          color="primary"
           size="sm"
           isIconOnly
           disabled={postEditedComment.isPending || postComment.isPending}

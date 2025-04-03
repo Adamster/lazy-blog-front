@@ -76,7 +76,7 @@ export const Header = () => {
               <Button
                 color="primary"
                 isIconOnly
-                variant="solid"
+                variant="flat"
                 onPress={() => router.push("/create")}
               >
                 <PencilSquareIcon className="w-5 h-5 " />
