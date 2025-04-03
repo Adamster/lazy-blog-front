@@ -32,6 +32,12 @@
     margin-bottom: 1rem !important;
   }
 
+  [data-editor-block-type="image"] {
+    // display: block;
+    margin: 0 auto;
+    width: 100%;
+  }
+
   > div > div *:last-child {
     margin-bottom: 0rem !important;
   }
@@ -150,6 +156,12 @@
   iframe {
     display: block;
     margin-bottom: 1rem;
+  }
+
+
+  img {
+    display: block;
+    margin: 0 auto;
   }
 
 

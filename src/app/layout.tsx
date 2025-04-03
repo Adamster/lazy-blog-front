@@ -7,7 +7,6 @@ import { AppProviders } from "@/shared/providers/app-providers";
 import { Header } from "@/widgets/header";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import Script from "next/script";
 
 const font = Mulish({
   weight: ["300", "400", "500", "600", "700", "800"],
@@ -23,10 +22,10 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <head>
-        <Script
+        {/* <Script
           crossOrigin="anonymous"
           src="//unpkg.com/react-scan/dist/auto.global.js"
-        />
+        /> */}
 
         <GoogleAnalytics />
         <MetaLinks />
