@@ -1,6 +1,9 @@
 import { HandThumbDownIcon, HandThumbUpIcon } from "@heroicons/react/24/solid";
 import { Button, Divider } from "@heroui/react";
-import { VotePostDirectionEnum } from "@/shared/api/openapi";
+import {
+  NullableOfVoteDirection,
+  VotePostDirectionEnum,
+} from "@/shared/api/openapi";
 import { useVotePost } from "../model/use-vote-post";
 import { randomMessageFromList } from "@/shared/lib/utils";
 import { useMemo } from "react";
@@ -8,6 +11,7 @@ import { useMemo } from "react";
 interface IProps {
   postId: string;
   postSlug: string;
+  voteDirection: NullableOfVoteDirection | null;
 }
 
 const POST_VOTE_MESSAGE = [
@@ -23,7 +27,7 @@ const POST_VOTE_MESSAGE = [
   "Just one like can change the world. Well, maybe this post.",
 ];
 
-export const PostVote = ({ postId, postSlug }: IProps) => {
+export const PostVote = ({ postId, postSlug, voteDirection }: IProps) => {
   const randomMessage = useMemo(
     () => randomMessageFromList(POST_VOTE_MESSAGE),
     []
@@ -40,6 +44,11 @@ export const PostVote = ({ postId, postSlug }: IProps) => {
             size="sm"
             isIconOnly
             variant="flat"
+            color={
+              voteDirection === VotePostDirectionEnum.Down
+                ? "primary"
+                : "default"
+            }
             onPress={() => {
               handleVote.mutate({ direction: VotePostDirectionEnum.Down });
             }}
@@ -50,6 +59,9 @@ export const PostVote = ({ postId, postSlug }: IProps) => {
             size="sm"
             isIconOnly
             variant="flat"
+            color={
+              voteDirection === VotePostDirectionEnum.Up ? "primary" : "default"
+            }
             onPress={() => {
               handleVote.mutate({ direction: VotePostDirectionEnum.Up });
             }}
