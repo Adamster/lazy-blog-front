@@ -27,6 +27,13 @@ import {
     AuthorPostResponseToJSON,
     AuthorPostResponseToJSONTyped,
 } from './AuthorPostResponse';
+import type { NullableOfVoteDirection } from './NullableOfVoteDirection';
+import {
+    NullableOfVoteDirectionFromJSON,
+    NullableOfVoteDirectionFromJSONTyped,
+    NullableOfVoteDirectionToJSON,
+    NullableOfVoteDirectionToJSONTyped,
+} from './NullableOfVoteDirection';
 
 /**
  * 
@@ -102,11 +109,19 @@ export interface PostDetailedResponse {
     isPublished: boolean;
     /**
      * 
+     * @type {NullableOfVoteDirection}
+     * @memberof PostDetailedResponse
+     */
+    voteDirection: NullableOfVoteDirection | null;
+    /**
+     * 
      * @type {Date}
      * @memberof PostDetailedResponse
      */
     createdAtUtc: Date;
 }
+
+
 
 /**
  * Check if a given object implements the PostDetailedResponse interface.
@@ -123,6 +138,7 @@ export function instanceOfPostDetailedResponse(value: object): value is PostDeta
     if (!('rating' in value) || value['rating'] === undefined) return false;
     if (!('views' in value) || value['views'] === undefined) return false;
     if (!('isPublished' in value) || value['isPublished'] === undefined) return false;
+    if (!('voteDirection' in value) || value['voteDirection'] === undefined) return false;
     if (!('createdAtUtc' in value) || value['createdAtUtc'] === undefined) return false;
     return true;
 }
@@ -148,6 +164,7 @@ export function PostDetailedResponseFromJSONTyped(json: any, ignoreDiscriminator
         'rating': json['rating'],
         'views': json['views'],
         'isPublished': json['isPublished'],
+        'voteDirection': NullableOfVoteDirectionFromJSON(json['voteDirection']),
         'createdAtUtc': (new Date(json['createdAtUtc'])),
     };
 }
@@ -174,6 +191,7 @@ export function PostDetailedResponseToJSONTyped(value?: PostDetailedResponse | n
         'rating': value['rating'],
         'views': value['views'],
         'isPublished': value['isPublished'],
+        'voteDirection': NullableOfVoteDirectionToJSON(value['voteDirection']),
         'createdAtUtc': ((value['createdAtUtc']).toISOString()),
     };
 }

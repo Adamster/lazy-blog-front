@@ -51,6 +51,12 @@ export interface UpdatePostRequest {
     coverUrl: string | null;
     /**
      * 
+     * @type {boolean}
+     * @memberof UpdatePostRequest
+     */
+    isCoverDisplayed: boolean;
+    /**
+     * 
      * @type {Array<string>}
      * @memberof UpdatePostRequest
      */
@@ -72,6 +78,7 @@ export function instanceOfUpdatePostRequest(value: object): value is UpdatePostR
     if (!('body' in value) || value['body'] === undefined) return false;
     if (!('slug' in value) || value['slug'] === undefined) return false;
     if (!('coverUrl' in value) || value['coverUrl'] === undefined) return false;
+    if (!('isCoverDisplayed' in value) || value['isCoverDisplayed'] === undefined) return false;
     if (!('tags' in value) || value['tags'] === undefined) return false;
     if (!('isPublished' in value) || value['isPublished'] === undefined) return false;
     return true;
@@ -92,6 +99,7 @@ export function UpdatePostRequestFromJSONTyped(json: any, ignoreDiscriminator: b
         'body': json['body'],
         'slug': json['slug'],
         'coverUrl': json['coverUrl'],
+        'isCoverDisplayed': json['isCoverDisplayed'],
         'tags': json['tags'],
         'isPublished': json['isPublished'],
     };
@@ -113,6 +121,7 @@ export function UpdatePostRequestToJSONTyped(value?: UpdatePostRequest | null, i
         'body': value['body'],
         'slug': value['slug'],
         'coverUrl': value['coverUrl'],
+        'isCoverDisplayed': value['isCoverDisplayed'],
         'tags': value['tags'],
         'isPublished': value['isPublished'],
     };

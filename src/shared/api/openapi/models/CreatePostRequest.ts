@@ -60,6 +60,12 @@ export interface CreatePostRequest {
      * @type {boolean}
      * @memberof CreatePostRequest
      */
+    isCoverDisplayed?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CreatePostRequest
+     */
     isPublished?: boolean;
 }
 
@@ -92,6 +98,7 @@ export function CreatePostRequestFromJSONTyped(json: any, ignoreDiscriminator: b
         'userId': json['userId'],
         'tags': json['tags'] == null ? null : json['tags'],
         'coverUrl': json['coverUrl'],
+        'isCoverDisplayed': json['isCoverDisplayed'] == null ? undefined : json['isCoverDisplayed'],
         'isPublished': json['isPublished'] == null ? undefined : json['isPublished'],
     };
 }
@@ -113,6 +120,7 @@ export function CreatePostRequestToJSONTyped(value?: CreatePostRequest | null, i
         'userId': value['userId'],
         'tags': value['tags'],
         'coverUrl': value['coverUrl'],
+        'isCoverDisplayed': value['isCoverDisplayed'],
         'isPublished': value['isPublished'],
     };
 }
