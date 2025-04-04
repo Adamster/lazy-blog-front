@@ -33,7 +33,6 @@
   }
 
   [data-editor-block-type="image"] {
-    // display: block;
     margin: 0 auto;
     width: 100%;
   }
@@ -160,7 +159,7 @@
 
 
   img {
-    display: block;
+    display: block !important;
     margin: 0 auto;
   }
 
