@@ -78,7 +78,7 @@ export const UpdateAvatar = ({ userData }: IProps) => {
               <Button
                 color="primary"
                 size="sm"
-                variant="solid"
+                variant="flat"
                 onPress={handleCropAndUpload}
               >
                 <RocketLaunchIcon className="h-4 w-4" />

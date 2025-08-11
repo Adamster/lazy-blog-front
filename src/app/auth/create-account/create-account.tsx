@@ -153,7 +153,7 @@ export default function CreateAccount() {
 
             <Button
               type="submit"
-              variant="solid"
+              variant="flat"
               color="primary"
               disabled={loading}
               isLoading={loading}

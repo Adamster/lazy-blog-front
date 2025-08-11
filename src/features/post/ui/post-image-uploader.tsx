@@ -116,7 +116,7 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
             <ButtonGroup>
               <Button
                 size="sm"
-                variant="solid"
+                variant="flat"
                 color="primary"
                 onPress={handleCropAndUpload}
               >
