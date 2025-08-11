@@ -66,7 +66,7 @@ export const Header = () => {
           <IsAuth
             fallback={
               <NavbarItem>
-                <Button color="primary" onPress={onAuthOpen}>
+                <Button variant="flat" color="primary" onPress={onAuthOpen}>
                   Log In
                 </Button>
               </NavbarItem>

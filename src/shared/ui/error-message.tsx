@@ -49,7 +49,7 @@ export const ErrorMessage = ({ error }: { error: unknown }) => {
       />
       <h2 className="text-3xl font-bold">A glitch in the Lazyverse...</h2>
       <p>{errorMessage}</p>
-      <Button as={Link} href="/">
+      <Button color="primary" variant="flat" as={Link} href="/">
         Go Home
       </Button>
     </div>
