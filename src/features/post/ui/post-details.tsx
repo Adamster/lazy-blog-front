@@ -62,16 +62,22 @@ export const PostDetailsRating = ({ rating }: { rating: number }) => {
   );
 };
 
-export const PostDetailsTags = ({ tags }: { tags: TagPostResponse[] }) => {
+export const PostDetailsTags = ({
+  tags,
+  className,
+}: {
+  tags: TagPostResponse[];
+  className?: string;
+}) => {
   return tags?.length ? (
-    <div className="flex flex-wrap items-center gap-4 text-foreground">
+    <div className={`flex flex-wrap items-center gap-2 ${className}`}>
       {tags.map((tag) => (
         <Link
           key={tag.tagId}
           href={`/tag/${titleToSnake(tag.tag)}`}
           className="text-foreground text-sm hover:opacity-70"
         >
-          <Chip variant="flat" className="text-gray">
+          <Chip variant="flat" radius="sm" className="bg-primary bg-opacity-20">
             {tag.tag}
           </Chip>
         </Link>

@@ -67,18 +67,18 @@ export default function PostCard({
                 alt={post.title}
               />
             </Link>
-          ) : (
-            <span></span>
-          )}
+          ) : null}
 
           <div className="flex flex-wrap items-center gap-4 text-gray">
             <PostDetailsData date={post.createdAtUtc} />
             <PostDetailsViews views={post.views} />
             <PostDetailsComments comments={post.comments} />
             <PostDetailsRating rating={post.rating} />
-          </div>
 
-          {!hideTags && <PostDetailsTags tags={post.tags} />}
+            {!hideTags && (
+              <PostDetailsTags className="ms-auto" tags={post.tags} />
+            )}
+          </div>
         </div>
       </div>
 

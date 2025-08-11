@@ -81,6 +81,7 @@ export default function LoginForm({ closeModal }: LoginFormProps) {
       </div>
 
       <Button
+        variant="flat"
         type="submit"
         color="primary"
         isLoading={loading}

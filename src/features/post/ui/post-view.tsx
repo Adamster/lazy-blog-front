@@ -56,21 +56,6 @@ export const PostView = ({ post }: IProps) => {
 
           <MDPreview source={post.body} />
 
-          <IsAuth>
-            <IsAuthor
-              fallback={
-                <PostVote
-                  voteDirection={post.voteDirection}
-                  postId={post.id}
-                  postSlug={post.slug}
-                />
-              }
-              userId={post.author.id || ""}
-            >
-              <></>
-            </IsAuthor>
-          </IsAuth>
-
           <Comments
             postId={post.id}
             postComments={postComments}
@@ -134,16 +119,32 @@ export const PostView = ({ post }: IProps) => {
 
               <Divider className="layout-page-divider" />
 
-              <div className="flex flex-wrap items-center gap-4 text-gray">
-                <PostDetailsData date={post.createdAtUtc} />
-                <div className="flex flex-wrap items-center gap-4 text-gray">
+              <div className="flex flex-wrap items-center gap-4 text-gray w-full">
+                <div className="flex flex-wrap items-center gap-4 text-gray w-full">
+                  <PostDetailsData date={post.createdAtUtc} />
                   <PostDetailsViews views={post.views} />
                   <PostDetailsComments comments={postComments?.length || 0} />
                   <PostDetailsRating rating={post.rating} />
                 </div>
-              </div>
 
-              <PostDetailsTags tags={post.tags} />
+                <PostDetailsTags tags={post.tags} />
+
+                <IsAuth>
+                  <IsAuthor
+                    fallback={
+                      <PostVote
+                        voteDirection={post.voteDirection}
+                        postId={post.id}
+                        postSlug={post.slug}
+                        rating={post.rating}
+                      />
+                    }
+                    userId={post.author.id || ""}
+                  >
+                    <></>
+                  </IsAuthor>
+                </IsAuth>
+              </div>
             </div>
           </div>
 

@@ -84,7 +84,7 @@ export default function ResetPassword() {
 
             <Button
               type="submit"
-              variant="solid"
+              variant="flat"
               color="primary"
               disabled={resetPasswordMutation.isPending}
               isLoading={resetPasswordMutation.isPending}

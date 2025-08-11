@@ -78,6 +78,7 @@ export const UpdatePasswordForm = () => {
 
         <div className="flex justify-end">
           <Button
+            variant="flat"
             type="submit"
             color="primary"
             disabled={changePasswordMutation.isPending}

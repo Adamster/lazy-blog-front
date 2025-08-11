@@ -99,6 +99,7 @@ export const UpdateUserForm = ({ userData }: IProps) => {
 
         <div className="flex justify-end">
           <Button
+            variant="flat"
             type="submit"
             color="primary"
             disabled={updateUserMutation.isPending}

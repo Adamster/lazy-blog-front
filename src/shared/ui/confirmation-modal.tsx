@@ -43,7 +43,7 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
               <Button
                 color="primary"
                 size="md"
-                variant="solid"
+                variant="flat"
                 onPress={() => {
                   onConfirm();
                   onClose();

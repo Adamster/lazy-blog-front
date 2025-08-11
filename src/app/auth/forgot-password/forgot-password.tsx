@@ -57,7 +57,7 @@ export default function ForgotPassword() {
 
             <Button
               type="submit"
-              variant="solid"
+              variant="flat"
               color="primary"
               disabled={forgotPasswordMutation.isPending}
               isLoading={forgotPasswordMutation.isPending}
