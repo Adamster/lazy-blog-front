@@ -1,6 +1,6 @@
 import { addToastError } from "@/shared/lib/toasts";
 import { useAuth } from "@/features/auth/model/use-auth";
-import { Button, Input, Link, Spinner } from "@heroui/react";
+import { Button, Input, Link } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -87,7 +87,7 @@ export default function LoginForm({ closeModal }: LoginFormProps) {
         isLoading={loading}
         className="w-full"
       >
-        {loading ? <Spinner size="sm" /> : "Sign In"}
+        Sign In
       </Button>
     </form>
   );
