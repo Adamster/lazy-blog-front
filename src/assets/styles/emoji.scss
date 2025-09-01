@@ -1,13 +1,15 @@
+@reference "tailwindcss";
+
 .EmojiPickerReact {
-  @apply bg-background/70 border-zinc-200 dark:border-zinc-700 rounded-medium !important;
+  background: hsl(var(--heroui-background) / 0.7) !important;
+  @apply border-zinc-200 dark:border-zinc-700 rounded-sm;
 
   .epr-emoji-category-label {
-    // background-color: hsl(var(--heroui-background) / 0.7) !important;
-    @apply bg-background/70
+    background: hsl(var(--heroui-background) / 0.7) !important;
   }
 
   .epr-category-nav {
     backdrop-filter: blur(3px);
-    @apply bg-background/70 !important
+    background: hsl(var(--heroui-background) / 0.7) !important;
   }
 }

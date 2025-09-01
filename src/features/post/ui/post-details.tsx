@@ -77,7 +77,7 @@ export const PostDetailsTags = ({
           href={`/tag/${titleToSnake(tag.tag)}`}
           className="text-foreground text-sm hover:opacity-70"
         >
-          <Chip variant="flat" radius="sm" className="bg-primary bg-opacity-20">
+          <Chip variant="flat" radius="sm" className="bg-default/20">
             {tag.tag}
           </Chip>
         </Link>
