@@ -23,10 +23,11 @@ body {
   }
 
   &-divider {
-    @apply bg-zinc-200 dark:bg-zinc-700;
+    // @apply bg-zinc-200 dark:bg-zinc-700;
 
     &-mobile {
-      @apply bg-zinc-200 dark:bg-zinc-700 md:hidden mt-6;
+      // @apply bg-zinc-200 dark:bg-zinc-700;
+      @apply md:hidden mt-6;
     }
   }
 
@@ -84,10 +85,8 @@ body {
   }
 }
 
-.text-gray {
-  @apply text-zinc-500 dark:text-zinc-400;
-}
-
+.text-gray { @apply text-zinc-500; }
+.dark .text-gray { @apply text-zinc-400; }
 
 @keyframes fadeIn {
   from {
