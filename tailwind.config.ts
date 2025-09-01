@@ -10,24 +10,9 @@ export default {
     "./src/shared/**/*.{js,ts,jsx,tsx,mdx}",
     "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
-  theme: {
-    extend: {
-      width: {
-        content: "62%",
-        aside: "38%",
-      },
-    },
-  },
   darkMode: "class",
   plugins: [
     heroui({
-      layout: {
-        radius: {
-          // small: "1rem", // rounded-small
-          // medium: "1rem", // rounded-medium
-          // large: "1rem", // rounded-large
-        },
-      },
       themes: {
         light: {
           colors: {

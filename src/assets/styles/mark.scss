@@ -1,10 +1,10 @@
-// @import "highlight.js/styles/github.css"; // стиль для подсветки
+@reference "tailwindcss";
 
 [class^="_codeMirrorToolbar_"],
 [class^="_toolbarNodeKindSelectTrigger_"],
 [class^="_toolbarButtonSelectTrigger_"],
 [class^="_selectTrigger_"] {
-  @apply bg-default-100 !important;
+  background: hsl(var(--heroui-default-100)) !important;
 }
 
 .mdxeditor {
@@ -14,7 +14,7 @@
   }
 
   .mdxeditor-toolbar button[role="combobox"] {
-    width: auto!important;
+    width: auto !important;
   }
 }
 
@@ -27,7 +27,6 @@
 // }
 
 .mdxeditor-rich-text-editor {
-
   div[data-lexical-decorator] {
     margin-bottom: 1rem !important;
   }
@@ -42,8 +41,9 @@
   }
 
   table tbody {
-    th, td {
-      &:not([data-tool-cell="true"]){
+    th,
+    td {
+      &:not([data-tool-cell="true"]) {
         border: 1px solid rgb(113 113 122 / var(--tw-text-opacity, 1)) !important;
       }
     }
@@ -55,16 +55,19 @@
 }
 
 .wmde-markdown {
-  a.anchor { display: none }
+  a.anchor {
+    display: none;
+  }
 
   table {
     display: table !important;
     width: 100% !important;
     min-width: 100% !important;
 
-    th, td {
+    th,
+    td {
       text-align: left !important;
-      padding: 0.25rem 0.5rem !important; 
+      padding: 0.25rem 0.5rem !important;
       border: 1px solid rgb(113 113 122 / var(--tw-text-opacity, 1)) !important;
       white-space: normal !important;
       min-height: 1rem;
@@ -72,30 +75,36 @@
     }
 
     tr {
-      background: none !important
+      background: none !important;
     }
   }
-
-
 }
 
 .mdxeditor-rich-text-editor,
-.wmde-markdown  {
+.wmde-markdown {
   background: transparent !important;
   color: inherit !important;
-  font-size: inherit !important;
+  font-size: 1rem !important;
   font-family: var(--font-sans) !important;
 
   > * {
     max-width: 100%;
   }
-  
 
-  blockquote, details, pre, 
-  table, dl, 
-  ol, ul, 
-  p, 
-  h1, h2, h3, h4, h5, h6 {
+  blockquote,
+  details,
+  pre,
+  table,
+  dl,
+  ol,
+  ul,
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-size: 1rem !important;
     margin-top: 0 !important;
     padding-bottom: 0 !important;
@@ -104,24 +113,37 @@
     border-bottom: none !important;
   }
 
-  b, strong {
+  b,
+  strong {
     font-weight: 700 !important;
   }
-  
+
   h1 {
-    @apply text-3xl !important;
+    font-size: var(--text-3xl) !important /* 1.875rem = 30px */;
+    line-height: var(
+      --tw-leading,
+      var(--text-3xl--line-height) /* calc(2.25 / 1.875) ≈ 1.2 */
+    );
   }
 
   h2 {
-    @apply text-2xl !important
+    font-size: var(--text-2xl) !important /* 1.5rem = 24px */;
+    line-height: var(
+      --tw-leading,
+      var(--text-2xl--line-height) /* calc(2 / 1.5) ≈ 1.3333 */
+    );
   }
 
   h3 {
-    @apply text-xl !important
+    font-size: var(--text-xl) !important /* 1.25rem = 20px */;
+    line-height: var(
+      --tw-leading,
+      var(--text-xl--line-height) /* calc(1.75 / 1.25) ≈ 1.4 */
+    );
   }
- 
+
   a {
-    @apply text-primary !important;
+    color: hsl(var(--heroui-primary)) !important;
   }
 
   ul {
@@ -132,11 +154,13 @@
     @apply list-decimal;
   }
 
-  ul, ol {
-    @apply ms-5 ps-0 !important;
+  ul,
+  ol {
+    padding-left: 0!important;
+    margin-inline-start: calc(var(--spacing) * 5) !important; 
 
     > li {
-      margin: 0 0 .5rem !important;
+      margin: 0 0 0.5rem !important;
     }
   }
 
@@ -149,20 +173,19 @@
   }
 
   pre {
-    @apply bg-zinc-100 dark:bg-zinc-800 !important
+    @apply bg-zinc-100 dark:bg-zinc-800;
+    font-size: .9rem !important;
   }
-  
+
   iframe {
     display: block;
     margin-bottom: 1rem;
   }
 
-
   img {
     display: block !important;
     margin: 0 auto;
   }
-
 
   hr {
     @apply bg-zinc-200 dark:bg-zinc-700;
@@ -170,5 +193,4 @@
     height: 1px !important;
     border: none !important;
   }
-  
 }

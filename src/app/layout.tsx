@@ -1,6 +1,8 @@
 import { Mulish } from "next/font/google";
 
+import "../assets/styles/tailwind.css";
 import "../assets/styles/global.scss";
+
 import { GoogleAnalytics } from "@/shared/lib/head/google-analytics";
 import { MetaLinks } from "@/shared/lib/head/meta-links";
 import { AppProviders } from "@/shared/providers/app-providers";
