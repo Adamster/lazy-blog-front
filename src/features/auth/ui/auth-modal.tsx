@@ -1,4 +1,5 @@
 import {
+  Button,
   Divider,
   Link,
   Modal,
@@ -8,6 +9,7 @@ import {
   ModalHeader,
 } from "@heroui/react";
 import LoginForm from "./login-form";
+import { useAuth } from "../model/use-auth";
 
 export function AuthModal({
   isOpen,
@@ -16,6 +18,8 @@ export function AuthModal({
   isOpen: boolean;
   onOpenChange: () => void;
 }) {
+  const { loginWithGoogle } = useAuth();
+
   return (
     <Modal
       placement="top-center"
@@ -36,7 +40,10 @@ export function AuthModal({
 
             <ModalFooter className="flex flex-col items-center gap-4 sm:px-10 sm:pb-10">
               <Divider />
-
+              <Button variant="flat" color="primary" onPress={loginWithGoogle}>
+                Sign in with Google
+              </Button>
+              <Divider />
               <div className="text-sm text-gray">
                 Not a member yet?{" "}
                 <Link

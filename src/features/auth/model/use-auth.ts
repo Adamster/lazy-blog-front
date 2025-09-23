@@ -77,6 +77,45 @@ export const useAuthActions = () => {
     }
   };
 
+  const loginWithGoogle = async () => {
+    try {
+      const response = await fetch(
+        "https://blog-api-prod.notlazy.org/auth/Google/login",
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.detail || "Google login failed");
+      }
+
+      const authState: AuthState = {
+        userId: data.user.id!,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        accessTokenExpires: Date.now() + 30 * 60 * 1000,
+      };
+
+      saveAuthState(authState);
+
+      queryClient.setQueryData(["auth"], authState);
+      queryClient.setQueryData(["getUserById", data.user.id], data.user);
+    } catch (error) {
+      clearAuthState();
+      queryClient.setQueryData(["auth"], getAuthState());
+
+      if (error instanceof Error) {
+        throw new Error(error.message || "Google login failed");
+      }
+
+      throw new Error("Google login failed");
+    }
+  };
+
   const logout = () => {
     clearAuthState();
 
@@ -97,7 +136,7 @@ export const useAuthActions = () => {
     }
   };
 
-  return { login, logout, register };
+  return { login, logout, register, loginWithGoogle };
 };
 
 export const refreshToken = async (
