@@ -16,6 +16,9 @@ export default function ExternalCallbackPage() {
         );
 
         const data = await res.json();
+
+        console.log("data", data);
+
         if (!res.ok)
           throw new Error(data?.detail || "External callback failed");
 
@@ -37,7 +40,8 @@ export default function ExternalCallbackPage() {
           throw new Error("Invalid callback payload");
         }
       } catch (e) {
-        window.location.replace("/");
+        console.log(e);
+        // window.location.replace("/");
       }
     })();
   }, [queryClient]);

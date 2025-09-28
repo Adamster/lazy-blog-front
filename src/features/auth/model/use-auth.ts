@@ -85,6 +85,7 @@ export const useAuthActions = () => {
       new URLSearchParams({ returnUrl }).toString();
 
     const win = window.open(loginUrl, "_blank");
+
     if (!win) {
       throw new Error("Popup blocked. Allow popups and try again.");
     }
