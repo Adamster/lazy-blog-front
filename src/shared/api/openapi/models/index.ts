@@ -29,4 +29,3 @@ export * from './UserCommentResponse';
 export * from './UserPostItem';
 export * from './UserPostResponse';
 export * from './UserResponse';
-export * from './VoteDirection';
