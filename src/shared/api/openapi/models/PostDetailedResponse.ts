@@ -85,6 +85,12 @@ export interface PostDetailedResponse {
     coverUrl: string | null;
     /**
      * 
+     * @type {boolean}
+     * @memberof PostDetailedResponse
+     */
+    isCoverDisplayed: boolean;
+    /**
+     * 
      * @type {Array<TagPostResponse>}
      * @memberof PostDetailedResponse
      */
@@ -134,6 +140,7 @@ export function instanceOfPostDetailedResponse(value: object): value is PostDeta
     if (!('slug' in value) || value['slug'] === undefined) return false;
     if (!('body' in value) || value['body'] === undefined) return false;
     if (!('coverUrl' in value) || value['coverUrl'] === undefined) return false;
+    if (!('isCoverDisplayed' in value) || value['isCoverDisplayed'] === undefined) return false;
     if (!('tags' in value) || value['tags'] === undefined) return false;
     if (!('rating' in value) || value['rating'] === undefined) return false;
     if (!('views' in value) || value['views'] === undefined) return false;
@@ -160,6 +167,7 @@ export function PostDetailedResponseFromJSONTyped(json: any, ignoreDiscriminator
         'slug': json['slug'],
         'body': json['body'],
         'coverUrl': json['coverUrl'],
+        'isCoverDisplayed': json['isCoverDisplayed'],
         'tags': ((json['tags'] as Array<any>).map(TagPostResponseFromJSON)),
         'rating': json['rating'],
         'views': json['views'],
@@ -187,6 +195,7 @@ export function PostDetailedResponseToJSONTyped(value?: PostDetailedResponse | n
         'slug': value['slug'],
         'body': value['body'],
         'coverUrl': value['coverUrl'],
+        'isCoverDisplayed': value['isCoverDisplayed'],
         'tags': ((value['tags'] as Array<any>).map(TagPostResponseToJSON)),
         'rating': value['rating'],
         'views': value['views'],
