@@ -10,6 +10,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   register: (registerData: RegisterUserRequest) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   isAuthenticated: boolean;
 }
 
@@ -19,7 +20,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { data: auth, isLoading: isAuthLoading } = useAuthState();
-  const { login, logout, register } = useAuthActions();
+  const { login, logout, register, loginWithGoogle } = useAuthActions();
 
   const isAuthenticated = !!auth?.userId;
 
@@ -34,6 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         logout,
         register,
+        loginWithGoogle,
         isAuthenticated,
       }}
     >

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gen:api": "rm -rf src/api/apis && openapi-generator-cli generate -c openapi-config.json && prettier --write 'src/api/**/*.ts'"
+    "gen:api": "rm -rf src/shared/api/openapi && openapi-generator-cli generate -c openapi-config.json && prettier --write 'src/shared/api/openapi/**/*.ts'"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

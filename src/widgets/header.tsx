@@ -50,6 +50,12 @@ export const Header = () => {
               alt="Logo"
             />
           </Link>
+          {/* 
+          <div className="ms-4">
+            <Button size="sm" variant="flat" color="primary">
+              Blog
+            </Button>
+          </div> */}
         </NavbarBrand>
 
         <NavbarContent justify="end" className="flex items-center gap-4">
