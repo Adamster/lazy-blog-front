@@ -84,11 +84,7 @@ export const useAuthActions = () => {
       "https://blog-api-prod.notlazy.org/auth/Google/login?" +
       new URLSearchParams({ returnUrl }).toString();
 
-    const win = window.open(loginUrl, "_blank");
-
-    if (!win) {
-      throw new Error("Popup blocked. Allow popups and try again.");
-    }
+     window.location.assign(loginUrl);
   };
 
   const logout = () => {
