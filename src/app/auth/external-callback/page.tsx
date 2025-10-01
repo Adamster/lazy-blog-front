@@ -11,8 +11,7 @@ export default function ExternalCallbackPage() {
     (async () => {
       try {
         const res = await fetch(
-          "https://blog-api-prod.notlazy.org/auth/external-callback",
-          { credentials: "include" }
+          "https://blog-api-prod.notlazy.org/auth/external-callback"
         );
 
         const data = await res.json();
