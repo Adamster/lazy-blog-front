@@ -3,9 +3,8 @@
 import { useForm } from "react-hook-form";
 import { UpdatePostRequest } from "@/shared/api/openapi";
 import { PostForm } from "@/features/post/ui/post-form";
-import { IsAuth } from "@/features/auth/guards/is-auth";
-import { ErrorMessage } from "@/shared/ui/error-message";
 import { useCreatePost } from "@/features/post/model/use-create-post";
+import { ProtectedRoute } from "@/features/auth/guards/protected-route";
 
 const CreatePage = () => {
   const form = useForm<UpdatePostRequest>({
@@ -26,14 +25,14 @@ const CreatePage = () => {
   });
 
   return (
-    <IsAuth fallback={<ErrorMessage error={"Not Found."} />}>
+    <ProtectedRoute>
       <PostForm
         form={form}
         onSubmit={onSubmit}
         isCreate={true}
         isPending={createPostMutation.isPending}
       />
-    </IsAuth>
+    </ProtectedRoute>
   );
 };
 
