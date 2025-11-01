@@ -39,10 +39,10 @@ export function AuthModal({
             </ModalBody>
 
             <ModalFooter className="flex flex-col items-center gap-4 sm:px-10 sm:pb-10">
-              <Divider />
+              {/* <Divider />
               <Button variant="flat" color="primary" onPress={loginWithGoogle}>
                 Sign in with Google
-              </Button>
+              </Button> */}
               <Divider />
               <div className="text-sm text-gray">
                 Not a member yet?{" "}
