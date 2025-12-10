@@ -81,7 +81,7 @@ export const useAuthActions = () => {
     const returnUrl = `${window.location.origin}/auth/external-callback`;
 
     const loginUrl =
-      "https://blog-api-prod.notlazy.org/auth/Google/login?" +
+      "https://notlazy.org/auth/Google/login?" +
       new URLSearchParams({ returnUrl }).toString();
 
      window.location.assign(loginUrl);
