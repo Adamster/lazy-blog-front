@@ -29,7 +29,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API}/:path*`
+       destination: "https://blog-api-prod.notlazy.org/api/:path*"
       }
     ]
   },
