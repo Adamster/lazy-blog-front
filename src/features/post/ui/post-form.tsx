@@ -1,4 +1,4 @@
-import { MarkdownWrapper } from "./markdown-wrapper";
+import { Crepe } from "./crepe-wrapper";
 import {
   Button,
   ButtonGroup,
@@ -17,8 +17,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { UpdatePostRequest } from "@/shared/api/openapi";
 import { Controller, UseFormReturn } from "react-hook-form";
-import { useCallback, useState } from "react";
-import { debounce } from "lodash";
+import { useState } from "react";
 import { PostImageUploader } from "./post-image-uploader";
 import { useTags } from "@/features/tag/model/use-tags";
 import { useUser } from "@/shared/providers/user-provider";
@@ -50,13 +49,6 @@ export const PostForm = ({
     formState: { errors },
   } = form;
 
-  const handleChange = useCallback(
-    debounce((value: string, onChange: (v: string) => void) => {
-      onChange(value);
-    }, 300),
-    []
-  );
-
   return (
     <form noValidate className={cn("layout-page", fullView ? "full" : "")}>
       <div className="layout-page-content">
@@ -72,11 +64,11 @@ export const PostForm = ({
           control={control}
           rules={{ required: "Field is required" }}
           render={({ field }) => (
-            <MarkdownWrapper
+            <Crepe
               key={form.getValues("slug")}
-              placeholder="Too lazy to write a post? Just start typing..."
+              placeholder="Start typing, or press / for blocks…"
               markdown={field.value || ""}
-              onChange={(value) => handleChange(value, field.onChange)}
+              onChange={field.onChange}
             />
           )}
         />

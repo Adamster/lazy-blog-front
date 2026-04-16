@@ -1,13 +1,8 @@
-/* eslint-disable @next/next/no-img-element */
-
-import dynamic from "next/dynamic";
-
 import { PostDetailedResponse } from "@/shared/api/openapi";
 import { IsAuthor } from "@/features/auth/guards/is-author";
 import { ChevronLeftIcon, PencilIcon } from "@heroicons/react/24/solid";
 import { Badge, Button, cn, Divider, Image } from "@heroui/react";
 import { IsAuth } from "@/features/auth/guards/is-auth";
-import { Loading } from "@/shared/ui/loading";
 import {
   PostDetailsComments,
   PostDetailsData,
@@ -22,11 +17,7 @@ import { UserAvatar } from "@/features/user/ui/user-avatar";
 import { useState } from "react";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-
-const MDPreview = dynamic(() => import("@uiw/react-markdown-preview"), {
-  ssr: false,
-  loading: () => <Loading inline />,
-});
+import { Crepe } from "./crepe-wrapper";
 
 interface IProps {
   post: PostDetailedResponse | undefined;
@@ -54,7 +45,7 @@ export const PostView = ({ post }: IProps) => {
             </div>
           )}
 
-          <MDPreview source={post.body} />
+          <Crepe readonly markdown={post.body} />
 
           <Comments
             postId={post.id}

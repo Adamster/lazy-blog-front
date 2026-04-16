@@ -5,7 +5,6 @@ const API_URL =
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  transpilePackages: ["@mdxeditor/editor"],
   experimental: {
     scrollRestoration: true,
   },

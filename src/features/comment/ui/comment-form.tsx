@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { apiClient } from "@/shared/api/api-client";
 import { CommentResponse } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
