@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import {
   dehydrate,
   HydrationBoundary,
@@ -34,11 +35,11 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function Page({ params }: PageProps) {
   const { post: slug } = await params;
 
+  const postData = await getPostSSR(slug);
+  if (!postData) notFound();
+
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: ["getPostBySlug", slug],
-    queryFn: () => getPostSSR(slug),
-  });
+  queryClient.setQueryData(["getPostBySlug", slug], postData);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

@@ -1,4 +1,5 @@
 import { getAuthState } from "@/features/auth/lib/auth-storage";
+import { API_URL } from "@/shared/types";
 import {
   ChangePasswordApi,
   CommentsApi,
@@ -12,7 +13,7 @@ import {
 import { Configuration } from "./openapi";
 
 const configuration = new Configuration({
-  basePath: process.env.NEXT_PUBLIC_API,
+  basePath: API_URL,
   middleware: [
     {
       async pre(context) {
