@@ -1,17 +1,11 @@
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { apiClient } from "@/shared/api/api-client";
 import { useUser } from "@/shared/providers/user-provider";
-import {
-  NoSymbolIcon,
-  PencilIcon,
-  RocketLaunchIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Button, ButtonGroup, Image } from "@heroui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { Cropper, CropperRef } from "react-advanced-cropper";
-import "react-advanced-cropper/dist/style.css";
+import { ImageCropper } from "@/shared/ui/image-cropper-dynamic";
 
 interface Props {
   onUploadSuccess: (url: string) => void;
@@ -22,7 +16,6 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
   const { user } = useUser();
   const [imagePreview, setImagePreview] = useState("");
   const [cropVisible, setCropVisible] = useState(false);
-  const cropperRef = useRef<CropperRef>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const uploadMutation = useMutation({
@@ -48,41 +41,35 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
     setCropVisible(true);
   };
 
-  const handleCropAndUpload = () => {
-    const canvas = cropperRef.current?.getCanvas();
+  const handleCrop = (blob: Blob) => {
+    const image = new window.Image();
+    const blobUrl = URL.createObjectURL(blob);
+    image.src = blobUrl;
 
-    canvas?.toBlob((blob) => {
-      if (!blob) return;
+    image.onload = () => {
+      const shouldResize = image.width > 1000;
 
-      const image = new window.Image();
-      const blobUrl = URL.createObjectURL(blob);
-      image.src = blobUrl;
+      const targetWidth = shouldResize ? 1000 : image.width;
+      const targetHeight = shouldResize
+        ? Math.round((image.height * targetWidth) / image.width)
+        : image.height;
 
-      image.onload = () => {
-        const shouldResize = image.width > 1000;
+      const resizeCanvas = document.createElement("canvas");
+      resizeCanvas.width = targetWidth;
+      resizeCanvas.height = targetHeight;
 
-        const targetWidth = shouldResize ? 1000 : image.width;
-        const targetHeight = shouldResize
-          ? Math.round((image.height * targetWidth) / image.width)
-          : image.height;
+      const ctx = resizeCanvas.getContext("2d");
+      ctx?.drawImage(image, 0, 0, targetWidth, targetHeight);
 
-        const resizeCanvas = document.createElement("canvas");
-        resizeCanvas.width = targetWidth;
-        resizeCanvas.height = targetHeight;
-
-        const ctx = resizeCanvas.getContext("2d");
-        ctx?.drawImage(image, 0, 0, targetWidth, targetHeight);
-
-        resizeCanvas.toBlob((finalBlob) => {
-          if (finalBlob) {
-            const finalFile = new File([finalBlob], `post-${Date.now()}.png`, {
-              type: "image/png",
-            });
-            uploadMutation.mutate(finalFile);
-          }
-        }, "image/png");
-      };
-    }, "image/png");
+      resizeCanvas.toBlob((finalBlob) => {
+        if (finalBlob) {
+          const finalFile = new File([finalBlob], `post-${Date.now()}.png`, {
+            type: "image/png",
+          });
+          uploadMutation.mutate(finalFile);
+        }
+      }, "image/png");
+    };
   };
 
   const handleRemove = () => {
@@ -94,49 +81,25 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
   return (
     <>
       {cropVisible ? (
-        <div className="flex flex-col gap-4 max-w-full">
-          <Cropper
-            ref={cropperRef}
-            src={imagePreview}
-            stencilProps={{
-              aspectRatio: {
-                minimum: 3 / 2,
-                maximum: 16 / 9,
-              },
-              grid: true,
-            }}
-            sizeRestrictions={{
-              minWidth: 1000,
-              minHeight: 500,
-              maxWidth: 4000,
-              maxHeight: 4000,
-            }}
-          />
-          <div className="flex justify-center">
-            <ButtonGroup>
-              <Button
-                size="sm"
-                variant="flat"
-                color="primary"
-                onPress={handleCropAndUpload}
-              >
-                <RocketLaunchIcon className="h-4 w-4" />
-                Upload
-              </Button>
-              <Button
-                size="sm"
-                variant="flat"
-                isIconOnly
-                onPress={() => {
-                  setCropVisible(false);
-                  setImagePreview("");
-                }}
-              >
-                <NoSymbolIcon className="h-4 w-4" />
-              </Button>
-            </ButtonGroup>
-          </div>
-        </div>
+        <ImageCropper
+          src={imagePreview}
+          stencilProps={{
+            aspectRatio: { minimum: 3 / 2, maximum: 16 / 9 },
+            grid: true,
+          }}
+          sizeRestrictions={{
+            minWidth: 1000,
+            minHeight: 500,
+            maxWidth: 4000,
+            maxHeight: 4000,
+          }}
+          saveLabel="Upload"
+          onCrop={handleCrop}
+          onCancel={() => {
+            setCropVisible(false);
+            setImagePreview("");
+          }}
+        />
       ) : (
         <div className="flex flex-col w-full gap-4">
           {currentImage && (

@@ -1,17 +1,11 @@
 import { UserResponse } from "@/shared/api/openapi";
-import {
-  NoSymbolIcon,
-  PencilIcon,
-  RocketLaunchIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Button, ButtonGroup } from "@heroui/react";
 import { useRef, useState } from "react";
-import { CircleStencil, Cropper, CropperRef } from "react-advanced-cropper";
+import { ImageCropper } from "@/shared/ui/image-cropper-dynamic";
 import { useUploadAvatar } from "../model/use-upload-avatar";
 import { useDeleteAvatar } from "../model/use-delete-avatar";
 
-import "react-advanced-cropper/dist/style.css";
 import { UserAvatar } from "./user-avatar";
 
 interface IProps {
@@ -21,7 +15,6 @@ interface IProps {
 export const UpdateAvatar = ({ userData }: IProps) => {
   const [avatarPreview, setAvatarPreview] = useState("");
   const [cropperVisible, setCropperVisible] = useState(false);
-  const cropperRef = useRef<CropperRef>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const userId = userData?.id || "";
@@ -37,19 +30,12 @@ export const UpdateAvatar = ({ userData }: IProps) => {
     setCropperVisible(true);
   };
 
-  const handleCropAndUpload = () => {
-    const canvas = cropperRef.current?.getCanvas({ width: 150, height: 150 });
-
-    canvas?.toBlob((blob) => {
-      if (blob) {
-        const croppedFile = new File([blob], `avatar-${Date.now()}.png`, {
-          type: "image/png",
-        });
-
-        uploadAvatarMutation.mutate(croppedFile);
-        setCropperVisible(false);
-      }
+  const handleCrop = (blob: Blob) => {
+    const croppedFile = new File([blob], `avatar-${Date.now()}.png`, {
+      type: "image/png",
     });
+    uploadAvatarMutation.mutate(croppedFile);
+    setCropperVisible(false);
   };
 
   const handleCropClose = () => {
@@ -60,41 +46,21 @@ export const UpdateAvatar = ({ userData }: IProps) => {
   return (
     <>
       {cropperVisible ? (
-        <div className="flex flex-col gap-4 max-w-full">
-          <Cropper
-            ref={cropperRef}
-            src={avatarPreview}
-            stencilComponent={CircleStencil}
-            stencilProps={{ aspectRatio: 1 }}
-            sizeRestrictions={{
-              minWidth: 150,
-              minHeight: 150,
-              maxWidth: 4000,
-              maxHeight: 4000,
-            }}
-          />
-          <div className="flex justify-end">
-            <ButtonGroup>
-              <Button
-                color="primary"
-                size="sm"
-                variant="flat"
-                onPress={handleCropAndUpload}
-              >
-                <RocketLaunchIcon className="h-4 w-4" />
-                Save
-              </Button>
-              <Button
-                isIconOnly
-                size="sm"
-                variant="flat"
-                onPress={handleCropClose}
-              >
-                <NoSymbolIcon className="h-4 w-4" />
-              </Button>
-            </ButtonGroup>
-          </div>
-        </div>
+        <ImageCropper
+          src={avatarPreview}
+          stencilShape="circle"
+          stencilProps={{ aspectRatio: 1 }}
+          sizeRestrictions={{
+            minWidth: 150,
+            minHeight: 150,
+            maxWidth: 4000,
+            maxHeight: 4000,
+          }}
+          canvasWidth={150}
+          canvasHeight={150}
+          onCrop={handleCrop}
+          onCancel={handleCropClose}
+        />
       ) : (
         <div className="flex flex-col items-start gap-4">
           <UserAvatar user={userData} isProfile />

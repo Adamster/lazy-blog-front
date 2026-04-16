@@ -37,7 +37,7 @@ export default function RootLayout({
       <body className={`${font.variable}`}>
         <AppProviders>
           <Header />
-          <main className="max-w-6xl mx-auto">{children}</main>
+          <main className="max-w-4xl mx-auto">{children}</main>
         </AppProviders>
         <SpeedInsights />
       </body>

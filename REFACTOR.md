@@ -71,15 +71,17 @@
 - [x] Фикс тостов: `addToastError` больше не падает на Error без `.response` (был баг `Cannot read properties of undefined (reading 'status')`)
 - [x] Фикс кэша: `useCreatePost`/`useUpdatePost`/`useDeletePost` теперь инвалидируют `getPostBySlug`, `getAllPosts`, `getPostsByUserName`, `getPostsByTag` — страница поста показывает свежий контент после save
 
-**PR #3b — Dynamic import тяжёлых либ и minor upgrades (TODO):**
-- [ ] Dynamic import `emoji-picker-react`, `react-advanced-cropper` — по клику
-- [ ] Удалить/заменить `lodash` (остался один импорт? проверить)
-- [ ] Minor upgrades (безопасно):
+**PR #3b — Dynamic import тяжёлых либ и minor upgrades (DONE):**
+- [x] `react-advanced-cropper` — вынесен в общий компонент `src/shared/ui/image-cropper.tsx` + dynamic-обёртка `image-cropper-dynamic.tsx`. Используется в `PostImageUploader` и `UpdateAvatar`. **Бандл `/create`/`/profile`/`/edit` похудел на ~25KB** (cropper грузится по клику)
+- [x] `emoji-picker-react` — уже был dynamic (в `comment-form.tsx`)
+- [x] `lodash` удалён полностью (0 импортов в src после Phase 3a)
+- [x] Minor upgrades (0 vulns):
   - `@heroui/react` 2.8.3 → 2.8.10
   - `@tanstack/react-query` 5.66 → 5.99
   - `react-hook-form` 7.54 → 7.72
   - `framer-motion` 12.23 → 12.38
-  - `sass`, `date-fns`, `emoji-picker-react`, `react-haiku`, `react-markdown` и др.
+  - `sass` → 1.99, `date-fns` → 4.1, `emoji-picker-react` → 4.18, `react-haiku` → 2.4, `react-markdown` → 10.1
+  - `@vercel/analytics` → 1.6, `@vercel/speed-insights` → 1.3
 
 **PR #3c — Major upgrades (отдельно):**
 - [ ] HeroUI 2→3, Next 15→16, ESLint 9→10
