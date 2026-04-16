@@ -63,7 +63,7 @@ export default function ForgotPassword() {
               isLoading={forgotPasswordMutation.isPending}
             >
               {!forgotPasswordMutation.isPending && (
-                <RocketLaunchIcon className="w-4 h-4" />
+                <RocketLaunchIcon className="h-4 w-4" />
               )}
               Send
             </Button>

@@ -44,23 +44,23 @@ export default function UserPage({ userName }: { userName: string }) {
 
                 {user?.biography && (
                   <div>
-                    <p className="text-sm text-gray">About:</p>
+                    <p className="text-gray text-sm">About:</p>
                     <p className="whitespace-pre-line">{user?.biography}</p>
                   </div>
                 )}
 
                 <Divider />
 
-                <div className="flex items-center gap-4 text-gray">
+                <div className="text-gray flex items-center gap-4">
                   <div className="flex items-center gap-1">
-                    <CalendarIcon className="w-4 h-4" />
+                    <CalendarIcon className="h-4 w-4" />
                     <span className="ml-1 text-sm">
                       {formatDate2(user.createdOnUtc || "")}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-1">
-                    <DocumentTextIcon className="w-4 h-4" />
+                    <DocumentTextIcon className="h-4 w-4" />
                     <span className="ml-1 text-sm">{totalPosts}</span>
                   </div>
                 </div>

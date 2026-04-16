@@ -44,11 +44,11 @@ export function AuthModal({
                 Sign in with Google
               </Button>
               <Divider />
-              <div className="text-sm text-gray">
+              <div className="text-gray text-sm">
                 Not a member yet?{" "}
                 <Link
                   href="/auth/create-account"
-                  className="text-sm cursor-pointer hover:underline"
+                  className="cursor-pointer text-sm hover:underline"
                   onPress={() => onClose()}
                 >
                   Create an Account

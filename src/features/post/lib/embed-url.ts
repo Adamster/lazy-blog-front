@@ -14,23 +14,41 @@ export function toEmbedUrl(href: string): Embed | null {
     const id =
       url.searchParams.get("v") ??
       (url.pathname.startsWith("/embed/") ? url.pathname.split("/")[2] : null);
-    if (id) return { src: `https://www.youtube.com/embed/${id}`, aspectRatio: "16 / 9" };
+    if (id)
+      return {
+        src: `https://www.youtube.com/embed/${id}`,
+        aspectRatio: "16 / 9",
+      };
   }
   if (host === "youtu.be") {
     const id = url.pathname.slice(1).split("/")[0];
-    if (id) return { src: `https://www.youtube.com/embed/${id}`, aspectRatio: "16 / 9" };
+    if (id)
+      return {
+        src: `https://www.youtube.com/embed/${id}`,
+        aspectRatio: "16 / 9",
+      };
   }
 
   if (host === "vimeo.com" || host === "player.vimeo.com") {
     const parts = url.pathname.split("/").filter(Boolean);
     const id = parts[parts.length - 1];
     if (/^\d+$/.test(id))
-      return { src: `https://player.vimeo.com/video/${id}`, aspectRatio: "16 / 9" };
+      return {
+        src: `https://player.vimeo.com/video/${id}`,
+        aspectRatio: "16 / 9",
+      };
   }
 
   if (host === "open.spotify.com") {
     const parts = url.pathname.split("/").filter(Boolean);
-    const supportedTypes = ["track", "playlist", "album", "episode", "show", "artist"];
+    const supportedTypes = [
+      "track",
+      "playlist",
+      "album",
+      "episode",
+      "show",
+      "artist",
+    ];
     const typeIdx = parts[0] === "embed" ? 1 : 0;
     if (parts.length > typeIdx + 1 && supportedTypes.includes(parts[typeIdx])) {
       const type = parts[typeIdx];

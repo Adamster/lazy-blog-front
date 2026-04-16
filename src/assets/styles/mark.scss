@@ -156,8 +156,8 @@
 
   ul,
   ol {
-    padding-left: 0!important;
-    margin-inline-start: calc(var(--spacing) * 5) !important; 
+    padding-left: 0 !important;
+    margin-inline-start: calc(var(--spacing) * 5) !important;
 
     > li {
       margin: 0 0 0.5rem !important;
@@ -174,7 +174,7 @@
 
   pre {
     @apply bg-zinc-100 dark:bg-zinc-800;
-    font-size: .9rem !important;
+    font-size: 0.9rem !important;
   }
 
   iframe {

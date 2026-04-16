@@ -84,7 +84,7 @@ export const UpdatePasswordForm = () => {
             disabled={changePasswordMutation.isPending}
             isLoading={changePasswordMutation.isPending}
           >
-            <RocketLaunchIcon className="w-4 h-4" />
+            <RocketLaunchIcon className="h-4 w-4" />
             Save
           </Button>
         </div>

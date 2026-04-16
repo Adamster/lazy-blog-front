@@ -90,7 +90,7 @@ export default function ResetPassword() {
               isLoading={resetPasswordMutation.isPending}
             >
               {!resetPasswordMutation.isPending && (
-                <RocketLaunchIcon className="w-4 h-4" />
+                <RocketLaunchIcon className="h-4 w-4" />
               )}
               Reset
             </Button>

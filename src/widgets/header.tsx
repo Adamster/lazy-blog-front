@@ -40,7 +40,7 @@ export const Header = () => {
 
   return (
     <Navbar maxWidth="full">
-      <div className="max-w-none mx-auto flex justify-between items-center w-full">
+      <div className="mx-auto flex w-full max-w-none items-center justify-between">
         <NavbarBrand className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-4">
             <Image
@@ -62,9 +62,9 @@ export const Header = () => {
           <NavbarItem>
             <Button isIconOnly variant="flat" onPress={changeTheme}>
               {isDarkTheme ? (
-                <SunIcon className="w-5 h-5" />
+                <SunIcon className="h-5 w-5" />
               ) : (
-                <MoonIcon className="w-4 h-4" />
+                <MoonIcon className="h-4 w-4" />
               )}
             </Button>
           </NavbarItem>
@@ -85,7 +85,7 @@ export const Header = () => {
                 variant="flat"
                 onPress={() => router.push("/create")}
               >
-                <PencilSquareIcon className="w-5 h-5 " />
+                <PencilSquareIcon className="h-5 w-5" />
               </Button>
             </NavbarItem>
 

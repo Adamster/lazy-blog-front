@@ -7,7 +7,20 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky",
     "gen:api": "rm -rf src/shared/api/openapi && openapi-generator-cli generate -c openapi-config.json && prettier --write 'src/shared/api/openapi/**/*.ts'"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write",
+      "next lint --fix --file"
+    ],
+    "*.{json,md,scss,css}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -39,7 +52,11 @@
     "autoprefixer": "^10.4.20",
     "eslint": "^9",
     "eslint-config-next": "15.1.7",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "postcss": "^8.5.3",
+    "prettier": "^3.8.3",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4.1.12",
     "typescript": "^5"
   }

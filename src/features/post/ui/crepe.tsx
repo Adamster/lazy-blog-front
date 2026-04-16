@@ -146,9 +146,7 @@ export default function CrepeComponent({
 
       crepe.editor
         .config((ctx) => {
-          ctx
-            .get(listenerCtx)
-            .markdownUpdated((_, md) => emit(md));
+          ctx.get(listenerCtx).markdownUpdated((_, md) => emit(md));
         })
         .use(listener);
     }

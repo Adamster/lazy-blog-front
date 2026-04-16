@@ -25,8 +25,8 @@ export default function HomePage() {
 
           <div className="layout-page-aside-wrapper">
             <aside className="layout-page-aside-sticky">
-              <div className="overflow-auto max-w-full">
-                <div className="flex md:flex-col mb-1 md:mb-0 whitespace-nowrap gap-1">
+              <div className="max-w-full overflow-auto">
+                <div className="mb-1 flex gap-1 whitespace-nowrap md:mb-0 md:flex-col">
                   <TagsList />
                 </div>
               </div>
