@@ -37,7 +37,7 @@ export default function ExternalCallbackPage() {
         }
       } catch (e) {
         console.error("External callback failed", e);
-        window.location.replace("/auth/login?error=external-callback");
+        window.location.replace("/?error=external-callback");
       }
     })();
   }, [queryClient]);

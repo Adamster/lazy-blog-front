@@ -1,10 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { generateMeta } from "@/shared/lib/head/meta-data";
 import TagPage from "./tag-page";
 import { snakeToTitle } from "@/shared/lib/utils";
 
-export async function generateMetadata({ params }: any) {
+type PageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export async function generateMetadata({ params }: PageProps) {
   const { id: tag } = await params;
   const tagName = snakeToTitle(tag);
 
@@ -15,7 +17,7 @@ export async function generateMetadata({ params }: any) {
   });
 }
 
-export default async function Page({ params }: any) {
+export default async function Page({ params }: PageProps) {
   const { id: tag } = await params;
   return <TagPage tag={tag} />;
 }

@@ -29,19 +29,22 @@
 
 Чтобы блог перестал выглядеть как CSR-SPA на Next.js.
 
-- [ ] `src/app/error.tsx` — global error boundary
-- [ ] `src/app/not-found.tsx` — 404 страница
-- [ ] `src/app/loading.tsx` + `src/app/[user]/[post]/loading.tsx` — skeleton UI
-- [ ] `src/app/global-error.tsx`
-- [ ] React Query SSR hydration: `HydrationBoundary` + `dehydrate` в `query-provider.tsx`
-- [ ] Префетч на сервере: посты на главной, страница поста
-- [ ] `generateMetadata` для динамических роутов `[user]/[post]/page.tsx`, `[user]/page.tsx` вместо helper'а
-- [ ] OG/Twitter meta в `generateMetadata`
-- [ ] `src/app/sitemap.ts` — SEO
+**PR #2a — базовая обвязка (DONE):**
+- [x] `src/app/error.tsx` — route-level error boundary
+- [x] `src/app/global-error.tsx` — для ошибок в root layout
+- [x] `src/app/not-found.tsx` — 404 страница
+- [x] `src/app/loading.tsx` + `[user]/loading.tsx` + `[user]/[post]/loading.tsx` + `tag/[id]/loading.tsx`
+- [x] React Query SSR-safe `QueryClient` (per-request на сервере, singleton в браузере)
+- [x] SSR hydration для страницы поста: `HydrationBoundary` + `dehydrate` + `prefetchQuery` через `getPostSSR`
+- [x] Типизация params как `Promise<{...}>` в `[user]/[post]/page.tsx`, `[user]/page.tsx`, `tag/[id]/page.tsx` (убрали `any` и eslint-disable)
+
+**PR #2b — SEO:**
+- [ ] `src/app/sitemap.ts` — динамический sitemap из постов API
 - [ ] `src/app/robots.ts`
-- [ ] `src/app/opengraph-image.tsx` — dynamic OG-картинки (`@vercel/og`)
+- [ ] `src/app/[user]/[post]/opengraph-image.tsx` — dynamic OG-картинки (`@vercel/og`)
 - [ ] RSS feed: `src/app/feed.xml/route.ts`
-- [ ] Типизация params: убрать `any` в `src/app/[user]/[post]/page.tsx:1,7,26` и `[user]/page.tsx:1,7,29` (в Next 15 params — это `Promise`)
+- [ ] SSR prefetch для главной и `[user]/page.tsx` (сейчас flash-of-loading)
+- [ ] `notFound()` в server component при отсутствии пользователя/поста (сейчас клиент рендерит ошибку, статус 200)
 - [ ] Миграция Tailwind v3-style config → v4 CSS-first (`@theme` в `globals.css`)
 
 ---
