@@ -38,33 +38,51 @@
 - [x] SSR hydration для страницы поста: `HydrationBoundary` + `dehydrate` + `prefetchQuery` через `getPostSSR`
 - [x] Типизация params как `Promise<{...}>` в `[user]/[post]/page.tsx`, `[user]/page.tsx`, `tag/[id]/page.tsx` (убрали `any` и eslint-disable)
 
-**PR #2b — SEO:**
-- [ ] `src/app/sitemap.ts` — динамический sitemap из постов API
-- [ ] `src/app/robots.ts`
-- [ ] `src/app/[user]/[post]/opengraph-image.tsx` — dynamic OG-картинки (`@vercel/og`)
-- [ ] RSS feed: `src/app/feed.xml/route.ts`
-- [ ] SSR prefetch для главной и `[user]/page.tsx` (сейчас flash-of-loading)
-- [ ] `notFound()` в server component при отсутствии пользователя/поста (сейчас клиент рендерит ошибку, статус 200)
-- [ ] Миграция Tailwind v3-style config → v4 CSS-first (`@theme` в `globals.css`)
+**PR #2b — SEO (DONE):**
+- [x] `src/app/sitemap.ts` — динамический sitemap из постов API
+- [x] `src/app/robots.ts`
+- [x] RSS feed: `src/app/feed.xml/route.ts`
+- [x] SSR prefetch для главной и `[user]/page.tsx` — через `setQueryData` + `HydrationBoundary`
+- [x] `notFound()` в server components при отсутствии пользователя/поста
+- [x] React `cache()` для dedup `getPostSSR` / `getPostsByUserNameSSR` между `generateMetadata` и `Page`
+- [x] Прод-фикс: `||` вместо `??` для всех env-фолбэков (ловит пустую строку на Vercel)
+
+**PR #2c — полностью закрыт** (остальные пункты уехали дальше, см. ниже).
 
 ---
 
 ## 🟡 Фаза 3 — Производительность и чистка (1 день)
 
-- [ ] Dynamic import тяжёлых клиентских либ:
-  - `@mdxeditor/editor` (~1.2MB) → `next/dynamic({ ssr: false })` в `/create` и `/edit`
-  - `@uiw/react-markdown-preview` → на странице поста
-  - `emoji-picker-react`, `react-advanced-cropper` → по клику
-- [ ] Удалить неиспользуемое: `@milkdown/*` (5 пакетов, ~400KB), компонент `milkdown-crepe.tsx` заброшен
-- [ ] Удалить/заменить `lodash` (1–2 функции в коде)
+**PR #3a — замена редактора/превью на Milkdown Crepe (DONE):**
+- [x] Единый компонент `Crepe` (editor + readonly view) — 1:1 превью с редактором
+- [x] Dynamic import (`ssr: false`) для обоих режимов
+- [x] Фикс бага: редактор больше не пересоздаётся на каждый ввод (курсор не прыгает)
+- [x] Удалены: `@mdxeditor/editor`, `@uiw/react-markdown-preview`, `@uiw/codemirror-theme-eclipse`, `@codemirror/theme-one-dark`
+- [x] Удалены неиспользуемые: `@milkdown/react`, `@milkdown/preset-commonmark`, `@milkdown/theme-nord`, `@milkdown/prose` (−64 транзитивных пакета)
+- [x] Обновлены `@milkdown/crepe` и `@milkdown/kit` 7.6.3 → 7.20.0
+- [x] Убран `transpilePackages: ["@mdxeditor/editor"]`
+- [x] Удалён `lodash.debounce` из `post-form` (не нужен, onChange теперь без debounce внутри Crepe)
+- [x] Скрыты дефолтные block handle'ы Crepe (`+` и drag) — управление через `/`-меню и клавиатуру
+- [x] Включена фича LaTeX (math `$x^2$` и `$$...$$`)
+- [x] Placeholder обновлён: `"Start typing, or press / for blocks…"`
+- [x] Расширен контейнер `.layout-page-content` до `max-w-6xl` (было 4xl)
+- [x] Auto-embed в readonly: ссылки на YouTube / Vimeo / Spotify (включая уже `/embed/...` URL) автоматически превращаются в iframe через `MutationObserver`
+- [x] Кастомный slash-меню пункт **Advanced → Embed** — вставляет link-stub, который затем авто-разворачивается в iframe в превью
+- [x] Фикс тостов: `addToastError` больше не падает на Error без `.response` (был баг `Cannot read properties of undefined (reading 'status')`)
+- [x] Фикс кэша: `useCreatePost`/`useUpdatePost`/`useDeletePost` теперь инвалидируют `getPostBySlug`, `getAllPosts`, `getPostsByUserName`, `getPostsByTag` — страница поста показывает свежий контент после save
+
+**PR #3b — Dynamic import тяжёлых либ и minor upgrades (TODO):**
+- [ ] Dynamic import `emoji-picker-react`, `react-advanced-cropper` — по клику
+- [ ] Удалить/заменить `lodash` (остался один импорт? проверить)
 - [ ] Minor upgrades (безопасно):
   - `@heroui/react` 2.8.3 → 2.8.10
   - `@tanstack/react-query` 5.66 → 5.99
   - `react-hook-form` 7.54 → 7.72
   - `framer-motion` 12.23 → 12.38
-  - `@mdxeditor/editor` 3.24 → 3.54
   - `sass`, `date-fns`, `emoji-picker-react`, `react-haiku`, `react-markdown` и др.
-- [ ] Major upgrades — **отдельным PR**: HeroUI 2→3, Next 15→16, ESLint 9→10
+
+**PR #3c — Major upgrades (отдельно):**
+- [ ] HeroUI 2→3, Next 15→16, ESLint 9→10
 
 ---
 
@@ -100,6 +118,15 @@
 - [ ] Vitest + React Testing Library (0 тестов сейчас)
 - [ ] Критичный минимум: auth-flow, `post-form` submit, markdown render
 - [ ] Playwright: e2e главных сценариев (логин, создать пост, коммент)
+
+---
+
+## 📦 Фаза 7 — Технический долг / опционально
+
+Задачи, которые стоит когда-нибудь сделать, но не приоритет.
+
+- [ ] Миграция Tailwind v3-style config → v4 CSS-first (`@theme` в `globals.css`). Текущий `@config + @import "tailwindcss"` — рабочий. Отложено: не первая попытка, требует порта HeroUI-плагина.
+- [ ] Dynamic OG-картинки через `@vercel/og`. Сейчас превью берётся из `post.coverUrl` — работает. Имеет смысл только если появится много постов без обложки + трафик из соцсетей.
 
 ---
 

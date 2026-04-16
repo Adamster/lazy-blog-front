@@ -10,21 +10,18 @@ export const addToastSuccess = (message: string) => {
   });
 };
 
-export const addToastError = async (message: string, error?: Error) => {
-  // const errors: string[] = [];
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if ((error as any)?.response.status === 404) {
-    message = "Not Found.";
-  } else if (error && error instanceof ResponseError) {
-    const errorBody = await error.response.json();
-    message = errorBody.detail || message;
-
-    // if (errorBody.errors) {
-    //   errorBody.errors.forEach((error: { message: string }) => {
-    //     errors.push(error.message);
-    //   });
-    // }
+export const addToastError = async (message: string, error?: unknown) => {
+  if (error instanceof ResponseError) {
+    if (error.response.status === 404) {
+      message = "Not Found.";
+    } else {
+      try {
+        const errorBody = await error.response.json();
+        message = errorBody.detail || errorBody.message || message;
+      } catch {
+        // ignore parse error, keep default message
+      }
+    }
   } else if (error instanceof Error) {
     message = error.message;
   }
@@ -34,18 +31,5 @@ export const addToastError = async (message: string, error?: Error) => {
     description: message,
     color: "danger",
     variant: "flat",
-    // classNames: { base: "flex flex-col items-start" },
-    // endContent: (
-    //   <div className="flex min-w-full">
-    //     <ul className="ps-14 list-disc">
-    //       {errors.length &&
-    //         errors.map((e, index) => (
-    //           <li key={index} className="text-danger-500 text-sm">
-    //             {e}
-    //           </li>
-    //         ))}
-    //     </ul>
-    //   </div>
-    // ),
   });
 };

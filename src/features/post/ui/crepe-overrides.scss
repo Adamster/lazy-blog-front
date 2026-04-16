@@ -1,0 +1,13 @@
+.milkdown {
+  width: 100%;
+  background: transparent;
+
+  .ProseMirror {
+    padding: 0;
+    min-height: 20rem;
+  }
+
+  .milkdown-block-handle {
+    display: none;
+  }
+}
