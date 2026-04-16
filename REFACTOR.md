@@ -30,6 +30,7 @@
 Чтобы блог перестал выглядеть как CSR-SPA на Next.js.
 
 **PR #2a — базовая обвязка (DONE):**
+
 - [x] `src/app/error.tsx` — route-level error boundary
 - [x] `src/app/global-error.tsx` — для ошибок в root layout
 - [x] `src/app/not-found.tsx` — 404 страница
@@ -39,6 +40,7 @@
 - [x] Типизация params как `Promise<{...}>` в `[user]/[post]/page.tsx`, `[user]/page.tsx`, `tag/[id]/page.tsx` (убрали `any` и eslint-disable)
 
 **PR #2b — SEO (DONE):**
+
 - [x] `src/app/sitemap.ts` — динамический sitemap из постов API
 - [x] `src/app/robots.ts`
 - [x] RSS feed: `src/app/feed.xml/route.ts`
@@ -54,6 +56,7 @@
 ## 🟡 Фаза 3 — Производительность и чистка (1 день)
 
 **PR #3a — замена редактора/превью на Milkdown Crepe (DONE):**
+
 - [x] Единый компонент `Crepe` (editor + readonly view) — 1:1 превью с редактором
 - [x] Dynamic import (`ssr: false`) для обоих режимов
 - [x] Фикс бага: редактор больше не пересоздаётся на каждый ввод (курсор не прыгает)
@@ -72,6 +75,7 @@
 - [x] Фикс кэша: `useCreatePost`/`useUpdatePost`/`useDeletePost` теперь инвалидируют `getPostBySlug`, `getAllPosts`, `getPostsByUserName`, `getPostsByTag` — страница поста показывает свежий контент после save
 
 **PR #3b — Dynamic import тяжёлых либ и minor upgrades (DONE):**
+
 - [x] `react-advanced-cropper` — вынесен в общий компонент `src/shared/ui/image-cropper.tsx` + dynamic-обёртка `image-cropper-dynamic.tsx`. Используется в `PostImageUploader` и `UpdateAvatar`. **Бандл `/create`/`/profile`/`/edit` похудел на ~25KB** (cropper грузится по клику)
 - [x] `emoji-picker-react` — уже был dynamic (в `comment-form.tsx`)
 - [x] `lodash` удалён полностью (0 импортов в src после Phase 3a)
@@ -84,19 +88,21 @@
   - `@vercel/analytics` → 1.6, `@vercel/speed-insights` → 1.3
 
 **PR #3c — Major upgrades (отдельно):**
+
 - [ ] HeroUI 2→3, Next 15→16, ESLint 9→10
 
 ---
 
-## 🟢 Фаза 4 — DX и инфраструктура (0.5 дня)
+## 🟢 Фаза 4 — DX и инфраструктура (DONE)
 
-- [ ] Prettier config + форматирование репо
-- [ ] Husky + lint-staged для pre-commit
-- [ ] `.nvmrc`, `.editorconfig`
-- [ ] Scripts в `package.json`: `typecheck`, `format`, `format:check`
-- [ ] GitHub Actions: `.github/workflows/ci.yml` — typecheck + lint + build на PR
-- [ ] Sentry (или аналог) для клиентских ошибок
-- [ ] ESLint FSD-плагин: `eslint-plugin-boundaries` или `@feature-sliced/eslint-config`
+- [x] Prettier (`.prettierrc`, `.prettierignore`) + `prettier-plugin-tailwindcss`
+- [x] Husky + lint-staged: pre-commit форматирует и линтит staged-файлы
+- [x] `.nvmrc` (Node 22), `.editorconfig`
+- [x] Scripts: `typecheck`, `format`, `format:check`, `prepare`
+- [x] GitHub Actions `.github/workflows/ci.yml` — typecheck + lint + format:check на PR (build делает Vercel)
+- [x] Первый прогон Prettier по репо — консистентный baseline
+- [ ] Sentry / Rollbar — клиентские ошибки (отложено: не критично)
+- [ ] ESLint FSD-плагин `@feature-sliced/eslint-config` (отложено)
 
 ---
 

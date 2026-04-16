@@ -42,7 +42,7 @@ export const UserAvatar = ({
   return isLink ? (
     <Link
       href={`/${user.userName}`}
-      className="text-foreground hover:opacity-70 transition-opacity"
+      className="text-foreground transition-opacity hover:opacity-70"
     >
       {isAvatarOnly ? avatarOnly : avatar}
     </Link>

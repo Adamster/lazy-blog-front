@@ -34,10 +34,10 @@ export const PostView = ({ post }: IProps) => {
       <div className={cn("layout-page", fullView ? "full" : "")}>
         <div className="layout-page-content">
           {post.coverUrl && (
-            <div className="flex w-full mb-4">
+            <div className="mb-4 flex w-full">
               <Image
                 radius="sm"
-                className="max-w-full w-full"
+                className="w-full max-w-full"
                 removeWrapper
                 src={post.coverUrl}
                 alt={post.title}
@@ -61,7 +61,7 @@ export const PostView = ({ post }: IProps) => {
           <div className="layout-page-aside-wrapper">
             <div className="layout-page-aside-sticky">
               <Button
-                className="layout-page-view-toggle bg-background border-1 min-w-6 w-6 h-6"
+                className="layout-page-view-toggle bg-background h-6 w-6 min-w-6 border-1"
                 size="sm"
                 isIconOnly
                 variant="bordered"
@@ -69,16 +69,16 @@ export const PostView = ({ post }: IProps) => {
                 onPress={() => setFullView((view) => !view)}
               >
                 {fullView ? (
-                  <ChevronLeftIcon className="w-4 h-4" />
+                  <ChevronLeftIcon className="h-4 w-4" />
                 ) : (
-                  <ChevronRightIcon className="w-4 h-4" />
+                  <ChevronRightIcon className="h-4 w-4" />
                 )}
               </Button>
 
               <UserAvatar user={post.author} isLink />
 
               <div className="w-full">
-                <h1 className="text-xl font-semibold mb-1 relative pe-10">
+                <h1 className="relative mb-1 pe-10 text-xl font-semibold">
                   {!post.isPublished ? (
                     <Badge
                       color="warning"
@@ -97,11 +97,11 @@ export const PostView = ({ post }: IProps) => {
                       as={Link}
                       variant="flat"
                       color="primary"
-                      className="min-w-6 h-6 w-6 absolute top-[5%] right-0 translate-x-1/2 -translate-y-1/2"
+                      className="absolute top-[5%] right-0 h-6 w-6 min-w-6 translate-x-1/2 -translate-y-1/2"
                       isIconOnly
                       href={`/${post.author.userName}/${post.slug}/edit`}
                     >
-                      <PencilIcon className="w-3 h-3" />
+                      <PencilIcon className="h-3 w-3" />
                     </Button>
                   </IsAuthor>
                 </h1>
@@ -110,8 +110,8 @@ export const PostView = ({ post }: IProps) => {
 
               <Divider className="layout-page-divider" />
 
-              <div className="flex flex-wrap items-center gap-4 text-gray w-full">
-                <div className="flex flex-wrap items-center gap-4 text-gray w-full">
+              <div className="text-gray flex w-full flex-wrap items-center gap-4">
+                <div className="text-gray flex w-full flex-wrap items-center gap-4">
                   <PostDetailsData date={post.createdAtUtc} />
                   <PostDetailsViews views={post.views} />
                   <PostDetailsComments comments={postComments?.length || 0} />

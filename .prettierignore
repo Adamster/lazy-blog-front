@@ -1,0 +1,9 @@
+node_modules
+.next
+out
+build
+coverage
+public
+package-lock.json
+src/shared/api/openapi
+.vercel

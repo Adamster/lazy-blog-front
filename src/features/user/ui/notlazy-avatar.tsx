@@ -6,7 +6,7 @@ export const NotLazyAvatar = () => (
     avatarProps={{
       size: "md",
       src: "https://notlazy.org/images/notlazy.png",
-      fallback: <UserIcon className="w-4 h-4" />,
+      fallback: <UserIcon className="h-4 w-4" />,
     }}
     name={`!Lazy Blog`}
     description={"@notlazy"}

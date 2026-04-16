@@ -52,7 +52,7 @@ export default function ImageCropper({
   };
 
   return (
-    <div className="flex flex-col gap-4 max-w-full">
+    <div className="flex max-w-full flex-col gap-4">
       <Cropper
         ref={ref}
         src={src}
@@ -62,12 +62,7 @@ export default function ImageCropper({
       />
       <div className="flex justify-end">
         <ButtonGroup>
-          <Button
-            size="sm"
-            variant="flat"
-            color="primary"
-            onPress={handleSave}
-          >
+          <Button size="sm" variant="flat" color="primary" onPress={handleSave}>
             <RocketLaunchIcon className="h-4 w-4" />
             {saveLabel}
           </Button>

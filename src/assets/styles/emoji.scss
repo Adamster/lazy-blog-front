@@ -2,7 +2,7 @@
 
 .EmojiPickerReact {
   background: hsl(var(--heroui-background) / 0.7) !important;
-  @apply border-zinc-200 dark:border-zinc-700 rounded-sm;
+  @apply rounded-sm border-zinc-200 dark:border-zinc-700;
 
   .epr-emoji-category-label {
     background: hsl(var(--heroui-background) / 0.7) !important;

@@ -83,7 +83,7 @@ export const PostForm = ({
         <div className="layout-page-aside-wrapper">
           <aside className="layout-page-aside-sticky">
             <Button
-              className="layout-page-view-toggle bg-background border-1 min-w-6 w-6 h-6"
+              className="layout-page-view-toggle bg-background h-6 w-6 min-w-6 border-1"
               size="sm"
               isIconOnly
               variant="bordered"
@@ -91,9 +91,9 @@ export const PostForm = ({
               onPress={() => setFullView((view) => !view)}
             >
               {fullView ? (
-                <ChevronLeftIcon className="w-4 h-4" />
+                <ChevronLeftIcon className="h-4 w-4" />
               ) : (
-                <ChevronRightIcon className="w-4 h-4" />
+                <ChevronRightIcon className="h-4 w-4" />
               )}
             </Button>
 
@@ -122,7 +122,7 @@ export const PostForm = ({
                       isIconOnly
                       style={{ marginBottom: "0.125rem" }}
                     >
-                      <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                      <ArrowTopRightOnSquareIcon className="h-4 w-4" />
                     </Button>
                   }
                 />
@@ -186,9 +186,9 @@ export const PostForm = ({
                 name="isPublished"
                 control={control}
                 render={({ field }) => (
-                  <div className="flex flex-col gap-4 w-full items-end">
+                  <div className="flex w-full flex-col items-end gap-4">
                     <div
-                      className="w-full flex flex-row items-center gap-4 min-h-10 h-14 px-3 py-2 rounded-medium cursor-pointer shadow-sm bg-default-100 hover:bg-default-200"
+                      className="rounded-medium bg-default-100 hover:bg-default-200 flex h-14 min-h-10 w-full cursor-pointer flex-row items-center gap-4 px-3 py-2 shadow-sm"
                       onClick={() => field.onChange(!field.value)}
                     >
                       <Switch
@@ -214,7 +214,7 @@ export const PostForm = ({
                   disabled={isPending}
                   isLoading={isPending}
                 >
-                  {!isPending && <RocketLaunchIcon className="w-4 h-4" />}
+                  {!isPending && <RocketLaunchIcon className="h-4 w-4" />}
                   Go
                 </Button>
 

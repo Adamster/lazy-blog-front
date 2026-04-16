@@ -57,10 +57,10 @@ const Comment = ({ comment, postId }: IProps) => {
   return (
     <div>
       <div className="">
-        <div className="mb-4 flex flex-row justify-between gap-4 items-end">
+        <div className="mb-4 flex flex-row items-end justify-between gap-4">
           <UserAvatar user={comment.user} isLink />
 
-          <div className="flex flex-row items-center gap-4 text-gray">
+          <div className="text-gray flex flex-row items-center gap-4">
             <IsAuthor userId={comment.user.id || ""}>
               <>
                 <Button
@@ -71,9 +71,9 @@ const Comment = ({ comment, postId }: IProps) => {
                   onPress={() => setIsEditComment((prev) => !prev)}
                 >
                   {isEditComment ? (
-                    <XMarkIcon className="w-3 h-3"></XMarkIcon>
+                    <XMarkIcon className="h-3 w-3"></XMarkIcon>
                   ) : (
-                    <PencilIcon className="w-3 h-3" />
+                    <PencilIcon className="h-3 w-3" />
                   )}
                 </Button>
 
@@ -84,13 +84,13 @@ const Comment = ({ comment, postId }: IProps) => {
                   className="h-5 w-5 min-w-5"
                   onPress={openModal}
                 >
-                  <TrashIcon className="w-3 h-3" />
+                  <TrashIcon className="h-3 w-3" />
                 </Button>
               </>
             </IsAuthor>
 
             <span className="text-tiny flex items-center gap-1">
-              <CalendarIcon className="w-3 h-3" />
+              <CalendarIcon className="h-3 w-3" />
               {formatDate2(comment.createdAtUtc)}
             </span>
           </div>

@@ -158,7 +158,7 @@ export default function CreateAccount() {
               disabled={loading}
               isLoading={loading}
             >
-              {!loading && <RocketLaunchIcon className="w-4 h-4" />}
+              {!loading && <RocketLaunchIcon className="h-4 w-4" />}
               Send
             </Button>
           </form>

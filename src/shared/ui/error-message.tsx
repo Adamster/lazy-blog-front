@@ -40,7 +40,7 @@ export const ErrorMessage = ({ error }: { error: unknown }) => {
   }, [error]);
 
   return (
-    <div className="min-h-screen -mt-16 flex flex-col gap-4 items-center justify-center">
+    <div className="-mt-16 flex min-h-screen flex-col items-center justify-center gap-4">
       <Image
         src={isDarkTheme ? LogoLight : LogoDark}
         width={80}

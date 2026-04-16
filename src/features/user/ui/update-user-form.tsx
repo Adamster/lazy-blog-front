@@ -105,7 +105,7 @@ export const UpdateUserForm = ({ userData }: IProps) => {
             disabled={updateUserMutation.isPending}
             isLoading={updateUserMutation.isPending}
           >
-            <RocketLaunchIcon className="w-4 h-4" />
+            <RocketLaunchIcon className="h-4 w-4" />
             Save
           </Button>
         </div>

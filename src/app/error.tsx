@@ -14,7 +14,7 @@ export default function Error({ error, reset }: ErrorProps) {
   }, [error]);
 
   return (
-    <div className="min-h-screen -mt-16 flex flex-col gap-4 items-center justify-center">
+    <div className="-mt-16 flex min-h-screen flex-col items-center justify-center gap-4">
       <h2 className="text-3xl font-bold">A glitch in the Lazyverse...</h2>
       <p className="text-gray">{error?.message || "Unknown error"}</p>
       <div className="flex gap-2">

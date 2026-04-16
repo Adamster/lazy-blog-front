@@ -26,7 +26,7 @@ export const PostVote = ({ postId, postSlug, voteDirection }: IProps) => {
 
       <p className="text-sm">Did you like this post?</p>
 
-      <div className="flex items-center ms-auto gap-1 flex-1 ">
+      <div className="ms-auto flex flex-1 items-center gap-1">
         <Button
           size="sm"
           isIconOnly

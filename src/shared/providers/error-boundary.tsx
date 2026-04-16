@@ -31,7 +31,7 @@ export class ErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen -mt-16 flex flex-col gap-4 items-center justify-center">
+        <div className="-mt-16 flex min-h-screen flex-col items-center justify-center gap-4">
           <h2 className="text-3xl font-bold">
             A glitch in the Lazyverse... 😢
           </h2>

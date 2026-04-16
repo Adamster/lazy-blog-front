@@ -101,7 +101,7 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
           }}
         />
       ) : (
-        <div className="flex flex-col w-full gap-4">
+        <div className="flex w-full flex-col gap-4">
           {currentImage && (
             <Image removeWrapper src={currentImage} alt="Cover image" />
           )}
@@ -112,7 +112,7 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
               variant="flat"
               onPress={() => fileInputRef.current?.click()}
             >
-              <PencilIcon className="w-4 h-4" />
+              <PencilIcon className="h-4 w-4" />
               Cover Image
             </Button>
             <Button
@@ -122,7 +122,7 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
               color="danger"
               onPress={handleRemove}
             >
-              <TrashIcon className="w-4 h-4" />
+              <TrashIcon className="h-4 w-4" />
             </Button>
           </ButtonGroup>
 

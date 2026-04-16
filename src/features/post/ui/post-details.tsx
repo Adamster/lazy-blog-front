@@ -17,7 +17,7 @@ import { Chip, Link } from "@heroui/react";
 export const PostDetailsData = ({ date }: { date: Date }) => {
   return (
     <div className="flex items-center gap-1">
-      <CalendarIcon className="w-4 h-4" />
+      <CalendarIcon className="h-4 w-4" />
       <span className="ml-1 text-sm">{formatDate2(date)}</span>
     </div>
   );
@@ -27,9 +27,9 @@ export const PostDetailsViews = ({ views }: { views: number }) => {
   return (
     <div className="flex items-center gap-1">
       {views > 0 ? (
-        <EyeIconSolid className="w-4 h-4" />
+        <EyeIconSolid className="h-4 w-4" />
       ) : (
-        <EyeIconOutline className="w-4 h-4" />
+        <EyeIconOutline className="h-4 w-4" />
       )}
       <span className="ml-1 text-sm">{views}</span>
     </div>
@@ -40,9 +40,9 @@ export const PostDetailsComments = ({ comments }: { comments: number }) => {
   return (
     <div className="flex items-center gap-1">
       {comments > 0 ? (
-        <ChatBubbleLeftIconSolid className="w-4 h-4" />
+        <ChatBubbleLeftIconSolid className="h-4 w-4" />
       ) : (
-        <ChatBubbleLeftIconOutline className="w-4 h-4" />
+        <ChatBubbleLeftIconOutline className="h-4 w-4" />
       )}
       <span className="ml-1 text-sm">{comments}</span>
     </div>
@@ -53,9 +53,9 @@ export const PostDetailsRating = ({ rating }: { rating: number }) => {
   return (
     <div className="flex items-center gap-1">
       {rating > 0 ? (
-        <StarIconSolid className="w-4 h-4" />
+        <StarIconSolid className="h-4 w-4" />
       ) : (
-        <StarIconOutline className="w-4 h-4" />
+        <StarIconOutline className="h-4 w-4" />
       )}
       <span className="ml-1 text-sm">{rating}</span>
     </div>

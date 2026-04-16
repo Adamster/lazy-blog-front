@@ -72,7 +72,7 @@ export const UpdateAvatar = ({ userData }: IProps) => {
                 variant="flat"
                 onPress={() => fileInputRef.current?.click()}
               >
-                <PencilIcon className="w-4 h-4" />
+                <PencilIcon className="h-4 w-4" />
                 Avatar
               </Button>
 
@@ -83,7 +83,7 @@ export const UpdateAvatar = ({ userData }: IProps) => {
                 color="danger"
                 onPress={() => deleteAvatarMutation.mutate()}
               >
-                <TrashIcon className="w-4 h-4" />
+                <TrashIcon className="h-4 w-4" />
               </Button>
             </ButtonGroup>
           </div>

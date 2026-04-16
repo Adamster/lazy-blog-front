@@ -136,7 +136,7 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
         </div>
       </div>
 
-      <div className="flex gap-4 items-center justify-end">
+      <div className="flex items-center justify-end gap-4">
         <Button
           variant="flat"
           size="sm"

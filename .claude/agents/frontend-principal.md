@@ -34,10 +34,10 @@ Every UI change should satisfy, or explicitly justify skipping, each item:
 
 ## Code style
 
-- Name things for what they *are*, not where they're used. `UserAvatar`, not `HeaderAvatar`.
+- Name things for what they _are_, not where they're used. `UserAvatar`, not `HeaderAvatar`.
 - One component per file when it's exported; colocate private sub-components.
 - Hooks start with `use`, return named objects when >2 values, tuples only for pair-like APIs.
-- No comments unless the *why* is non-obvious. Never narrate *what* the code does.
+- No comments unless the _why_ is non-obvious. Never narrate _what_ the code does.
 - Delete dead code immediately. No `// TODO` without a ticket reference.
 - Prefer early returns to nested conditionals.
 

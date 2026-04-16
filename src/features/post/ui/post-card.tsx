@@ -29,7 +29,7 @@ export default function PostCard({
   return (
     <>
       <div className="flex w-full flex-col gap-6">
-        <div className="flex justify-center flex-col gap-4">
+        <div className="flex flex-col justify-center gap-4">
           {!hideAuthor && <UserAvatar user={author} isLink />}
 
           <div>
@@ -55,21 +55,21 @@ export default function PostCard({
 
           {post.coverUrl ? (
             <Link
-              className="flex items-center w-full"
+              className="flex w-full items-center"
               style={{}}
               href={`/${author.userName}/${post.slug}`}
             >
               <Image
                 removeWrapper
                 radius="sm"
-                className="max-w-full w-full"
+                className="w-full max-w-full"
                 src={post.coverUrl}
                 alt={post.title}
               />
             </Link>
           ) : null}
 
-          <div className="flex flex-wrap items-center gap-4 text-gray">
+          <div className="text-gray flex flex-wrap items-center gap-4">
             <PostDetailsData date={post.createdAtUtc} />
             <PostDetailsViews views={post.views} />
             <PostDetailsComments comments={post.comments} />
