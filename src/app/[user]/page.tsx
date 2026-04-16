@@ -1,5 +1,10 @@
-import { getUserSSR } from "@/features/user/model/get-user.ssr";
-import { UserResponse } from "@/shared/api/openapi";
+import { notFound } from "next/navigation";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { getPostsByUserNameSSR } from "@/features/post/model/get-posts-by-username.ssr";
 import { generateMeta } from "@/shared/lib/head/meta-data";
 import UserPage from "./user-page";
 
@@ -9,7 +14,8 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps) {
   const { user } = await params;
-  const userData: UserResponse | null = await getUserSSR(user);
+  const postsPage = await getPostsByUserNameSSR(user);
+  const userData = postsPage?.user;
 
   if (userData) {
     return generateMeta({
@@ -31,5 +37,19 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function Page({ params }: PageProps) {
   const { user: userName } = await params;
-  return <UserPage userName={userName} />;
+
+  const postsPage = await getPostsByUserNameSSR(userName);
+  if (!postsPage?.user) notFound();
+
+  const queryClient = new QueryClient();
+  queryClient.setQueryData(["getPostsByUserName", userName], {
+    pages: [postsPage],
+    pageParams: [0],
+  });
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <UserPage userName={userName} />
+    </HydrationBoundary>
+  );
 }

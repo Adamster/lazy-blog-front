@@ -1,22 +1,18 @@
-export const getPostSSR = async (slug: string) => {
+import { cache } from "react";
+
+const API_URL =
+  process.env.NEXT_PUBLIC_API ?? "https://blog-api-prod.notlazy.org";
+
+export const getPostSSR = cache(async (slug: string) => {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API}/api/posts/${slug}`,
-      {
-        cache: "no-store",
-      }
-    );
+    const response = await fetch(`${API_URL}/api/posts/${slug}`, {
+      cache: "no-store",
+    });
 
-    if (!response.ok) {
-      return null;
-    }
+    if (!response.ok) return null;
 
-    const data = await response.json();
-
-    return {
-      ...data,
-    };
+    return await response.json();
   } catch {
     return null;
   }
-};
+});
