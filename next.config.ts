@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API ?? "https://blog-api-prod.notlazy.org";
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: ["@mdxeditor/editor"],
@@ -29,7 +32,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API}/api/:path*`,
+        destination: `${API_URL}/api/:path*`,
       },
     ];
   },

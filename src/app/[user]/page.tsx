@@ -1,12 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getUserSSR } from "@/features/user/model/get-user.ssr";
 import { UserResponse } from "@/shared/api/openapi";
 import { generateMeta } from "@/shared/lib/head/meta-data";
 import UserPage from "./user-page";
 
-export async function generateMetadata({ params }: any) {
+type PageProps = {
+  params: Promise<{ user: string }>;
+};
+
+export async function generateMetadata({ params }: PageProps) {
   const { user } = await params;
-  const userData: UserResponse = await getUserSSR(user);
+  const userData: UserResponse | null = await getUserSSR(user);
 
   if (userData) {
     return generateMeta({
@@ -19,14 +22,14 @@ export async function generateMetadata({ params }: any) {
       url: `/${userData.userName}`,
       card: "summary",
     });
-  } else {
-    return generateMeta({
-      title: "Not Found",
-    });
   }
+
+  return generateMeta({
+    title: "Not Found",
+  });
 }
 
-export default async function Page({ params }: any) {
+export default async function Page({ params }: PageProps) {
   const { user: userName } = await params;
   return <UserPage userName={userName} />;
 }
