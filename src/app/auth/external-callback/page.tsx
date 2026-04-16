@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { saveAuthState } from "@/features/auth/lib/auth-storage";
+import { API_URL } from "@/shared/types";
 
 export default function ExternalCallbackPage() {
   const queryClient = useQueryClient();
@@ -10,13 +11,9 @@ export default function ExternalCallbackPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(
-          "https://blog-api-prod.notlazy.org/auth/external-callback"
-        );
+        const res = await fetch(`${API_URL}/auth/external-callback`);
 
         const data = await res.json();
-
-        console.log("data", data);
 
         if (!res.ok)
           throw new Error(data?.detail || "External callback failed");
@@ -39,8 +36,8 @@ export default function ExternalCallbackPage() {
           throw new Error("Invalid callback payload");
         }
       } catch (e) {
-        console.log(e);
-        // window.location.replace("/");
+        console.error("External callback failed", e);
+        window.location.replace("/auth/login?error=external-callback");
       }
     })();
   }, [queryClient]);

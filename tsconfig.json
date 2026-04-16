@@ -26,8 +26,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    "src/utils/toasts.tss"
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

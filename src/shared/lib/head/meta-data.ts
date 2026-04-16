@@ -1,3 +1,5 @@
+import { SITE_URL } from "@/shared/types";
+
 interface Props {
   title: string;
   description?: string;
@@ -10,13 +12,13 @@ interface Props {
 export const generateMeta = ({
   title,
   description = "The fine art of not being lazy… most of the time",
-  image = "https://notlazy.org/images/preview.jpg",
+  image = `${SITE_URL}/images/preview.jpg`,
   type = "website",
   card = "summary_large_image",
   url,
 }: Props) => {
   const fullTitle = title ? `${title} | !Lazy Blog` : "!Lazy Blog";
-  const fullUrl = url ? `https://notlazy.org${url}` : "https://notlazy.org";
+  const fullUrl = url ? `${SITE_URL}${url}` : SITE_URL;
 
   return {
     title: fullTitle,
