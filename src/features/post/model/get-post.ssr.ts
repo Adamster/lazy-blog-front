@@ -1,7 +1,7 @@
 import { cache } from "react";
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API ?? "https://blog-api-prod.notlazy.org";
+  process.env.NEXT_PUBLIC_API || "https://blog-api-prod.notlazy.org";
 
 export const getPostSSR = cache(async (slug: string) => {
   try {

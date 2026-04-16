@@ -1,7 +1,7 @@
 import { DisplayPostResponse } from "@/shared/api/openapi";
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API ?? "https://blog-api-prod.notlazy.org";
+  process.env.NEXT_PUBLIC_API || "https://blog-api-prod.notlazy.org";
 
 export const getAllPostsSSR = async (
   offset = 0

@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API ?? "https://blog-api-prod.notlazy.org";
+  process.env.NEXT_PUBLIC_API || "https://blog-api-prod.notlazy.org";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
