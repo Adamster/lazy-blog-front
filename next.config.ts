@@ -29,12 +29,9 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-       destination: "https://blog-api-prod.notlazy.org/api/:path*"
-      }
-    ]
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
+        destination: `${process.env.NEXT_PUBLIC_API}/api/:path*`,
+      },
+    ];
   },
 };
 
