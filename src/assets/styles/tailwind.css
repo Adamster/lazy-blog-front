@@ -1,2 +1,14 @@
 @config "../../../tailwind.config.ts";
 @import "tailwindcss";
+
+/* Design tokens — "Soft Brutalist Lime" redesign (additive; does not touch the
+   existing HeroUI theme). New utilities: bg/text/border-acid|ink|paper, font-display. */
+@theme inline {
+  --font-display: var(--font-display);
+}
+
+@theme {
+  --color-acid: #84cc16;
+  --color-ink: #14150f;
+  --color-paper: #f4f4ee;
+}

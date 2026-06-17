@@ -4,7 +4,7 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import HomePage from "./home-page";
+import HomePage from "./home-page-redesign";
 import { generateMeta } from "@/shared/lib/head/meta-data";
 import { getAllPostsSSR } from "@/features/post/model/get-all-posts.ssr";
 

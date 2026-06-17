@@ -1,4 +1,4 @@
-import { Mulish } from "next/font/google";
+import { Mulish, Space_Grotesk } from "next/font/google";
 
 import "../assets/styles/tailwind.css";
 import "../assets/styles/global.scss";
@@ -14,6 +14,12 @@ const font = Mulish({
   weight: ["300", "400", "500", "600", "700", "800"],
   subsets: ["latin"],
   variable: "--font-sans",
+});
+
+const display = Space_Grotesk({
+  weight: ["500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-display",
 });
 
 export default function RootLayout({
@@ -34,7 +40,7 @@ export default function RootLayout({
         <Analytics />
       </head>
 
-      <body className={`${font.variable}`}>
+      <body className={`${font.variable} ${display.variable}`}>
         <AppProviders>
           <Header />
           <main className="mx-auto max-w-4xl">{children}</main>
