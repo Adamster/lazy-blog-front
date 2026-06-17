@@ -36,6 +36,9 @@ export function ThemeProvider({ children }: ProvidersProps) {
       | null;
 
     const finalTheme = storedTheme || (systemPrefersDark ? "dark" : "light");
+    // SSR-safe theme init: localStorage/matchMedia aren't available during
+    // render, so we must resolve the real theme after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTheme(finalTheme);
   }, []);
 
