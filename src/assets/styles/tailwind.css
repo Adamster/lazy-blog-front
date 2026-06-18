@@ -1,18 +1,9 @@
 @config "../../../tailwind.config.ts";
 @import "tailwindcss";
 
-/* Design tokens — "Soft Brutalist Lime" redesign (additive; does not touch the
-   existing HeroUI theme). New utilities: bg/text/border-acid|ink|paper, font-display. */
+/* Expose the Space Grotesk display font as a Tailwind utility (`font-display`). */
 @theme inline {
   --font-display: var(--font-display);
-}
-
-/* Tokens for the "wide grid" redesign variant (src/app/redesign).
-   The mono variant (route "/") uses the .mono-scope palette below instead. */
-@theme {
-  --color-acid: #84cc16;
-  --color-ink: #14150f;
-  --color-paper: #f4f4ee;
 }
 
 /* "Brutalist Mono" (variant B) palette — light by default, dark via the theme
