@@ -4,9 +4,42 @@
 
 /* Layout */
 
+/* App canvas = the mono background (the redesign is now the default). Painted
+   on <html> so short pages and overscroll never reveal an uncovered (white)
+   strip behind the page wrapper. The theme class (.light/.dark) lives on a
+   wrapper div inside <body>, so we match the dark canvas via :has(). */
+html {
+  background-color: #f4f4f4; /* --m-bg, light */
+}
+html:has([data-theme="dark"]) {
+  background-color: #1a1a1a; /* --m-bg, dark */
+}
+/* The theme wrapper [data-theme] holds the loader (rendered outside the mono
+   page wrapper) and all page content. Paint it too — otherwise the loader area
+   shows the HeroUI body background, a different shade than the html canvas. */
+[data-theme="light"] {
+  background-color: #f4f4f4;
+}
+[data-theme="dark"] {
+  background-color: #1a1a1a;
+}
+
+/* Interactive elements always get the pointer cursor (browsers default
+   <button> to an arrow). Disabled controls keep the not-allowed cursor. */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
 body {
   font-size: 16px;
   font-family: var(--font-sans) !important;
+  /* Prevent the few-px horizontal scroll caused by full-bleed (100vw) sections
+     when a vertical scrollbar is present. `clip` doesn't break sticky. */
+  overflow-x: clip;
 
   h1,
   h2,
