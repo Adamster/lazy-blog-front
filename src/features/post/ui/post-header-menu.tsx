@@ -13,7 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { apiClient } from "@/shared/api/api-client";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
-import { MonoMenu, type MonoMenuItem } from "@/shared/ui/mono";
+import { Menu, type MenuItem } from "@/shared/ui";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
 import { usePublishPost, useHidePost } from "../model/use-publish-post";
 
@@ -57,7 +57,7 @@ export const PostHeaderMenu = ({
 
   const iconCls = "size-3.5";
 
-  const items: MonoMenuItem[] = [
+  const items: MenuItem[] = [
     {
       id: "edit",
       label: "Редактировать",
@@ -85,7 +85,7 @@ export const PostHeaderMenu = ({
 
   return (
     <>
-      <MonoMenu items={items} triggerLabel="Post options" />
+      <Menu items={items} triggerLabel="Post options" />
       <ConfirmDeleteModal
         message="Are you sure?"
         isOpen={confirmOpen}

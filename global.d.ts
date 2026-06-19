@@ -3,3 +3,9 @@
 declare module "*.css";
 declare module "*.scss";
 declare module "*.sass";
+
+// SVG imports (resolved by the bundler's asset loader to a URL string).
+declare module "*.svg" {
+  const src: string;
+  export default src;
+}

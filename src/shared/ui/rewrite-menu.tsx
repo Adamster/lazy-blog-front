@@ -4,7 +4,7 @@ import { useRef, useState, type ReactNode } from "react";
 import { useClickOutside } from "react-haiku";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/solid";
 
-export interface MonoMenuItem {
+export interface MenuItem {
   /** Stable id for the row (React key + onSelect dispatch). */
   id: string;
   label: ReactNode;
@@ -14,8 +14,8 @@ export interface MonoMenuItem {
   danger?: boolean;
 }
 
-interface MonoMenuProps {
-  items: MonoMenuItem[];
+interface MenuProps {
+  items: MenuItem[];
   /** Accessible label for the trigger (e.g. "Post options"). */
   triggerLabel: string;
 }
@@ -25,7 +25,7 @@ interface MonoMenuProps {
  * the dots. Shared by the post header and own-comment rows so the two kebabs
  * can never drift apart.
  */
-export function MonoMenu({ items, triggerLabel }: MonoMenuProps) {
+export function Menu({ items, triggerLabel }: MenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 

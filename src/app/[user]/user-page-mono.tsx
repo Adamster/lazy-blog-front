@@ -12,13 +12,7 @@ import { usePostsByUserName } from "@/features/post/model/use-posts-by-username"
 import { useViewMode } from "@/shared/providers/view-mode-provider";
 import { MonoHeader } from "@/widgets/mono-header";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
-import {
-  MonoLabel,
-  MonoCategory,
-  MonoMetric,
-  MatrixText,
-  fmt,
-} from "@/shared/ui/mono";
+import { Label, Category, Metric, MatrixText, fmt } from "@/shared/ui";
 import { formatDate2 } from "@/shared/lib/utils";
 
 const nameOf = (u?: UserResponse) =>
@@ -148,7 +142,7 @@ export default function UserPageMono({ userName }: { userName: string }) {
         <section className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
           <div className="mx-auto grid max-w-[1240px] gap-10 px-10 py-10 sm:grid-cols-3">
             <div>
-              <MonoLabel>TOTAL LIKES</MonoLabel>
+              <Label>TOTAL LIKES</Label>
               <div className="font-display mt-2 text-[46px] leading-none font-bold tracking-[-0.02em] text-[var(--m-accent)] tabular-nums">
                 {fmt(totalLikes)}
               </div>
@@ -159,7 +153,7 @@ export default function UserPageMono({ userName }: { userName: string }) {
             </div>
 
             <div>
-              <MonoLabel>TOTAL VIEWS</MonoLabel>
+              <Label>TOTAL VIEWS</Label>
               <div className="font-display mt-2 text-[46px] leading-none font-bold tracking-[-0.02em] text-[var(--m-accent)] tabular-nums">
                 {fmt(totalViews)}
               </div>
@@ -170,7 +164,7 @@ export default function UserPageMono({ userName }: { userName: string }) {
             </div>
 
             <div>
-              <MonoLabel>ACTIVITY · 6M</MonoLabel>
+              <Label>ACTIVITY · 6M</Label>
               {/* Always draw the chart — an empty profile reads as a flat
                   line of zeros rather than a "no data" message. */}
               <div className="mt-2">
@@ -187,7 +181,7 @@ export default function UserPageMono({ userName }: { userName: string }) {
         </section>
 
         {/* Publications — when empty, the scramble takes over the label itself */}
-        <MonoLabel className="mono-label py-10">
+        <Label className="mono-label py-10">
           {posts.length === 0 ? (
             <MatrixText
               text={`${user?.userName ?? userName} is still lost in procrastination`.toUpperCase()}
@@ -195,7 +189,7 @@ export default function UserPageMono({ userName }: { userName: string }) {
           ) : (
             "PUBLICATIONS"
           )}
-        </MonoLabel>
+        </Label>
 
         {posts.length === 0 ? null : view === "grid" ? (
           <section className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
@@ -219,7 +213,7 @@ export default function UserPageMono({ userName }: { userName: string }) {
                   </div>
                   <div className="flex flex-1 flex-col p-5">
                     <div className="mb-2">
-                      <MonoCategory>{catOf(p)}</MonoCategory>
+                      <Category>{catOf(p)}</Category>
                     </div>
                     <h3 className="mono-title text-balance transition-colors group-hover:text-[var(--m-accent)]">
                       {p.title}
@@ -227,9 +221,9 @@ export default function UserPageMono({ userName }: { userName: string }) {
                     <div className="mt-auto flex items-center gap-4 pt-6 text-[12px] text-[var(--m-muted2)]">
                       <span>{formatDate2(p.createdAtUtc)}</span>
                       <span className="ml-auto flex items-center gap-4">
-                        <MonoMetric kind="likes" value={p.rating} />
-                        <MonoMetric kind="views" value={p.views} />
-                        <MonoMetric kind="comments" value={p.comments} />
+                        <Metric kind="likes" value={p.rating} />
+                        <Metric kind="views" value={p.views} />
+                        <Metric kind="comments" value={p.comments} />
                       </span>
                     </div>
                   </div>
@@ -249,7 +243,7 @@ export default function UserPageMono({ userName }: { userName: string }) {
                 </div>
                 <div className="flex flex-col justify-center px-7 py-6">
                   <div className="mb-2">
-                    <MonoCategory>{catOf(p)}</MonoCategory>
+                    <Category>{catOf(p)}</Category>
                   </div>
                   <h3 className="mono-title text-balance transition-colors group-hover:text-[var(--m-accent)]">
                     <Link
@@ -262,9 +256,9 @@ export default function UserPageMono({ userName }: { userName: string }) {
                   <div className="mt-6 flex items-center gap-2.5 text-[12px] text-[var(--m-muted2)]">
                     <span>{formatDate2(p.createdAtUtc)}</span>
                     <span className="ml-auto flex items-center gap-4">
-                      <MonoMetric kind="likes" value={p.rating} />
-                      <MonoMetric kind="views" value={p.views} />
-                      <MonoMetric kind="comments" value={p.comments} />
+                      <Metric kind="likes" value={p.rating} />
+                      <Metric kind="views" value={p.views} />
+                      <Metric kind="comments" value={p.comments} />
                     </span>
                   </div>
                 </div>

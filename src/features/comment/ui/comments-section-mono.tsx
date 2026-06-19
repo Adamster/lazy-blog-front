@@ -2,7 +2,7 @@
 
 import { CommentResponse } from "@/shared/api/openapi";
 import { IsAuth } from "@/features/auth/guards/is-auth";
-import { MonoLabel, MatrixText } from "@/shared/ui/mono";
+import { Label, MatrixText } from "@/shared/ui";
 import CommentMono from "./comment-view-mono";
 import CommentFormMono from "@/features/comment/ui/comment-form-mono";
 
@@ -51,13 +51,13 @@ export function CommentsMono({
         </div>
       ) : (
         <>
-          <MonoLabel className="mono-label py-10">
+          <Label className="mono-label py-10">
             {count > 0 ? (
               `${count} COMMENTS`
             ) : (
               <MatrixText text="SIGNAL SENT ... NO REPLY YET" />
             )}
-          </MonoLabel>
+          </Label>
           {count > 0 && (
             <div className="flex flex-col gap-7">
               {postComments?.map((comment: CommentResponse) => (

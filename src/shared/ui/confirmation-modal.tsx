@@ -1,5 +1,5 @@
 import React from "react";
-import { MonoModal, MonoModalHeader, useModalTitleId } from "@/shared/ui/mono";
+import { Modal, ModalHeader, useModalTitleId } from "@/shared/ui";
 
 interface ConfirmDeleteModalProps {
   message: string;
@@ -17,7 +17,7 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   const titleId = useModalTitleId();
 
   return (
-    <MonoModal
+    <Modal
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       width="sm"
@@ -26,11 +26,7 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
       {(onClose) => (
         <>
           {/* The message IS the title; actions stand in for the close control. */}
-          <MonoModalHeader
-            eyebrow="// CONFIRM"
-            title={message}
-            titleId={titleId}
-          />
+          <ModalHeader eyebrow="// CONFIRM" title={message} titleId={titleId} />
 
           <div className="flex items-center justify-end gap-3">
             <button
@@ -53,7 +49,7 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
           </div>
         </>
       )}
-    </MonoModal>
+    </Modal>
   );
 };
 

@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { useUserById } from "@/features/user/model/use-user-by-id";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { useResetPassword } from "@/features/auth/model/use-reset-password";
-import { MonoField, MonoSubmitButton } from "@/shared/ui/mono";
+import { Field, SubmitButton } from "@/shared/ui";
 import { MonoHeader } from "@/widgets/mono-header";
 
 const focusRing =
@@ -64,7 +64,7 @@ export default function ResetPassword() {
         <form noValidate onSubmit={handleSubmit(onSubmit)}>
           {/* New password */}
           <div className="mb-4">
-            <MonoField
+            <Field
               id="new-password"
               label="New password"
               type="password"
@@ -85,7 +85,7 @@ export default function ResetPassword() {
 
           {/* Confirm */}
           <div className="mb-4">
-            <MonoField
+            <Field
               id="confirm-password"
               label="Confirm new password"
               type="password"
@@ -101,12 +101,12 @@ export default function ResetPassword() {
             />
           </div>
 
-          <MonoSubmitButton
+          <SubmitButton
             pending={resetPasswordMutation.isPending}
             pendingLabel="Updating…"
           >
             Update password →
-          </MonoSubmitButton>
+          </SubmitButton>
         </form>
 
         <p className="mt-6 text-center text-[14px] text-[var(--m-muted)]">

@@ -13,8 +13,8 @@ import { useAuth } from "@/features/auth/model/use-auth";
 import { useUser } from "@/shared/providers/user-provider";
 import { IsAuthor } from "@/features/auth/guards/is-author";
 import { MonoHeader } from "@/widgets/mono-header";
-import { MonoCategory, MonoStatusBadge } from "@/shared/ui/mono";
-import type { MonoStatus } from "@/shared/ui/mono";
+import { Category, StatusBadge } from "@/shared/ui";
+import type { Status } from "@/shared/ui";
 import { useCommentsById } from "@/features/comment/model/use-comments-by-id";
 import { CommentsMono } from "@/features/comment/ui/comments-section-mono";
 import { PostVoteMono } from "./post-vote-mono";
@@ -59,7 +59,7 @@ export const PostViewMono = ({ post }: IProps) => {
   // Status badge slot — pinned top-right of the header, same accent-chip
   // treatment as the home hero. No backing field yet; set this when a
   // pinned / latest-drop flag lands on the post model.
-  const status: MonoStatus | null = null;
+  const status: Status | null = null;
 
   return (
     <div
@@ -72,13 +72,13 @@ export const PostViewMono = ({ post }: IProps) => {
       <div className="mx-auto max-w-[780px] px-10 pt-10">
         {/* Tag + draft + owner kebab */}
         <div className="mb-2 flex flex-wrap items-center gap-3">
-          <MonoCategory>{cat}</MonoCategory>
+          <Category>{cat}</Category>
           {!post.isPublished && (
             <span className="border-2 border-[var(--m-accent)] px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] text-[var(--m-accent)] uppercase">
               [ Draft ]
             </span>
           )}
-          {status && <MonoStatusBadge status={status} className="ml-auto" />}
+          {status && <StatusBadge status={status} className="ml-auto" />}
           <IsAuthor userId={post.author.id || ""}>
             <div className={status ? "" : "ml-auto"}>
               <PostHeaderMenu

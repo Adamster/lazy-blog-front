@@ -15,13 +15,7 @@ import { useAllPosts } from "@/features/post/model/use-all-posts";
 import { useViewMode } from "@/shared/providers/view-mode-provider";
 import { MonoHeader } from "@/widgets/mono-header";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
-import {
-  MonoLabel,
-  MonoCategory,
-  MonoMetric,
-  MonoStatusBadge,
-  MonoDot,
-} from "@/shared/ui/mono";
+import { Label, Category, Metric, StatusBadge, Dot } from "@/shared/ui";
 import { formatDate2 } from "@/shared/lib/utils";
 
 const nameOf = (u: UserResponse) =>
@@ -130,9 +124,9 @@ export default function HomePageMono() {
             <section className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
               <div className="mx-auto grid max-w-[1240px] gap-10 px-10 py-10 lg:grid-cols-3">
                 <div className="hidden lg:block">
-                  <MonoLabel caret className="mono-label mb-4">
+                  <Label caret className="mono-label mb-4">
                     MOST ACTIVE USER · JUN
-                  </MonoLabel>
+                  </Label>
                   {topUser && (
                     <div className="min-w-0">
                       <Link
@@ -143,18 +137,16 @@ export default function HomePageMono() {
                       </Link>
                       <div className="mt-4 flex items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
                         <span>@{topUser.author.userName}</span>
-                        <MonoDot />
-                        <MonoMetric kind="posts" value={topUser.count} />
-                        <MonoMetric kind="likes" value={topUser.likes} />
+                        <Dot />
+                        <Metric kind="posts" value={topUser.count} />
+                        <Metric kind="likes" value={topUser.likes} />
                       </div>
                     </div>
                   )}
                 </div>
 
                 <div className="hidden min-w-0 lg:block">
-                  <MonoLabel className="mono-label mb-4">
-                    TOP POST · JUN
-                  </MonoLabel>
+                  <Label className="mono-label mb-4">TOP POST · JUN</Label>
                   {topPost && (
                     <Link
                       href={hrefOf(topPost)}
@@ -165,18 +157,16 @@ export default function HomePageMono() {
                       </div>
                       <div className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px] text-[var(--m-muted)]">
                         <span>@{topPost.author.userName}</span>
-                        <MonoDot />
-                        <MonoMetric kind="views" value={topPost.views} />
-                        <MonoMetric kind="likes" value={topPost.rating} />
+                        <Dot />
+                        <Metric kind="views" value={topPost.views} />
+                        <Metric kind="likes" value={topPost.rating} />
                       </div>
                     </Link>
                   )}
                 </div>
 
                 <div>
-                  <MonoLabel className="mono-label mb-2">
-                    POSTS BY MONTH
-                  </MonoLabel>
+                  <Label className="mono-label mb-2">POSTS BY MONTH</Label>
                   <Sparkline
                     series={series}
                     gradientId="homeSparkGrad"
@@ -192,7 +182,7 @@ export default function HomePageMono() {
             {/* Section label — above the hero (view mode lives in the header menu) */}
             {rest.length > 0 && (
               <div className="flex items-center py-10">
-                <MonoLabel>PUBLICATIONS</MonoLabel>
+                <Label>PUBLICATIONS</Label>
               </div>
             )}
 
@@ -200,7 +190,7 @@ export default function HomePageMono() {
             {hero && (
               <section className="group relative grid bg-[var(--m-card)] transition-colors hover:bg-[var(--m-panel)] lg:grid-cols-[1.05fr_1fr]">
                 {/* Status badge — pinned top-right (LATEST DROP / future PINNED) */}
-                <MonoStatusBadge
+                <StatusBadge
                   status="LATEST DROP"
                   className="absolute top-5 right-5 z-10"
                 />
@@ -212,7 +202,7 @@ export default function HomePageMono() {
                 </Link>
                 <div className="flex flex-col justify-center p-8 lg:p-[34px]">
                   <div className="mb-2">
-                    <MonoCategory>{catOf(hero)}</MonoCategory>
+                    <Category>{catOf(hero)}</Category>
                   </div>
                   <h1 className="font-display text-[clamp(2rem,4vw,2.5rem)] leading-[1.04] font-bold tracking-[-0.02em] text-balance transition-colors group-hover:text-[var(--m-accent)]">
                     <Link
@@ -234,16 +224,16 @@ export default function HomePageMono() {
                     >
                       @{hero.author.userName}
                     </Link>
-                    <MonoDot />
+                    <Dot />
                     <span>{formatDate2(hero.createdAtUtc)}</span>
-                    <MonoDot />
-                    <MonoMetric
+                    <Dot />
+                    <Metric
                       kind="likes"
                       value={hero.rating}
                       accent={hero.voteDirection === VotePostDirectionEnum.Up}
                     />
-                    <MonoMetric kind="views" value={hero.views} />
-                    <MonoMetric kind="comments" value={hero.comments} />
+                    <Metric kind="views" value={hero.views} />
+                    <Metric kind="comments" value={hero.comments} />
                   </div>
                 </div>
               </section>
@@ -275,7 +265,7 @@ export default function HomePageMono() {
                       </Link>
                       <div className="flex flex-1 flex-col p-5">
                         <div className="mb-2">
-                          <MonoCategory>{catOf(p)}</MonoCategory>
+                          <Category>{catOf(p)}</Category>
                         </div>
                         <h3 className="mono-title text-balance transition-colors group-hover:text-[var(--m-accent)]">
                           <Link
@@ -293,15 +283,15 @@ export default function HomePageMono() {
                             @{p.author.userName}
                           </Link>
                           <span className="ml-auto flex items-center gap-4">
-                            <MonoMetric
+                            <Metric
                               kind="likes"
                               value={p.rating}
                               accent={
                                 p.voteDirection === VotePostDirectionEnum.Up
                               }
                             />
-                            <MonoMetric kind="views" value={p.views} />
-                            <MonoMetric kind="comments" value={p.comments} />
+                            <Metric kind="views" value={p.views} />
+                            <Metric kind="comments" value={p.comments} />
                           </span>
                         </div>
                       </div>
@@ -328,7 +318,7 @@ export default function HomePageMono() {
                     </Link>
                     <div className="flex flex-col justify-center px-7 py-6">
                       <div className="mb-2">
-                        <MonoCategory>{catOf(p)}</MonoCategory>
+                        <Category>{catOf(p)}</Category>
                       </div>
                       <h3 className="mono-title text-balance transition-colors group-hover:text-[var(--m-accent)]">
                         <Link
@@ -345,18 +335,18 @@ export default function HomePageMono() {
                         >
                           @{p.author.userName}
                         </Link>
-                        <MonoDot />
+                        <Dot />
                         <span>{formatDate2(p.createdAtUtc)}</span>
                         <span className="ml-auto flex items-center gap-4">
-                          <MonoMetric
+                          <Metric
                             kind="likes"
                             value={p.rating}
                             accent={
                               p.voteDirection === VotePostDirectionEnum.Up
                             }
                           />
-                          <MonoMetric kind="views" value={p.views} />
-                          <MonoMetric kind="comments" value={p.comments} />
+                          <Metric kind="views" value={p.views} />
+                          <Metric kind="comments" value={p.comments} />
                         </span>
                       </div>
                     </div>

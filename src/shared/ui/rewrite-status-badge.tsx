@@ -1,9 +1,9 @@
 import { SparklesIcon, MapPinIcon } from "@heroicons/react/24/solid";
 
-export type MonoStatus = "LATEST DROP" | "PINNED";
+export type Status = "LATEST DROP" | "PINNED";
 
-interface MonoStatusBadgeProps {
-  status: MonoStatus;
+interface StatusBadgeProps {
+  status: Status;
   /** Extra utilities (e.g. positioning) merged onto the badge. */
   className?: string;
 }
@@ -12,10 +12,7 @@ interface MonoStatusBadgeProps {
  * Accent-chip status badge (`LATEST DROP` / `PINNED`) with leading icon, shown
  * on the home hero and the post header. Same `--m-dim` chip treatment in both.
  */
-export function MonoStatusBadge({
-  status,
-  className = "",
-}: MonoStatusBadgeProps) {
+export function StatusBadge({ status, className = "" }: StatusBadgeProps) {
   const Icon = status === "PINNED" ? MapPinIcon : SparklesIcon;
   return (
     <span

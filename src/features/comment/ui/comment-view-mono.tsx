@@ -11,7 +11,7 @@ import Link from "next/link";
 import CommentFormMono from "@/features/comment/ui/comment-form-mono";
 import { formatDate2 } from "@/shared/lib/utils";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
-import { MonoMenu, type MonoMenuItem } from "@/shared/ui/mono";
+import { Menu, type MenuItem } from "@/shared/ui";
 
 interface IProps {
   comment: CommentResponse;
@@ -57,7 +57,7 @@ const CommentMono = ({ comment, postId }: IProps) => {
 
   const handle = comment.user.userName ?? "";
 
-  const menuItems: MonoMenuItem[] = [
+  const menuItems: MenuItem[] = [
     {
       id: "edit",
       label: "Редактировать",
@@ -116,7 +116,7 @@ const CommentMono = ({ comment, postId }: IProps) => {
 
         <IsAuthor userId={comment.user.id || ""}>
           <div className="ml-auto">
-            <MonoMenu items={menuItems} triggerLabel="Comment options" />
+            <Menu items={menuItems} triggerLabel="Comment options" />
           </div>
         </IsAuthor>
       </div>

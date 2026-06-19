@@ -5,12 +5,12 @@ import { useForm } from "react-hook-form";
 import { RegisterUserRequest } from "@/shared/api/openapi";
 import { addToastError } from "@/shared/lib/toasts";
 import {
-  MonoField,
-  MonoModal,
-  MonoModalHeader,
-  MonoSubmitButton,
+  Field,
+  Modal,
+  ModalHeader,
+  SubmitButton,
   useModalTitleId,
-} from "@/shared/ui/mono";
+} from "@/shared/ui";
 import { useAuth } from "../model/use-auth";
 import { useForgotPassword } from "../model/use-forgot-password";
 
@@ -131,7 +131,7 @@ function LoginView({
 
   return (
     <>
-      <MonoModalHeader
+      <ModalHeader
         eyebrow="// ACCESS"
         title="Welcome back"
         titleId={titleId}
@@ -141,7 +141,7 @@ function LoginView({
 
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-4">
-          <MonoField
+          <Field
             id="login-email"
             label="Email"
             type="email"
@@ -154,11 +154,11 @@ function LoginView({
           />
         </div>
 
-        {/* Password + a right-aligned "Forgot?" link. MonoField no longer
+        {/* Password + a right-aligned "Forgot?" link. Field no longer
             reserves space below the underline, so add a deliberate `mt-2` gap
             between the field and the link, then the canonical 16 (`mt-4`)
             before the submit — stays clean in both empty and error states. */}
-        <MonoField
+        <Field
           id="login-password"
           label="Password"
           type="password"
@@ -177,9 +177,9 @@ function LoginView({
         </div>
 
         <div className="mt-4">
-          <MonoSubmitButton pending={loading} pendingLabel="Logging in…">
+          <SubmitButton pending={loading} pendingLabel="Logging in…">
             Log in →
-          </MonoSubmitButton>
+          </SubmitButton>
         </div>
       </form>
 
@@ -221,7 +221,7 @@ function ForgotView({
 
   return (
     <>
-      <MonoModalHeader
+      <ModalHeader
         eyebrow="// RECOVERY"
         title="Reset password"
         titleId={titleId}
@@ -231,7 +231,7 @@ function ForgotView({
 
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-4">
-          <MonoField
+          <Field
             id="forgot-email"
             label="Email"
             type="email"
@@ -244,9 +244,9 @@ function ForgotView({
           />
         </div>
 
-        <MonoSubmitButton pending={isPending} pendingLabel="Sending…">
+        <SubmitButton pending={isPending} pendingLabel="Sending…">
           Send reset link →
-        </MonoSubmitButton>
+        </SubmitButton>
       </form>
 
       <HelperLine>
@@ -311,7 +311,7 @@ function RegisterView({
 
   return (
     <>
-      <MonoModalHeader
+      <ModalHeader
         eyebrow="// NEW USER"
         title="Create an account"
         titleId={titleId}
@@ -321,7 +321,7 @@ function RegisterView({
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
         {/* Email + Username */}
         <div className="grid grid-cols-2 gap-4">
-          <MonoField
+          <Field
             id="reg-email"
             label="Email"
             type="email"
@@ -333,7 +333,7 @@ function RegisterView({
               pattern: EMAIL_PATTERN,
             })}
           />
-          <MonoField
+          <Field
             id="reg-username"
             label="Username"
             type="text"
@@ -352,7 +352,7 @@ function RegisterView({
 
         {/* First + Last name */}
         <div className="mt-4 grid grid-cols-2 gap-4">
-          <MonoField
+          <Field
             id="reg-firstname"
             label="First name"
             type="text"
@@ -364,7 +364,7 @@ function RegisterView({
               minLength: { value: 2, message: "At least 2 characters" },
             })}
           />
-          <MonoField
+          <Field
             id="reg-lastname"
             label="Last name"
             type="text"
@@ -380,7 +380,7 @@ function RegisterView({
 
         {/* Password + Confirm */}
         <div className="mt-4 grid grid-cols-2 gap-4">
-          <MonoField
+          <Field
             id="reg-password"
             label="Password"
             type="password"
@@ -393,7 +393,7 @@ function RegisterView({
               pattern: PASSWORD_PATTERN,
             })}
           />
-          <MonoField
+          <Field
             id="reg-confirm"
             label="Confirm password"
             type="password"
@@ -409,9 +409,9 @@ function RegisterView({
         </div>
 
         <div className="mt-4">
-          <MonoSubmitButton pending={loading} pendingLabel="Creating…">
+          <SubmitButton pending={loading} pendingLabel="Creating…">
             Create account →
-          </MonoSubmitButton>
+          </SubmitButton>
         </div>
       </form>
 
@@ -451,7 +451,7 @@ export function AuthModal({
   }, [isOpen, isAuthenticated, onOpenChange]);
 
   return (
-    <MonoModal
+    <Modal
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       // Reset to login whenever the modal fully closes, so reopening starts fresh.
@@ -487,6 +487,6 @@ export function AuthModal({
           />
         );
       }}
-    </MonoModal>
+    </Modal>
   );
 }

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-interface MonoLabelProps {
+interface LabelProps {
   /** Label text WITHOUT the `// ` prefix — the prefix is rendered for you. */
   children: ReactNode;
   /** Add a blinking terminal caret after the text (home "MOST ACTIVE USER"). */
@@ -16,12 +16,12 @@ interface MonoLabelProps {
  * stats, `// PUBLICATIONS`, `// ADD COMMENT`, auth eyebrows, …). Renders the
  * `// ` prefix and an optional blinking caret so callers pass only the text.
  */
-export function MonoLabel({
+export function Label({
   children,
   caret = false,
   uppercase = false,
   className = "mono-label",
-}: MonoLabelProps) {
+}: LabelProps) {
   return (
     <div className={`${className}${uppercase ? "uppercase" : ""}`}>
       {"// "}

@@ -15,7 +15,7 @@ const ICONS = {
   comments: ChatBubbleLeftIcon,
 } as const;
 
-interface MonoMetricProps {
+interface MetricProps {
   kind: keyof typeof ICONS;
   value: number;
   /** Tint the metric with the accent color (e.g. an up-voted post's likes). */
@@ -28,7 +28,7 @@ interface MonoMetricProps {
  * previously-duplicated `Metric` definitions in home-page-mono and
  * user-page-mono.
  */
-export function MonoMetric({ kind, value, accent = false }: MonoMetricProps) {
+export function Metric({ kind, value, accent = false }: MetricProps) {
   const Icon = ICONS[kind];
   return (
     <span

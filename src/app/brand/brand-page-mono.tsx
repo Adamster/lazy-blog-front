@@ -4,14 +4,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Bars3Icon, LinkIcon } from "@heroicons/react/24/solid";
 import { MonoHeader } from "@/widgets/mono-header";
 import { LogoSloth } from "@/shared/ui/logo-sloth";
-import {
-  MonoLabel,
-  MonoCategory,
-  MonoStatusBadge,
-  MonoMetric,
-  MonoDot,
-  MonoField,
-} from "@/shared/ui/mono";
+import { Label, Category, StatusBadge, Metric, Dot, Field } from "@/shared/ui";
 
 /* ----------------------------- palettes ----------------------------- */
 // Explicit hex so the light/dark logo & colour demos render correctly
@@ -326,8 +319,7 @@ export default function BrandPageMono() {
           <strong className="text-[var(--m-accent)]">лайм</strong> (оливковый в
           свете, кислотный в тёмной). Геометрия: квадратные углы, рамки 2px, без
           скруглений. Это живой референс — все примеры собраны из реальных
-          примитивов{" "}
-          <code className="text-[var(--m-fg)]">src/shared/ui/mono</code>.
+          примитивов <code className="text-[var(--m-fg)]">src/shared/ui</code>.
         </p>
 
         <div className="mt-10 flex flex-col gap-10">
@@ -385,19 +377,19 @@ export default function BrandPageMono() {
           <Section
             index="04"
             title="LABELS · CATEGORIES · STATUS"
-            intro="«Терминальные» маркеры: // EYEBROW (MonoLabel), [ category ] (MonoCategory), статус-бейдж (MonoStatusBadge). Лейблы/категории — 11px / 0.12em; бейдж — 0.06em uppercase."
+            intro="«Терминальные» маркеры: // EYEBROW (Label), [ category ] (Category), статус-бейдж (StatusBadge). Лейблы/категории — 11px / 0.12em; бейдж — 0.06em uppercase."
           >
             <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
               <Demo caption="LABELS & EYEBROWS">
                 <div className="flex flex-col gap-4">
-                  <MonoLabel>PUBLICATIONS</MonoLabel>
-                  <MonoLabel caret>MOST ACTIVE USER</MonoLabel>
+                  <Label>PUBLICATIONS</Label>
+                  <Label caret>MOST ACTIVE USER</Label>
                   <div>
-                    <MonoCategory>ai</MonoCategory>
+                    <Category>ai</Category>
                   </div>
                   <div className="flex flex-wrap items-center gap-2.5">
-                    <MonoStatusBadge status="LATEST DROP" />
-                    <MonoStatusBadge status="PINNED" />
+                    <StatusBadge status="LATEST DROP" />
+                    <StatusBadge status="PINNED" />
                   </div>
                 </div>
               </Demo>
@@ -471,13 +463,13 @@ export default function BrandPageMono() {
           <Section
             index="06"
             title="FORM FIELD"
-            intro="Underline-поле (MonoField): инпут 14px, лейбл всегда 11px/0.12em uppercase — анимируется только позиция (placeholder-спот → верх на фокусе/заполнении). Бордер 2px dim → accent на фокусе; ошибка (m-error, 11px) рендерится только при наличии. Пароль получает eye-toggle."
+            intro="Underline-поле (Field): инпут 14px, лейбл всегда 11px/0.12em uppercase — анимируется только позиция (placeholder-спот → верх на фокусе/заполнении). Бордер 2px dim → accent на фокусе; ошибка (m-error, 11px) рендерится только при наличии. Пароль получает eye-toggle."
           >
             <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
               <Demo caption="UNDERLINE FIELD">
-                <MonoField id="brand-email" label="Email" type="email" />
+                <Field id="brand-email" label="Email" type="email" />
                 <div className="mt-2">
-                  <MonoField id="brand-pass" label="Password" type="password" />
+                  <Field id="brand-pass" label="Password" type="password" />
                 </div>
               </Demo>
               <Demo caption="SPEC">
@@ -495,7 +487,7 @@ export default function BrandPageMono() {
           <Section
             index="07"
             title="META / INFO ROWS"
-            intro="Строки автор · дата · метрики — ОДИН кегль Caption 12px, иконки 14px (MonoMetric), разделитель · (MonoDot) цветом muted2, числа tabular-nums. In-group gap 10, между метриками 16."
+            intro="Строки автор · дата · метрики — ОДИН кегль Caption 12px, иконки 14px (Metric), разделитель · (Dot) цветом muted2, числа tabular-nums. In-group gap 10, между метриками 16."
           >
             <div className="flex flex-col gap-5">
               <Demo caption="POST BYLINE · avatar 40px">
@@ -507,9 +499,9 @@ export default function BrandPageMono() {
                     </div>
                     <div className="flex items-center gap-2 text-[12px] text-[var(--m-muted)]">
                       <span>@lazy_ela</span>
-                      <MonoDot />
+                      <Dot />
                       <span>14 Jun 2025</span>
-                      <MonoDot />
+                      <Dot />
                       <span>6 min read</span>
                     </div>
                   </div>
@@ -518,12 +510,12 @@ export default function BrandPageMono() {
               <Demo caption="FEED / LIST META · Caption 12px · icon 14px">
                 <div className="flex flex-wrap items-center gap-4 text-[12px] text-[var(--m-muted2)]">
                   <span className="text-[var(--m-fg)]">@kostya</span>
-                  <MonoDot />
+                  <Dot />
                   <span>12 May 2025</span>
                   <span className="ml-auto flex items-center gap-4">
-                    <MonoMetric kind="likes" value={412} />
-                    <MonoMetric kind="views" value={18240} />
-                    <MonoMetric kind="comments" value={37} />
+                    <Metric kind="likes" value={412} />
+                    <Metric kind="views" value={18240} />
+                    <Metric kind="comments" value={37} />
                   </span>
                 </div>
               </Demo>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal, ModalContent } from "@heroui/react";
+import { Modal as HeroModal, ModalContent } from "@heroui/react";
 import { useId, useState, type ReactNode } from "react";
 
 const focusRing =
@@ -16,7 +16,7 @@ const focusRing =
  * `width` picks one of the canonical modal widths. Children receive the HeroUI
  * `onClose` callback.
  */
-export function MonoModal({
+export function Modal({
   isOpen,
   onOpenChange,
   onClose,
@@ -51,7 +51,7 @@ export function MonoModal({
         aria-hidden="true"
       />
 
-      <Modal
+      <HeroModal
         placement="center"
         scrollBehavior="outside"
         isOpen={isOpen}
@@ -82,7 +82,7 @@ export function MonoModal({
             </div>
           )}
         </ModalContent>
-      </Modal>
+      </HeroModal>
     </>
   );
 }
@@ -91,9 +91,9 @@ export function MonoModal({
  * Canonical modal header: `// EYEBROW` (mono-label, mb-2) + 32px title + optional
  * 14px subtitle (mt-4), with a 36px close ✕ control top-right. Returns the
  * heading `id` via `titleId` so the caller can wire `aria-labelledby` on
- * {@link MonoModal}.
+ * {@link Modal}.
  */
-export function MonoModalHeader({
+export function ModalHeader({
   eyebrow,
   title,
   titleId,
@@ -142,7 +142,7 @@ export function MonoModalHeader({
  * 36px (`h-9`), Space Grotesk 700 / 14px, accent fill. Shows `pendingLabel`
  * while disabled-pending.
  */
-export function MonoSubmitButton({
+export function SubmitButton({
   children,
   pending = false,
   pendingLabel,
