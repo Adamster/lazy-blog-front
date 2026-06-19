@@ -10,7 +10,7 @@ import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { usePostsByUserName } from "@/features/post/model/use-posts-by-username";
 import { useViewMode } from "@/shared/providers/view-mode-provider";
-import { MonoHeader } from "@/widgets/mono-header";
+import { Header } from "@/widgets/rewrite-header";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
 import { Label, Category, Metric, MatrixText, fmt } from "@/shared/ui";
 import { formatDate2 } from "@/shared/lib/utils";
@@ -89,7 +89,7 @@ export default function UserPageMono({ userName }: { userName: string }) {
       className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <MonoHeader />
+      <Header />
 
       <main className="mx-auto max-w-[1240px] px-10 pt-10 pb-10">
         {/* Profile header */}

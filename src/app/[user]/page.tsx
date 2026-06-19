@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { getPostsByUserNameSSR } from "@/features/post/model/get-posts-by-username.ssr";
 import { generateMeta } from "@/shared/lib/head/meta-data";
-import UserPage from "./user-page-mono";
+import UserPage from "./rewrite-user-page";
 
 type PageProps = {
   params: Promise<{ user: string }>;

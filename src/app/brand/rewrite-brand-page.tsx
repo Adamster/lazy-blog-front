@@ -2,7 +2,7 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import { Bars3Icon, LinkIcon } from "@heroicons/react/24/solid";
-import { MonoHeader } from "@/widgets/mono-header";
+import { Header } from "@/widgets/rewrite-header";
 import { LogoSloth } from "@/shared/ui/logo-sloth";
 import { Label, Category, StatusBadge, Metric, Dot, Field } from "@/shared/ui";
 
@@ -299,7 +299,7 @@ export default function BrandPageMono() {
       className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <MonoHeader />
+      <Header />
 
       <main className="mx-auto max-w-[1100px] px-10 pt-20 pb-10">
         {/* Masthead */}

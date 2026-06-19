@@ -3,8 +3,8 @@
 import { CommentResponse } from "@/shared/api/openapi";
 import { IsAuth } from "@/features/auth/guards/is-auth";
 import { Label, MatrixText } from "@/shared/ui";
-import CommentMono from "./comment-view-mono";
-import CommentFormMono from "@/features/comment/ui/comment-form-mono";
+import CommentMono from "./rewrite-comment-view";
+import CommentFormMono from "@/features/comment/ui/rewrite-comment-form";
 
 interface IProps {
   postId: string;

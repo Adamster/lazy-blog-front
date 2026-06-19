@@ -43,7 +43,7 @@ const Caret = () => (
   </span>
 );
 
-export function MonoHeader() {
+export function Header() {
   const { isDarkTheme, changeTheme } = useTheme();
   const { user } = useUser();
   const { isAuthenticated, logout } = useAuth();

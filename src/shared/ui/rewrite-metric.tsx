@@ -25,8 +25,8 @@ interface MetricProps {
 /**
  * Icon + number metric (likes / views / posts / comments) used in feed cards,
  * list rows, the hero byline and profile stats. Consolidates the two
- * previously-duplicated `Metric` definitions in home-page-mono and
- * user-page-mono.
+ * previously-duplicated `Metric` definitions in rewrite-home-page and
+ * rewrite-user-page.
  */
 export function Metric({ kind, value, accent = false }: MetricProps) {
   const Icon = ICONS[kind];

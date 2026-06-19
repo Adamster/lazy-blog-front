@@ -2,7 +2,7 @@
 
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
-import { PostViewMono } from "@/features/post/ui/post-view-mono";
+import { PostViewMono } from "@/features/post/ui/rewrite-post-view";
 import { usePostBySlug } from "@/features/post/model/use-post-by-slug";
 import { useIncrementViewPost } from "@/features/post/model/use-increment-view-post";
 

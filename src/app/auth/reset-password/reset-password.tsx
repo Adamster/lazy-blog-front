@@ -10,7 +10,7 @@ import { useUserById } from "@/features/user/model/use-user-by-id";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { useResetPassword } from "@/features/auth/model/use-reset-password";
 import { Field, SubmitButton } from "@/shared/ui";
-import { MonoHeader } from "@/widgets/mono-header";
+import { Header } from "@/widgets/rewrite-header";
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
@@ -49,7 +49,7 @@ export default function ResetPassword() {
       className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <MonoHeader />
+      <Header />
 
       <main className="mx-auto max-w-[468px] px-10 pt-28 pb-24">
         <div className="mono-label mb-2">{"// RESET PASSWORD"}</div>

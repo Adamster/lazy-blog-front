@@ -2,8 +2,8 @@
 
 /* Previous header variant — HeroUI Dropdown (a separate floating panel below
    the burger). Kept as a fallback in case we revert from the animated morphing
-   `mono-header.tsx`. To switch back, import `MonoHeader` from this file instead
-   of `@/widgets/mono-header` in the pages that use it. */
+   `rewrite-header.tsx`. To switch back, import `Header` from this file instead
+   of `@/widgets/rewrite-header` in the pages that use it. */
 
 import Link from "next/link";
 import { useState } from "react";
@@ -28,7 +28,7 @@ import { useAuth } from "@/features/auth/model/use-auth";
 import { AuthModal } from "@/features/auth/ui/auth-modal";
 import { LogoSloth } from "@/shared/ui/logo-sloth";
 
-export function MonoHeader() {
+export function Header() {
   const { isDarkTheme, changeTheme } = useTheme();
   const { user } = useUser();
   const { isAuthenticated, logout } = useAuth();

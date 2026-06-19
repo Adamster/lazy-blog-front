@@ -12,13 +12,13 @@ import { formatDate2 } from "@/shared/lib/utils";
 import { useAuth } from "@/features/auth/model/use-auth";
 import { useUser } from "@/shared/providers/user-provider";
 import { IsAuthor } from "@/features/auth/guards/is-author";
-import { MonoHeader } from "@/widgets/mono-header";
+import { Header } from "@/widgets/rewrite-header";
 import { Category, StatusBadge } from "@/shared/ui";
 import type { Status } from "@/shared/ui";
 import { useCommentsById } from "@/features/comment/model/use-comments-by-id";
-import { CommentsMono } from "@/features/comment/ui/comments-section-mono";
-import { PostVoteMono } from "./post-vote-mono";
-import { PostHeaderMenu } from "./post-header-menu";
+import { CommentsMono } from "@/features/comment/ui/rewrite-comments-section";
+import { PostVoteMono } from "./rewrite-post-vote";
+import { PostHeaderMenu } from "./rewrite-post-header-menu";
 import { Crepe } from "./crepe-wrapper";
 
 interface IProps {
@@ -66,7 +66,7 @@ export const PostViewMono = ({ post }: IProps) => {
       className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <MonoHeader />
+      <Header />
 
       {/* Above — on normal --m-bg: chip, title, summary */}
       <div className="mx-auto max-w-[780px] px-10 pt-10">

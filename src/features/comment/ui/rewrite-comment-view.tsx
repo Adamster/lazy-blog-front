@@ -8,7 +8,7 @@ import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import Link from "next/link";
-import CommentFormMono from "@/features/comment/ui/comment-form-mono";
+import CommentFormMono from "@/features/comment/ui/rewrite-comment-form";
 import { formatDate2 } from "@/shared/lib/utils";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
 import { Menu, type MenuItem } from "@/shared/ui";

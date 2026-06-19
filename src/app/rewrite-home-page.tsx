@@ -13,7 +13,7 @@ import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { useAllPosts } from "@/features/post/model/use-all-posts";
 import { useViewMode } from "@/shared/providers/view-mode-provider";
-import { MonoHeader } from "@/widgets/mono-header";
+import { Header } from "@/widgets/rewrite-header";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
 import { Label, Category, Metric, StatusBadge, Dot } from "@/shared/ui";
 import { formatDate2 } from "@/shared/lib/utils";
@@ -108,7 +108,7 @@ export default function HomePageMono() {
       className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <MonoHeader />
+      <Header />
 
       <main className="mx-auto max-w-[1240px] px-10 pt-20 pb-10">
         {posts.length === 0 ? (
