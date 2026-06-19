@@ -5,46 +5,15 @@ import { Loading } from "@/shared/ui/loading";
 import { addToastError } from "@/shared/lib/toasts";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useUserById } from "@/features/user/model/use-user-by-id";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { useResetPassword } from "@/features/auth/model/use-reset-password";
+import { MonoField, MonoSubmitButton } from "@/shared/ui/mono";
 import { MonoHeader } from "@/widgets/mono-header";
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
-const fieldLabel = "mono-field-label";
-
-function inputClasses(hasError: boolean) {
-  return `mono-input py-2.5 pr-8 text-[15px] leading-[1.5] ${
-    hasError
-      ? "border-[var(--m-error)]"
-      : "border-[var(--m-dim)] focus:border-[var(--m-accent)]"
-  }`;
-}
-
-function EyeIcon({ off }: { off: boolean }) {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      aria-hidden="true"
-    >
-      <path
-        d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"
-        strokeLinejoin="round"
-      />
-      <circle cx="12" cy="12" r="3" />
-      {off ? <path d="M3 3l18 18" strokeLinecap="round" /> : null}
-    </svg>
-  );
-}
 
 export default function ResetPassword() {
   const searchParams = useSearchParams();
@@ -53,9 +22,6 @@ export default function ResetPassword() {
 
   const { data: user, isLoading, isError, error } = useUserById(userId);
   const resetPasswordMutation = useResetPassword(user?.email || "", token);
-
-  const [showPw, setShowPw] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
 
   const {
     register,
@@ -86,106 +52,64 @@ export default function ResetPassword() {
       <MonoHeader />
 
       <main className="mx-auto max-w-[468px] px-10 pt-28 pb-24">
-        <div className="mono-label mb-3.5">{"// RESET PASSWORD"}</div>
-        <h1 className="font-display text-[40px] leading-[1.02] font-bold tracking-[-0.025em]">
+        <div className="mono-label mb-2">{"// RESET PASSWORD"}</div>
+        <h1 className="font-display text-[40px] leading-[1.04] font-bold tracking-[-0.02em]">
           Set a new password
         </h1>
-        <div className="mt-3.5 mb-10 border-l-[3px] border-l-[var(--m-accent)] bg-[var(--m-accent)]/[0.06] px-3.5 py-3 text-[13px] leading-[1.6] text-[var(--m-muted)]">
-          Пароль: минимум 6 символов — хотя бы одна заглавная и строчная буква,
-          цифра и спецсимвол.
+        <div className="mt-4 mb-7 border-l-2 border-l-[var(--m-accent)] bg-[var(--m-accent)]/[0.06] px-4 py-3 text-[14px] leading-[1.6] text-[var(--m-muted)]">
+          Make it count: 6+ characters with at least one uppercase, one
+          lowercase, a number, and a special character.
         </div>
 
         <form noValidate onSubmit={handleSubmit(onSubmit)}>
           {/* New password */}
-          <div className="mb-6">
-            <label htmlFor="new-password" className={fieldLabel}>
-              NEW PASSWORD <span className="text-[var(--m-accent)]">*</span>
-            </label>
-            <div className="relative flex items-center">
-              <input
-                id="new-password"
-                type={showPw ? "text" : "password"}
-                autoComplete="new-password"
-                aria-invalid={Boolean(errors.newPassword)}
-                className={inputClasses(Boolean(errors.newPassword))}
-                {...register("newPassword", {
-                  required: "New password required",
-                  minLength: { value: 6, message: "At least 6 characters" },
-                  pattern: {
-                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/,
-                    message:
-                      "At least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character",
-                  },
-                })}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPw((s) => !s)}
-                aria-label={showPw ? "Hide password" : "Show password"}
-                className={`absolute right-0 flex p-1 text-[var(--m-muted2)] transition-colors hover:text-[var(--m-accent)] ${focusRing}`}
-              >
-                <EyeIcon off={showPw} />
-              </button>
-            </div>
-            <p
-              className="min-h-[16px] text-[11px] tracking-[0.02em] text-[var(--m-error)]"
-              role={errors.newPassword ? "alert" : undefined}
-            >
-              {errors.newPassword ? `! ${errors.newPassword.message}` : ""}
-            </p>
+          <div className="mb-4">
+            <MonoField
+              id="new-password"
+              label="New password"
+              type="password"
+              autoComplete="new-password"
+              required
+              error={errors.newPassword?.message}
+              {...register("newPassword", {
+                required: "New password required",
+                minLength: { value: 6, message: "At least 6 characters" },
+                pattern: {
+                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/,
+                  message:
+                    "At least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character",
+                },
+              })}
+            />
           </div>
 
           {/* Confirm */}
-          <div className="mb-2">
-            <label htmlFor="confirm-password" className={fieldLabel}>
-              CONFIRM NEW PASSWORD{" "}
-              <span className="text-[var(--m-accent)]">*</span>
-            </label>
-            <div className="relative flex items-center">
-              <input
-                id="confirm-password"
-                type={showConfirm ? "text" : "password"}
-                autoComplete="new-password"
-                aria-invalid={Boolean(errors.confirmPassword)}
-                className={inputClasses(Boolean(errors.confirmPassword))}
-                {...register("confirmPassword", {
-                  required: "Confirmation required",
-                  validate: (value) =>
-                    value === getValues("newPassword") ||
-                    "Passwords do not match",
-                })}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirm((s) => !s)}
-                aria-label={showConfirm ? "Hide password" : "Show password"}
-                className={`absolute right-0 flex p-1 text-[var(--m-muted2)] transition-colors hover:text-[var(--m-accent)] ${focusRing}`}
-              >
-                <EyeIcon off={showConfirm} />
-              </button>
-            </div>
-            <p
-              className="min-h-[16px] text-[11px] tracking-[0.02em] text-[var(--m-error)]"
-              role={errors.confirmPassword ? "alert" : undefined}
-            >
-              {errors.confirmPassword
-                ? `! ${errors.confirmPassword.message}`
-                : ""}
-            </p>
+          <div className="mb-4">
+            <MonoField
+              id="confirm-password"
+              label="Confirm new password"
+              type="password"
+              autoComplete="new-password"
+              required
+              error={errors.confirmPassword?.message}
+              {...register("confirmPassword", {
+                required: "Confirmation required",
+                validate: (value) =>
+                  value === getValues("newPassword") ||
+                  "Passwords do not match",
+              })}
+            />
           </div>
 
-          <button
-            type="submit"
-            disabled={resetPasswordMutation.isPending}
-            className={`font-display mt-6 w-full bg-[var(--m-accent)] py-4 text-[14.5px] font-bold text-[var(--m-bg)] transition-[filter] hover:brightness-110 disabled:pointer-events-none disabled:opacity-80 ${focusRing}`}
+          <MonoSubmitButton
+            pending={resetPasswordMutation.isPending}
+            pendingLabel="Updating…"
           >
-            {resetPasswordMutation.isPending
-              ? "Updating…"
-              : "Update password →"}
-          </button>
+            Update password →
+          </MonoSubmitButton>
         </form>
 
-        <p className="mt-7 text-center text-[12.5px] text-[var(--m-muted)]">
+        <p className="mt-6 text-center text-[14px] text-[var(--m-muted)]">
           ←{" "}
           <Link
             href="/"

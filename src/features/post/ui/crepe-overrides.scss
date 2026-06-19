@@ -11,3 +11,84 @@
     display: none;
   }
 }
+
+/* Readonly post view (wrapped in `.mono-prose`): use the brutalist mono system
+   fonts instead of Crepe's Noto Sans/Serif, and a consistent 16px body, so the
+   article reads the same as the rest of the app. Scoped so the editor on the
+   create/edit pages keeps its own defaults. */
+.mono-prose {
+  --crepe-font-default: var(--font-mono);
+  --crepe-font-title: var(--font-display);
+
+  .ProseMirror {
+    font-size: 16px;
+    line-height: 1.85;
+
+    p {
+      font-size: 16px;
+      line-height: 1.85;
+      color: var(--m-fg);
+      margin: 0 0 20px;
+    }
+
+    // Crepe maps markdown headings to h2/h3 (it reserves h1 for the doc title),
+    // so apply the design's single heading treatment to both for a consistent
+    // 24px Space Grotesk section heading regardless of source level.
+    h2,
+    h3 {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      text-align: left;
+      margin: 36px 0 16px;
+    }
+
+    ul,
+    ol {
+      margin: 0 0 20px;
+      padding-left: 22px;
+    }
+
+    li {
+      font-size: 16px;
+      line-height: 1.8;
+      margin: 0 0 8px;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      background: var(--m-panel);
+      padding: 2px 6px;
+    }
+
+    a {
+      color: var(--m-accent);
+      text-underline-offset: 2px;
+    }
+
+    blockquote {
+      margin: 28px 0;
+      border-left: 3px solid var(--m-accent);
+      background: color-mix(in srgb, var(--m-accent) 6%, transparent);
+      padding: 18px 20px;
+
+      p {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.6;
+        color: var(--m-fg);
+      }
+
+      // Small attribution line (e.g. `— @handle`) — the last paragraph in the
+      // quote reads as the source per the design.
+      p + p {
+        margin: 10px 0 0;
+        font-size: 12px;
+        color: var(--m-muted);
+      }
+    }
+  }
+}

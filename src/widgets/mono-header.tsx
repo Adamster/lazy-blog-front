@@ -1,166 +1,240 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState, type ComponentType, type SVGProps } from "react";
+import { motion } from "framer-motion";
+import { useClickOutside } from "react-haiku";
+import { useDisclosure } from "@heroui/react";
+import { Bars3Icon } from "@heroicons/react/24/solid";
 import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Switch,
-  useDisclosure,
-} from "@heroui/react";
-import {
-  Bars3Icon,
-  MoonIcon,
   UserIcon,
   PencilSquareIcon,
   ArrowRightStartOnRectangleIcon,
-} from "@heroicons/react/24/solid";
+  ArrowRightEndOnRectangleIcon,
+} from "@heroicons/react/24/outline";
 import { useTheme } from "@/shared/providers/theme-providers";
 import { useUser } from "@/shared/providers/user-provider";
 import { useAuth } from "@/features/auth/model/use-auth";
 import { AuthModal } from "@/features/auth/ui/auth-modal";
 import { LogoSloth } from "@/shared/ui/logo-sloth";
 
+// Terminal command rows: a `>` prompt + the command, hover highlights the line.
+const cmdBase =
+  "flex w-full items-center gap-2 px-4 py-2.5 text-left text-[14px] whitespace-nowrap transition-colors hover:bg-[var(--m-panel)]";
+const cmdCls = `${cmdBase} text-[var(--m-fg)] hover:text-[var(--m-accent)]`;
+const cmdDanger = `${cmdBase} text-[var(--m-error)] hover:text-[var(--m-error)]`;
+
+// Trailing `[ icon ]` on the account rows — bracketed like the toggles' `[ on ]`
+// so the whole right column reads uniformly; muted2 (same color as the icon).
+const BracketIcon = ({
+  Icon,
+}: {
+  Icon: ComponentType<SVGProps<SVGSVGElement>>;
+}) => (
+  <span className="ml-auto inline-flex items-center gap-1.5 text-[11px] text-[var(--m-muted2)]">
+    [<Icon className="size-3.5" />]
+  </span>
+);
+
+// Accent `>` command prompt.
+const Caret = () => (
+  <span aria-hidden className="text-[var(--m-accent)]">
+    &gt;
+  </span>
+);
+
 export function MonoHeader() {
   const { isDarkTheme, changeTheme } = useTheme();
   const { user } = useUser();
   const { isAuthenticated, logout } = useAuth();
-  // Portal the dropdown into a node that lives inside the themed `.mono-scope`
-  // ancestry; HeroUI otherwise mounts overlays on document.body, where neither
-  // the `.dark` class nor the `--m-*` tokens are in scope.
-  const [menuPortal, setMenuPortal] = useState<HTMLElement | null>(null);
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const {
     isOpen: isAuthOpen,
     onOpen: onAuthOpen,
     onOpenChange: onAuthOpenChange,
   } = useDisclosure();
 
-  const btnBase =
-    "flex size-9 flex-none items-center justify-center border-2 border-[var(--m-line)] bg-[var(--m-bg)] text-[var(--m-fg)] transition-colors hover:border-[var(--m-accent)] hover:bg-[var(--m-accent)] hover:text-[var(--m-bg)]";
+  // TODO(i18n): stub — no translation layer yet, this only flips the indicator.
+  // Wire it to a real i18n provider (+ persistence) when one lands.
+  const [lang, setLang] = useState<"en" | "ru">("en");
+  const toggleLang = () => setLang((prev) => (prev === "en" ? "ru" : "en"));
 
-  // Mono square toggle used for the settings rows (reflects state; the row's
-  // onPress is the actual control, so the switch is display-only).
-  const switchClassNames = {
-    wrapper:
-      "rounded-none border-2 border-[var(--m-dim)] bg-transparent group-data-[selected=true]:border-[var(--m-accent)] group-data-[selected=true]:bg-[var(--m-accent)]",
-    thumb:
-      "rounded-none bg-[var(--m-muted)] group-data-[selected=true]:bg-[var(--m-bg)]",
-  };
+  useClickOutside(menuRef, () => setOpen(false));
 
   return (
     <>
-      {/* Fixed sloth logo — top left, persists on scroll */}
-      <Link href="/" aria-label="Home" className="fixed top-5 left-5 z-50">
-        <LogoSloth />
+      {/* Peeking sloth — tucked off the left edge (tilted CCW); on hover it
+          slides out and rotates clockwise to upright. Links home. */}
+      <Link
+        href="/"
+        aria-label="Home"
+        className="fixed top-5 left-0 z-50 -translate-x-[72%] -rotate-[15deg] transition-all duration-300 ease-out hover:-translate-x-[12%] hover:rotate-0"
+      >
+        <LogoSloth className="size-10 text-[var(--m-fg)]" />
       </Link>
 
-      {/* Portal target — a viewport-spanning, non-interactive node that keeps the
-          overlay inside the themed scope without skewing HeroUI's placement. */}
-      <div
-        ref={setMenuPortal}
-        className="mono-portal pointer-events-none fixed inset-0 z-40"
-        aria-hidden="true"
-      />
-
-      {/* Fixed menu — top right; single trigger opens a context menu */}
-      <div className="fixed top-5 right-5 z-50">
-        <Dropdown
-          placement="bottom-end"
-          shouldBlockScroll={false}
-          portalContainer={menuPortal ?? undefined}
-          classNames={{
-            content:
-              "mono-portal pointer-events-auto min-w-[230px] max-w-[300px] rounded-none border-2 border-[var(--m-line)] bg-[var(--m-card)] p-0 text-[var(--m-fg)]",
-          }}
+      {/* Fixed morphing menu — top right. Anchored by `right-5`, so the
+          container grows leftward/downward: the burger fades out, the box
+          expands, then the console items fade in. */}
+      <div ref={menuRef} className="fixed top-5 right-5 z-50">
+        <motion.div
+          initial={false}
+          animate={{ width: open ? 280 : 36, height: open ? "auto" : 36 }}
+          transition={{ duration: 0.32, ease: [0.2, 0.8, 0.2, 1] }}
+          className={`relative overflow-hidden border-2 bg-[var(--m-card)] transition-colors ${
+            open
+              ? "border-[var(--m-line)]"
+              : isAuthenticated
+                ? "border-[var(--m-accent)]"
+                : "border-[var(--m-dim)]"
+          }`}
         >
-          <DropdownTrigger>
-            <button type="button" aria-label="Menu" className={btnBase}>
-              <Bars3Icon className="size-4" />
-            </button>
-          </DropdownTrigger>
-
-          <DropdownMenu
-            aria-label="Menu"
-            variant="flat"
-            itemClasses={{
-              base: "rounded-none gap-2.5 px-4 py-2.5 text-[var(--m-fg)] data-[hover=true]:bg-[var(--m-panel)] data-[hover=true]:text-[var(--m-fg)]",
-              title: "font-[inherit] text-[13px]",
-            }}
+          {/* Console list — always rendered (so the box can size to it), faded
+              in only after the box has expanded. */}
+          <motion.div
+            animate={{ opacity: open ? 1 : 0 }}
+            transition={{ duration: 0.18, delay: open ? 0.2 : 0 }}
+            aria-hidden={!open}
+            className="w-[276px]"
           >
+            {/* Terminal prompt header */}
+            <div className="flex items-center border-b-2 border-[var(--m-dim)] px-4 py-2.5 text-[12px] tracking-[0.02em]">
+              <Link
+                href="/"
+                onClick={() => setOpen(false)}
+                aria-label="Home"
+                tabIndex={open ? 0 : -1}
+                className="min-w-0 truncate"
+              >
+                <span className="text-[var(--m-accent)]">
+                  @{user?.userName ?? "guest"}
+                </span>{" "}
+                <span className="text-[var(--m-muted2)]">:~$</span>
+              </Link>
+              <span
+                aria-hidden
+                className="ml-1.5 shrink-0 text-[var(--m-accent)]"
+                style={{ animation: "lzblink 1.1s steps(1) infinite" }}
+              >
+                _
+              </span>
+            </div>
+
             {/* Account */}
             {isAuthenticated ? (
-              <DropdownItem
-                key="profile"
-                textValue={user?.userName ?? "Profile"}
-                classNames={{ title: "truncate" }}
-                startContent={<UserIcon className="size-4 shrink-0" />}
+              <Link
                 href={`/${user?.userName ?? ""}`}
+                onClick={() => setOpen(false)}
+                className={cmdCls}
+                tabIndex={open ? 0 : -1}
               >
-                @{user?.userName}
-              </DropdownItem>
+                <Caret />
+                profile
+                <BracketIcon Icon={UserIcon} />
+              </Link>
             ) : (
-              <DropdownItem
-                key="auth"
-                textValue="Log in"
-                showDivider
-                startContent={<UserIcon className="size-4" />}
-                onPress={onAuthOpen}
+              <button
+                type="button"
+                onClick={() => {
+                  onAuthOpen();
+                  setOpen(false);
+                }}
+                className={cmdCls}
+                tabIndex={open ? 0 : -1}
               >
-                Log in
-              </DropdownItem>
+                <Caret />
+                login
+                <BracketIcon Icon={ArrowRightEndOnRectangleIcon} />
+              </button>
             )}
 
-            {isAuthenticated ? (
-              <DropdownItem
-                key="create"
-                textValue="Create post"
-                showDivider
-                startContent={<PencilSquareIcon className="size-4" />}
+            {isAuthenticated && (
+              <Link
                 href="/create"
+                onClick={() => setOpen(false)}
+                className={cmdCls}
+                tabIndex={open ? 0 : -1}
               >
-                Create post
-              </DropdownItem>
-            ) : null}
+                <Caret />
+                create_post
+                <BracketIcon Icon={PencilSquareIcon} />
+              </Link>
+            )}
 
-            {/* Settings — theme toggle with the switch on the right */}
-            <DropdownItem
-              key="theme"
-              textValue="Dark mode"
-              closeOnSelect={false}
-              showDivider={isAuthenticated}
-              startContent={<MoonIcon className="size-4" />}
-              endContent={
-                <Switch
-                  size="sm"
-                  isSelected={isDarkTheme}
-                  className="pointer-events-none scale-[0.82]"
-                  classNames={switchClassNames}
-                  aria-hidden
-                />
-              }
-              onPress={changeTheme}
-            >
-              Dark mode
-            </DropdownItem>
-
-            {/* Logout — bottom, set apart */}
-            {isAuthenticated ? (
-              <DropdownItem
-                key="logout"
-                textValue="Logout"
-                classNames={{ title: "text-[var(--m-error)]" }}
-                startContent={
-                  <ArrowRightStartOnRectangleIcon className="size-4 text-[var(--m-error)]" />
-                }
-                onPress={logout}
+            {/* logout — an account command, kept with profile/create_post */}
+            {isAuthenticated && (
+              <button
+                type="button"
+                onClick={() => {
+                  logout();
+                  setOpen(false);
+                }}
+                className={cmdDanger}
+                tabIndex={open ? 0 : -1}
               >
-                Logout
-              </DropdownItem>
-            ) : null}
-          </DropdownMenu>
-        </Dropdown>
+                <span aria-hidden>&gt;</span>
+                logout
+                <BracketIcon Icon={ArrowRightStartOnRectangleIcon} />
+              </button>
+            )}
+
+            {/* Settings block — toggles grouped under a console comment */}
+            <div className="border-t-2 border-[var(--m-dim)]">
+              <div className="px-4 pt-3 pb-1 text-[11px] tracking-[0.1em] text-[var(--m-muted2)]">
+                {"// settings"}
+              </div>
+
+              {/* dark_mode — toggles theme, keeps the menu open */}
+              <button
+                type="button"
+                onClick={changeTheme}
+                className={cmdCls}
+                tabIndex={open ? 0 : -1}
+              >
+                <Caret />
+                <span>dark_mode</span>
+                <span
+                  className="ml-auto text-[11px]"
+                  style={{
+                    color: isDarkTheme ? "var(--m-accent)" : "var(--m-muted2)",
+                  }}
+                >
+                  {isDarkTheme ? "[ on ]" : "[ off ]"}
+                </span>
+              </button>
+
+              {/* lang — flips the indicator (i18n wiring pending) */}
+              <button
+                type="button"
+                onClick={toggleLang}
+                className={cmdCls}
+                tabIndex={open ? 0 : -1}
+              >
+                <Caret />
+                <span>lang</span>
+                <span className="ml-auto text-[11px] text-[var(--m-accent)]">
+                  [ {lang} ]
+                </span>
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Burger — overlay on the closed box; fades out on open. The
+              closed box border goes accent when authed (logged-in cue). */}
+          <motion.button
+            type="button"
+            aria-label="Menu"
+            aria-expanded={open}
+            onClick={() => setOpen(true)}
+            animate={{ opacity: open ? 0 : 1 }}
+            transition={{ duration: 0.12 }}
+            style={{ pointerEvents: open ? "none" : "auto" }}
+            className="absolute top-0 right-0 flex size-8 items-center justify-center text-[var(--m-fg)]"
+          >
+            <Bars3Icon className="size-4" />
+          </motion.button>
+        </motion.div>
       </div>
 
       <AuthModal isOpen={isAuthOpen} onOpenChange={onAuthOpenChange} />

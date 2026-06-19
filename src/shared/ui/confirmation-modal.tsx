@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-} from "@heroui/react";
+import { MonoModal, MonoModalHeader, useModalTitleId } from "@/shared/ui/mono";
 
 interface ConfirmDeleteModalProps {
   message: string;
@@ -21,41 +14,46 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   onOpenChange,
   onConfirm,
 }) => {
+  const titleId = useModalTitleId();
+
   return (
-    <Modal
-      placement="center"
+    <MonoModal
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      size="sm"
-      backdrop="blur"
+      width="sm"
+      labelledBy={titleId}
     >
-      <ModalContent>
-        {(onClose) => (
-          <>
-            <ModalHeader className="sm:px-10">Confirmation</ModalHeader>
-            <ModalBody className="sm:px-10">
-              <p>{message}</p>
-            </ModalBody>
-            <ModalFooter className="sm:px-10">
-              <Button size="md" variant="light" onPress={onOpenChange}>
-                Cancel
-              </Button>
-              <Button
-                color="primary"
-                size="md"
-                variant="flat"
-                onPress={() => {
-                  onConfirm();
-                  onClose();
-                }}
-              >
-                Yes
-              </Button>
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
-    </Modal>
+      {(onClose) => (
+        <>
+          {/* The message IS the title; actions stand in for the close control. */}
+          <MonoModalHeader
+            eyebrow="// CONFIRM"
+            title={message}
+            titleId={titleId}
+          />
+
+          <div className="flex items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="mono-btn-outline inline-flex h-9 items-center px-4 text-[14px] font-semibold tracking-[0.06em]"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onConfirm();
+                onClose();
+              }}
+              className="inline-flex h-9 items-center border-2 border-[var(--m-error)] bg-[var(--m-error)] px-4 text-[14px] font-bold tracking-[0.06em] text-[var(--m-bg)] uppercase transition-colors hover:bg-transparent hover:text-[var(--m-error)]"
+            >
+              Delete
+            </button>
+          </div>
+        </>
+      )}
+    </MonoModal>
   );
 };
 

@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { Image } from "@heroui/react";
-import { ChatBubbleLeftIcon } from "@heroicons/react/24/solid";
 import {
   DisplayPostResponse,
   UserResponse,
@@ -22,7 +21,6 @@ import {
   MonoMetric,
   MonoStatusBadge,
   MonoDot,
-  fmt,
 } from "@/shared/ui/mono";
 import { formatDate2 } from "@/shared/lib/utils";
 
@@ -118,7 +116,7 @@ export default function HomePageMono() {
     >
       <MonoHeader />
 
-      <main className="mx-auto max-w-[1240px] px-10 pt-20 pb-28">
+      <main className="mx-auto max-w-[1240px] px-10 pt-20 pb-10">
         {posts.length === 0 ? (
           <div className="border-2 border-[var(--m-line)] py-24 text-center">
             <p className="font-display text-3xl font-bold">{"// EMPTY FEED"}</p>
@@ -143,7 +141,7 @@ export default function HomePageMono() {
                       >
                         {nameOf(topUser.author)}
                       </Link>
-                      <div className="mt-4 flex items-center gap-2.5 text-[11px] text-[var(--m-muted)]">
+                      <div className="mt-4 flex items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
                         <span>@{topUser.author.userName}</span>
                         <MonoDot />
                         <MonoMetric kind="posts" value={topUser.count} />
@@ -165,7 +163,7 @@ export default function HomePageMono() {
                       <div className="mono-title h-[30px] truncate !leading-[30px] transition-colors group-hover:text-[var(--m-accent)]">
                         {topPost.title}
                       </div>
-                      <div className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-[var(--m-muted)]">
+                      <div className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px] text-[var(--m-muted)]">
                         <span>@{topPost.author.userName}</span>
                         <MonoDot />
                         <MonoMetric kind="views" value={topPost.views} />
@@ -200,7 +198,7 @@ export default function HomePageMono() {
 
             {/* Hero — bg-fill block, no border (Home 2) */}
             {hero && (
-              <section className="group relative grid bg-[var(--m-card)] lg:grid-cols-[1.05fr_1fr]">
+              <section className="group relative grid bg-[var(--m-card)] transition-colors hover:bg-[var(--m-panel)] lg:grid-cols-[1.05fr_1fr]">
                 {/* Status badge — pinned top-right (LATEST DROP / future PINNED) */}
                 <MonoStatusBadge
                   status="LATEST DROP"
@@ -208,7 +206,7 @@ export default function HomePageMono() {
                 />
                 <Link
                   href={hrefOf(hero)}
-                  className="block aspect-[16/10] overflow-hidden bg-[var(--m-panel)]"
+                  className="relative z-10 block aspect-[16/10] overflow-hidden bg-[var(--m-panel)]"
                 >
                   <Cover post={hero} />
                 </Link>
@@ -216,20 +214,23 @@ export default function HomePageMono() {
                   <div className="mb-2">
                     <MonoCategory>{catOf(hero)}</MonoCategory>
                   </div>
-                  <Link href={hrefOf(hero)}>
-                    <h1 className="font-display text-[clamp(2rem,4vw,2.5rem)] leading-[1.04] font-bold tracking-[-0.02em] text-balance transition-colors group-hover:text-[var(--m-accent)]">
+                  <h1 className="font-display text-[clamp(2rem,4vw,2.5rem)] leading-[1.04] font-bold tracking-[-0.02em] text-balance transition-colors group-hover:text-[var(--m-accent)]">
+                    <Link
+                      href={hrefOf(hero)}
+                      className="after:absolute after:inset-0"
+                    >
                       {hero.title}
-                    </h1>
-                  </Link>
+                    </Link>
+                  </h1>
                   {hero.summary && (
                     <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
                       {hero.summary}
                     </p>
                   )}
-                  <div className="mt-6 flex flex-wrap items-center gap-2.5 text-[12.5px] text-[var(--m-muted)]">
+                  <div className="mt-6 flex flex-wrap items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
                     <Link
                       href={`/${hero.author.userName}`}
-                      className="text-[var(--m-fg)] transition-colors hover:text-[var(--m-accent)]"
+                      className="relative z-10 text-[var(--m-fg)] transition-colors hover:text-[var(--m-accent)]"
                     >
                       @{hero.author.userName}
                     </Link>
@@ -242,6 +243,7 @@ export default function HomePageMono() {
                       accent={hero.voteDirection === VotePostDirectionEnum.Up}
                     />
                     <MonoMetric kind="views" value={hero.views} />
+                    <MonoMetric kind="comments" value={hero.comments} />
                   </div>
                 </div>
               </section>
@@ -283,7 +285,7 @@ export default function HomePageMono() {
                             {p.title}
                           </Link>
                         </h3>
-                        <div className="mt-auto flex items-center gap-4 pt-6 text-[11.5px] text-[var(--m-muted2)]">
+                        <div className="mt-auto flex items-center gap-4 pt-6 text-[12px] text-[var(--m-muted2)]">
                           <Link
                             href={`/${p.author.userName}`}
                             className="relative z-10 truncate text-[var(--m-fg)] transition-colors hover:text-[var(--m-accent)]"
@@ -299,6 +301,7 @@ export default function HomePageMono() {
                               }
                             />
                             <MonoMetric kind="views" value={p.views} />
+                            <MonoMetric kind="comments" value={p.comments} />
                           </span>
                         </div>
                       </div>
@@ -353,10 +356,7 @@ export default function HomePageMono() {
                             }
                           />
                           <MonoMetric kind="views" value={p.views} />
-                          <span className="inline-flex items-center gap-1 tabular-nums">
-                            <ChatBubbleLeftIcon className="size-3.5 shrink-0" />
-                            {fmt(p.comments)}
-                          </span>
+                          <MonoMetric kind="comments" value={p.comments} />
                         </span>
                       </div>
                     </div>

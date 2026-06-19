@@ -18,10 +18,11 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => {
           <ThemeProvider>
             <HeroUIProvider navigate={router.push}>
               <ToastProvider
-                toastOffset={"top-right".includes("top") ? 60 : 0}
-                placement="top-right"
+                toastOffset={16}
+                placement="bottom-right"
                 toastProps={{
                   shouldShowTimeoutProgress: true,
+                  hideCloseButton: true,
                 }}
               />
               <ViewModeProvider>{children}</ViewModeProvider>

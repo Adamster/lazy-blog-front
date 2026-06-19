@@ -12,7 +12,13 @@ import { usePostsByUserName } from "@/features/post/model/use-posts-by-username"
 import { useViewMode } from "@/shared/providers/view-mode-provider";
 import { MonoHeader } from "@/widgets/mono-header";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
-import { MonoLabel, MonoCategory, MonoMetric, fmt } from "@/shared/ui/mono";
+import {
+  MonoLabel,
+  MonoCategory,
+  MonoMetric,
+  MatrixText,
+  fmt,
+} from "@/shared/ui/mono";
 import { formatDate2 } from "@/shared/lib/utils";
 
 const nameOf = (u?: UserResponse) =>
@@ -76,9 +82,13 @@ export default function UserPageMono({ userName }: { userName: string }) {
   const totalLikes = posts.reduce((sum, p) => sum + (p.rating ?? 0), 0);
   const totalViews = posts.reduce((sum, p) => sum + (p.views ?? 0), 0);
 
-  // Posts-per-month series: 6 consecutive months (0 for empty), anchored at the
-  // most recent post. Derived from loaded posts until a dedicated API exists.
-  const series = buildMonthlySeries(posts.map((p) => p.createdAtUtc));
+  // Activity: a rolling "last 6 months" window anchored at the current month
+  // (0 for empty months). Derived from loaded posts until a dedicated API exists.
+  const series = buildMonthlySeries(
+    posts.map((p) => p.createdAtUtc),
+    6,
+    true
+  );
 
   return (
     <div
@@ -87,7 +97,7 @@ export default function UserPageMono({ userName }: { userName: string }) {
     >
       <MonoHeader />
 
-      <main className="mx-auto max-w-[1240px] px-10 pt-10 pb-28">
+      <main className="mx-auto max-w-[1240px] px-10 pt-10 pb-10">
         {/* Profile header */}
         <section className="flex flex-col gap-8 pb-10 sm:flex-row sm:items-start">
           <div className="size-32 flex-none overflow-hidden">
@@ -110,7 +120,7 @@ export default function UserPageMono({ userName }: { userName: string }) {
             <h1 className="font-display text-[40px] leading-none font-bold tracking-[-0.02em]">
               {nameOf(user)}
             </h1>
-            <div className="mt-4 text-[13px] text-[var(--m-muted)]">
+            <div className="mt-4 text-[12px] text-[var(--m-muted)]">
               <span>@{user?.userName ?? userName}</span>
               {user?.createdOnUtc && (
                 <span> · joined {formatDate2(user.createdOnUtc)}</span>
@@ -122,9 +132,13 @@ export default function UserPageMono({ userName }: { userName: string }) {
                 </span>
               </span>
             </div>
-            {user?.biography && (
+            {user?.biography ? (
               <p className="mt-4 max-w-[40em] text-[14px] leading-[1.6] whitespace-pre-line text-[var(--m-muted)]">
                 {user.biography}
+              </p>
+            ) : (
+              <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted2)]">
+                404: bio not found
               </p>
             )}
           </div>
@@ -156,41 +170,34 @@ export default function UserPageMono({ userName }: { userName: string }) {
             </div>
 
             <div>
-              <MonoLabel>ACTIVITY</MonoLabel>
-              {posts.length > 0 ? (
-                <>
-                  <div className="mt-2">
-                    <Sparkline
-                      series={series}
-                      gradientId="profileSparkGrad"
-                      ariaLabel={`Activity by month: ${series
-                        .map((s) => `${s.label} ${s.count}`)
-                        .join(", ")}`}
-                    />
-                  </div>
-                </>
-              ) : (
-                <div className="mt-3 text-[12px] text-[var(--m-muted2)]">
-                  No activity yet
-                </div>
-              )}
+              <MonoLabel>ACTIVITY · 6M</MonoLabel>
+              {/* Always draw the chart — an empty profile reads as a flat
+                  line of zeros rather than a "no data" message. */}
+              <div className="mt-2">
+                <Sparkline
+                  series={series}
+                  gradientId="profileSparkGrad"
+                  ariaLabel={`Activity by month: ${series
+                    .map((s) => `${s.label} ${s.count}`)
+                    .join(", ")}`}
+                />
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Publications */}
-        <MonoLabel className="mono-label py-10">PUBLICATIONS</MonoLabel>
+        {/* Publications — when empty, the scramble takes over the label itself */}
+        <MonoLabel className="mono-label py-10">
+          {posts.length === 0 ? (
+            <MatrixText
+              text={`${user?.userName ?? userName} is still lost in procrastination`.toUpperCase()}
+            />
+          ) : (
+            "PUBLICATIONS"
+          )}
+        </MonoLabel>
 
-        {posts.length === 0 ? (
-          <div className="bg-[var(--m-card)] py-24 text-center">
-            <p className="font-display text-3xl font-bold">
-              {"// NO POSTS YET"}
-            </p>
-            <p className="mt-3 text-sm text-[var(--m-muted)]">
-              {user?.userName ?? userName} is still lost in procrastination.
-            </p>
-          </div>
-        ) : view === "grid" ? (
+        {posts.length === 0 ? null : view === "grid" ? (
           <section className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
             {posts.map((p, index) => (
               <motion.div
@@ -217,7 +224,7 @@ export default function UserPageMono({ userName }: { userName: string }) {
                     <h3 className="mono-title text-balance transition-colors group-hover:text-[var(--m-accent)]">
                       {p.title}
                     </h3>
-                    <div className="mt-auto flex items-center gap-4 pt-6 text-[11.5px] text-[var(--m-muted2)]">
+                    <div className="mt-auto flex items-center gap-4 pt-6 text-[12px] text-[var(--m-muted2)]">
                       <span>{formatDate2(p.createdAtUtc)}</span>
                       <span className="ml-auto flex items-center gap-4">
                         <MonoMetric kind="likes" value={p.rating} />

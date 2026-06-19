@@ -11,7 +11,10 @@ interface SparklinePoint {
  */
 export function buildMonthlySeries(
   dates: (string | Date)[],
-  months = 6
+  months = 6,
+  // Anchor the window at the current month (rolling "last N months") instead of
+  // the most recent data point — so an old last-post doesn't show a stale window.
+  anchorNow = false
 ): SparklinePoint[] {
   const counts = new Map<string, number>();
   let anchor: Date | null = null;
@@ -23,7 +26,7 @@ export function buildMonthlySeries(
     if (!anchor || d.getTime() > anchor.getTime()) anchor = d;
   }
 
-  const end = anchor ?? new Date();
+  const end = anchorNow ? new Date() : (anchor ?? new Date());
   const series: SparklinePoint[] = [];
   for (let offset = months - 1; offset >= 0; offset--) {
     const m = new Date(end.getFullYear(), end.getMonth() - offset, 1);

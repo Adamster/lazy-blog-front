@@ -12,6 +12,12 @@
    render in a body-level portal outside `.mono-scope`. */
 .mono-scope,
 .mono-portal {
+  /* Design-system scope root is JetBrains Mono (data / labels / body); titles
+     opt into Space Grotesk via `font-display`. Mirrors the design file's root
+     and the per-page inline fallback, and — crucially — gives portaled overlays
+     (auth modal, dropdowns) the mono font so `// LABEL` tracking reads right
+     instead of inheriting the body `var(--font-sans)`. */
+  font-family: var(--font-mono);
   --m-bg: #f4f4f4;
   --m-fg: #161616;
   --m-accent: #4d7c0f;
@@ -26,7 +32,7 @@
 .dark .mono-scope,
 .dark .mono-portal {
   --m-bg: #1a1a1a;
-  --m-fg: #ededed;
+  --m-fg: #dcdcdc;
   --m-accent: #cdff48;
   --m-line: #e6e6e6;
   --m-panel: #2a2a2a;
@@ -109,12 +115,12 @@
   /* Eyebrow / section label — the accent `// LABEL` line. Add `uppercase` where
      the source did. */
   .mono-label {
-    @apply text-[11px] tracking-[0.12em] text-[var(--m-accent)];
+    @apply text-[11px] font-medium tracking-[0.12em] text-[var(--m-accent)];
   }
 
   /* `[ cat ]` category line — always uppercase, accent. */
   .mono-cat {
-    @apply text-[11px] tracking-[0.12em] text-[var(--m-accent)] uppercase;
+    @apply text-[11px] font-medium tracking-[0.12em] text-[var(--m-accent)] uppercase;
   }
 
   /* Card / content title (H3 size). Pair with `group-hover:text-[var(--m-accent)]`
@@ -125,7 +131,7 @@
 
   /* Field label for the mono auth + reset forms. */
   .mono-field-label {
-    @apply mb-2 block text-[11px] tracking-[0.12em] text-[var(--m-muted2)] uppercase;
+    @apply mb-2 block text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase;
   }
 
   /* Underline-style text input (auth + reset). Border color is applied per
