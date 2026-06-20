@@ -85,17 +85,12 @@ export const PostVote = ({
   const liked = voteDirection === VotePostDirectionEnum.Up;
   const disliked = voteDirection === VotePostDirectionEnum.Down;
 
-  // Toggle semantics: clicking the active direction sends the opposite so the
-  // backend clears it; clicking the inactive direction switches the vote.
-  const onVote = (direction: VotePostDirectionEnum, isActive: boolean) => {
+  // Send the clicked direction as-is; the backend toggles: no vote → set it,
+  // same direction again → clear it (reset to 0), other direction → switch.
+  // The optimistic `applyVote` mirrors that exact behaviour.
+  const onVote = (direction: VotePostDirectionEnum) => {
     if (!canVote || handleVote.isPending) return;
-    handleVote.mutate({
-      direction: isActive
-        ? direction === VotePostDirectionEnum.Up
-          ? VotePostDirectionEnum.Down
-          : VotePostDirectionEnum.Up
-        : direction,
-    });
+    handleVote.mutate({ direction });
   };
 
   const net = rating ?? 0;
@@ -108,13 +103,13 @@ export const PostVote = ({
 
   return (
     <section className="mx-[calc(50%-50vw)] mt-12 w-screen bg-[var(--m-card)]">
-      <div className="mx-auto grid max-w-[780px] grid-cols-3 items-start gap-10 px-10 py-10">
+      <div className="mx-auto grid max-w-[780px] items-start gap-10 px-10 py-10 sm:grid-cols-3">
         {/* // LIKE IT — upvote toggle (REAL vote, STUB count) */}
         <div className="min-w-0">
-          <div className={labelCls}>{"// like it"}</div>
+          <div className={labelCls}>{"// love it"}</div>
           <button
             type="button"
-            onClick={() => onVote(VotePostDirectionEnum.Up, liked)}
+            onClick={() => onVote(VotePostDirectionEnum.Up)}
             aria-pressed={liked}
             aria-label="Like this post"
             disabled={!canVote || handleVote.isPending}
@@ -137,10 +132,10 @@ export const PostVote = ({
 
         {/* // DISLIKE IT — downvote toggle (REAL vote, STUB count) */}
         <div className="min-w-0">
-          <div className={labelCls}>{"// dislike it"}</div>
+          <div className={labelCls}>{"// hate it"}</div>
           <button
             type="button"
-            onClick={() => onVote(VotePostDirectionEnum.Down, disliked)}
+            onClick={() => onVote(VotePostDirectionEnum.Down)}
             aria-pressed={disliked}
             aria-label="Dislike this post"
             disabled={!canVote || handleVote.isPending}
@@ -164,7 +159,7 @@ export const PostVote = ({
         {/* // RATING — STUB sparkline + REAL net rating */}
         <div className="min-w-0">
           <div className={labelCls}>{"// rating"}</div>
-          <div className="relative mt-3 h-[60px] w-full overflow-visible">
+          <div className="relative mt-2 h-[46px] w-full overflow-visible">
             <div className="absolute inset-x-0 top-1/2 h-0.5 bg-[var(--m-dim)]" />
             <svg
               viewBox="0 0 100 52"

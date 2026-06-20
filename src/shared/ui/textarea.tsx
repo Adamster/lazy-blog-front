@@ -16,6 +16,9 @@ interface TextareaProps extends NativeTextareaProps {
   id?: string;
   /** Validation message; presence switches the field to its error state. */
   error?: string;
+  /** Start as a single row and auto-grow with content (like the comment
+   *  composer) instead of a fixed `rows` box. */
+  autoGrow?: boolean;
 }
 
 /**
@@ -27,7 +30,17 @@ interface TextareaProps extends NativeTextareaProps {
  */
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   function Textarea(
-    { label, value, onChange, id, error, required, rows = 3, ...rest },
+    {
+      label,
+      value,
+      onChange,
+      id,
+      error,
+      required,
+      rows = 3,
+      autoGrow = false,
+      ...rest
+    },
     ref
   ) {
     const reactId = useId();
@@ -52,19 +65,24 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           <textarea
             id={fieldId}
             ref={ref}
-            rows={rows}
+            rows={autoGrow ? 1 : rows}
             value={value}
             onChange={onChange}
             required={required}
             placeholder=" "
             aria-invalid={hasError}
             aria-describedby={hasError ? errorId : undefined}
-            className={`block w-full resize-y border-0 border-b-2 bg-transparent px-0 pt-5 pb-2 text-[14px] leading-[1.6] text-[var(--m-fg)] caret-[var(--m-accent)] transition-all outline-none placeholder:text-transparent ${
+            className={`block w-full border-0 border-b-2 bg-transparent px-0 pt-5 pb-2 text-[14px] leading-[1.6] text-[var(--m-fg)] caret-[var(--m-accent)] transition-all outline-none placeholder:text-transparent ${
+              autoGrow ? "resize-none overflow-hidden" : "resize-y"
+            } ${
               hasError
                 ? "border-[var(--m-error)]"
                 : "border-[var(--m-dim)] focus:border-[var(--m-accent)]"
             }`}
-            style={{ fontFamily: "var(--font-mono)" }}
+            style={{
+              fontFamily: "var(--font-mono)",
+              ...(autoGrow ? { fieldSizing: "content" } : {}),
+            }}
             {...rest}
           />
         </div>

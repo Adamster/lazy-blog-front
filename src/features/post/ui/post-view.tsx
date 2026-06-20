@@ -6,6 +6,7 @@ import {
   HeartIcon,
   ChatBubbleLeftIcon,
 } from "@heroicons/react/24/solid";
+import { EyeSlashIcon } from "@heroicons/react/24/outline";
 import { AuthorPostResponse, PostDetailedResponse } from "@/shared/api/openapi";
 import { formatDate2 } from "@/shared/lib/utils";
 import { Avatar, Category, PostBody, StatusBadge } from "@/shared/ui";
@@ -131,11 +132,6 @@ export const PostView = ({
         {/* Tag + draft + owner kebab */}
         <div className="mb-2 flex flex-wrap items-center gap-3">
           <Category>{cat}</Category>
-          {!post.isPublished && (
-            <span className="border-2 border-[var(--m-accent)] px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] text-[var(--m-accent)] uppercase">
-              [ Draft ]
-            </span>
-          )}
           {status && <StatusBadge status={status} className="ml-auto" />}
           {headerMenu}
         </div>
@@ -168,6 +164,16 @@ export const PostView = ({
               unoptimized
               className="object-cover [filter:contrast(1.03)]"
             />
+            {/* Draft overlay — a crossed-out eye makes the hidden state obvious
+                (the cover is dimmed; only the author sees this page anyway). */}
+            {!post.isPublished && (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2.5 bg-[var(--m-bg)]/75">
+                <EyeSlashIcon className="size-10 text-[var(--m-fg)]" />
+                <span className="text-[11px] font-semibold tracking-[0.12em] text-[var(--m-fg)] uppercase">
+                  Unpublished
+                </span>
+              </div>
+            )}
           </div>
         )}
 

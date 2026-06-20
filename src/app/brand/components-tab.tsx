@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { LinkIcon, TrashIcon, PencilIcon } from "@heroicons/react/24/solid";
+import { EyeSlashIcon } from "@heroicons/react/24/outline";
 import {
   Label,
   Category,
@@ -188,7 +189,7 @@ export function ComponentsTab() {
         <Section
           index="02"
           title="LABELS · CATEGORIES · BADGES"
-          intro="Terminal markers — Label (// X, optional blinking caret), Category ([ x ]), StatusBadge (LATEST DROP / PINNED), and the inline [ Draft ] badge. Labels/categories 11px / 0.12em; badges 0.06em uppercase."
+          intro="Terminal markers — Label (// X, optional blinking caret), Category ([ x ]), StatusBadge (LATEST DROP / PINNED), and the unpublished/draft cover overlay (dim + crossed-eye + UNPUBLISHED — shown on the author's own feed cards & their post page). Labels/categories 11px / 0.12em; badges 0.06em uppercase."
         >
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
             <Panel caption="// LABELS & CATEGORY">
@@ -210,7 +211,7 @@ export function ComponentsTab() {
               </div>
             </Panel>
 
-            <Panel caption="// STATUS & INLINE BADGES">
+            <Panel caption="// STATUS · DRAFT · SEPARATOR">
               <div className="grid grid-cols-2 gap-x-7 gap-y-7">
                 <State caption="status · latest drop">
                   <StatusBadge status="LATEST DROP" />
@@ -218,17 +219,22 @@ export function ComponentsTab() {
                 <State caption="status · pinned">
                   <StatusBadge status="PINNED" />
                 </State>
-                <State caption="inline [ Draft ] badge">
-                  <span className="border-2 border-[var(--m-accent)] px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] text-[var(--m-accent)] uppercase">
-                    [ Draft ]
-                  </span>
-                </State>
                 <State caption="dot separator">
                   <span className="flex items-center gap-2 text-[12px] text-[var(--m-muted)]">
                     <span>@lazy</span>
                     <Dot />
                     <span>14 Jun</span>
                   </span>
+                </State>
+                <State caption="unpublished cover overlay">
+                  <div className="relative aspect-[16/9] w-full overflow-hidden border-2 border-[var(--m-dim)] bg-[var(--m-panel)]">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[var(--m-bg)]/70">
+                      <EyeSlashIcon className="size-7 text-[var(--m-fg)]" />
+                      <span className="text-[11px] font-semibold tracking-[0.12em] text-[var(--m-fg)] uppercase">
+                        Unpublished
+                      </span>
+                    </div>
+                  </div>
                 </State>
               </div>
             </Panel>

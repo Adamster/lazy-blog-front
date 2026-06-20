@@ -11,7 +11,9 @@ export const getAllPostsSSR = async (
     if (offset > 0) url.searchParams.set("offset", String(offset));
 
     const response = await fetch(url.toString(), {
-      next: { revalidate: 300 },
+      // Tagged so publish/unpublish/delete can bust the home feed on demand
+      // (otherwise an unpublished post lingers up to the 5-min ISR window).
+      next: { revalidate: 300, tags: ["posts:all"] },
     });
 
     if (!response.ok) return [];

@@ -11,7 +11,6 @@ import {
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { useAllPosts } from "@/features/post/model/use-all-posts";
-import { useViewMode } from "@/shared/providers/view-mode-provider";
 import { Header } from "@/widgets/header";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
 import { Label, Category, Metric, StatusBadge, Dot } from "@/shared/ui";
@@ -54,7 +53,6 @@ function HeroCover({ post }: { post: DisplayPostResponse }) {
 export default function HomePage() {
   const query = useAllPosts();
   const reduceMotion = useReducedMotion();
-  const { view } = useViewMode();
 
   const sentinelRef = useInfiniteScroll({
     hasNextPage: query.hasNextPage,
@@ -65,7 +63,11 @@ export default function HomePage() {
   if (query.isLoading) return <Loading />;
   if (query.error) return <ErrorMessage error={query.error} />;
 
-  const posts = (query.data?.pages?.flat() ?? []) as DisplayPostResponse[];
+  // Defensive: the public home feed only ever shows published posts (drafts are
+  // author-only). Guards against a stale cache / API edge surfacing a draft.
+  const posts = (
+    (query.data?.pages?.flat() ?? []) as DisplayPostResponse[]
+  ).filter((p) => p.isPublished);
   const hero = posts[0];
   const rest = posts.slice(1);
   // While more pages can still load, only render complete 3-column rows so the
@@ -73,9 +75,6 @@ export default function HomePage() {
   const visibleGrid = query.hasNextPage
     ? rest.slice(0, Math.floor(rest.length / 3) * 3)
     : rest;
-  // The list view is single-column, so a trailing partial row can't exist;
-  // show every loaded post.
-  const visibleList = rest;
 
   // Monthly stats are derived from the loaded feed until a dedicated API exists.
   const topPost = posts.reduce(
@@ -183,7 +182,7 @@ export default function HomePage() {
               </div>
             </section>
 
-            {/* Section label — above the hero (view mode lives in the header menu) */}
+            {/* Section label — above the hero */}
             {rest.length > 0 && (
               <div className="flex items-center py-10">
                 <Label>PUBLICATIONS</Label>
@@ -243,8 +242,8 @@ export default function HomePage() {
               </section>
             )}
 
-            {/* Grid view — shared PostCard (bg-fill cards, no borders) */}
-            {view === "grid" && visibleGrid.length > 0 && (
+            {/* Grid feed — shared PostCard (bg-fill cards, no borders) */}
+            {visibleGrid.length > 0 && (
               <section className="mt-7 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
                 {visibleGrid.map((p, index) => (
                   <motion.div
@@ -263,24 +262,8 @@ export default function HomePage() {
                       post={p}
                       href={hrefOf(p)}
                       authorHandle={p.author.userName ?? undefined}
-                      variant="grid"
                     />
                   </motion.div>
-                ))}
-              </section>
-            )}
-
-            {/* List view — shared PostCard (bg-fill rows, no borders) */}
-            {view === "list" && visibleList.length > 0 && (
-              <section className="mt-7 flex flex-col gap-7">
-                {visibleList.map((p) => (
-                  <PostCard
-                    key={p.id}
-                    post={p}
-                    href={hrefOf(p)}
-                    authorHandle={p.author.userName ?? undefined}
-                    variant="list"
-                  />
                 ))}
               </section>
             )}

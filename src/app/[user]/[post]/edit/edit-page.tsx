@@ -5,6 +5,7 @@ import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
 import { PostForm } from "@/features/post/ui/post-form";
+import { Header } from "@/widgets/header";
 import { IsAuth, IsAuthor, useUser } from "@/entities/session";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -65,23 +66,28 @@ const EditPage = () => {
 
   return (
     <IsAuth fallback={<ErrorMessage error={"Not Found."} />}>
-      <IsAuthor
-        userId={postData?.author.id || ""}
-        fallback={
-          <ErrorMessage error={"Nice try, but this isn’t your playground!"} />
-        }
+      <div
+        className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
+        style={{ fontFamily: "var(--font-mono)" }}
       >
-        {form && isAuthor && (
-          <PostForm
-            key={postData?.id}
-            form={form}
-            onSubmit={onSubmit}
-            isCreate={false}
-            isPending={updatePostMutation.isPending}
-            onDelete={onDelete}
-          />
-        )}
-      </IsAuthor>
+        <Header />
+        <IsAuthor
+          userId={postData?.author.id || ""}
+          fallback={
+            <ErrorMessage error={"Nice try, but this isn’t your playground!"} />
+          }
+        >
+          {form && isAuthor && (
+            <PostForm
+              key={postData?.id}
+              form={form}
+              onSubmit={onSubmit}
+              isPending={updatePostMutation.isPending}
+              onDelete={onDelete}
+            />
+          )}
+        </IsAuthor>
+      </div>
 
       {isModalOpen && (
         <ConfirmDeleteModal

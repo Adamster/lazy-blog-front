@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { EyeSlashIcon } from "@heroicons/react/24/outline";
 import {
   DisplayPostResponse,
   UserPostItem,
@@ -19,8 +20,6 @@ interface PostCardMonoProps {
   /** `@handle` to link above the meta row. Omitted on a user's own profile feed
    *  where the author is implicit. */
   authorHandle?: string;
-  /** `grid` = vertical card (cover on top); `list` = horizontal row. */
-  variant: "grid" | "list";
 }
 
 const catOf = (p: FeedPost) => p.tags?.[0]?.tag ?? "post";
@@ -51,7 +50,7 @@ function Cover({ post }: { post: FeedPost }) {
   );
 }
 
-/** Author `@handle` link + the metrics cluster shared by both variants. */
+/** Author `@handle` link + the metrics cluster shown in the card footer. */
 function CardMeta({
   post,
   authorHandle,
@@ -88,42 +87,23 @@ function CardMeta({
  * The single source-of-truth feed card for the home + profile feeds. Built to
  * the Brutalist-Mono feed spec: flush cover, `p-5` (20px) content, `[ category ]`
  * → 18px `mono-title` (`mb-2`), and a Caption-12 meta footer using the shared
- * `Metric` / `Dot` primitives. `variant` switches between the vertical grid card
- * and the horizontal list row.
+ * `Metric` / `Dot` primitives. Renders the vertical grid card.
  */
-export function PostCard({
-  post,
-  href,
-  authorHandle,
-  variant,
-}: PostCardMonoProps) {
-  if (variant === "list") {
-    return (
-      <article className="group relative grid bg-[var(--m-card)] transition-colors hover:bg-[var(--m-panel)] sm:grid-cols-[272px_1fr]">
-        <div className="relative aspect-[16/10] overflow-hidden bg-[var(--m-panel)]">
-          <Cover post={post} />
-        </div>
-        <div className="flex flex-col justify-center px-7 py-6">
-          <div className="mb-2">
-            <Category>{catOf(post)}</Category>
-          </div>
-          <h3 className="mono-title text-balance transition-colors group-hover:text-[var(--m-accent)]">
-            <Link href={href} className="after:absolute after:inset-0">
-              {post.title}
-            </Link>
-          </h3>
-          <div className="mt-6 flex items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
-            <CardMeta post={post} authorHandle={authorHandle} />
-          </div>
-        </div>
-      </article>
-    );
-  }
-
+export function PostCard({ post, href, authorHandle }: PostCardMonoProps) {
   return (
     <article className="group relative flex h-full flex-col bg-[var(--m-card)] transition-colors hover:bg-[var(--m-panel)]">
       <div className="relative aspect-[16/10] overflow-hidden bg-[var(--m-panel)]">
         <Cover post={post} />
+        {/* Draft cover overlay — same crossed-eye + label "hidden" cue as the
+            post page (only the author's own profile feed shows drafts). */}
+        {!post.isPublished && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-[var(--m-bg)]/70">
+            <EyeSlashIcon className="size-8 text-[var(--m-fg)]" />
+            <span className="text-[11px] font-semibold tracking-[0.12em] text-[var(--m-fg)] uppercase">
+              Unpublished
+            </span>
+          </div>
+        )}
       </div>
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-2">

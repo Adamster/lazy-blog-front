@@ -1,30 +1,14 @@
 import { Metadata } from "next";
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query";
 import HomePage from "./home-page";
 import { generateMeta } from "@/shared/lib/head/meta-data";
-import { getAllPostsSSR } from "@/features/post/model/get-all-posts.ssr";
-import { postKeys } from "@/features/post/model/post-keys";
 
 export const metadata: Metadata = generateMeta({
   title: "Home",
 });
 
-export default async function Page() {
-  const posts = await getAllPostsSSR(0);
-
-  const queryClient = new QueryClient();
-  queryClient.setQueryData(postKeys.list(), {
-    pages: [posts],
-    pageParams: [0],
-  });
-
-  return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <HomePage />
-    </HydrationBoundary>
-  );
+// No SSR feed seed — the home feed loads client-side. The blog is small and we
+// don't need every article in the crawl; the social/SEO meta tags above are
+// enough, and individual article pages stay server-rendered for their own SEO.
+export default function Page() {
+  return <HomePage />;
 }

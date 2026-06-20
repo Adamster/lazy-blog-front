@@ -43,6 +43,27 @@
   --m-error: #ff6b6b;
 }
 
+/* Cover crop modal — tint react-advanced-cropper's chrome to the Brutalist-Mono
+   accent (it lives inside `.mono-portal`). Square handles, accent stencil lines
+   + grid, dimmed overlay on the cropped-out area. */
+.mono-portal .advanced-cropper-simple-handler {
+  background: var(--m-accent);
+  border-radius: 0;
+  width: 8px;
+  height: 8px;
+}
+.mono-portal .advanced-cropper-simple-line {
+  border-color: var(--m-accent);
+}
+.mono-portal .advanced-cropper-stencil-grid line {
+  stroke: var(--m-accent);
+  opacity: 0.45;
+}
+.mono-portal .advanced-cropper-stencil-overlay {
+  color: var(--m-bg);
+  opacity: 0.6;
+}
+
 /* Dropdown/menu separators — HeroUI's `showDivider` renders an <hr> with a
    ~1px `bg-divider` token. Replace it with the brutalist 2px `--m-dim`
    full-bleed rule used elsewhere. */
@@ -153,5 +174,37 @@
   /* Square icon-only button — dim border, accent on hover (no uppercase). */
   .mono-icon-btn {
     @apply flex flex-none items-center justify-center border-2 border-[var(--m-dim)] text-[var(--m-muted)] transition-colors hover:border-[var(--m-accent)] hover:text-[var(--m-accent)];
+  }
+
+  /* Brutalist scrollbar — square, 2px-inset dim thumb on the page background.
+     Apply to any capped/overflowing list (Crepe slash menu, etc.) so it never
+     falls back to the OS chrome. */
+  .mono-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--m-dim) var(--m-bg);
+  }
+  .mono-scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  .mono-scrollbar::-webkit-scrollbar-track {
+    background: var(--m-bg);
+  }
+  .mono-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--m-dim);
+    border: 2px solid var(--m-bg);
+    border-radius: 0;
+  }
+  .mono-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--m-muted2);
+  }
+
+  /* Invisible scrollbar — the element still scrolls, but no bar is drawn (for
+     small capped fields where a visible bar would be ugly, e.g. the summary). */
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
 }

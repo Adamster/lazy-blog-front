@@ -46,7 +46,7 @@ function withBigEmoji(text: string): ReactNode {
         buf = "";
       }
       out.push(
-        <span key={key++} className="align-[-0.1em] text-[1.35em] leading-none">
+        <span key={key++} className="align-[-0.1em] text-[1.5em] leading-none">
           {segment}
         </span>
       );

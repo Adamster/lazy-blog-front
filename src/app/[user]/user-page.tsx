@@ -6,7 +6,6 @@ import { UserResponse } from "@/shared/api/openapi";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { usePostsByUserName } from "@/features/post/model/use-posts-by-username";
-import { useViewMode } from "@/shared/providers/view-mode-provider";
 import { Header } from "@/widgets/header";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
 import { Label, MatrixText, Avatar, fmt } from "@/shared/ui";
@@ -20,7 +19,6 @@ const nameOf = (u?: UserResponse) =>
 export default function UserPage({ userName }: { userName: string }) {
   const query = usePostsByUserName(userName);
   const reduceMotion = useReducedMotion();
-  const { view } = useViewMode();
 
   const sentinelRef = useInfiniteScroll({
     hasNextPage: query.hasNextPage,
@@ -144,7 +142,7 @@ export default function UserPage({ userName }: { userName: string }) {
           )}
         </Label>
 
-        {posts.length === 0 ? null : view === "grid" ? (
+        {posts.length === 0 ? null : (
           <section className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
             {posts.map((p, index) => (
               <motion.div
@@ -157,23 +155,8 @@ export default function UserPage({ userName }: { userName: string }) {
                   delay: Math.min(index * 0.04, 0.32),
                 }}
               >
-                <PostCard
-                  post={p}
-                  href={`/${handle}/${p.slug}`}
-                  variant="grid"
-                />
+                <PostCard post={p} href={`/${handle}/${p.slug}`} />
               </motion.div>
-            ))}
-          </section>
-        ) : (
-          <section className="flex flex-col gap-7">
-            {posts.map((p) => (
-              <PostCard
-                key={p.id}
-                post={p}
-                href={`/${handle}/${p.slug}`}
-                variant="list"
-              />
             ))}
           </section>
         )}

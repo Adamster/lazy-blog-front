@@ -34,8 +34,8 @@ export const PostHeaderMenu = ({
   const router = useRouter();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const publishPost = usePublishPost(postId, postSlug);
-  const hidePost = useHidePost(postId, postSlug);
+  const publishPost = usePublishPost(postId, postSlug, authorHandle);
+  const hidePost = useHidePost(postId, postSlug, authorHandle);
   // Local delete (optimistic remove-from-feed → home), distinct from the shared
   // `useDeletePost` used by the edit page (routes to the author profile).
   const deletePost = useDeletePostMenu(postId);

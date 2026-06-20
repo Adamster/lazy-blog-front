@@ -17,6 +17,38 @@
   width: 100%;
   background: transparent;
 
+  /* Crepe's common theme ships only structure — the `--crepe-color-*` palette
+     lives in its (light/dark) color themes, which we don't import (they'd fight
+     our token system + dark mode). Without them every chrome surface — toolbar,
+     slash/block menu, link tooltip, code mirror — resolves to undefined colors
+     and renders "all black". Map the full Crepe palette onto our `--m-*` tokens
+     so the editor chrome inherits the Brutalist-Mono theme and tracks light/dark
+     automatically (the tokens already flip under `.dark .mono-scope`). */
+  --crepe-color-background: var(--m-bg);
+  --crepe-color-on-background: var(--m-fg);
+  --crepe-color-surface: var(--m-card);
+  --crepe-color-surface-low: var(--m-panel);
+  --crepe-color-on-surface: var(--m-fg);
+  --crepe-color-on-surface-variant: var(--m-muted);
+  --crepe-color-outline: var(--m-dim);
+  --crepe-color-primary: var(--m-accent);
+  --crepe-color-secondary: var(--m-panel);
+  --crepe-color-on-secondary: var(--m-fg);
+  --crepe-color-inverse: var(--m-fg);
+  --crepe-color-on-inverse: var(--m-bg);
+  --crepe-color-inline-code: var(--m-accent);
+  --crepe-color-error: var(--m-error);
+  --crepe-color-hover: var(--m-panel);
+  --crepe-color-selected: var(--m-dim);
+  --crepe-color-inline-area: var(--m-panel);
+
+  --crepe-font-title: var(--font-display);
+  --crepe-font-default: var(--font-mono);
+  --crepe-font-code: var(--font-mono);
+
+  --crepe-shadow-1: 0 1px 3px 1px rgba(0, 0, 0, 0.12);
+  --crepe-shadow-2: 0 2px 6px 2px rgba(0, 0, 0, 0.16);
+
   .ProseMirror {
     padding: 0;
     min-height: 20rem;
@@ -24,6 +56,276 @@
 
   .milkdown-block-handle {
     display: none;
+  }
+
+  /* ── Slash menu (`/` command palette) — brutalist frame ──
+     Square, 2px dim border + 2px accent top stripe, no shadow, no radius.
+     Capped width within the 780 column; capped height with the shared
+     `.mono-scrollbar` (never the OS chrome). */
+  .milkdown-slash-menu {
+    min-width: 240px;
+    max-width: 280px;
+    background: var(--m-bg);
+    border: 2px solid var(--m-dim);
+    border-top: 2px solid var(--m-accent);
+    border-radius: 0;
+    box-shadow: none;
+
+    /* Crepe rounds EVERY menu <li> (tabs + rows) at 8px — square them all, and
+       zero the default <ul> margins (browser 1em top/bottom) that leave dead
+       bands above/below the tabs and the item list. */
+    ul {
+      margin: 0;
+      padding-left: 0;
+
+      li {
+        border-radius: 0;
+      }
+    }
+
+    /* Tab header (Text / List / Advanced) — square brutalist tabs, mono,
+       selected = accent underline (not a rounded grey pill). */
+    .tab-group {
+      border-bottom: 2px solid var(--m-dim);
+      padding: 6px 0 0;
+
+      ul {
+        padding: 0;
+        gap: 0;
+
+        li {
+          padding: 8px 12px;
+          font-family: var(--font-mono);
+          font-size: 12px;
+          font-weight: 500;
+          font-style: normal;
+          letter-spacing: 0.06em;
+          line-height: 1.2;
+          color: var(--m-muted2);
+
+          &:hover {
+            background: var(--m-panel);
+            color: var(--m-fg);
+          }
+          &.selected {
+            background: transparent;
+            color: var(--m-accent);
+            border-bottom: 2px solid var(--m-accent);
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+
+    .menu-groups {
+      max-height: 320px;
+      padding: 0;
+      /* Inline the .mono-scrollbar utility (this menu portals outside the
+         element we'd add the class to). Keep in sync with tailwind.css. */
+      scrollbar-width: thin;
+      scrollbar-color: var(--m-dim) var(--m-bg);
+
+      &::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      &::-webkit-scrollbar-track {
+        background: var(--m-bg);
+      }
+      &::-webkit-scrollbar-thumb {
+        background: var(--m-dim);
+        border: 2px solid var(--m-bg);
+        border-radius: 0;
+      }
+      &::-webkit-scrollbar-thumb:hover {
+        background: var(--m-muted2);
+      }
+
+      .menu-group {
+        h6 {
+          font-family: var(--font-mono);
+          font-size: 11px;
+          font-weight: 500;
+          line-height: 1.2;
+          letter-spacing: 0.12em;
+          margin: 0;
+          padding: 12px 14px 6px;
+          color: var(--m-muted2);
+        }
+
+        li {
+          min-width: 0;
+          gap: 12px;
+          padding: 10px 14px;
+          border-radius: 0;
+          border-bottom: 2px solid var(--m-dim);
+
+          &:last-child {
+            border-bottom: 0;
+          }
+
+          &.hover,
+          &.active {
+            background: var(--m-panel);
+
+            svg {
+              color: var(--m-accent);
+              fill: var(--m-accent);
+            }
+          }
+
+          svg {
+            width: 16px;
+            height: 16px;
+            color: var(--m-muted);
+            fill: var(--m-muted);
+          }
+
+          > span {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1.2;
+          }
+        }
+
+        /* Drop Crepe's faint inter-group divider — every row already carries a
+           2px rule. */
+        + .menu-group::before {
+          display: none;
+        }
+      }
+    }
+  }
+
+  /* ── Selection bubble (inline format toolbar) — theme-matching chip ──
+     Surface bg + 2px line border (NOT inverted), fg icons; hover = panel +
+     accent icon, active/toggled = accent fill. Square, 32px buttons. */
+  .milkdown-toolbar {
+    background: var(--m-card);
+    border: 2px solid var(--m-line);
+    border-radius: 0;
+    box-shadow: none;
+
+    .divider {
+      background: var(--m-dim);
+      opacity: 1;
+    }
+
+    .toolbar-item {
+      width: 32px;
+      height: 32px;
+      border-radius: 0;
+
+      svg {
+        color: var(--m-fg);
+        fill: var(--m-fg);
+      }
+
+      &:hover {
+        background: var(--m-panel);
+
+        svg {
+          color: var(--m-accent);
+          fill: var(--m-accent);
+        }
+      }
+
+      &.active {
+        background: var(--m-accent);
+
+        svg {
+          color: var(--m-bg);
+          fill: var(--m-bg);
+        }
+      }
+    }
+  }
+
+  /* Link preview / edit popovers — same theme-matching chip; the edit input is
+     a mono underline on the surface. */
+  .milkdown-link-preview > .link-preview,
+  .milkdown-link-edit > .link-edit {
+    background: var(--m-card);
+    border: 2px solid var(--m-line);
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .milkdown-link-preview > .link-preview {
+    .link-display {
+      color: var(--m-fg);
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .link-icon,
+    .button {
+      border-radius: 0;
+
+      svg {
+        color: var(--m-fg);
+        fill: var(--m-fg);
+      }
+
+      &:hover {
+        background: var(--m-panel);
+
+        svg {
+          color: var(--m-accent);
+          fill: var(--m-accent);
+        }
+      }
+    }
+  }
+
+  .milkdown-link-edit > .link-edit {
+    .input-area {
+      color: var(--m-fg);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      border-bottom: 2px solid var(--m-line);
+      padding-bottom: 2px;
+    }
+
+    .button {
+      border-radius: 0;
+
+      svg {
+        color: var(--m-fg);
+        fill: var(--m-fg);
+      }
+
+      &:hover {
+        background: var(--m-panel);
+
+        svg {
+          color: var(--m-accent);
+          fill: var(--m-accent);
+        }
+      }
+    }
+  }
+
+  /* Placeholder ("Type something…") — our muted token; the size inherits the
+     14px prose body. */
+  .crepe-placeholder::before {
+    color: var(--m-muted2);
+  }
+
+  /* Image block — inline "add image" prompt + the URL-edit confirm button.
+     Crepe ships the prompt at 16px (off our scale) and rounds both; pin to 14px
+     and square them. */
+  .milkdown-image-block {
+    .empty-image-inline {
+      font-size: 14px;
+      border-radius: 0;
+    }
+
+    .image-edit .confirm {
+      font-size: 14px;
+      border-radius: 0;
+    }
   }
 }
 

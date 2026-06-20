@@ -1,11 +1,4 @@
-import { notFound } from "next/navigation";
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query";
 import { getPostsByUserNameSSR } from "@/features/post/model/get-posts-by-username.ssr";
-import { postKeys } from "@/features/post/model/post-keys";
 import { generateMeta } from "@/shared/lib/head/meta-data";
 import UserPage from "./user-page";
 
@@ -36,21 +29,12 @@ export async function generateMetadata({ params }: PageProps) {
   });
 }
 
+// No SSR feed seed: the profile feed loads client-side (authenticated, so the
+// OWNER sees their own drafts directly) — this removes the no-auth published-only
+// seed that flashed + made the likes/views stats jump when drafts loaded in.
+// `generateMetadata` above still emits the social/SEO meta tags; missing users
+// surface via the client query's error state.
 export default async function Page({ params }: PageProps) {
   const { user: userName } = await params;
-
-  const postsPage = await getPostsByUserNameSSR(userName);
-  if (!postsPage?.user) notFound();
-
-  const queryClient = new QueryClient();
-  queryClient.setQueryData(postKeys.byUser(userName), {
-    pages: [postsPage],
-    pageParams: [0],
-  });
-
-  return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <UserPage userName={userName} />
-    </HydrationBoundary>
-  );
+  return <UserPage userName={userName} />;
 }

@@ -188,16 +188,19 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
             <div
               role="dialog"
               aria-label="Emoji picker"
-              className="absolute bottom-full left-0 z-50 mb-2 w-72 border-2 border-[var(--m-line)] bg-[var(--m-card)] p-2"
+              className="absolute bottom-full left-0 z-50 mb-2 w-72 border-2 border-[var(--m-dim)] bg-[var(--m-dim)]"
             >
-              <div className="grid grid-cols-8 gap-0.5">
+              {/* Faint brutalist grid — the outer border AND the 2px gap rules
+                  are both `--m-dim` (cells `--m-card`), so the whole thing reads
+                  subtly, edge to edge. */}
+              <div className="grid grid-cols-8 gap-[2px]">
                 {EMOJIS.map((emoji) => (
                   <button
                     key={emoji}
                     type="button"
                     aria-label={`Insert ${emoji}`}
                     onClick={() => insertEmoji(emoji)}
-                    className={`flex aspect-square items-center justify-center text-[20px] leading-none transition-colors hover:bg-[var(--m-panel)] ${focusRing}`}
+                    className={`flex aspect-square items-center justify-center bg-[var(--m-card)] text-[20px] leading-none transition-colors hover:bg-[var(--m-panel)] ${focusRing}`}
                   >
                     {emoji}
                   </button>
