@@ -112,6 +112,103 @@
   }
 }
 
+/* Toast slide-in — Brutalist Mono. From the right, short + linear-ish. */
+@keyframes mono-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.mono-toast-enter {
+  animation: mono-toast-in 200ms ease forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-toast-enter {
+    animation: none;
+  }
+}
+
+/* Glitch headline — Brutalist Mono error pages. The main text jitters on the
+   "glitch beat"; two clipped ghost copies (accent top half, error bottom half)
+   flash on the same beat. Theme-aware via the `--m-*` tokens. */
+@keyframes mono-glitch-jit {
+  0%,
+  92%,
+  100% {
+    transform: none;
+  }
+  93% {
+    transform: translate(-2px, 1px);
+  }
+  95% {
+    transform: translate(2px, -1px);
+  }
+  97% {
+    transform: translate(-1px, 0);
+  }
+}
+@keyframes mono-glitch-flash {
+  0%,
+  92%,
+  100% {
+    opacity: 0;
+  }
+  93%,
+  96% {
+    opacity: 1;
+  }
+}
+.mono-glitch {
+  position: relative;
+  display: inline-block;
+}
+.mono-glitch-main {
+  display: inline-block;
+  animation: mono-glitch-jit 4.2s infinite;
+}
+.mono-glitch-ghost {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  animation: mono-glitch-flash 4.2s infinite;
+}
+.mono-glitch-g1 {
+  color: var(--m-accent);
+  transform: translate(-2px, 0);
+  clip-path: inset(0 0 55% 0);
+}
+.mono-glitch-g2 {
+  color: var(--m-error);
+  transform: translate(2px, 0);
+  clip-path: inset(55% 0 0 0);
+}
+/* Blinking block caret — terminal feel after a glitch headline. */
+.mono-caret {
+  display: inline-block;
+  width: 0.55ch;
+  height: 1em;
+  vertical-align: -0.1em;
+  margin-left: 4px;
+  background: var(--m-accent);
+  animation: lzblink 1.05s step-end infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-glitch-main {
+    animation: none;
+  }
+  .mono-glitch-ghost {
+    display: none;
+  }
+  .mono-caret {
+    animation: none;
+  }
+}
+
 /* Blinking terminal caret for the "Brutalist Mono" (variant B) home stats label. */
 @keyframes lzblink {
   0%,

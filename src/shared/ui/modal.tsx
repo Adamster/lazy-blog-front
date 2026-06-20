@@ -42,6 +42,7 @@ export function Modal({
   onOpenChange,
   onClose,
   width = "md",
+  tone = "default",
   labelledBy,
   children,
 }: {
@@ -50,6 +51,8 @@ export function Modal({
   /** Fires when the modal fully closes (e.g. to reset internal view state). */
   onClose?: () => void;
   width?: "sm" | "md" | "lg" | "xl";
+  /** Top-stripe colour: accent (default) or error (destructive confirms). */
+  tone?: "default" | "danger";
   /** id of the heading element, wired to the dialog via `aria-labelledby`. */
   labelledBy?: string;
   children: (close: () => void) => ReactNode;
@@ -160,7 +163,11 @@ export function Modal({
           tabIndex={-1}
           onClick={(event) => event.stopPropagation()}
           style={{ fontFamily: "var(--font-mono)" }}
-          className={`mono-modal-enter m-0 w-[calc(100%-2rem)] ${widthClass[width]} border-2 border-t-2 border-[var(--m-dim)] border-t-[var(--m-accent)] bg-[var(--m-bg)] shadow-none outline-none`}
+          className={`mono-modal-enter m-0 w-[calc(100%-2rem)] ${widthClass[width]} border-2 border-t-2 border-[var(--m-dim)] ${
+            tone === "danger"
+              ? "border-t-[var(--m-error)]"
+              : "border-t-[var(--m-accent)]"
+          } bg-[var(--m-bg)] shadow-none outline-none`}
         >
           <div className="px-9 pt-[34px] pb-9">
             {children(() => onOpenChange())}

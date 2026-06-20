@@ -674,7 +674,9 @@ export function ComponentsTab() {
       <ConfirmDeleteModal
         isOpen={confirmOpen}
         onOpenChange={() => setConfirmOpen(false)}
-        message="Delete this post?"
+        title="Delete this post?"
+        description="This post and all its comments will be permanently removed. This can't be undone."
+        confirmLabel="Delete post"
         onConfirm={() => addToastSuccess("Deleted (demo)")}
       />
     </>

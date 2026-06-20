@@ -91,7 +91,9 @@ const EditPage = () => {
 
       {isModalOpen && (
         <ConfirmDeleteModal
-          message="Are you sure?"
+          title="Delete post?"
+          description="This post and all its comments will be permanently removed. This can't be undone."
+          confirmLabel="Delete post"
           isOpen={isModalOpen}
           onOpenChange={() => setIsModalOpen(false)}
           onConfirm={confirmedDelete}

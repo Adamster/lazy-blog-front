@@ -1,12 +1,12 @@
 "use client";
 
 import { ResponseError } from "@/shared/api/openapi";
-import { useTheme } from "@/shared/providers/theme-providers";
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useState } from "react";
-import LogoDark from "@/assets/icons/logo-dark.svg";
-import LogoLight from "@/assets/icons/logo-light.svg";
+import { GlitchText } from "./glitch-text";
+
+const focusRing =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
 
 /** Narrows the `{ response: { status } }` shape some fetch errors carry. */
 const statusOf = (error: unknown): number | undefined => {
@@ -24,8 +24,19 @@ const statusOf = (error: unknown): number | undefined => {
   return undefined;
 };
 
-export const ErrorMessage = ({ error }: { error: unknown }) => {
-  const { isDarkTheme } = useTheme();
+/**
+ * Full-screen error state — the "glitch in the Lazyverse" page used wherever a
+ * query/boundary fails. Brutalist-Mono: a status line, a glitching headline
+ * with a blinking caret, the real error in a `stacktrace.log` panel, and Try
+ * again (when a `reset` is wired) + Go home actions.
+ */
+export const ErrorMessage = ({
+  error,
+  reset,
+}: {
+  error: unknown;
+  reset?: () => void;
+}) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -54,31 +65,70 @@ export const ErrorMessage = ({ error }: { error: unknown }) => {
     fetchErrorMessage();
   }, [error]);
 
+  const status = statusOf(error);
+  const statusLine =
+    status === 404 ? "NOT FOUND · 404" : `RUNTIME EXCEPTION · ${status ?? 500}`;
+
   return (
     <div
-      className="mono-scope flex min-h-screen flex-col items-center justify-center gap-6 bg-[var(--m-bg)] px-10 text-center text-[var(--m-fg)]"
+      className="mono-scope flex min-h-screen w-full flex-col justify-center bg-[var(--m-bg)] px-10 py-14 text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <Image
-        src={isDarkTheme ? LogoLight : LogoDark}
-        width={80}
-        height={80}
-        alt="NOT LAZY"
-      />
-      <h1 className="font-display text-[32px] leading-[1.04] font-bold tracking-[-0.02em]">
-        A glitch in the Lazyverse...
-      </h1>
-      {errorMessage ? (
-        <p className="text-[14px] leading-[1.6] text-[var(--m-muted)]">
-          {errorMessage}
+      <div className="mx-auto w-full max-w-[640px]">
+        <div className="mb-6 flex items-center gap-2.5 text-[11px] tracking-[0.14em] text-[var(--m-error)]">
+          <span
+            aria-hidden="true"
+            className="inline-block size-[7px] bg-[var(--m-error)]"
+          />
+          {statusLine}
+        </div>
+
+        <h1 className="font-display text-[clamp(32px,6vw,48px)] leading-[1.04] font-bold tracking-[-0.03em] text-[var(--m-fg)]">
+          <GlitchText caret>A glitch in the Lazyverse</GlitchText>
+        </h1>
+
+        <p className="mt-5 max-w-[42ch] text-[14px] leading-[1.6] text-[var(--m-muted)]">
+          Something broke on our side — not you. Try again; if it keeps
+          happening, head back home.
         </p>
-      ) : null}
-      <Link
-        href="/"
-        className="mono-cta inline-flex h-9 items-center px-4 text-[14px] font-bold tracking-[0.06em]"
-      >
-        Go Home
-      </Link>
+
+        {errorMessage ? (
+          <div className="mt-6 border-2 border-[var(--m-dim)] bg-[var(--m-card)]">
+            <div className="flex items-center gap-2 border-b-2 border-[var(--m-dim)] px-3 py-2">
+              <span className="size-2 border-2 border-[var(--m-error)]" />
+              <span className="size-2 border-2 border-[var(--m-dim)]" />
+              <span className="ml-1 text-[11px] tracking-[0.08em] text-[var(--m-muted2)]">
+                stacktrace.log
+              </span>
+            </div>
+            <div className="px-3.5 py-3 text-[11px] leading-[1.85] break-words text-[var(--m-muted)]">
+              <span className="text-[var(--m-error)]">Error</span>
+              {": "}
+              <span className="text-[var(--m-fg)]">{errorMessage}</span>
+            </div>
+          </div>
+        ) : null}
+
+        <div className="mt-7 flex flex-wrap gap-3">
+          {reset ? (
+            <button
+              type="button"
+              onClick={reset}
+              className={`mono-cta inline-flex h-9 items-center justify-center px-4 text-[14px] font-bold tracking-[0.06em] ${focusRing}`}
+            >
+              Try again
+            </button>
+          ) : null}
+          <Link
+            href="/"
+            className={`inline-flex h-9 items-center justify-center px-4 text-[14px] font-semibold tracking-[0.06em] ${
+              reset ? "mono-btn-outline" : "mono-cta font-bold"
+            } ${focusRing}`}
+          >
+            Go home
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

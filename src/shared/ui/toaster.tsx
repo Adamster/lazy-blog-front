@@ -2,7 +2,7 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { CheckIcon, ExclamationCircleIcon } from "@heroicons/react/24/solid";
 import { useIsMounted } from "@/shared/lib/use-is-mounted";
 import {
   dismissToast,
@@ -13,25 +13,14 @@ import {
 
 const NO_TOASTS: readonly Toast[] = [];
 
-/** Auto-dismiss after this many ms, matching HeroUI's default timeout. */
-const TIMEOUT_MS = 6000;
+/** Auto-dismiss after this many ms (design spec). */
+const TIMEOUT_MS = 4000;
 
-// Mono/brutalist toast skin. The toast stack portals to <body> (outside
-// `.mono-scope`, where the `--m-*` tokens don't resolve) — so the dark mono
-// palette is used literally. Square, 2px frame + 2px accent left edge
-// (lime = success, red = error).
-const EDGE: Record<Toast["tone"], string> = {
-  success: "border-l-[#cdff48]",
-  error: "border-l-[#ff6b6b]",
+/** Type-coloured 4px left stripe + icon colour. */
+const STRIPE: Record<Toast["tone"], string> = {
+  success: "var(--m-accent)",
+  error: "var(--m-error)",
 };
-
-function ToastIcon({ tone }: { tone: Toast["tone"] }) {
-  return tone === "success" ? (
-    <CheckIcon className="size-5 shrink-0 text-[#cdff48]" />
-  ) : (
-    <XMarkIcon className="size-5 shrink-0 text-[#ff6b6b]" />
-  );
-}
 
 function ToastCard({ toast }: { toast: Toast }) {
   useEffect(() => {
@@ -39,26 +28,42 @@ function ToastCard({ toast }: { toast: Toast }) {
     return () => clearTimeout(timer);
   }, [toast.id]);
 
+  const isSuccess = toast.tone === "success";
+
   return (
     <div
-      className={`pointer-events-auto flex w-[340px] max-w-[calc(100vw-2rem)] items-start gap-3 border-2 border-l-2 border-[#2c2c2c] ${EDGE[toast.tone]} bg-[#1a1a1a] p-3 shadow-none`}
+      className="mono-toast-enter pointer-events-auto flex w-[380px] max-w-[calc(100vw-2.5rem)] items-stretch"
+      style={{ borderLeft: `4px solid ${STRIPE[toast.tone]}` }}
     >
-      <ToastIcon tone={toast.tone} />
-      <div className="min-w-0 flex-1">
-        <p className="text-[14px] font-bold tracking-[0.01em] text-[#dcdcdc]">
+      {/* Icon column — on the card surface */}
+      <div className="flex w-[52px] flex-none items-center justify-center bg-[var(--m-card)]">
+        {isSuccess ? (
+          <CheckIcon className="size-3.5 text-[var(--m-accent)]" />
+        ) : (
+          <ExclamationCircleIcon className="size-3.5 text-[var(--m-error)]" />
+        )}
+      </div>
+
+      {/* Content — card surface */}
+      <div className="min-w-0 flex-1 bg-[var(--m-card)] px-3 py-[13px]">
+        <p className="text-[14px] leading-[1.2] font-semibold text-[var(--m-fg)]">
           {toast.title}
         </p>
-        <p className="mt-0.5 text-[12px] leading-[1.5] break-words text-[#9a9a9a]">
-          {toast.description}
-        </p>
+        {toast.description ? (
+          <p className="mt-[3px] text-[12px] leading-[1.5] break-words text-[var(--m-muted)]">
+            {toast.description}
+          </p>
+        ) : null}
       </div>
+
+      {/* Close panel — page-bg, 2px dim left rule */}
       <button
         type="button"
         onClick={() => dismissToast(toast.id)}
         aria-label="Dismiss notification"
-        className="-mt-1 -mr-1 flex size-6 shrink-0 items-center justify-center text-[#6f6f6f] transition-colors hover:bg-[#262626] hover:text-[#dcdcdc] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#cdff48]"
+        className="flex w-[52px] flex-none items-center justify-center border-l-2 border-[var(--m-dim)] bg-[var(--m-bg)] text-[18px] leading-none text-[var(--m-muted2)] transition-colors hover:text-[var(--m-fg)]"
       >
-        <XMarkIcon className="size-3.5" aria-hidden="true" />
+        ✕
       </button>
     </div>
   );
@@ -66,14 +71,13 @@ function ToastCard({ toast }: { toast: Toast }) {
 
 /**
  * Own toast renderer — subscribes to the module-level emitter in
- * `@/shared/lib/toasts` and renders a fixed, stacked portal of mono toasts in
- * an `aria-live="polite"` region (auto-dismiss + manual close). Replaces
- * HeroUI's `ToastProvider`.
+ * `@/shared/lib/toasts` and renders a top-right stacked portal of two-tone
+ * Brutalist-Mono toasts (4px type stripe · 52px icon col + content on
+ * `--m-card` · 52px close panel on `--m-bg`). Portals into a `.mono-portal`
+ * node so the `--m-*` tokens + mono font resolve (mirrors `Modal`).
  */
 export function Toaster() {
   const mounted = useIsMounted();
-  // Subscribe to the module-level emitter. Server snapshot is empty so SSR and
-  // first paint render nothing; the portal mounts client-side.
   const toasts = useSyncExternalStore(
     subscribeToasts,
     getToasts,
@@ -85,7 +89,8 @@ export function Toaster() {
   return createPortal(
     <div
       aria-live="polite"
-      className="pointer-events-none fixed right-4 bottom-4 z-[70] flex flex-col items-end gap-2.5"
+      className="mono-portal pointer-events-none fixed top-16 right-5 z-[70] flex flex-col items-end gap-2"
+      style={{ fontFamily: "var(--font-mono)" }}
     >
       {toasts.map((toast) => (
         <ToastCard key={toast.id} toast={toast} />

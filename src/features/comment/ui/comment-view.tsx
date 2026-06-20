@@ -143,7 +143,8 @@ const CommentView = ({ comment, postId }: IProps) => {
       )}
 
       <ConfirmDeleteModal
-        message="Are you sure?"
+        title="Delete comment?"
+        description="This comment will be permanently removed. This can't be undone."
         isOpen={isModalOpen}
         onOpenChange={() => setIsModalOpen(false)}
         onConfirm={handleConfirmDelete}
