@@ -542,7 +542,7 @@ export function ComponentsTab() {
         <Section
           index="07"
           title="META · DATA"
-          intro="Metric (icon + tabular number, each kind), the MatrixText decode animation, and the Sparkline (monthly series). One caption size — 12px; icons 14px."
+          intro="Metric (icon + tabular number, each kind), the MatrixText decode animation, and the Sparkline (monthly series). One caption size — 12px; icons 14px; one colour — muted. Byline rule: the @handle is the profile link (+ the avatar), the name is plain text; handle is muted everywhere with a muted→accent hover (never underline). Only the profile-page header @handle is accent."
         >
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
             <Panel caption="// METRIC — every kind">

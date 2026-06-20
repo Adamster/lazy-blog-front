@@ -38,6 +38,7 @@ The frontend (home / profile / post / auth) uses the "Brutalist Mono" design sys
 ### Meta / info rows (author · date · icon+number)
 
 - ONE size: **Caption 12px** (`text-[12px]`) — NEVER 11/11.5/12.5. **ONE colour: the row text + icon+number metrics = `--m-muted`** (NOT muted2 — muted reads better and keeps hero byline / post byline / feed card / comment meta identical; don't split muted vs muted2 across surfaces). Icons **14px** (`size-3.5`). In-group gap 10 (`gap-2.5`), between-metrics gap 16 (`gap-4`), separator middle-dot `·` = `Dot` (intentionally dimmer `muted2`, consistent everywhere), tabular-nums.
+- **Profile link & byline rule (one model everywhere):** the **`@handle` is the profile link** (it maps to the `/username` route) — plus the **avatar** is a link too (two paths to the profile). The **name is ALWAYS plain text, never a link** (a `<span>`, keep it as prominent as the surface wants — e.g. post byline name stays `font-display` semibold). Never wrap a post-link around the `@handle` (no nested anchors — split title-link and handle-link). **Link hover = colour-reveal `muted → accent`, NEVER underline** (`transition-colors hover:text-[var(--m-accent)]`; the handle inherits the row's `muted` base). The `@handle` is **muted everywhere** (feed cards, stat blocks, comments, post byline). The **only accent `@handle`** is on the profile page header — and there it's the page's own subject identity (display text, not a link), not a generic byline.
 
 ### Components (fixed sizes)
 
