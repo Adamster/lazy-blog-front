@@ -4,7 +4,7 @@ import { CommentResponse } from "@/shared/api/openapi";
 import { IsAuthor } from "@/entities/session";
 import { useDeleteComment } from "@/features/comment/model/use-delete-comment";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import CommentForm from "@/features/comment/ui/comment-form";
 import { formatDate2 } from "@/shared/lib/utils";
@@ -20,6 +20,43 @@ const nameOf = (u: CommentResponse["user"]) =>
   [u.firstName, u.lastName].filter(Boolean).join(" ") ||
   u.userName ||
   "Unknown";
+
+const graphemeSegmenter =
+  typeof Intl !== "undefined" && "Segmenter" in Intl
+    ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
+    : null;
+const EMOJI_RE = /\p{Extended_Pictographic}/u;
+
+/**
+ * Render comment text with emoji enlarged (~1.35em). Native emoji otherwise
+ * inherit the 14px body size and read tiny; we segment into graphemes (so ZWJ
+ * sequences / variation selectors stay intact) and wrap emoji ones in a larger
+ * span, leaving the surrounding text at body size. Falls back to plain text
+ * where `Intl.Segmenter` is unavailable.
+ */
+function withBigEmoji(text: string): ReactNode {
+  if (!graphemeSegmenter) return text;
+  const out: ReactNode[] = [];
+  let buf = "";
+  let key = 0;
+  for (const { segment } of graphemeSegmenter.segment(text)) {
+    if (EMOJI_RE.test(segment)) {
+      if (buf) {
+        out.push(buf);
+        buf = "";
+      }
+      out.push(
+        <span key={key++} className="align-[-0.1em] text-[1.35em] leading-none">
+          {segment}
+        </span>
+      );
+    } else {
+      buf += segment;
+    }
+  }
+  if (buf) out.push(buf);
+  return out;
+}
 
 const CommentView = ({ comment, postId }: IProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -100,7 +137,7 @@ const CommentView = ({ comment, postId }: IProps) => {
             &gt;
           </span>
           <p className="text-[14px] leading-[1.6] whitespace-pre-line text-[var(--m-fg)]">
-            {comment.body}
+            {withBigEmoji(comment.body)}
           </p>
         </div>
       )}
