@@ -218,7 +218,7 @@ export default function HomePage() {
                   <div className="mt-6 flex flex-wrap items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
                     <Link
                       href={`/${hero.author.userName}`}
-                      className="relative z-10 text-[var(--m-fg)] transition-colors hover:text-[var(--m-accent)]"
+                      className="relative z-10 text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
                     >
                       @{hero.author.userName}
                     </Link>

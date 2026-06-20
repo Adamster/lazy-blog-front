@@ -64,7 +64,7 @@ function CardMeta({
       {authorHandle ? (
         <Link
           href={`/${authorHandle}`}
-          className="relative z-10 truncate text-[var(--m-fg)] transition-colors hover:text-[var(--m-accent)]"
+          className="relative z-10 truncate text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
         >
           @{authorHandle}
         </Link>
