@@ -1,13 +1,10 @@
 "use client";
 
 import { CommentResponse } from "@/shared/api/openapi";
-import { useTheme } from "@/shared/providers/theme-providers";
 import { useUser } from "@/entities/session";
 import { useAddComment } from "@/features/comment/model/use-add-comment";
 import { useUpdateComment } from "@/features/comment/model/use-update-comment";
 import { FaceSmileIcon } from "@heroicons/react/24/outline";
-import { EmojiStyle, Theme } from "emoji-picker-react";
-import dynamic from "next/dynamic";
 import {
   useCallback,
   useEffect,
@@ -17,28 +14,53 @@ import {
 } from "react";
 import { useClickOutside } from "react-haiku";
 
-const Picker = dynamic(() => import("emoji-picker-react"), {
-  ssr: false,
-});
-
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
 
-// emoji-picker-react sets its CSS variables on a hashed Flairup class injected
-// into a runtime <style>, so a stylesheet override loses the cascade. Setting
-// them inline on the root (via the `style` prop) wins — square corners, 2px
-// branding frame, and the mono palette (tokens resolve inside `.mono-scope`).
-const EMOJI_PICKER_STYLE = {
-  "--epr-picker-border-radius": "0px",
-  "--epr-picker-border-color": "var(--m-line)",
-  "--epr-bg-color": "var(--m-card)",
-  "--epr-category-label-bg-color": "var(--m-card)",
-  "--epr-hover-bg-color": "var(--m-panel)",
-  "--epr-focus-bg-color": "var(--m-panel)",
-  "--epr-text-color": "var(--m-fg)",
-  border: "2px solid var(--m-line)",
-  borderRadius: 0,
-} as React.CSSProperties;
+// Curated set of common emojis — native unicode (rendered by the OS, always
+// crisp, zero deps/CDN). Just the essentials, not the whole Unicode catalogue.
+const EMOJIS = [
+  "😀",
+  "😁",
+  "😂",
+  "🤣",
+  "😅",
+  "😊",
+  "🙂",
+  "😉",
+  "😍",
+  "😘",
+  "😎",
+  "🤔",
+  "😐",
+  "🙄",
+  "😴",
+  "🥳",
+  "😢",
+  "😭",
+  "😡",
+  "🤯",
+  "😱",
+  "🤗",
+  "🫠",
+  "💀",
+  "👀",
+  "🔥",
+  "✨",
+  "⭐",
+  "❤️",
+  "💯",
+  "🎉",
+  "✅",
+  "👍",
+  "👎",
+  "👏",
+  "🙏",
+  "🙌",
+  "💪",
+  "👋",
+  "🚀",
+];
 
 interface IProps {
   postId?: string;
@@ -50,7 +72,6 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
   const [body, setBody] = useState(editComment?.body || "");
   const [showEmoji, setShowEmoji] = useState(false);
   const [focused, setFocused] = useState(false);
-  const { isDarkTheme } = useTheme();
   const { user } = useUser();
   const pickerRef = useRef<HTMLDivElement>(null);
   const emojiButtonRef = useRef<HTMLButtonElement>(null);
@@ -85,6 +106,12 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [showEmoji]);
+
+  const insertEmoji = (emoji: string) => {
+    setBody((prev) => prev + emoji);
+    setShowEmoji(false);
+    taRef.current?.focus();
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,26 +188,21 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
             <div
               role="dialog"
               aria-label="Emoji picker"
-              className="absolute bottom-full left-0 z-50 mb-2"
+              className="absolute bottom-full left-0 z-50 mb-2 border-2 border-[var(--m-line)] bg-[var(--m-card)] p-2"
             >
-              <Picker
-                theme={isDarkTheme ? Theme.DARK : Theme.LIGHT}
-                onEmojiClick={(e) => {
-                  setBody((prevBody) => prevBody + e.emoji);
-                  setShowEmoji(false);
-                  taRef.current?.focus();
-                }}
-                autoFocusSearch={false}
-                emojiStyle={EmojiStyle.NATIVE}
-                searchDisabled
-                height={300}
-                width={360}
-                skinTonesDisabled
-                previewConfig={{
-                  showPreview: false,
-                }}
-                style={EMOJI_PICKER_STYLE}
-              />
+              <div className="grid grid-cols-8 gap-0.5">
+                {EMOJIS.map((emoji) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    aria-label={`Insert ${emoji}`}
+                    onClick={() => insertEmoji(emoji)}
+                    className={`flex size-8 items-center justify-center text-[20px] leading-none transition-colors hover:bg-[var(--m-panel)] ${focusRing}`}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
