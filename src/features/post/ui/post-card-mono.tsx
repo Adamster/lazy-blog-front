@@ -37,6 +37,7 @@ function Cover({ post }: { post: FeedPost }) {
         alt={post.title}
         fill
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+        unoptimized
         className="object-cover [filter:contrast(1.03)]"
       />
     );

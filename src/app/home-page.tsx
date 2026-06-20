@@ -37,6 +37,7 @@ function HeroCover({ post }: { post: DisplayPostResponse }) {
         fill
         sizes="(max-width: 1024px) 100vw, 640px"
         priority
+        unoptimized
         className="object-cover [filter:contrast(1.03)]"
       />
     );

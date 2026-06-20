@@ -34,6 +34,7 @@ export function Avatar({ src, name, size = "sm" }: AvatarProps) {
           alt={name}
           width={box}
           height={box}
+          unoptimized
           className="size-full object-cover"
         />
       ) : (

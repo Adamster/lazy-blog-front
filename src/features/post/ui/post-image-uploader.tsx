@@ -2,10 +2,13 @@ import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { apiClient } from "@/shared/api/api-client";
 import { useUser } from "@/shared/providers/user-provider";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { Button, ButtonGroup, Image } from "@heroui/react";
+import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { ImageCropper } from "@/shared/ui/image-cropper-dynamic";
+
+const focusRing =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
 
 interface Props {
   onUploadSuccess: (url: string) => void;
@@ -103,28 +106,36 @@ export const PostImageUploader = ({ onUploadSuccess, currentImage }: Props) => {
       ) : (
         <div className="flex w-full flex-col gap-4">
           {currentImage && (
-            <Image removeWrapper src={currentImage} alt="Cover image" />
+            <div className="relative aspect-[16/10] w-full overflow-hidden border-2 border-[var(--m-dim)] bg-[var(--m-panel)]">
+              <Image
+                src={currentImage}
+                alt="Cover image"
+                fill
+                sizes="(max-width: 768px) 100vw, 780px"
+                unoptimized
+                className="object-cover"
+              />
+            </div>
           )}
 
-          <ButtonGroup>
-            <Button
-              size="sm"
-              variant="flat"
-              onPress={() => fileInputRef.current?.click()}
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className={`mono-btn-outline inline-flex h-9 items-center gap-2 px-4 text-[14px] font-semibold tracking-[0.06em] ${focusRing}`}
             >
-              <PencilIcon className="h-4 w-4" />
+              <PencilIcon className="size-3.5" />
               Cover Image
-            </Button>
-            <Button
-              isIconOnly
-              size="sm"
-              variant="flat"
-              color="danger"
-              onPress={handleRemove}
+            </button>
+            <button
+              type="button"
+              onClick={handleRemove}
+              aria-label="Remove cover image"
+              className={`mono-icon-btn size-9 text-[var(--m-error)] hover:border-[var(--m-error)] hover:text-[var(--m-error)] ${focusRing}`}
             >
-              <TrashIcon className="h-4 w-4" />
-            </Button>
-          </ButtonGroup>
+              <TrashIcon className="size-[18px]" />
+            </button>
+          </div>
 
           <input
             ref={fileInputRef}

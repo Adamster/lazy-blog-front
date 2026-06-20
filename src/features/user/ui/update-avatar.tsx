@@ -1,16 +1,20 @@
 import { UserResponse } from "@/shared/api/openapi";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { Button, ButtonGroup } from "@heroui/react";
 import { useRef, useState } from "react";
 import { ImageCropper } from "@/shared/ui/image-cropper-dynamic";
+import { Avatar } from "@/shared/ui";
 import { useUploadAvatar } from "../model/use-upload-avatar";
 import { useDeleteAvatar } from "../model/use-delete-avatar";
 
-import { UserAvatar } from "./user-avatar";
+const focusRing =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
 
 interface IProps {
   userData: UserResponse | undefined;
 }
+
+const nameOf = (u?: UserResponse) =>
+  [u?.firstName, u?.lastName].filter(Boolean).join(" ") || u?.userName || "—";
 
 export const UpdateAvatar = ({ userData }: IProps) => {
   const [avatarPreview, setAvatarPreview] = useState("");
@@ -48,7 +52,6 @@ export const UpdateAvatar = ({ userData }: IProps) => {
       {cropperVisible ? (
         <ImageCropper
           src={avatarPreview}
-          stencilShape="circle"
           stencilProps={{ aspectRatio: 1 }}
           sizeRestrictions={{
             minWidth: 150,
@@ -63,29 +66,26 @@ export const UpdateAvatar = ({ userData }: IProps) => {
         />
       ) : (
         <div className="flex flex-col items-start gap-4">
-          <UserAvatar user={userData} isProfile />
+          <Avatar src={userData?.avatarUrl} name={nameOf(userData)} size="lg" />
 
-          <div className="flex flex-wrap gap-4">
-            <ButtonGroup>
-              <Button
-                size="sm"
-                variant="flat"
-                onPress={() => fileInputRef.current?.click()}
-              >
-                <PencilIcon className="h-4 w-4" />
-                Avatar
-              </Button>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className={`mono-btn-outline inline-flex h-9 items-center gap-2 px-4 text-[14px] font-semibold tracking-[0.06em] ${focusRing}`}
+            >
+              <PencilIcon className="size-3.5" />
+              Avatar
+            </button>
 
-              <Button
-                isIconOnly
-                size="sm"
-                variant="flat"
-                color="danger"
-                onPress={() => deleteAvatarMutation.mutate()}
-              >
-                <TrashIcon className="h-4 w-4" />
-              </Button>
-            </ButtonGroup>
+            <button
+              type="button"
+              onClick={() => deleteAvatarMutation.mutate()}
+              aria-label="Remove avatar"
+              className={`mono-icon-btn size-9 text-[var(--m-error)] hover:border-[var(--m-error)] hover:text-[var(--m-error)] ${focusRing}`}
+            >
+              <TrashIcon className="size-[18px]" />
+            </button>
           </div>
 
           <input

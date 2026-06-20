@@ -172,6 +172,7 @@ export const PostViewMono = ({ post, comments, commentsCount = 0 }: IProps) => {
               fill
               sizes="(max-width: 860px) 100vw, 780px"
               priority
+              unoptimized
               className="object-cover [filter:contrast(1.03)]"
             />
           </div>

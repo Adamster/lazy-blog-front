@@ -2,7 +2,6 @@
 
 import "react-advanced-cropper/dist/style.css";
 
-import { Button, ButtonGroup } from "@heroui/react";
 import { NoSymbolIcon, RocketLaunchIcon } from "@heroicons/react/24/outline";
 import { useRef } from "react";
 import {
@@ -60,16 +59,23 @@ export default function ImageCropper({
         stencilProps={stencilProps}
         sizeRestrictions={sizeRestrictions}
       />
-      <div className="flex justify-end">
-        <ButtonGroup>
-          <Button size="sm" variant="flat" color="primary" onPress={handleSave}>
-            <RocketLaunchIcon className="h-4 w-4" />
-            {saveLabel}
-          </Button>
-          <Button size="sm" variant="flat" isIconOnly onPress={onCancel}>
-            <NoSymbolIcon className="h-4 w-4" />
-          </Button>
-        </ButtonGroup>
+      <div className="flex justify-end gap-3">
+        <button
+          type="button"
+          onClick={handleSave}
+          className="mono-cta inline-flex h-9 items-center gap-2 px-4 text-[14px] font-bold tracking-[0.06em] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
+        >
+          <RocketLaunchIcon className="size-3.5" />
+          {saveLabel}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          aria-label="Cancel"
+          className="mono-icon-btn size-9 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
+        >
+          <NoSymbolIcon className="size-[18px]" />
+        </button>
       </div>
     </div>
   );
