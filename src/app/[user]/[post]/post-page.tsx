@@ -6,7 +6,7 @@ import { PostViewMono } from "@/features/post/ui/post-view";
 import { usePostBySlug } from "@/features/post/model/use-post-by-slug";
 import { useIncrementViewPost } from "@/features/post/model/use-increment-view-post";
 import { useCommentsById } from "@/features/comment/model/use-comments-by-id";
-import { CommentsMono } from "@/features/comment/ui/rewrite-comments-section";
+import { CommentsMono } from "@/features/comment/ui/comments-section";
 
 export default function PostPage({ slug }: { slug: string }) {
   const { data, error, isLoading } = usePostBySlug(slug);

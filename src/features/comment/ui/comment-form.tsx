@@ -1,21 +1,28 @@
 "use client";
 
-import { apiClient } from "@/shared/api/api-client";
 import { CommentResponse } from "@/shared/api/openapi";
-import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { useTheme } from "@/shared/providers/theme-providers";
 import { useUser } from "@/shared/providers/user-provider";
+import { useAddComment } from "@/features/comment/model/use-add-comment";
+import { useUpdateComment } from "@/features/comment/model/use-update-comment";
 import { FaceSmileIcon } from "@heroicons/react/24/outline";
-import { cn } from "@heroui/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EmojiStyle, Theme } from "emoji-picker-react";
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useClickOutside } from "react-haiku";
 
 const Picker = dynamic(() => import("emoji-picker-react"), {
   ssr: false,
 });
+
+const focusRing =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
 
 // emoji-picker-react sets its CSS variables on a hashed Flairup class injected
 // into a runtime <style>, so a stylesheet override loses the cascade. Setting
@@ -40,90 +47,57 @@ interface IProps {
 }
 
 function CommentFormMono({ postId, editComment, setIsEditComment }: IProps) {
-  const queryClient = useQueryClient();
   const [body, setBody] = useState(editComment?.body || "");
   const [showEmoji, setShowEmoji] = useState(false);
   const [focused, setFocused] = useState(false);
   const { isDarkTheme } = useTheme();
   const { user } = useUser();
   const pickerRef = useRef<HTMLDivElement>(null);
+  const emojiButtonRef = useRef<HTMLButtonElement>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
 
-  useClickOutside(pickerRef, () => {
-    setShowEmoji(false);
-  });
+  const addComment = useAddComment(postId ?? "", user);
+  const updateComment = useUpdateComment(postId ?? "", user?.id ?? "");
+
+  const closeEmoji = useCallback(() => setShowEmoji(false), []);
+  useClickOutside(pickerRef, closeEmoji);
 
   // Auto-grow the single-row textarea to fit its content (and shrink back when
-  // cleared after submit), per the design's compose field.
-  useEffect(() => {
-    const t = taRef.current;
-    if (!t) return;
-    t.style.height = "auto";
-    t.style.height = `${t.scrollHeight}px`;
+  // cleared after submit). `useLayoutEffect` runs before paint so the height is
+  // correct on first frame — no visible jump. `field-sizing: content` (set
+  // inline below) makes this native where supported; this stays the fallback.
+  useLayoutEffect(() => {
+    const ta = taRef.current;
+    if (!ta) return;
+    ta.style.height = "auto";
+    ta.style.height = `${ta.scrollHeight}px`;
   }, [body]);
 
-  const postComment = useMutation({
-    mutationFn: () =>
-      apiClient.comments.addComment({
-        addCommentRequest: { postId: postId!, userId: user!.id!, body },
-      }),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["getCommentsByPostId", postId],
-      });
-
-      addToastSuccess("Comment has been posted");
-    },
-
-    onError: () => {
-      addToastError("Error posting comment");
-    },
-
-    onSettled: () => {
-      setBody("");
-      setShowEmoji(false);
-    },
-  });
-
-  const postEditedComment = useMutation({
-    mutationFn: () =>
-      apiClient.comments.updateComment({
-        updateCommentRequest: {
-          userId: user ? user.id! : "",
-          body: body,
-          commentId: editComment ? editComment.id : "",
-        },
-      }),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["getCommentsByPostId", postId],
-      });
-
-      addToastSuccess("Comment has been updated");
-    },
-
-    onError: () => {
-      addToastError("Error updating comment");
-    },
-
-    onSettled: () => {
-      setBody("");
-      setShowEmoji(false);
-    },
-  });
+  // Close the emoji popover on Escape and return focus to its trigger.
+  useEffect(() => {
+    if (!showEmoji) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowEmoji(false);
+        emojiButtonRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [showEmoji]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    if (editComment) {
-      e.preventDefault();
-      postEditedComment.mutate();
+    e.preventDefault();
+    if (!body.trim()) return;
 
-      if (setIsEditComment) setIsEditComment(false);
+    if (editComment) {
+      updateComment.mutate({ commentId: editComment.id, body });
+      setIsEditComment?.(false);
     } else {
-      e.preventDefault();
-      postComment.mutate();
+      addComment.mutate(body);
+      setBody("");
     }
+    setShowEmoji(false);
   };
 
   const handleCancel = () => {
@@ -135,7 +109,7 @@ function CommentFormMono({ postId, editComment, setIsEditComment }: IProps) {
     setShowEmoji(false);
   };
 
-  const isPending = postEditedComment.isPending || postComment.isPending;
+  const isPending = updateComment.isPending || addComment.isPending;
 
   const floated = focused || body.length > 0;
   const labelText = editComment ? "Edit comment" : "Add a comment";
@@ -164,7 +138,7 @@ function CommentFormMono({ postId, editComment, setIsEditComment }: IProps) {
           onBlur={() => setFocused(false)}
           aria-label={labelText}
           className="block w-full resize-none overflow-hidden border-0 border-b-2 border-[var(--m-accent)] bg-transparent px-0 pt-5 pb-2 text-[14px] leading-[1.6] text-[var(--m-fg)] caret-[var(--m-accent)] outline-none"
-          style={{ fontFamily: "var(--font-mono)" }}
+          style={{ fontFamily: "var(--font-mono)", fieldSizing: "content" }}
         />
       </div>
 
@@ -172,45 +146,50 @@ function CommentFormMono({ postId, editComment, setIsEditComment }: IProps) {
         {/* Emoji button + popover, anchored to the button (opens upward-left) */}
         <div ref={pickerRef} className="relative">
           <button
+            ref={emojiButtonRef}
             type="button"
             aria-label="Insert emoji"
+            aria-haspopup="dialog"
+            aria-expanded={showEmoji}
             onClick={() => setShowEmoji((state) => !state)}
-            className="mono-icon-btn size-9"
+            className={`mono-icon-btn size-9 ${focusRing}`}
           >
             <FaceSmileIcon className="size-[18px] shrink-0" />
           </button>
 
-          <div
-            className={cn(
-              "absolute bottom-full left-0 z-50 mb-2",
-              showEmoji ? "" : "hidden"
-            )}
-          >
-            <Picker
-              theme={isDarkTheme ? Theme.DARK : Theme.LIGHT}
-              onEmojiClick={(e) => {
-                setBody((prevBody) => prevBody + e.emoji);
-                setShowEmoji(false);
-              }}
-              autoFocusSearch={false}
-              emojiStyle={EmojiStyle.NATIVE}
-              searchDisabled
-              height={300}
-              width={360}
-              skinTonesDisabled
-              previewConfig={{
-                showPreview: false,
-              }}
-              style={EMOJI_PICKER_STYLE}
-            />
-          </div>
+          {showEmoji && (
+            <div
+              role="dialog"
+              aria-label="Emoji picker"
+              className="absolute bottom-full left-0 z-50 mb-2"
+            >
+              <Picker
+                theme={isDarkTheme ? Theme.DARK : Theme.LIGHT}
+                onEmojiClick={(e) => {
+                  setBody((prevBody) => prevBody + e.emoji);
+                  setShowEmoji(false);
+                  taRef.current?.focus();
+                }}
+                autoFocusSearch={false}
+                emojiStyle={EmojiStyle.NATIVE}
+                searchDisabled
+                height={300}
+                width={360}
+                skinTonesDisabled
+                previewConfig={{
+                  showPreview: false,
+                }}
+                style={EMOJI_PICKER_STYLE}
+              />
+            </div>
+          )}
         </div>
 
         {editComment && (
           <button
             type="button"
             onClick={handleCancel}
-            className="mono-btn-outline ml-auto inline-flex h-9 items-center px-4 text-[14px] font-semibold tracking-[0.06em]"
+            className={`mono-btn-outline ml-auto inline-flex h-9 items-center px-4 text-[14px] font-semibold tracking-[0.06em] ${focusRing}`}
           >
             Cancel
           </button>
@@ -219,10 +198,9 @@ function CommentFormMono({ postId, editComment, setIsEditComment }: IProps) {
         <button
           type="submit"
           disabled={isPending}
-          className={cn(
-            "mono-cta inline-flex h-9 items-center px-4 text-[14px] font-bold tracking-[0.06em]",
+          className={`mono-cta inline-flex h-9 items-center px-4 text-[14px] font-bold tracking-[0.06em] ${focusRing} ${
             editComment ? "" : "ml-auto"
-          )}
+          }`}
         >
           {isPending ? "Sending" : editComment ? "Update" : "Send"}
         </button>

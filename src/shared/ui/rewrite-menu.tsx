@@ -39,7 +39,7 @@ export function Menu({ items, triggerLabel }: MenuProps) {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex size-8 items-center justify-center bg-transparent text-[var(--m-muted2)] transition-colors hover:text-[var(--m-accent)]"
+        className="flex size-8 items-center justify-center bg-transparent text-[var(--m-muted2)] transition-colors hover:text-[var(--m-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
       >
         <EllipsisVerticalIcon className="size-[18px]" />
       </button>
