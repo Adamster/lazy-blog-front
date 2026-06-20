@@ -119,7 +119,7 @@ export const PostVoteMono = ({
             aria-label="Like this post"
             disabled={!canVote || handleVote.isPending}
             className={
-              "font-display mt-2 inline-flex items-center gap-2.5 bg-transparent p-0 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums transition-colors disabled:opacity-100 " +
+              "font-display mt-2 inline-flex items-center gap-2.5 bg-transparent p-0 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[var(--m-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--m-card)] disabled:opacity-100 " +
               (liked
                 ? "text-[var(--m-accent)]"
                 : "text-[var(--m-muted2)] " +
@@ -127,7 +127,7 @@ export const PostVoteMono = ({
             }
           >
             {fmt(STUB.likes)}
-            <HeartIcon className="size-[22px] flex-none" />
+            <HeartIcon className="size-5 flex-none" />
           </button>
           <div className={subRowCls}>
             <HeartIcon className="size-3.5 flex-none" />
@@ -145,7 +145,7 @@ export const PostVoteMono = ({
             aria-label="Dislike this post"
             disabled={!canVote || handleVote.isPending}
             className={
-              "font-display mt-2 inline-flex items-center gap-2.5 bg-transparent p-0 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums transition-colors disabled:opacity-100 " +
+              "font-display mt-2 inline-flex items-center gap-2.5 bg-transparent p-0 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[var(--m-error)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--m-card)] disabled:opacity-100 " +
               (disliked
                 ? "text-[var(--m-error)]"
                 : "text-[var(--m-muted2)] " +
@@ -153,7 +153,7 @@ export const PostVoteMono = ({
             }
           >
             {fmt(STUB.dislikes)}
-            <BrokenHeartIcon className="size-[22px] flex-none" />
+            <BrokenHeartIcon className="size-5 flex-none" />
           </button>
           <div className={subRowCls}>
             <BrokenHeartIcon className="size-3.5 flex-none" />

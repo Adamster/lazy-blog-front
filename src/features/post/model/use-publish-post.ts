@@ -1,40 +1,76 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/shared/api/api-client";
+import { PostDetailedResponse } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 
+const postKey = (slug: string) => ["getPostBySlug", slug] as const;
+
 /**
- * Publish / unpublish (hide) a post from the post-header kebab. Both invalidate
- * the detailed-post query so the `[ Draft ]` chip + publish/unpublish row flip
- * after the change lands. `slug` keys the invalidation to the post in view.
+ * Optimistically flip `isPublished` on the cached detailed post so the
+ * `[ Draft ]` chip + publish/unpublish row react instantly. Snapshots for
+ * rollback, invalidates on settle. `published` is the target state.
  */
-export const usePublishPost = (postId: string, postSlug: string) => {
+function usePublishToggle(
+  postId: string,
+  postSlug: string,
+  published: boolean,
+  mutationFn: () => Promise<unknown>,
+  messages: { success: string; error: string }
+) {
   const queryClient = useQueryClient();
+  const key = postKey(postSlug);
 
   return useMutation({
-    mutationFn: () => apiClient.posts.publishPost({ id: postId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getPostBySlug", postSlug] });
-      addToastSuccess("Post has been published");
+    mutationFn,
+
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: key });
+      const previous = queryClient.getQueryData<PostDetailedResponse>(key);
+
+      if (previous) {
+        queryClient.setQueryData<PostDetailedResponse>(key, {
+          ...previous,
+          isPublished: published,
+        });
+      }
+
+      return { previous };
     },
-    onError: (error: any) => {
-      addToastError("Error publishing post", error);
+
+    onError: (error: unknown, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(key, context.previous);
+      }
+      addToastError(messages.error, error);
+    },
+
+    onSuccess: () => addToastSuccess(messages.success),
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: key });
     },
   });
-};
+}
 
-export const useHidePost = (postId: string, postSlug: string) => {
-  const queryClient = useQueryClient();
+/**
+ * Publish / unpublish (hide) a post from the post-header kebab. Both optimistic
+ * toggles update the `getPostBySlug` cache so the `[ Draft ]` chip + the
+ * publish/unpublish menu row flip immediately, then self-heal on error.
+ */
+export const usePublishPost = (postId: string, postSlug: string) =>
+  usePublishToggle(
+    postId,
+    postSlug,
+    true,
+    () => apiClient.posts.publishPost({ id: postId }),
+    { success: "Post has been published", error: "Error publishing post" }
+  );
 
-  return useMutation({
-    mutationFn: () => apiClient.posts.hidePost({ id: postId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getPostBySlug", postSlug] });
-      addToastSuccess("Post has been unpublished");
-    },
-    onError: (error: any) => {
-      addToastError("Error unpublishing post", error);
-    },
-  });
-};
+export const useHidePost = (postId: string, postSlug: string) =>
+  usePublishToggle(
+    postId,
+    postSlug,
+    false,
+    () => apiClient.posts.hidePost({ id: postId }),
+    { success: "Post has been unpublished", error: "Error unpublishing post" }
+  );

@@ -1,68 +1,32 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import Link from "next/link";
-import { Image } from "@heroui/react";
 import { HeartIcon, EyeIcon } from "@heroicons/react/24/solid";
-import { UserPostItem, UserResponse } from "@/shared/api/openapi";
+import { UserResponse } from "@/shared/api/openapi";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { usePostsByUserName } from "@/features/post/model/use-posts-by-username";
 import { useViewMode } from "@/shared/providers/view-mode-provider";
 import { Header } from "@/widgets/rewrite-header";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
-import { Label, Category, Metric, MatrixText, fmt } from "@/shared/ui";
+import { Label, MatrixText, Avatar, fmt } from "@/shared/ui";
+import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { formatDate2 } from "@/shared/lib/utils";
+import { PostCardMono } from "@/features/post/ui/post-card-mono";
 
 const nameOf = (u?: UserResponse) =>
   [u?.firstName, u?.lastName].filter(Boolean).join(" ") || u?.userName || "—";
 
-const initOf = (u?: UserResponse) =>
-  (u?.firstName?.[0] || u?.userName?.[0] || "•").toUpperCase();
-
-const catOf = (p: UserPostItem) => p.tags?.[0]?.tag ?? "post";
-const firstLetter = (s?: string) =>
-  (s?.match(/[\p{L}\p{N}]/u)?.[0] ?? "•").toUpperCase();
-
-function Cover({ post }: { post: UserPostItem }) {
-  if (post.coverUrl) {
-    return (
-      <Image
-        removeWrapper
-        radius="none"
-        src={post.coverUrl}
-        alt={post.title}
-        className="h-full w-full object-cover [filter:contrast(1.03)]"
-      />
-    );
-  }
-  return (
-    <div className="flex h-full w-full items-center justify-center bg-[var(--m-dim)]">
-      <span className="font-display text-5xl font-bold text-[var(--m-accent)] select-none">
-        {firstLetter(post.title)}
-      </span>
-    </div>
-  );
-}
-
 export default function UserPageMono({ userName }: { userName: string }) {
   const query = usePostsByUserName(userName);
-  const observerRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
   const { view } = useViewMode();
 
-  useEffect(() => {
-    if (!observerRef.current || !query.hasNextPage) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => entry.isIntersecting && query.fetchNextPage(),
-      { threshold: 1.0 }
-    );
-
-    observer.observe(observerRef.current);
-    return () => observer.disconnect();
-  }, [query, query.fetchNextPage, query.hasNextPage]);
+  const sentinelRef = useInfiniteScroll({
+    hasNextPage: query.hasNextPage,
+    fetchNextPage: query.fetchNextPage,
+    isFetching: query.isFetchingNextPage,
+  });
 
   if (query.isLoading) return <Loading />;
   if (query.error) return <ErrorMessage error={query.error} />;
@@ -70,6 +34,7 @@ export default function UserPageMono({ userName }: { userName: string }) {
   const posts = query.data?.pages.flatMap((page) => page.postItems) ?? [];
   const totalPosts = query.data?.pages[0]?.totalPostCount ?? 0;
   const user = query.data?.pages[0]?.user;
+  const handle = user?.userName ?? userName;
 
   // Likes / views / activity are derived from the loaded posts until a
   // dedicated aggregate API exists; they grow as more pages load in.
@@ -94,28 +59,14 @@ export default function UserPageMono({ userName }: { userName: string }) {
       <main className="mx-auto max-w-[1240px] px-10 pt-10 pb-10">
         {/* Profile header */}
         <section className="flex flex-col gap-8 pb-10 sm:flex-row sm:items-start">
-          <div className="size-32 flex-none overflow-hidden">
-            {user?.avatarUrl ? (
-              <Image
-                removeWrapper
-                radius="none"
-                src={user.avatarUrl}
-                alt={nameOf(user)}
-                className="size-32 object-cover [filter:contrast(1.03)]"
-              />
-            ) : (
-              <div className="font-display flex size-32 items-center justify-center border-2 border-[var(--m-accent)] text-5xl font-bold text-[var(--m-accent)] select-none">
-                {initOf(user)}
-              </div>
-            )}
-          </div>
+          <Avatar src={user?.avatarUrl} name={nameOf(user)} size="lg" />
 
           <div className="min-w-0 flex-1">
             <h1 className="font-display text-[40px] leading-none font-bold tracking-[-0.02em]">
               {nameOf(user)}
             </h1>
             <div className="mt-4 text-[12px] text-[var(--m-muted)]">
-              <span>@{user?.userName ?? userName}</span>
+              <span>@{handle}</span>
               {user?.createdOnUtc && (
                 <span> · joined {formatDate2(user.createdOnUtc)}</span>
               )}
@@ -184,7 +135,7 @@ export default function UserPageMono({ userName }: { userName: string }) {
         <Label className="mono-label py-10">
           {posts.length === 0 ? (
             <MatrixText
-              text={`${user?.userName ?? userName} is still lost in procrastination`.toUpperCase()}
+              text={`${handle} is still lost in procrastination`.toUpperCase()}
             />
           ) : (
             "PUBLICATIONS"
@@ -204,71 +155,29 @@ export default function UserPageMono({ userName }: { userName: string }) {
                   delay: Math.min(index * 0.04, 0.32),
                 }}
               >
-                <Link
-                  href={`/${user?.userName ?? userName}/${p.slug}`}
-                  className="group flex h-full flex-col bg-[var(--m-card)] transition-colors hover:bg-[var(--m-panel)]"
-                >
-                  <div className="aspect-[16/10] overflow-hidden">
-                    <Cover post={p} />
-                  </div>
-                  <div className="flex flex-1 flex-col p-5">
-                    <div className="mb-2">
-                      <Category>{catOf(p)}</Category>
-                    </div>
-                    <h3 className="mono-title text-balance transition-colors group-hover:text-[var(--m-accent)]">
-                      {p.title}
-                    </h3>
-                    <div className="mt-auto flex items-center gap-4 pt-6 text-[12px] text-[var(--m-muted2)]">
-                      <span>{formatDate2(p.createdAtUtc)}</span>
-                      <span className="ml-auto flex items-center gap-4">
-                        <Metric kind="likes" value={p.rating} />
-                        <Metric kind="views" value={p.views} />
-                        <Metric kind="comments" value={p.comments} />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
+                <PostCardMono
+                  post={p}
+                  href={`/${handle}/${p.slug}`}
+                  variant="grid"
+                />
               </motion.div>
             ))}
           </section>
         ) : (
           <section className="flex flex-col gap-7">
             {posts.map((p) => (
-              <div
+              <PostCardMono
                 key={p.id}
-                className="group relative grid bg-[var(--m-card)] transition-colors hover:bg-[var(--m-panel)] sm:grid-cols-[272px_1fr]"
-              >
-                <div className="aspect-[16/10] overflow-hidden bg-[var(--m-panel)]">
-                  <Cover post={p} />
-                </div>
-                <div className="flex flex-col justify-center px-7 py-6">
-                  <div className="mb-2">
-                    <Category>{catOf(p)}</Category>
-                  </div>
-                  <h3 className="mono-title text-balance transition-colors group-hover:text-[var(--m-accent)]">
-                    <Link
-                      href={`/${user?.userName ?? userName}/${p.slug}`}
-                      className="after:absolute after:inset-0"
-                    >
-                      {p.title}
-                    </Link>
-                  </h3>
-                  <div className="mt-6 flex items-center gap-2.5 text-[12px] text-[var(--m-muted2)]">
-                    <span>{formatDate2(p.createdAtUtc)}</span>
-                    <span className="ml-auto flex items-center gap-4">
-                      <Metric kind="likes" value={p.rating} />
-                      <Metric kind="views" value={p.views} />
-                      <Metric kind="comments" value={p.comments} />
-                    </span>
-                  </div>
-                </div>
-              </div>
+                post={p}
+                href={`/${handle}/${p.slug}`}
+                variant="list"
+              />
             ))}
           </section>
         )}
 
         {query.isFetchingNextPage && <Loading inline />}
-        {query.hasNextPage && <div ref={observerRef} className="h-20" />}
+        {query.hasNextPage && <div ref={sentinelRef} className="h-20" />}
       </main>
     </div>
   );

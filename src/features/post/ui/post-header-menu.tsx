@@ -1,21 +1,17 @@
 "use client";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   PencilSquareIcon,
   EyeSlashIcon,
   EyeIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import { apiClient } from "@/shared/api/api-client";
-import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { Menu, type MenuItem } from "@/shared/ui";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
 import { usePublishPost, useHidePost } from "../model/use-publish-post";
+import { useDeletePostMenu } from "../model/use-delete-post-menu";
 
 interface IProps {
   postId: string;
@@ -36,24 +32,13 @@ export const PostHeaderMenu = ({
   isPublished,
 }: IProps) => {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const publishPost = usePublishPost(postId, postSlug);
   const hidePost = useHidePost(postId, postSlug);
-
-  // Local delete — unlike the shared `useDeletePost` (used by the edit page,
-  // routes to the author profile), the kebab returns to home per the design.
-  const deletePost = useMutation({
-    mutationFn: () => apiClient.posts.deletePost({ id: postId }),
-    onSuccess: () => {
-      addToastSuccess("Post has been deleted");
-      queryClient.invalidateQueries({ queryKey: ["getAllPosts"] });
-      queryClient.invalidateQueries({ queryKey: ["getPostsByUserName"] });
-      router.push("/");
-    },
-    onError: (error: any) => addToastError("Error deleting post", error),
-  });
+  // Local delete (optimistic remove-from-feed → home), distinct from the shared
+  // `useDeletePost` used by the edit page (routes to the author profile).
+  const deletePost = useDeletePostMenu(postId);
 
   const iconCls = "size-3.5";
 

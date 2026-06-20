@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
-import { Image } from "@heroui/react";
 import {
   DisplayPostResponse,
   UserResponse,
@@ -16,7 +15,9 @@ import { useViewMode } from "@/shared/providers/view-mode-provider";
 import { Header } from "@/widgets/rewrite-header";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
 import { Label, Category, Metric, StatusBadge, Dot } from "@/shared/ui";
+import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { formatDate2 } from "@/shared/lib/utils";
+import { PostCardMono } from "@/features/post/ui/post-card-mono";
 
 const nameOf = (u: UserResponse) =>
   [u.firstName, u.lastName].filter(Boolean).join(" ") || u.userName;
@@ -27,15 +28,16 @@ const hrefOf = (p: DisplayPostResponse) => `/${p.author.userName}/${p.slug}`;
 const firstLetter = (s?: string) =>
   (s?.match(/[\p{L}\p{N}]/u)?.[0] ?? "•").toUpperCase();
 
-function Cover({ post }: { post: DisplayPostResponse }) {
+function HeroCover({ post }: { post: DisplayPostResponse }) {
   if (post.coverUrl) {
     return (
       <Image
-        removeWrapper
-        radius="none"
         src={post.coverUrl}
         alt={post.title}
-        className="h-full w-full object-cover [filter:contrast(1.03)]"
+        fill
+        sizes="(max-width: 1024px) 100vw, 640px"
+        priority
+        className="object-cover [filter:contrast(1.03)]"
       />
     );
   }
@@ -50,21 +52,14 @@ function Cover({ post }: { post: DisplayPostResponse }) {
 
 export default function HomePageMono() {
   const query = useAllPosts();
-  const observerRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
   const { view } = useViewMode();
 
-  useEffect(() => {
-    if (!observerRef.current || !query.hasNextPage) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => entry.isIntersecting && query.fetchNextPage(),
-      { threshold: 1.0 }
-    );
-
-    observer.observe(observerRef.current);
-    return () => observer.disconnect();
-  }, [query, query.fetchNextPage, query.hasNextPage]);
+  const sentinelRef = useInfiniteScroll({
+    hasNextPage: query.hasNextPage,
+    fetchNextPage: query.fetchNextPage,
+    isFetching: query.isFetchingNextPage,
+  });
 
   if (query.isLoading) return <Loading />;
   if (query.error) return <ErrorMessage error={query.error} />;
@@ -198,7 +193,7 @@ export default function HomePageMono() {
                   href={hrefOf(hero)}
                   className="relative z-10 block aspect-[16/10] overflow-hidden bg-[var(--m-panel)]"
                 >
-                  <Cover post={hero} />
+                  <HeroCover post={hero} />
                 </Link>
                 <div className="flex flex-col justify-center p-8 lg:p-[34px]">
                   <div className="mb-2">
@@ -239,7 +234,7 @@ export default function HomePageMono() {
               </section>
             )}
 
-            {/* Grid view — bg-fill cards (no borders) */}
+            {/* Grid view — shared PostCard (bg-fill cards, no borders) */}
             {view === "grid" && visibleGrid.length > 0 && (
               <section className="mt-7 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
                 {visibleGrid.map((p, index) => (
@@ -255,108 +250,34 @@ export default function HomePageMono() {
                       delay: Math.min(index * 0.04, 0.32),
                     }}
                   >
-                    <div className="group relative flex h-full flex-col bg-[var(--m-card)] transition-colors hover:bg-[var(--m-panel)]">
-                      <Link
-                        href={hrefOf(p)}
-                        aria-label={p.title}
-                        className="relative z-10 block aspect-[16/10] overflow-hidden bg-[var(--m-panel)]"
-                      >
-                        <Cover post={p} />
-                      </Link>
-                      <div className="flex flex-1 flex-col p-5">
-                        <div className="mb-2">
-                          <Category>{catOf(p)}</Category>
-                        </div>
-                        <h3 className="mono-title text-balance transition-colors group-hover:text-[var(--m-accent)]">
-                          <Link
-                            href={hrefOf(p)}
-                            className="after:absolute after:inset-0"
-                          >
-                            {p.title}
-                          </Link>
-                        </h3>
-                        <div className="mt-auto flex items-center gap-4 pt-6 text-[12px] text-[var(--m-muted2)]">
-                          <Link
-                            href={`/${p.author.userName}`}
-                            className="relative z-10 truncate text-[var(--m-fg)] transition-colors hover:text-[var(--m-accent)]"
-                          >
-                            @{p.author.userName}
-                          </Link>
-                          <span className="ml-auto flex items-center gap-4">
-                            <Metric
-                              kind="likes"
-                              value={p.rating}
-                              accent={
-                                p.voteDirection === VotePostDirectionEnum.Up
-                              }
-                            />
-                            <Metric kind="views" value={p.views} />
-                            <Metric kind="comments" value={p.comments} />
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                    <PostCardMono
+                      post={p}
+                      href={hrefOf(p)}
+                      authorHandle={p.author.userName ?? undefined}
+                      variant="grid"
+                    />
                   </motion.div>
                 ))}
               </section>
             )}
 
-            {/* List view — bg-fill rows (no borders) */}
+            {/* List view — shared PostCard (bg-fill rows, no borders) */}
             {view === "list" && visibleList.length > 0 && (
               <section className="mt-7 flex flex-col gap-7">
                 {visibleList.map((p) => (
-                  <div
+                  <PostCardMono
                     key={p.id}
-                    className="group relative grid bg-[var(--m-card)] transition-colors hover:bg-[var(--m-panel)] sm:grid-cols-[272px_1fr]"
-                  >
-                    <Link
-                      href={hrefOf(p)}
-                      aria-label={p.title}
-                      className="relative z-10 block aspect-[16/10] overflow-hidden bg-[var(--m-panel)]"
-                    >
-                      <Cover post={p} />
-                    </Link>
-                    <div className="flex flex-col justify-center px-7 py-6">
-                      <div className="mb-2">
-                        <Category>{catOf(p)}</Category>
-                      </div>
-                      <h3 className="mono-title text-balance transition-colors group-hover:text-[var(--m-accent)]">
-                        <Link
-                          href={hrefOf(p)}
-                          className="after:absolute after:inset-0"
-                        >
-                          {p.title}
-                        </Link>
-                      </h3>
-                      <div className="mt-6 flex items-center gap-2.5 text-[12px] text-[var(--m-muted2)]">
-                        <Link
-                          href={`/${p.author.userName}`}
-                          className="relative z-10 text-[var(--m-fg)] transition-colors hover:text-[var(--m-accent)]"
-                        >
-                          @{p.author.userName}
-                        </Link>
-                        <Dot />
-                        <span>{formatDate2(p.createdAtUtc)}</span>
-                        <span className="ml-auto flex items-center gap-4">
-                          <Metric
-                            kind="likes"
-                            value={p.rating}
-                            accent={
-                              p.voteDirection === VotePostDirectionEnum.Up
-                            }
-                          />
-                          <Metric kind="views" value={p.views} />
-                          <Metric kind="comments" value={p.comments} />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                    post={p}
+                    href={hrefOf(p)}
+                    authorHandle={p.author.userName ?? undefined}
+                    variant="list"
+                  />
                 ))}
               </section>
             )}
 
             {query.isFetchingNextPage && <Loading inline />}
-            {query.hasNextPage && <div ref={observerRef} className="h-20" />}
+            {query.hasNextPage && <div ref={sentinelRef} className="h-20" />}
           </>
         )}
       </main>
