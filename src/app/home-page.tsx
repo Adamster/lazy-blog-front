@@ -127,14 +127,16 @@ export default function HomePage() {
                   </Label>
                   {topUser && (
                     <div className="min-w-0">
-                      <Link
-                        href={`/${topUser.author.userName}`}
-                        className="mono-title block h-[30px] truncate !leading-[30px] transition-colors hover:text-[var(--m-accent)]"
-                      >
+                      <div className="mono-title block h-[30px] truncate !leading-[30px]">
                         {nameOf(topUser.author)}
-                      </Link>
+                      </div>
                       <div className="mt-4 flex items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
-                        <span>@{topUser.author.userName}</span>
+                        <Link
+                          href={`/${topUser.author.userName}`}
+                          className="transition-colors hover:text-[var(--m-accent)]"
+                        >
+                          @{topUser.author.userName}
+                        </Link>
                         <Dot />
                         <Metric kind="posts" value={topUser.count} />
                         <Metric kind="likes" value={topUser.likes} />
