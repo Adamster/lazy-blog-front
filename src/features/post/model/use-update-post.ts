@@ -3,7 +3,7 @@
 import { apiClient } from "@/shared/api/api-client";
 import { UpdatePostOperationRequest } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
-import { useUser } from "@/features/user/provider/user-provider";
+import { useUser } from "@/entities/session";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 

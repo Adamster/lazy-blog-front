@@ -10,9 +10,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { AuthorPostResponse, PostDetailedResponse } from "@/shared/api/openapi";
 import { formatDate2 } from "@/shared/lib/utils";
-import { useAuth } from "@/features/auth/model/use-auth";
-import { useUser } from "@/features/user/provider/user-provider";
-import { IsAuthor } from "@/features/auth/guards/is-author";
+import { useAuth, useUser, IsAuthor } from "@/entities/session";
 import { Avatar, Category, StatusBadge } from "@/shared/ui";
 import type { Status } from "@/shared/ui";
 import { PostVote } from "./post-vote";

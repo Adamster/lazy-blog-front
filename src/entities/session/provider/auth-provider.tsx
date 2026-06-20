@@ -1,8 +1,11 @@
 import { RegisterUserRequest } from "@/shared/api/openapi";
 import { Loading } from "@/shared/ui/loading";
-import { useAuthActions, useAuthState } from "@/features/auth/model/use-auth";
+import {
+  useAuthActions,
+  useAuthState,
+} from "@/entities/session/model/use-auth";
 import React, { createContext } from "react";
-import { UserProvider } from "@/features/user/provider/user-provider";
+import { UserProvider } from "@/entities/session/provider/user-provider";
 import { AuthState } from "@/shared/lib/auth-storage";
 
 interface AuthContextType {

@@ -1,4 +1,4 @@
-import { useAuth } from "@/features/auth/model/use-auth";
+import { useAuth } from "@/entities/session";
 import { apiClient } from "@/shared/api/api-client";
 import { ChangePasswordRequest } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";

@@ -1,7 +1,7 @@
 "use client";
 
 import { CommentResponse } from "@/shared/api/openapi";
-import { IsAuthor } from "@/features/auth/guards/is-author";
+import { IsAuthor } from "@/entities/session";
 import { useDeleteComment } from "@/features/comment/model/use-delete-comment";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";

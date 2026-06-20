@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserById } from "@/features/user/model/use-user-by-id";
+import { useUserById } from "@/entities/session/model/use-user-by-id";
 import { UserResponse } from "@/shared/api/openapi";
 import { Loading } from "@/shared/ui/loading";
 import React, { createContext, useContext } from "react";

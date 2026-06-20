@@ -1,12 +1,10 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { IsAuth } from "@/features/auth/guards/is-auth";
-import { useUserById } from "@/features/user/model/use-user-by-id";
+import { IsAuth, useUser, useUserById } from "@/entities/session";
 import { UpdateAvatar } from "@/features/user/ui/update-avatar";
 import { UpdatePasswordForm } from "@/features/user/ui/update-pass-form";
 import { UpdateUserForm } from "@/features/user/ui/update-user-form";
-import { useUser } from "@/features/user/provider/user-provider";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 

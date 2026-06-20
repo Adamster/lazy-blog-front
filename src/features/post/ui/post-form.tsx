@@ -14,8 +14,8 @@ import {
 } from "@heroicons/react/24/solid";
 import { UpdatePostRequest } from "@/shared/api/openapi";
 import { Field, Select, Switch, type SelectOption } from "@/shared/ui";
-import { useTags } from "@/features/tag/model/use-tags";
-import { useUser } from "@/features/user/provider/user-provider";
+import { useTags } from "@/entities/tag";
+import { useUser } from "@/entities/session";
 import { Crepe } from "./crepe-wrapper";
 import { PostImageUploader } from "./post-image-uploader";
 

@@ -6,7 +6,7 @@ import { addToastError } from "@/shared/lib/toasts";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { useUserById } from "@/features/user/model/use-user-by-id";
+import { useUserById } from "@/entities/session";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { useResetPassword } from "@/features/auth/model/use-reset-password";
 import { Field, SubmitButton } from "@/shared/ui";

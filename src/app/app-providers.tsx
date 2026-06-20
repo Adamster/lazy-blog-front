@@ -1,6 +1,6 @@
 "use client";
 
-import { AuthProvider } from "@/features/auth/provider/auth-provider";
+import { AuthProvider } from "@/entities/session";
 import { ErrorBoundary } from "@/shared/providers/error-boundary";
 import { ReactQueryProvider } from "@/shared/providers/query-provider";
 import { ThemeProvider } from "@/shared/providers/theme-providers";

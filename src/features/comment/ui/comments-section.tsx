@@ -1,7 +1,7 @@
 "use client";
 
 import { CommentResponse } from "@/shared/api/openapi";
-import { IsAuth } from "@/features/auth/guards/is-auth";
+import { IsAuth } from "@/entities/session";
 import { Label, MatrixText } from "@/shared/ui";
 import CommentView from "./comment-view";
 import CommentForm from "@/features/comment/ui/comment-form";

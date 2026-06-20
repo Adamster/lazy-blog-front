@@ -1,6 +1,6 @@
 import { apiClient } from "@/shared/api/api-client";
 import { RegisterUserRequest, ResponseError } from "@/shared/api/openapi";
-import { AuthContext } from "@/features/auth/provider/auth-provider";
+import { AuthContext } from "@/entities/session/provider/auth-provider";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext } from "react";

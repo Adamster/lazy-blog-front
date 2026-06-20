@@ -1,6 +1,6 @@
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { apiClient } from "@/shared/api/api-client";
-import { useUser } from "@/features/user/provider/user-provider";
+import { useUser } from "@/entities/session";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";

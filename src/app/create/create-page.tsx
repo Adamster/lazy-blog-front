@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { UpdatePostRequest } from "@/shared/api/openapi";
 import { PostForm } from "@/features/post/ui/post-form";
 import { useCreatePost } from "@/features/post/model/use-create-post";
-import { ProtectedRoute } from "@/features/auth/guards/protected-route";
+import { ProtectedRoute } from "@/entities/session";
 
 const CreatePage = () => {
   const form = useForm<UpdatePostRequest>({

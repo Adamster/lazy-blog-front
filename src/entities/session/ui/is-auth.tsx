@@ -1,4 +1,4 @@
-import { useAuth } from "@/features/auth/model/use-auth";
+import { useAuth } from "@/entities/session/model/use-auth";
 import { ReactNode } from "react";
 
 interface IProps {

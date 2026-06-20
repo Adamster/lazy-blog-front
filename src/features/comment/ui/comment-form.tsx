@@ -2,7 +2,7 @@
 
 import { CommentResponse } from "@/shared/api/openapi";
 import { useTheme } from "@/shared/providers/theme-providers";
-import { useUser } from "@/features/user/provider/user-provider";
+import { useUser } from "@/entities/session";
 import { useAddComment } from "@/features/comment/model/use-add-comment";
 import { useUpdateComment } from "@/features/comment/model/use-update-comment";
 import { FaceSmileIcon } from "@heroicons/react/24/outline";

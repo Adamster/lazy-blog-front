@@ -11,7 +11,7 @@ import {
   SubmitButton,
   useModalTitleId,
 } from "@/shared/ui";
-import { useAuth } from "../model/use-auth";
+import { useAuth } from "@/entities/session";
 import { useForgotPassword } from "../model/use-forgot-password";
 
 type AuthView = "login" | "forgot" | "register";
