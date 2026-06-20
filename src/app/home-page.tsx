@@ -148,20 +148,24 @@ export default function HomePage() {
                 <div className="hidden min-w-0 lg:block">
                   <Label className="mono-label mb-4">TOP POST · JUN</Label>
                   {topPost && (
-                    <Link
-                      href={hrefOf(topPost)}
-                      className="group block min-w-0"
-                    >
-                      <div className="mono-title h-[30px] truncate !leading-[30px] transition-colors group-hover:text-[var(--m-accent)]">
-                        {topPost.title}
-                      </div>
+                    <div className="min-w-0">
+                      <Link href={hrefOf(topPost)} className="group block">
+                        <div className="mono-title h-[30px] truncate !leading-[30px] transition-colors group-hover:text-[var(--m-accent)]">
+                          {topPost.title}
+                        </div>
+                      </Link>
                       <div className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px] text-[var(--m-muted)]">
-                        <span>@{topPost.author.userName}</span>
+                        <Link
+                          href={`/${topPost.author.userName}`}
+                          className="transition-colors hover:text-[var(--m-accent)]"
+                        >
+                          @{topPost.author.userName}
+                        </Link>
                         <Dot />
                         <Metric kind="views" value={topPost.views} />
                         <Metric kind="likes" value={topPost.rating} />
                       </div>
-                    </Link>
+                    </div>
                   )}
                 </div>
 
