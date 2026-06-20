@@ -7,7 +7,7 @@ import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { usePostsByUserName } from "@/features/post/model/use-posts-by-username";
 import { useViewMode } from "@/shared/providers/view-mode-provider";
-import { Header } from "@/widgets/rewrite-header";
+import { Header } from "@/widgets/header";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
 import { Label, MatrixText, Avatar, fmt } from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";

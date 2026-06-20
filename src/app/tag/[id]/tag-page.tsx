@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { snakeToTitle } from "@/shared/lib/utils";
-import { Header } from "@/widgets/rewrite-header";
+import { Header } from "@/widgets/header";
 import { Label, Category } from "@/shared/ui";
 import { useViewMode } from "@/shared/providers/view-mode-provider";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";

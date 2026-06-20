@@ -2,7 +2,7 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import { Bars3Icon, LinkIcon } from "@heroicons/react/24/solid";
-import { Header } from "@/widgets/rewrite-header";
+import { Header } from "@/widgets/header";
 import { LogoSloth } from "@/shared/ui/logo-sloth";
 import { Label, Category, StatusBadge, Metric, Dot, Field } from "@/shared/ui";
 
@@ -207,7 +207,7 @@ function LogoCard({ dark }: { dark: boolean }) {
         >
           [ TEAM ]
         </span>
-        <span className="font-display text-[36px] leading-none font-bold tracking-[-0.02em]">
+        <span className="font-display text-[40px] leading-none font-bold tracking-[-0.02em]">
           NOT <span style={{ color: p.accent }}>LAZY</span>
         </span>
       </div>

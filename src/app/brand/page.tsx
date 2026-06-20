@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { generateMeta } from "@/shared/lib/head/meta-data";
-import BrandPage from "./rewrite-brand-page";
+import BrandPage from "./brand-page";
 
 export const metadata: Metadata = generateMeta({
   title: "Brand Identity",

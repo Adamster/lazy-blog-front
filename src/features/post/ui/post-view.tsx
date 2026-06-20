@@ -13,7 +13,7 @@ import { formatDate2 } from "@/shared/lib/utils";
 import { useAuth } from "@/features/auth/model/use-auth";
 import { useUser } from "@/shared/providers/user-provider";
 import { IsAuthor } from "@/features/auth/guards/is-author";
-import { Header } from "@/widgets/rewrite-header";
+import { Header } from "@/widgets/header";
 import { Avatar, Category, StatusBadge } from "@/shared/ui";
 import type { Status } from "@/shared/ui";
 import { PostVoteMono } from "./post-vote";

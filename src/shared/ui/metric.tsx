@@ -32,9 +32,12 @@ export function Metric({ kind, value, accent = false }: MetricProps) {
   const Icon = ICONS[kind];
   return (
     <span
-      className={`inline-flex items-center gap-1 tabular-nums${
-        accent ? "text-[var(--m-accent)]" : ""
-      }`}
+      className={[
+        "inline-flex items-center gap-1 tabular-nums",
+        accent && "text-[var(--m-accent)]",
+      ]
+        .filter(Boolean)
+        .join(" ")}
     >
       <Icon className="size-3.5 shrink-0" />
       {fmt(value)}

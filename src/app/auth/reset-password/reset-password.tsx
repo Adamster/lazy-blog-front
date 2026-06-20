@@ -10,7 +10,7 @@ import { useUserById } from "@/features/user/model/use-user-by-id";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { useResetPassword } from "@/features/auth/model/use-reset-password";
 import { Field, SubmitButton } from "@/shared/ui";
-import { Header } from "@/widgets/rewrite-header";
+import { Header } from "@/widgets/header";
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";

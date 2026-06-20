@@ -23,7 +23,11 @@ export function Label({
   className = "mono-label",
 }: LabelProps) {
   return (
-    <div className={`${className}${uppercase ? "uppercase" : ""}`}>
+    <div
+      className={[className, uppercase && "uppercase"]
+        .filter(Boolean)
+        .join(" ")}
+    >
       {"// "}
       {children}
       {caret && (
