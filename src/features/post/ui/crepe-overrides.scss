@@ -1,0 +1,173 @@
+/* Crepe (Milkdown) editor — "Brutalist Mono" theme override.
+ *
+ * The WYSIWYG editor's editable area is `.ProseMirror`, wrapped here in
+ * `.mono-prose` (see `crepe.tsx`). `src/assets/styles/prose.css` is the single
+ * source of truth for prose styling and is shared with the server-rendered read
+ * view (`<PostBody>`), so what you type is 1:1 with the published page.
+ *
+ * Crepe ships its own theme (`@milkdown/crepe/theme/common/style.css`) whose
+ * rules are scoped `.milkdown .ProseMirror <tag>` (specificity 0-2-1) and beat
+ * the read view's `.mono-prose <tag>` (0-2-0). This file:
+ *   1. strips Crepe's editor padding / hides block handles (editor chrome only),
+ *   2. re-asserts the `prose.css` scale at `.mono-prose .ProseMirror …`
+ *      specificity so the editable content renders identically to the read view.
+ * Values here MUST mirror `prose.css` — keep the two in lockstep. */
+
+.milkdown {
+  width: 100%;
+  background: transparent;
+
+  .ProseMirror {
+    padding: 0;
+    min-height: 20rem;
+  }
+
+  .milkdown-block-handle {
+    display: none;
+  }
+}
+
+/* Re-assert the shared prose scale at editor specificity. Mirrors prose.css. */
+.mono-prose .ProseMirror {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--m-fg);
+
+  p {
+    font-size: 16px;
+    line-height: 1.85;
+    color: var(--m-fg);
+    margin: 0 0 20px;
+    padding: 0;
+  }
+
+  // Crepe maps every markdown heading onto h1..h6; the design uses a single
+  // 24px Space Grotesk section heading regardless of source level (matching
+  // prose.css), so the editor preview and the published page agree.
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-align: left;
+    margin: 36px 0 16px;
+    padding: 0;
+  }
+
+  ul,
+  ol {
+    margin: 0 0 20px;
+    padding-left: 22px;
+  }
+  ul {
+    list-style: disc;
+  }
+  ol {
+    list-style: decimal;
+  }
+  li {
+    font-size: 16px;
+    line-height: 1.8;
+    margin: 0 0 8px;
+  }
+
+  a {
+    color: var(--m-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  strong {
+    font-weight: 700;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--m-fg);
+    background: var(--m-panel);
+    padding: 2px 6px;
+    border-radius: 0;
+  }
+
+  pre {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.6;
+    background: var(--m-panel);
+    border: 2px solid var(--m-dim);
+    padding: 16px 18px;
+    margin: 0 0 20px;
+    overflow-x: auto;
+
+    code {
+      background: transparent;
+      padding: 0;
+      font-size: 14px;
+    }
+  }
+
+  blockquote {
+    margin: 28px 0;
+    border-left: 2px solid var(--m-accent);
+    background: color-mix(in srgb, var(--m-accent) 6%, transparent);
+    padding: 18px 20px;
+
+    p {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--m-fg);
+    }
+
+    p + p {
+      margin: 10px 0 0;
+      font-size: 12px;
+      color: var(--m-muted);
+    }
+  }
+
+  hr {
+    height: 2px;
+    border: 0;
+    background: var(--m-dim);
+    margin: 36px 0;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto 20px;
+    border: 2px solid var(--m-dim);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 20px;
+    font-size: 14px;
+  }
+  th,
+  td {
+    border: 2px solid var(--m-dim);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    font-family: var(--font-display);
+    font-weight: 700;
+    background: var(--m-panel);
+  }
+
+  del {
+    color: var(--m-muted);
+  }
+}
