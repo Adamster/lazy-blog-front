@@ -5,10 +5,9 @@ import {
   VotePostDirectionEnum,
 } from "@/shared/api/openapi";
 import { addToastError } from "@/shared/lib/toasts";
+import { postKeys } from "./post-keys";
 
 type VoteVars = { direction: VotePostDirectionEnum };
-
-const postKey = (slug: string) => ["getPostBySlug", slug] as const;
 
 /**
  * Applies one vote to a post's `voteDirection` + net `rating`, with toggle
@@ -45,7 +44,7 @@ function applyVote(
  */
 export const useVotePost = (postId: string, postSlug: string) => {
   const queryClient = useQueryClient();
-  const key = postKey(postSlug);
+  const key = postKeys.detail(postSlug);
 
   return useMutation({
     mutationFn: ({ direction }: VoteVars) =>

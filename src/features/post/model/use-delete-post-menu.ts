@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { apiClient } from "@/shared/api/api-client";
 import { DisplayPostResponse, UserPostItem } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
+import { postKeys } from "./post-keys";
 
 /** `useAllPosts` infinite-cache shape: each page is a flat post array. */
 type AllPostsCache = {
@@ -51,22 +52,22 @@ export const useDeletePostMenu = (postId: string) => {
     mutationFn: () => apiClient.posts.deletePost({ id: postId }),
 
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["getAllPosts"] });
-      await queryClient.cancelQueries({ queryKey: ["getPostsByUserName"] });
+      await queryClient.cancelQueries({ queryKey: postKeys.list() });
+      await queryClient.cancelQueries({ queryKey: postKeys.byUser() });
 
       const allPostsSnapshots = queryClient.getQueriesData<AllPostsCache>({
-        queryKey: ["getAllPosts"],
+        queryKey: postKeys.list(),
       });
       const userPostsSnapshots = queryClient.getQueriesData<UserPostsCache>({
-        queryKey: ["getPostsByUserName"],
+        queryKey: postKeys.byUser(),
       });
 
       queryClient.setQueriesData<AllPostsCache>(
-        { queryKey: ["getAllPosts"] },
+        { queryKey: postKeys.list() },
         (cache) => removeFromAllPosts(cache, postId)
       );
       queryClient.setQueriesData<UserPostsCache>(
-        { queryKey: ["getPostsByUserName"] },
+        { queryKey: postKeys.byUser() },
         (cache) => removeFromUserPosts(cache, postId)
       );
 
@@ -89,8 +90,8 @@ export const useDeletePostMenu = (postId: string) => {
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["getAllPosts"] });
-      queryClient.invalidateQueries({ queryKey: ["getPostsByUserName"] });
+      queryClient.invalidateQueries({ queryKey: postKeys.list() });
+      queryClient.invalidateQueries({ queryKey: postKeys.byUser() });
     },
   });
 };

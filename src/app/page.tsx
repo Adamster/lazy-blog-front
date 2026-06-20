@@ -7,6 +7,7 @@ import {
 import HomePage from "./home-page";
 import { generateMeta } from "@/shared/lib/head/meta-data";
 import { getAllPostsSSR } from "@/features/post/model/get-all-posts.ssr";
+import { postKeys } from "@/features/post/model/post-keys";
 
 export const metadata: Metadata = generateMeta({
   title: "Home",
@@ -16,7 +17,7 @@ export default async function Page() {
   const posts = await getAllPostsSSR(0);
 
   const queryClient = new QueryClient();
-  queryClient.setQueryData(["getAllPosts"], {
+  queryClient.setQueryData(postKeys.list(), {
     pages: [posts],
     pageParams: [0],
   });

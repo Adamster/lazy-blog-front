@@ -2,6 +2,7 @@ import { apiClient } from "@/shared/api/api-client";
 import { UpdateUserRequest } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { userKeys } from "@/entities/session";
 
 export const useUpdateUser = (userId: string) => {
   const queryClient = useQueryClient();
@@ -22,7 +23,7 @@ export const useUpdateUser = (userId: string) => {
       addToastSuccess("Profile successfully updated!");
 
       queryClient.invalidateQueries({
-        queryKey: ["getUserById", userId],
+        queryKey: userKeys.byId(userId),
       });
     },
 

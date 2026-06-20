@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/shared/api/api-client";
 import { CommentResponse } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
-import { commentsKey } from "./comments-key";
+import { commentKeys } from "./comment-keys";
 
 /**
  * Delete a comment with an optimistic removal: `onMutate` snapshots the thread
@@ -11,7 +11,7 @@ import { commentsKey } from "./comments-key";
  */
 export const useDeleteComment = (postId: string, commentId: string) => {
   const queryClient = useQueryClient();
-  const key = commentsKey(postId);
+  const key = commentKeys.byPost(postId);
 
   return useMutation({
     mutationFn: () => apiClient.comments.deleteComment({ id: commentId }),

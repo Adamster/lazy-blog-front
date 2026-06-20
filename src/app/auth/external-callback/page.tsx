@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { saveAuthState } from "@/shared/lib/auth-storage";
+import { userKeys } from "@/entities/session";
 import { API_URL } from "@/shared/types";
 
 export default function ExternalCallbackPage() {
@@ -30,7 +31,7 @@ export default function ExternalCallbackPage() {
 
           saveAuthState(authState);
           queryClient.setQueryData(["auth"], authState);
-          queryClient.setQueryData(["getUserById", user.id], user);
+          queryClient.setQueryData(userKeys.byId(user.id), user);
           window.location.replace("/");
         } else {
           throw new Error("Invalid callback payload");

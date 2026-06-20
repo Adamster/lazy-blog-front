@@ -10,6 +10,7 @@ import {
   getAuthState,
   saveAuthState,
 } from "@/shared/lib/auth-storage";
+import { userKeys } from "./user-keys";
 
 export function useAuth() {
   const context = useContext(AuthContext);
@@ -60,10 +61,7 @@ export const useAuthActions = () => {
       saveAuthState(authState);
 
       queryClient.setQueryData(["auth"], authState);
-      queryClient.setQueryData(
-        ["getUserById", response.user.id],
-        response.user
-      );
+      queryClient.setQueryData(userKeys.byId(response.user.id), response.user);
     } catch (error) {
       clearAuthState();
 
@@ -91,7 +89,7 @@ export const useAuthActions = () => {
     clearAuthState();
 
     queryClient.setQueryData(["auth"], getAuthState());
-    queryClient.removeQueries({ queryKey: ["getUserById"] });
+    queryClient.removeQueries({ queryKey: userKeys.byId() });
   };
 
   const register = async (registerData: RegisterUserRequest) => {
@@ -136,6 +134,6 @@ export const refreshToken = async (
     clearAuthState();
 
     queryClient.setQueryData(["auth"], getAuthState());
-    queryClient.removeQueries({ queryKey: ["getUserById"] });
+    queryClient.removeQueries({ queryKey: userKeys.byId() });
   }
 };

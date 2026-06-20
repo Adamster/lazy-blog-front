@@ -6,6 +6,7 @@ import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { useUser } from "@/entities/session";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { postKeys } from "./post-keys";
 
 export const useUpdatePost = () => {
   const router = useRouter();
@@ -22,11 +23,11 @@ export const useUpdatePost = () => {
       addToastSuccess("Post has been updated");
 
       queryClient.invalidateQueries({
-        queryKey: ["getPostBySlug", updatePostRequest.slug],
+        queryKey: postKeys.detail(updatePostRequest.slug),
       });
-      queryClient.invalidateQueries({ queryKey: ["getAllPosts"] });
-      queryClient.invalidateQueries({ queryKey: ["getPostsByUserName"] });
-      queryClient.invalidateQueries({ queryKey: ["getPostsByTag"] });
+      queryClient.invalidateQueries({ queryKey: postKeys.list() });
+      queryClient.invalidateQueries({ queryKey: postKeys.byUser() });
+      queryClient.invalidateQueries({ queryKey: postKeys.byTag() });
 
       if (updatePostRequest.isPublished) {
         router.push(`/${user?.userName}/${updatePostRequest.slug}`);

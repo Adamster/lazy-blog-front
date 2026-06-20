@@ -2,8 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/shared/api/api-client";
 import { PostDetailedResponse } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
-
-const postKey = (slug: string) => ["getPostBySlug", slug] as const;
+import { postKeys } from "./post-keys";
 
 /**
  * Optimistically flip `isPublished` on the cached detailed post so the
@@ -18,7 +17,7 @@ function usePublishToggle(
   messages: { success: string; error: string }
 ) {
   const queryClient = useQueryClient();
-  const key = postKey(postSlug);
+  const key = postKeys.detail(postSlug);
 
   return useMutation({
     mutationFn,

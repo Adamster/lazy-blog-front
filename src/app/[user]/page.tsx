@@ -5,6 +5,7 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import { getPostsByUserNameSSR } from "@/features/post/model/get-posts-by-username.ssr";
+import { postKeys } from "@/features/post/model/post-keys";
 import { generateMeta } from "@/shared/lib/head/meta-data";
 import UserPage from "./user-page";
 
@@ -42,7 +43,7 @@ export default async function Page({ params }: PageProps) {
   if (!postsPage?.user) notFound();
 
   const queryClient = new QueryClient();
-  queryClient.setQueryData(["getPostsByUserName", userName], {
+  queryClient.setQueryData(postKeys.byUser(userName), {
     pages: [postsPage],
     pageParams: [0],
   });

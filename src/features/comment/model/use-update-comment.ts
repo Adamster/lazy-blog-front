@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/shared/api/api-client";
 import { CommentResponse } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
-import { commentsKey } from "./comments-key";
+import { commentKeys } from "./comment-keys";
 
 type UpdateVars = { commentId: string; body: string };
 
@@ -14,7 +14,7 @@ type UpdateVars = { commentId: string; body: string };
  */
 export const useUpdateComment = (postId: string, userId: string) => {
   const queryClient = useQueryClient();
-  const key = commentsKey(postId);
+  const key = commentKeys.byPost(postId);
 
   return useMutation({
     mutationFn: ({ commentId, body }: UpdateVars) =>

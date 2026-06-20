@@ -1,6 +1,7 @@
 import { apiClient } from "@/shared/api/api-client";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { userKeys } from "@/entities/session";
 
 export const useDeleteAvatar = (userId: string) => {
   const queryClient = useQueryClient();
@@ -11,7 +12,7 @@ export const useDeleteAvatar = (userId: string) => {
       addToastSuccess("Avatar deleted!");
 
       queryClient.invalidateQueries({
-        queryKey: ["getUserById", userId],
+        queryKey: userKeys.byId(userId),
       });
     },
     onError: (error) => {

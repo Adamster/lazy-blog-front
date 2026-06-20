@@ -5,6 +5,7 @@ import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { useUser } from "@/entities/session";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { postKeys } from "./post-keys";
 
 export const useDeletePost = () => {
   const router = useRouter();
@@ -20,8 +21,8 @@ export const useDeletePost = () => {
     onSuccess: () => {
       addToastSuccess("Post has been deleted");
 
-      queryClient.invalidateQueries({ queryKey: ["getAllPosts"] });
-      queryClient.invalidateQueries({ queryKey: ["getPostsByUserName"] });
+      queryClient.invalidateQueries({ queryKey: postKeys.list() });
+      queryClient.invalidateQueries({ queryKey: postKeys.byUser() });
 
       router.push(`/${user?.userName}`);
     },
