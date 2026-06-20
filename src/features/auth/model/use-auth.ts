@@ -9,7 +9,7 @@ import {
   clearAuthState,
   getAuthState,
   saveAuthState,
-} from "../lib/auth-storage";
+} from "@/shared/lib/auth-storage";
 
 export function useAuth() {
   const context = useContext(AuthContext);

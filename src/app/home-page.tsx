@@ -17,7 +17,7 @@ import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
 import { Label, Category, Metric, StatusBadge, Dot } from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { formatDate2 } from "@/shared/lib/utils";
-import { PostCardMono } from "@/features/post/ui/post-card-mono";
+import { PostCard } from "@/features/post/ui/post-card";
 
 const nameOf = (u: UserResponse) =>
   [u.firstName, u.lastName].filter(Boolean).join(" ") || u.userName;
@@ -51,7 +51,7 @@ function HeroCover({ post }: { post: DisplayPostResponse }) {
   );
 }
 
-export default function HomePageMono() {
+export default function HomePage() {
   const query = useAllPosts();
   const reduceMotion = useReducedMotion();
   const { view } = useViewMode();
@@ -253,7 +253,7 @@ export default function HomePageMono() {
                       delay: Math.min(index * 0.04, 0.32),
                     }}
                   >
-                    <PostCardMono
+                    <PostCard
                       post={p}
                       href={hrefOf(p)}
                       authorHandle={p.author.userName ?? undefined}
@@ -268,7 +268,7 @@ export default function HomePageMono() {
             {view === "list" && visibleList.length > 0 && (
               <section className="mt-7 flex flex-col gap-7">
                 {visibleList.map((p) => (
-                  <PostCardMono
+                  <PostCard
                     key={p.id}
                     post={p}
                     href={hrefOf(p)}

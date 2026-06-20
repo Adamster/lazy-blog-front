@@ -1,4 +1,4 @@
-import { getAuthState } from "@/features/auth/lib/auth-storage";
+import { getAuthState } from "@/shared/lib/auth-storage";
 import { API_URL } from "@/shared/types";
 import {
   ChangePasswordApi,

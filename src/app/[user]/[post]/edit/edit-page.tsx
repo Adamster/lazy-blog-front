@@ -6,7 +6,7 @@ import { Loading } from "@/shared/ui/loading";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
 import { PostForm } from "@/features/post/ui/post-form";
 import { IsAuthor } from "@/features/auth/guards/is-author";
-import { useUser } from "@/shared/providers/user-provider";
+import { useUser } from "@/features/user/provider/user-provider";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";

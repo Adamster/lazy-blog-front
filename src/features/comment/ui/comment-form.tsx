@@ -2,7 +2,7 @@
 
 import { CommentResponse } from "@/shared/api/openapi";
 import { useTheme } from "@/shared/providers/theme-providers";
-import { useUser } from "@/shared/providers/user-provider";
+import { useUser } from "@/features/user/provider/user-provider";
 import { useAddComment } from "@/features/comment/model/use-add-comment";
 import { useUpdateComment } from "@/features/comment/model/use-update-comment";
 import { FaceSmileIcon } from "@heroicons/react/24/outline";
@@ -46,7 +46,7 @@ interface IProps {
   setIsEditComment?: (param: boolean) => void;
 }
 
-function CommentFormMono({ postId, editComment, setIsEditComment }: IProps) {
+function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
   const [body, setBody] = useState(editComment?.body || "");
   const [showEmoji, setShowEmoji] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -209,4 +209,4 @@ function CommentFormMono({ postId, editComment, setIsEditComment }: IProps) {
   );
 }
 
-export default CommentFormMono;
+export default CommentForm;

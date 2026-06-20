@@ -293,7 +293,7 @@ const TYPE: {
 const authSubmit =
   "flex h-9 w-full items-center justify-center bg-[var(--m-accent)] text-[var(--m-bg)] font-display font-bold text-[14px] leading-none";
 
-export default function BrandPageMono() {
+export default function BrandPage() {
   return (
     <div
       className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"

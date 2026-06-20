@@ -12,12 +12,12 @@ import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
 import { Label, MatrixText, Avatar, fmt } from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { formatDate2 } from "@/shared/lib/utils";
-import { PostCardMono } from "@/features/post/ui/post-card-mono";
+import { PostCard } from "@/features/post/ui/post-card";
 
 const nameOf = (u?: UserResponse) =>
   [u?.firstName, u?.lastName].filter(Boolean).join(" ") || u?.userName || "—";
 
-export default function UserPageMono({ userName }: { userName: string }) {
+export default function UserPage({ userName }: { userName: string }) {
   const query = usePostsByUserName(userName);
   const reduceMotion = useReducedMotion();
   const { view } = useViewMode();
@@ -155,7 +155,7 @@ export default function UserPageMono({ userName }: { userName: string }) {
                   delay: Math.min(index * 0.04, 0.32),
                 }}
               >
-                <PostCardMono
+                <PostCard
                   post={p}
                   href={`/${handle}/${p.slug}`}
                   variant="grid"
@@ -166,7 +166,7 @@ export default function UserPageMono({ userName }: { userName: string }) {
         ) : (
           <section className="flex flex-col gap-7">
             {posts.map((p) => (
-              <PostCardMono
+              <PostCard
                 key={p.id}
                 post={p}
                 href={`/${handle}/${p.slug}`}

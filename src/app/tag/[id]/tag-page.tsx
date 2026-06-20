@@ -8,7 +8,7 @@ import { Header } from "@/widgets/header";
 import { Label, Category } from "@/shared/ui";
 import { useViewMode } from "@/shared/providers/view-mode-provider";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
-import { PostCardMono } from "@/features/post/ui/post-card-mono";
+import { PostCard } from "@/features/post/ui/post-card";
 import { usePostsByTag } from "@/features/post/model/use-posts-by-tag";
 
 export default function TagPage({ tag }: { tag: string }) {
@@ -77,7 +77,7 @@ export default function TagPage({ tag }: { tag: string }) {
                   delay: Math.min(index * 0.04, 0.32),
                 }}
               >
-                <PostCardMono
+                <PostCard
                   post={p}
                   href={`/${p.author.userName}/${p.slug}`}
                   authorHandle={p.author.userName ?? undefined}
@@ -89,7 +89,7 @@ export default function TagPage({ tag }: { tag: string }) {
         ) : (
           <section className="flex flex-col gap-7">
             {posts.map((p) => (
-              <PostCardMono
+              <PostCard
                 key={p.id}
                 post={p}
                 href={`/${p.author.userName}/${p.slug}`}

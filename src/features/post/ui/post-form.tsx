@@ -15,7 +15,7 @@ import {
 import { UpdatePostRequest } from "@/shared/api/openapi";
 import { Field, Select, Switch, type SelectOption } from "@/shared/ui";
 import { useTags } from "@/features/tag/model/use-tags";
-import { useUser } from "@/shared/providers/user-provider";
+import { useUser } from "@/features/user/provider/user-provider";
 import { Crepe } from "./crepe-wrapper";
 import { PostImageUploader } from "./post-image-uploader";
 

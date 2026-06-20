@@ -2,8 +2,8 @@ import { RegisterUserRequest } from "@/shared/api/openapi";
 import { Loading } from "@/shared/ui/loading";
 import { useAuthActions, useAuthState } from "@/features/auth/model/use-auth";
 import React, { createContext } from "react";
-import { UserProvider } from "../../../shared/providers/user-provider";
-import { AuthState } from "../lib/auth-storage";
+import { UserProvider } from "@/features/user/provider/user-provider";
+import { AuthState } from "@/shared/lib/auth-storage";
 
 interface AuthContextType {
   auth: AuthState;

@@ -73,7 +73,7 @@ function buildRatingPath(series: readonly number[]) {
   return { d, dotLeft: `${last.x}%`, dotTop: `${(last.y / 52) * 100}%` };
 }
 
-export const PostVoteMono = ({
+export const PostVote = ({
   postId,
   postSlug,
   voteDirection,

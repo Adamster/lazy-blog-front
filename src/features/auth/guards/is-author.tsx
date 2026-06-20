@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { useUser } from "@/shared/providers/user-provider";
+import { useUser } from "@/features/user/provider/user-provider";
 
 interface IProps {
   children: ReactNode;

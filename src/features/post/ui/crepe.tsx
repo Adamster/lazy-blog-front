@@ -9,7 +9,7 @@ import { listener, listenerCtx } from "@milkdown/kit/plugin/listener";
 import { editorViewCtx, parserCtx } from "@milkdown/kit/core";
 import { Slice } from "@milkdown/kit/prose/model";
 import { useAuth } from "@/features/auth/model/use-auth";
-import { useUser } from "@/shared/providers/user-provider";
+import { useUser } from "@/features/user/provider/user-provider";
 import { API_URL } from "@/shared/types";
 import { observeEmbeds, toEmbedUrl } from "../lib/embed-url";
 

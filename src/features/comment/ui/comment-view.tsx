@@ -6,7 +6,7 @@ import { useDeleteComment } from "@/features/comment/model/use-delete-comment";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import Link from "next/link";
-import CommentFormMono from "@/features/comment/ui/comment-form";
+import CommentForm from "@/features/comment/ui/comment-form";
 import { formatDate2 } from "@/shared/lib/utils";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
 import { Avatar, Dot, Menu, type MenuItem } from "@/shared/ui";
@@ -21,7 +21,7 @@ const nameOf = (u: CommentResponse["user"]) =>
   u.userName ||
   "Unknown";
 
-const CommentMono = ({ comment, postId }: IProps) => {
+const CommentView = ({ comment, postId }: IProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditComment, setIsEditComment] = useState(false);
 
@@ -86,7 +86,7 @@ const CommentMono = ({ comment, postId }: IProps) => {
 
       {isEditComment ? (
         <div className="mt-6">
-          <CommentFormMono
+          <CommentForm
             postId={postId}
             editComment={comment}
             setIsEditComment={setIsEditComment}
@@ -113,4 +113,4 @@ const CommentMono = ({ comment, postId }: IProps) => {
   );
 };
 
-export default CommentMono;
+export default CommentView;

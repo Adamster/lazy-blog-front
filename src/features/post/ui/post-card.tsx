@@ -91,7 +91,7 @@ function CardMeta({
  * `Metric` / `Dot` primitives. `variant` switches between the vertical grid card
  * and the horizontal list row.
  */
-export function PostCardMono({
+export function PostCard({
   post,
   href,
   authorHandle,

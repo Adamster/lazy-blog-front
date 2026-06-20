@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useClickOutside } from "react-haiku";
 import { Bars3Icon } from "@heroicons/react/24/solid";
 import { useTheme } from "@/shared/providers/theme-providers";
-import { useUser } from "@/shared/providers/user-provider";
+import { useUser } from "@/features/user/provider/user-provider";
 import { useAuth } from "@/features/auth/model/use-auth";
 import { AuthModal } from "@/features/auth/ui/auth-modal";
 import { AccountCommands } from "./account-commands";

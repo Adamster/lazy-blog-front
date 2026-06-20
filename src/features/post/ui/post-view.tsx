@@ -11,12 +11,11 @@ import {
 import { AuthorPostResponse, PostDetailedResponse } from "@/shared/api/openapi";
 import { formatDate2 } from "@/shared/lib/utils";
 import { useAuth } from "@/features/auth/model/use-auth";
-import { useUser } from "@/shared/providers/user-provider";
+import { useUser } from "@/features/user/provider/user-provider";
 import { IsAuthor } from "@/features/auth/guards/is-author";
-import { Header } from "@/widgets/header";
 import { Avatar, Category, StatusBadge } from "@/shared/ui";
 import type { Status } from "@/shared/ui";
-import { PostVoteMono } from "./post-vote";
+import { PostVote } from "./post-vote";
 import { PostHeaderMenu } from "./post-header-menu";
 import { Crepe } from "./crepe-wrapper";
 
@@ -97,7 +96,7 @@ function PostByline({
   );
 }
 
-export const PostViewMono = ({ post, comments, commentsCount = 0 }: IProps) => {
+export const PostView = ({ post, comments, commentsCount = 0 }: IProps) => {
   const { isAuthenticated } = useAuth();
   const { user } = useUser();
 
@@ -108,7 +107,7 @@ export const PostViewMono = ({ post, comments, commentsCount = 0 }: IProps) => {
 
   // Voting is allowed for authenticated readers who are NOT the author. The
   // section is shown to everyone (logged-out / owner included); the click is
-  // gated inside PostVoteMono via `canVote`.
+  // gated inside PostVote via `canVote`.
   const isAuthor = !!user?.id && user.id === post.author.id;
   const canVote = isAuthenticated && !isAuthor;
 
@@ -118,12 +117,7 @@ export const PostViewMono = ({ post, comments, commentsCount = 0 }: IProps) => {
   const status: Status | null = null;
 
   return (
-    <div
-      className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
-      style={{ fontFamily: "var(--font-mono)" }}
-    >
-      <Header />
-
+    <>
       {/* Above — on normal --m-bg: chip, title, summary */}
       <div className="mx-auto max-w-[780px] px-10 pt-10">
         {/* Tag + draft + owner kebab */}
@@ -187,7 +181,7 @@ export const PostViewMono = ({ post, comments, commentsCount = 0 }: IProps) => {
       {/* Rating section — full-bleed band, shown to ALL readers; the vote click
           is gated via `canVote` (auth'd & non-author). Outside the article text
           flow so the w-screen break-out can't trigger horizontal scroll. */}
-      <PostVoteMono
+      <PostVote
         voteDirection={post.voteDirection}
         postId={post.id}
         postSlug={post.slug}
@@ -198,6 +192,6 @@ export const PostViewMono = ({ post, comments, commentsCount = 0 }: IProps) => {
       {/* Comments — injected by the route to keep the comment feature out of
           this post-feature file (FSD: no sideways feature imports). */}
       <div className="mx-auto max-w-[780px] px-10 pb-10">{comments}</div>
-    </div>
+    </>
   );
 };

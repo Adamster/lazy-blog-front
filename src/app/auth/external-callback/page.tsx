@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { saveAuthState } from "@/features/auth/lib/auth-storage";
+import { saveAuthState } from "@/shared/lib/auth-storage";
 import { API_URL } from "@/shared/types";
 
 export default function ExternalCallbackPage() {

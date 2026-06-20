@@ -5,7 +5,7 @@ import "../assets/styles/global.scss";
 
 import { GoogleAnalytics } from "@/shared/lib/head/google-analytics";
 import { MetaLinks } from "@/shared/lib/head/meta-links";
-import { AppProviders } from "@/shared/providers/app-providers";
+import { AppProviders } from "@/app/app-providers";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 

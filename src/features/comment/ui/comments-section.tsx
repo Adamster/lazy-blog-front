@@ -3,8 +3,8 @@
 import { CommentResponse } from "@/shared/api/openapi";
 import { IsAuth } from "@/features/auth/guards/is-auth";
 import { Label, MatrixText } from "@/shared/ui";
-import CommentMono from "./comment-view";
-import CommentFormMono from "@/features/comment/ui/comment-form";
+import CommentView from "./comment-view";
+import CommentForm from "@/features/comment/ui/comment-form";
 
 interface IProps {
   postId: string;
@@ -13,7 +13,7 @@ interface IProps {
   isPostPublished: boolean;
 }
 
-export function CommentsMono({
+export function CommentsSection({
   postId,
   postComments,
   postCommentsLoading,
@@ -28,7 +28,7 @@ export function CommentsMono({
       {isPostPublished && (
         <IsAuth>
           <div className="pt-10">
-            <CommentFormMono postId={postId} />
+            <CommentForm postId={postId} />
           </div>
         </IsAuth>
       )}
@@ -61,7 +61,7 @@ export function CommentsMono({
           {count > 0 && (
             <div className="flex flex-col gap-7">
               {postComments?.map((comment: CommentResponse) => (
-                <CommentMono
+                <CommentView
                   postId={postId}
                   key={comment.id}
                   comment={comment}
