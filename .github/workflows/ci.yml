@@ -28,6 +28,47 @@ jobs:
       - name: Prettier check
         run: npm run format:check
 
+  # Unit + component tests (Vitest). Headless, no network, deterministic — a
+  # BLOCKING gate alongside `verify`.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Unit + component tests
+        run: npm run test:run
+
+  # Playwright smoke. The app proxies `/api/*` to a LIVE backend, so this flow
+  # depends on external availability and is intentionally NON-BLOCKING
+  # (`continue-on-error: true`). The spec also skips data-dependent steps when the
+  # backend returns no posts. Promote to a required check by removing
+  # `continue-on-error` once the API is reliably reachable from CI.
+  e2e:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run smoke spec
+        run: npm run test:e2e
+
   # OpenAPI drift guard: the client in `src/shared/api/openapi` is generated from
   # a LIVE prod spec (`openapi-config.json` → blog-api-prod.notlazy.org), so the
   # committed client can silently drift from the contract. This job regenerates

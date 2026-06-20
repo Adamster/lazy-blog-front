@@ -16,7 +16,7 @@ type VoteVars = { direction: VotePostDirectionEnum };
  * cache matches the eventual server state. The vote and stored-direction enums
  * share the same `'Up' | 'Down'` values, so they compare directly.
  */
-function applyVote(
+export function applyVote(
   post: PostDetailedResponse,
   direction: VotePostDirectionEnum
 ): PostDetailedResponse {
