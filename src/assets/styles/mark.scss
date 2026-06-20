@@ -4,13 +4,13 @@
 [class^="_toolbarNodeKindSelectTrigger_"],
 [class^="_toolbarButtonSelectTrigger_"],
 [class^="_selectTrigger_"] {
-  background: hsl(var(--heroui-default-100)) !important;
+  background: var(--m-panel) !important;
 }
 
 .mdxeditor {
   div[role="toolbar"] {
     top: 4rem;
-    background-color: hsl(var(--heroui-default-100));
+    background-color: var(--m-panel);
   }
 
   .mdxeditor-toolbar button[role="combobox"] {
@@ -143,7 +143,7 @@
   }
 
   a {
-    color: hsl(var(--heroui-primary)) !important;
+    color: var(--m-accent) !important;
   }
 
   ul {
@@ -167,8 +167,8 @@
   blockquote {
     margin: 0;
     padding: 0 1em;
-    color: hsl(var(--heroui-deault)) !important;
-    border-left: 0.25em solid hsl(var(--heroui-primary)) !important;
+    color: var(--m-muted) !important;
+    border-left: 0.25em solid var(--m-accent) !important;
     font-style: italic;
   }
 

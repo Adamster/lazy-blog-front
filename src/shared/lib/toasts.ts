@@ -1,39 +1,54 @@
-import React from "react";
-import { CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { ResponseError } from "@/shared/api/openapi";
-import { addToast } from "@heroui/react";
 
-// Mono/brutalist toast skin. Toasts portal to <body> (outside `.mono-scope`,
-// so the `--m-*` tokens don't resolve there) — use the dark mono palette
-// literally. We use `color: "default"` (NOT success/danger) so HeroUI doesn't
-// tint the background green/red or round the close button; the look is fully
-// driven by classNames + a custom icon. Square, 2px frame + 2px accent left
-// edge (lime = success, red = error).
-const toastSkin = (edge: string) => ({
-  base: `!rounded-none [&_*]:!rounded-none border-2 border-l-2 !border-[#2c2c2c] ${edge} !bg-[#1a1a1a] shadow-none`,
-  wrapper: "!rounded-none !bg-transparent",
-  icon: "!rounded-none !bg-transparent",
-  content: "!rounded-none !bg-transparent",
-  title: "font-bold text-[14px] tracking-[0.01em] text-[#dcdcdc]",
-  description: "text-[12px] leading-[1.5] text-[#9a9a9a]",
-  closeButton:
-    "!rounded-none border-0 opacity-100 text-[#6f6f6f] data-[hover=true]:bg-[#262626] data-[hover=true]:text-[#dcdcdc]",
-});
+/**
+ * Module-level toast emitter. `addToastSuccess`/`addToastError` are called
+ * imperatively from hooks and other non-component code, so the toast queue
+ * lives outside React: a tiny subscribe/emit store that the `<Toaster />`
+ * provider subscribes to and renders. Keeps the exact public signatures the
+ * app already depends on.
+ */
 
-const successSkin = toastSkin("!border-l-[#cdff48]");
-const errorSkin = toastSkin("!border-l-[#ff6b6b]");
+export type ToastTone = "success" | "error";
+
+export interface Toast {
+  id: number;
+  tone: ToastTone;
+  title: string;
+  description: string;
+}
+
+type Listener = (toasts: readonly Toast[]) => void;
+
+let toasts: Toast[] = [];
+let nextId = 0;
+const listeners = new Set<Listener>();
+
+const emit = () => {
+  const snapshot = toasts;
+  listeners.forEach((listener) => listener(snapshot));
+};
+
+export const subscribeToasts = (listener: Listener) => {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+};
+
+export const getToasts = (): readonly Toast[] => toasts;
+
+const push = (toast: Omit<Toast, "id">) => {
+  toasts = [...toasts, { ...toast, id: nextId++ }];
+  emit();
+};
+
+export const dismissToast = (id: number) => {
+  toasts = toasts.filter((toast) => toast.id !== id);
+  emit();
+};
 
 export const addToastSuccess = (message: string) => {
-  addToast({
-    title: "Success",
-    description: message,
-    color: "default",
-    variant: "flat",
-    icon: React.createElement(CheckIcon, {
-      className: "size-5 text-[#cdff48]",
-    }),
-    classNames: successSkin,
-  });
+  push({ tone: "success", title: "Success", description: message });
 };
 
 export const addToastError = async (message: string, error?: unknown) => {
@@ -52,14 +67,5 @@ export const addToastError = async (message: string, error?: unknown) => {
     message = error.message;
   }
 
-  addToast({
-    title: "Error",
-    description: message,
-    color: "default",
-    variant: "flat",
-    icon: React.createElement(XMarkIcon, {
-      className: "size-5 text-[#ff6b6b]",
-    }),
-    classNames: errorSkin,
-  });
+  push({ tone: "error", title: "Error", description: message });
 };

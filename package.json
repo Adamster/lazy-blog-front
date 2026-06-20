@@ -24,7 +24,6 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
-    "@heroui/react": "^2.8.10",
     "@milkdown/crepe": "^7.20.0",
     "@milkdown/kit": "^7.20.0",
     "@tailwindcss/postcss": "^4.1.12",

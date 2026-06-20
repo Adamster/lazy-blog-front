@@ -1,20 +1,40 @@
 "use client";
 
-import { Modal as HeroModal, ModalContent } from "@heroui/react";
-import { useId, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useEffectEvent,
+  useId,
+  useRef,
+  type ReactNode,
+} from "react";
+import { createPortal } from "react-dom";
+import { useIsMounted } from "@/shared/lib/use-is-mounted";
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
 
+const FOCUSABLE =
+  'a[href],area[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"]),[contenteditable="true"]';
+
+const widthClass = {
+  sm: "max-w-[400px]",
+  md: "max-w-[432px]",
+  lg: "max-w-[480px]",
+} as const;
+
 /**
  * Brutalist-Mono modal shell. The single source of modal chrome for the app
  * (auth, confirm, …): square, 2px dim frame + 2px accent top stripe, blurred
- * backdrop. Portals into a self-created `.mono-portal` node so HeroUI overlays
- * resolve the themed `--m-*` tokens + mono font (HeroUI otherwise mounts on
- * document.body, outside the `.dark` scope).
+ * backdrop. Portals into a self-created `.mono-portal` node so the themed
+ * `--m-*` tokens + mono font resolve (the body-level portal otherwise mounts
+ * outside the `.dark` scope).
  *
- * `width` picks one of the canonical modal widths. Children receive the HeroUI
- * `onClose` callback.
+ * A hand-rolled accessible dialog: `role="dialog"` + `aria-modal`, focus moved
+ * in on open, Tab/Shift+Tab trapped within, focus restored on close, Esc +
+ * backdrop click close (via `onOpenChange`), and body scroll locked while open.
+ *
+ * `width` picks one of the canonical modal widths. Children receive an
+ * `onClose` callback that triggers `onOpenChange`.
  */
 export function Modal({
   isOpen,
@@ -33,57 +53,121 @@ export function Modal({
   labelledBy?: string;
   children: (close: () => void) => ReactNode;
 }) {
-  // Portal target inside the themed `.mono-portal` scope.
-  const [portal, setPortal] = useState<HTMLElement | null>(null);
+  // Portal only after mount (SSR-safe).
+  const mounted = useIsMounted();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  // Element focused before the modal opened, restored on close.
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
 
-  const maxWidth =
-    width === "lg"
-      ? "max-w-[480px]"
-      : width === "sm"
-        ? "max-w-[400px]"
-        : "max-w-[432px]";
+  // Non-reactive bridges to the caller's (often inline) callbacks: read the
+  // latest value without making the open/close effect depend on them.
+  const requestClose = useEffectEvent(() => onOpenChange());
+  const handleClosed = useEffectEvent(() => onClose?.());
 
-  return (
-    <>
+  // Open lifecycle: scroll lock, focus move-in, focus restore + onClose fire.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    restoreFocusRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+
+    // Body scroll lock, compensating for the scrollbar width to avoid shift.
+    const { body } = document;
+    const prevOverflow = body.style.overflow;
+    const prevPaddingRight = body.style.paddingRight;
+    const scrollbar = window.innerWidth - document.documentElement.clientWidth;
+    body.style.overflow = "hidden";
+    if (scrollbar > 0) body.style.paddingRight = `${scrollbar}px`;
+
+    // Move focus into the dialog (first focusable, else the dialog itself).
+    const dialog = dialogRef.current;
+    const first = dialog?.querySelector<HTMLElement>(FOCUSABLE);
+    (first ?? dialog)?.focus();
+
+    return () => {
+      body.style.overflow = prevOverflow;
+      body.style.paddingRight = prevPaddingRight;
+      restoreFocusRef.current?.focus?.();
+      restoreFocusRef.current = null;
+      handleClosed();
+    };
+  }, [isOpen]);
+
+  // Esc to close + Tab focus trap.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.stopPropagation();
+        requestClose();
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const dialog = dialogRef.current;
+      if (!dialog) return;
+      const focusables = Array.from(
+        dialog.querySelectorAll<HTMLElement>(FOCUSABLE)
+      ).filter((el) => el.offsetParent !== null || el === dialog);
+      if (focusables.length === 0) {
+        event.preventDefault();
+        dialog.focus();
+        return;
+      }
+
+      const firstEl = focusables[0];
+      const lastEl = focusables[focusables.length - 1];
+      const active = document.activeElement;
+
+      if (event.shiftKey) {
+        if (active === firstEl || !dialog.contains(active)) {
+          event.preventDefault();
+          lastEl.focus();
+        }
+      } else if (active === lastEl) {
+        event.preventDefault();
+        firstEl.focus();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown, true);
+    return () => document.removeEventListener("keydown", onKeyDown, true);
+  }, [isOpen]);
+
+  if (!mounted || !isOpen) return null;
+
+  return createPortal(
+    <div className="mono-portal fixed inset-0 z-[60]">
+      {/* Backdrop — click closes; clicks inside the dialog don't bubble here. */}
       <div
-        ref={setPortal}
-        className="mono-portal pointer-events-none fixed inset-0 z-[60]"
+        className="mono-backdrop-enter absolute inset-0 bg-[#0a0a0a]/70 backdrop-blur-[2px]"
         aria-hidden="true"
+        onClick={() => onOpenChange()}
       />
 
-      <HeroModal
-        placement="center"
-        scrollBehavior="outside"
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        onClose={onClose}
-        radius="none"
-        hideCloseButton
-        disableAnimation
-        portalContainer={portal ?? undefined}
-        aria-labelledby={labelledBy}
-        style={{ fontFamily: "var(--font-mono)" }}
-        classNames={{
-          // `outside` scroll = one normal scrollbar when the modal is taller
-          // than the viewport (no inner modal scroll).
-          wrapper: "pointer-events-auto items-center py-6",
-          base: `mono-portal mono-modal-enter pointer-events-auto m-0 w-[calc(100%-2rem)] ${maxWidth} rounded-none border-2 border-[var(--m-dim)] bg-[var(--m-bg)] shadow-none`,
-          backdrop:
-            "mono-backdrop-enter pointer-events-auto bg-[#0a0a0a]/70 backdrop-blur-[2px]",
-          header: "p-0",
-          body: "p-0",
-          footer: "p-0",
-        }}
-      >
-        <ModalContent>
-          {(close) => (
-            <div className="border-t-2 border-t-[var(--m-accent)]">
-              <div className="px-9 pt-[34px] pb-9">{children(close)}</div>
-            </div>
-          )}
-        </ModalContent>
-      </HeroModal>
-    </>
+      {/* Scroll wrapper — `outside` semantics: the page scrolls when the modal
+          is taller than the viewport (no inner modal scroll). */}
+      <div className="absolute inset-0 flex items-center justify-center overflow-y-auto py-6">
+        <div
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={labelledBy}
+          tabIndex={-1}
+          onClick={(event) => event.stopPropagation()}
+          style={{ fontFamily: "var(--font-mono)" }}
+          className={`mono-modal-enter m-0 w-[calc(100%-2rem)] ${widthClass[width]} border-2 border-t-2 border-[var(--m-dim)] border-t-[var(--m-accent)] bg-[var(--m-bg)] shadow-none outline-none`}
+        >
+          <div className="px-9 pt-[34px] pb-9">
+            {children(() => onOpenChange())}
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body
   );
 }
 
