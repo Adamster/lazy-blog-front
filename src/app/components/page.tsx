@@ -1,11 +1,7 @@
-import { Metadata } from "next";
-import { generateMeta } from "@/shared/lib/head/meta-data";
-import ComponentsPage from "./components-page";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = generateMeta({
-  title: "Components",
-});
-
+// The components showcase now lives as a tab inside the brand reference.
+// Keep this route as a permanent redirect so any existing link still resolves.
 export default function Page() {
-  return <ComponentsPage />;
+  redirect("/brand?tab=components");
 }
