@@ -70,15 +70,17 @@ function PostByline({
           <Avatar src={post.author.avatarUrl} name={nameOf(post.author)} />
         </Link>
         <div className="min-w-0">
-          <Link
-            href={`/${authorHandle}`}
-            className="font-display block truncate text-[14px] font-semibold hover:text-[var(--m-accent)]"
-          >
+          <span className="font-display block truncate text-[14px] font-semibold">
             {nameOf(post.author)}
-          </Link>
+          </span>
           <span className="text-[12px] text-[var(--m-muted)]">
-            @{authorHandle} · {formatDate2(post.createdAtUtc)} · {readTime} min
-            read
+            <Link
+              href={`/${authorHandle}`}
+              className="transition-colors hover:text-[var(--m-accent)]"
+            >
+              @{authorHandle}
+            </Link>
+            {` · ${formatDate2(post.createdAtUtc)} · ${readTime} min read`}
           </span>
         </div>
 

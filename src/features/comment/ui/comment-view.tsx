@@ -62,14 +62,16 @@ const CommentView = ({ comment, postId }: IProps) => {
         </Link>
 
         <div className="min-w-0">
-          <Link
-            href={`/${handle}`}
-            className="font-display block text-[14px] font-semibold text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
-          >
+          <span className="font-display block text-[14px] font-semibold text-[var(--m-muted)]">
             {nameOf(comment.user)}
-          </Link>
+          </span>
           <div className="mt-0.5 flex items-center gap-2.5 text-[12px] whitespace-nowrap">
-            <span className="text-[var(--m-muted)]">@{handle}</span>
+            <Link
+              href={`/${handle}`}
+              className="text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
+            >
+              @{handle}
+            </Link>
             <Dot />
             <span className="text-[var(--m-muted)] tabular-nums">
               {formatDate2(comment.createdAtUtc)}
