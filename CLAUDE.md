@@ -14,11 +14,11 @@ The frontend (home / profile / post / auth) uses the "Brutalist Mono" design sys
 
 - **46**/700/-0.02em — big stat NUMBERS (profile counts, vote score; tabular-nums). Deliberately larger than H1; don't fold into 40/32. — **Space Grotesk**.
 - Display **40**/700/-0.02em · H1 **32**/700/-0.02em (also the modal title) · H3 **18**/600/0 — **Space Grotesk** (`font-display`).
-- **Prose 16**/400/lh 1.85 = article reading ONLY (`.mono-prose`, post body); don't unify down to 14, 16 is deliberate for long-form.
+- **Prose 14**/400/lh 1.85 = article reading (`.mono-prose`, post body). **Temporary: dropped from 16 → 14 on owner request; may revert to 16.** Lives in `src/assets/styles/prose.css` (read view) + mirrored in `crepe-overrides.scss` (editor) — change both together.
 - **UI body 14**/400/lh 1.6 = the default for EVERYTHING else: card summaries, bios, descriptions, comment text, **buttons** (700/0.06em), **inputs**, helper links, info boxes, menu rows, dropdown/toast titles, modal subtitle's sibling text.
 - **Caption 12**/400 = meta/info rows, captions · **Label 11**/500/**0.12em** = labels, eyebrows `// X`, categories `[ x ]`, field labels, errors — **JetBrains Mono**.
-- Not part of the scale (don't "fix" them onto it): the `✕` close glyph (sized to its 36px control), SVG/logo internal text. Article prose has its OWN sub-scale in `crepe-overrides.scss` (16 body · 24 h2 · 18 h3 · 14 code/small) — keep it separate from chrome.
-- Line-heights: stat/H1/hero 1.04 · H3 1.18 · UI body 1.6 · prose(16px) 1.85 · labels 1.2.
+- Not part of the scale (don't "fix" them onto it): the `✕` close glyph (sized to its 36px control), SVG/logo internal text. Article prose has its OWN sub-scale in `prose.css` (+ `crepe-overrides.scss` mirror): 14 body · 24 heading · 14 code · 14 blockquote — keep it separate from chrome.
+- Line-heights: stat/H1/hero 1.04 · H3 1.18 · UI body 1.6 · prose(14px) 1.85 · labels 1.2.
 - Space Grotesk = identity/titles/numbers; JetBrains Mono = data/code/body/labels.
 
 ### Letter-spacing

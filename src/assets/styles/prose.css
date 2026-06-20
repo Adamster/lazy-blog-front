@@ -5,12 +5,12 @@
  * server-rendered post read view AND the editor's live preview, so the two are
  * guaranteed 1:1 identical.
  *
- * Scale (CLAUDE.md): body 16/1.85 · heading 24 Space Grotesk · code 14 ·
- * blockquote · tokens via var(--m-*). */
+ * Scale (CLAUDE.md): body 14/1.85 (temporary — may revert to 16) · heading 24
+ * Space Grotesk · code 14 · blockquote · tokens via var(--m-*). */
 
 .mono-prose {
   font-family: var(--font-mono);
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.85;
   color: var(--m-fg);
 }
@@ -23,7 +23,7 @@
 }
 
 .mono-prose p {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.85;
   color: var(--m-fg);
   margin: 0 0 20px;
@@ -58,7 +58,7 @@
   list-style: decimal;
 }
 .mono-prose li {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.8;
   margin: 0 0 8px;
 }
@@ -114,7 +114,7 @@
 }
 .mono-prose blockquote p {
   margin: 0;
-  font-size: 18px;
+  font-size: 14px;
   line-height: 1.6;
   color: var(--m-fg);
 }

@@ -30,12 +30,12 @@
 /* Re-assert the shared prose scale at editor specificity. Mirrors prose.css. */
 .mono-prose .ProseMirror {
   font-family: var(--font-mono);
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.85;
   color: var(--m-fg);
 
   p {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.85;
     color: var(--m-fg);
     margin: 0 0 20px;
@@ -73,7 +73,7 @@
     list-style: decimal;
   }
   li {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.8;
     margin: 0 0 8px;
   }
@@ -122,7 +122,7 @@
 
     p {
       margin: 0;
-      font-size: 18px;
+      font-size: 14px;
       line-height: 1.6;
       color: var(--m-fg);
     }

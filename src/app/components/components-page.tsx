@@ -645,8 +645,8 @@ export default function ComponentsPage() {
               <Panel caption="// MATRIXTEXT (animated decode)">
                 <State caption="cycles forever · respects reduced-motion">
                   <MatrixText
-                    text="NOT LAZY // DECODE"
-                    className="font-display text-[18px] font-bold tracking-[-0.02em] text-[var(--m-accent)]"
+                    text="// SIGNAL SENT ... NO REPLY YET"
+                    className="mono-label"
                   />
                 </State>
               </Panel>

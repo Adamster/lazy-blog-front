@@ -263,9 +263,9 @@ const TYPE: {
     style: { fontSize: 18, fontWeight: 600, lineHeight: 1.18 },
   },
   {
-    spec: "Prose · 16 / 400 · lh 1.85",
+    spec: "Prose · 14 / 400 · lh 1.85",
     sample: "Уверенность — это не знание; это стиль.",
-    style: { fontSize: 16, fontWeight: 400, lineHeight: 1.85 },
+    style: { fontSize: 14, fontWeight: 400, lineHeight: 1.85 },
   },
   {
     spec: "UI body · 14 / 400 · lh 1.6",
@@ -593,7 +593,7 @@ export default function BrandPage() {
                 <Spec label="Hero / H1 leading" value="1.04" />
                 <Spec label="H3 leading" value="1.18" />
                 <Spec label="Body / summary (14px)" value="1.6" />
-                <Spec label="Prose (16px) · labels" value="1.85 · 1.2" />
+                <Spec label="Prose (14px) · labels" value="1.85 · 1.2" />
               </div>
             </div>
           </Section>

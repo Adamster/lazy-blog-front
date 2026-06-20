@@ -33,7 +33,7 @@ type NativeInputProps = Omit<
 >;
 
 interface FieldProps extends NativeInputProps {
-  /** Visible label — floats up on focus/fill, ALWAYS rendered uppercase. */
+  /** Visible label — floats up when the field has content, ALWAYS uppercase. */
   label: string;
   /** Underline text input type. Password adds the eye toggle. */
   type?: "text" | "email" | "password";
@@ -46,51 +46,33 @@ interface FieldProps extends NativeInputProps {
 }
 
 /**
- * Underline text field with a Material floating label (the design system's
- * auth/reset field). The label sits as a placeholder when empty + blurred and
- * floats up — always uppercase — on focus or when filled. Underline is dim by
- * default and turns accent on focus (error → `--m-error`). Password fields get
- * the eye toggle. Pass react-hook-form's error message into `error`.
+ * Underline text field with a Material floating label. The label rests in the
+ * placeholder spot when empty + blurred and floats up — always uppercase — on
+ * focus OR whenever the input has content. "Has content" is detected purely in
+ * CSS via `:not(:placeholder-shown)` (the input carries an invisible `" "`
+ * placeholder), so it works for typed text, `value`, `defaultValue`, react-hook-
+ * form's imperative `register()` values, and browser autofill alike — no JS
+ * "filled" state to drift out of sync. Underline is dim by default, accent on
+ * focus (error → `--m-error`). Pass react-hook-form's error message into `error`.
  */
 export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
-  {
-    label,
-    type = "text",
-    value,
-    onChange,
-    id,
-    error,
-    required,
-    onFocus,
-    onBlur,
-    ...inputProps
-  },
+  { label, type = "text", value, onChange, id, error, required, ...inputProps },
   ref
 ) {
   const reactId = useId();
   const fieldId = id ?? reactId;
   const errorId = `${fieldId}-error`;
-
-  const [focused, setFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [filled, setFilled] = useState(false);
 
   const isPassword = type === "password";
   const hasError = Boolean(error);
-  // Controlled (RHF passes value) and uncontrolled both float correctly: the
-  // value-derived check covers controlled; `filled` (set onChange) covers the
-  // uncontrolled `register()` path where `value` is undefined.
-  const floated =
-    focused || filled || (value !== undefined && value.length > 0);
 
   return (
     <div>
-      <div className="relative">
+      <div className="group relative">
         <label
           htmlFor={fieldId}
-          className={`pointer-events-none absolute left-0 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-all duration-150 ${
-            floated ? "top-0" : "top-5"
-          }`}
+          className="pointer-events-none absolute top-5 left-0 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-all duration-150 group-focus-within:top-0 group-has-[input:not(:placeholder-shown)]:top-0"
         >
           {label}
           {required ? (
@@ -103,23 +85,14 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
           ref={ref}
           type={isPassword && showPassword ? "text" : type}
           value={value}
+          onChange={onChange}
           required={required}
+          // Invisible placeholder so `:placeholder-shown` reflects emptiness —
+          // this is what drives the float, independent of value source.
+          placeholder=" "
           aria-invalid={hasError}
           aria-describedby={hasError ? errorId : undefined}
-          onChange={(e) => {
-            setFilled(e.target.value.length > 0);
-            onChange?.(e);
-          }}
-          onFocus={(e) => {
-            setFocused(true);
-            onFocus?.(e);
-          }}
-          onBlur={(e) => {
-            setFocused(false);
-            setFilled(e.target.value.length > 0);
-            onBlur?.(e);
-          }}
-          className={`block w-full border-0 border-b-2 bg-transparent px-0 pt-5 pb-2 text-[14px] leading-[1.5] text-[var(--m-fg)] caret-[var(--m-accent)] transition-all outline-none ${
+          className={`block w-full border-0 border-b-2 bg-transparent px-0 pt-5 pb-2 text-[14px] leading-[1.5] text-[var(--m-fg)] caret-[var(--m-accent)] transition-all outline-none placeholder:text-transparent ${
             isPassword ? "pr-8" : ""
           } ${
             hasError
