@@ -66,7 +66,9 @@ export default function UserPage({ userName }: { userName: string }) {
               {nameOf(user)}
             </h1>
             <div className="mt-4 text-[12px] text-[var(--m-muted)]">
-              <span>@{handle}</span>
+              <span className="font-medium text-[var(--m-accent)]">
+                @{handle}
+              </span>
               {user?.createdOnUtc && (
                 <span> · joined {formatDate2(user.createdOnUtc)}</span>
               )}
