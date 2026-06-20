@@ -188,7 +188,7 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
             <div
               role="dialog"
               aria-label="Emoji picker"
-              className="absolute bottom-full left-0 z-50 mb-2 border-2 border-[var(--m-line)] bg-[var(--m-card)] p-2"
+              className="absolute bottom-full left-0 z-50 mb-2 w-72 border-2 border-[var(--m-line)] bg-[var(--m-card)] p-2"
             >
               <div className="grid grid-cols-8 gap-0.5">
                 {EMOJIS.map((emoji) => (
@@ -197,7 +197,7 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
                     type="button"
                     aria-label={`Insert ${emoji}`}
                     onClick={() => insertEmoji(emoji)}
-                    className={`flex size-8 items-center justify-center text-[20px] leading-none transition-colors hover:bg-[var(--m-panel)] ${focusRing}`}
+                    className={`flex aspect-square items-center justify-center text-[20px] leading-none transition-colors hover:bg-[var(--m-panel)] ${focusRing}`}
                   >
                     {emoji}
                   </button>
