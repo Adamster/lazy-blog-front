@@ -112,7 +112,7 @@ export function PostCard({
               {post.title}
             </Link>
           </h3>
-          <div className="mt-6 flex items-center gap-2.5 text-[12px] text-[var(--m-muted2)]">
+          <div className="mt-6 flex items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
             <CardMeta post={post} authorHandle={authorHandle} />
           </div>
         </div>
@@ -134,7 +134,7 @@ export function PostCard({
             {post.title}
           </Link>
         </h3>
-        <div className="mt-auto flex items-center gap-4 pt-6 text-[12px] text-[var(--m-muted2)]">
+        <div className="mt-auto flex items-center gap-4 pt-6 text-[12px] text-[var(--m-muted)]">
           <CardMeta post={post} authorHandle={authorHandle} />
         </div>
       </div>

@@ -548,7 +548,7 @@ export function ComponentsTab() {
             <Panel caption="// METRIC — every kind">
               <div className="flex flex-col gap-7">
                 <State caption="default (muted)">
-                  <div className="flex flex-wrap items-center gap-4 text-[12px] text-[var(--m-muted2)]">
+                  <div className="flex flex-wrap items-center gap-4 text-[12px] text-[var(--m-muted)]">
                     <Metric kind="likes" value={412} />
                     <Metric kind="views" value={18240} />
                     <Metric kind="posts" value={37} />
@@ -556,7 +556,7 @@ export function ComponentsTab() {
                   </div>
                 </State>
                 <State caption="accent (e.g. up-voted)">
-                  <div className="flex flex-wrap items-center gap-4 text-[12px] text-[var(--m-muted2)]">
+                  <div className="flex flex-wrap items-center gap-4 text-[12px] text-[var(--m-muted)]">
                     <Metric kind="likes" value={413} accent />
                     <Metric kind="views" value={18241} />
                   </div>

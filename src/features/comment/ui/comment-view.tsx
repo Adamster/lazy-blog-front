@@ -71,7 +71,7 @@ const CommentView = ({ comment, postId }: IProps) => {
           <div className="mt-0.5 flex items-center gap-2.5 text-[12px] whitespace-nowrap">
             <span className="text-[var(--m-accent)]">@{handle}</span>
             <Dot />
-            <span className="text-[var(--m-muted2)] tabular-nums">
+            <span className="text-[var(--m-muted)] tabular-nums">
               {formatDate2(comment.createdAtUtc)}
             </span>
           </div>

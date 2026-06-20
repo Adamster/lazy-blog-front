@@ -37,7 +37,7 @@ The frontend (home / profile / post / auth) uses the "Brutalist Mono" design sys
 
 ### Meta / info rows (author · date · icon+number)
 
-- ONE size: **Caption 12px** (`text-[12px]`) — NEVER 11/11.5/12.5. Icons **14px** (`size-3.5`). In-group gap 10 (`gap-2.5`), between-metrics gap 16 (`gap-4`), separator middle-dot `·` muted2, tabular-nums.
+- ONE size: **Caption 12px** (`text-[12px]`) — NEVER 11/11.5/12.5. **ONE colour: the row text + icon+number metrics = `--m-muted`** (NOT muted2 — muted reads better and keeps hero byline / post byline / feed card / comment meta identical; don't split muted vs muted2 across surfaces). Icons **14px** (`size-3.5`). In-group gap 10 (`gap-2.5`), between-metrics gap 16 (`gap-4`), separator middle-dot `·` = `Dot` (intentionally dimmer `muted2`, consistent everywhere), tabular-nums.
 
 ### Components (fixed sizes)
 
