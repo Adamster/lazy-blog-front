@@ -76,7 +76,7 @@ function PostByline({
           <span className="text-[12px] text-[var(--m-muted)]">
             <Link
               href={`/${authorHandle}`}
-              className="transition-colors hover:text-[var(--m-accent)]"
+              className="font-medium text-[var(--m-accent)] underline-offset-2 hover:underline"
             >
               @{authorHandle}
             </Link>
