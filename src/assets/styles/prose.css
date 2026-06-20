@@ -1,0 +1,164 @@
+/* "Brutalist Mono" prose sub-scale.
+ *
+ * Targets the output of the shared <PostBody> renderer (react-markdown), which
+ * wraps content in `.mono-prose`. The SAME `.mono-prose` wraps both the
+ * server-rendered post read view AND the editor's live preview, so the two are
+ * guaranteed 1:1 identical.
+ *
+ * Scale (CLAUDE.md): body 16/1.85 · heading 24 Space Grotesk · code 14 ·
+ * blockquote · tokens via var(--m-*). */
+
+.mono-prose {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--m-fg);
+}
+
+.mono-prose > :first-child {
+  margin-top: 0;
+}
+.mono-prose > :last-child {
+  margin-bottom: 0;
+}
+
+.mono-prose p {
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--m-fg);
+  margin: 0 0 20px;
+}
+
+/* The doc title is the page <h1>; markdown headings render as the design's
+   single 24px Space Grotesk section heading regardless of source level. */
+.mono-prose h1,
+.mono-prose h2,
+.mono-prose h3,
+.mono-prose h4,
+.mono-prose h5,
+.mono-prose h6 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-align: left;
+  margin: 36px 0 16px;
+}
+
+.mono-prose ul,
+.mono-prose ol {
+  margin: 0 0 20px;
+  padding-left: 22px;
+}
+.mono-prose ul {
+  list-style: disc;
+}
+.mono-prose ol {
+  list-style: decimal;
+}
+.mono-prose li {
+  font-size: 16px;
+  line-height: 1.8;
+  margin: 0 0 8px;
+}
+/* GFM task lists — drop the marker, align the checkbox. */
+.mono-prose li:has(> input[type="checkbox"]) {
+  list-style: none;
+  margin-left: -22px;
+}
+.mono-prose li > input[type="checkbox"] {
+  margin-right: 8px;
+  accent-color: var(--m-accent);
+}
+
+.mono-prose a {
+  color: var(--m-accent);
+  text-underline-offset: 2px;
+}
+
+.mono-prose strong {
+  font-weight: 700;
+}
+
+/* Inline code. */
+.mono-prose code {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  background: var(--m-panel);
+  padding: 2px 6px;
+}
+
+/* Fenced code blocks — the <code> inside resets the inline chrome. */
+.mono-prose pre {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+  background: var(--m-panel);
+  border: 2px solid var(--m-dim);
+  padding: 16px 18px;
+  margin: 0 0 20px;
+  overflow-x: auto;
+}
+.mono-prose pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 14px;
+}
+
+.mono-prose blockquote {
+  margin: 28px 0;
+  border-left: 2px solid var(--m-accent);
+  background: color-mix(in srgb, var(--m-accent) 6%, transparent);
+  padding: 18px 20px;
+}
+.mono-prose blockquote p {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--m-fg);
+}
+/* Attribution line (e.g. `— @handle`) — a trailing paragraph reads as source. */
+.mono-prose blockquote p + p {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--m-muted);
+}
+
+.mono-prose hr {
+  height: 2px;
+  border: 0;
+  background: var(--m-dim);
+  margin: 36px 0;
+}
+
+.mono-prose img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto 20px;
+  border: 2px solid var(--m-dim);
+}
+
+/* GFM tables. */
+.mono-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 20px;
+  font-size: 14px;
+}
+.mono-prose th,
+.mono-prose td {
+  border: 2px solid var(--m-dim);
+  padding: 8px 12px;
+  text-align: left;
+}
+.mono-prose th {
+  font-family: var(--font-display);
+  font-weight: 700;
+  background: var(--m-panel);
+}
+
+.mono-prose del {
+  color: var(--m-muted);
+}

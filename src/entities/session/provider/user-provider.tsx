@@ -2,7 +2,6 @@
 
 import { useUserById } from "@/entities/session/model/use-user-by-id";
 import { UserResponse } from "@/shared/api/openapi";
-import { Loading } from "@/shared/ui/loading";
 import React, { createContext, useContext } from "react";
 
 interface UserContextType {
@@ -26,11 +25,13 @@ export function UserProvider({
   userId: string | null;
   children: React.ReactNode;
 }) {
-  const { data: user, isLoading } = useUserById(userId || "");
+  // Render children unconditionally (no blocking spinner) so the server tree
+  // reaches the HTML for crawlers. `user` is `undefined` until the query
+  // resolves on the client; consumers already treat it as optional and the
+  // interactive islands re-render once it lands.
+  const { data: user } = useUserById(userId || "");
 
-  return isLoading ? (
-    <Loading compensateHeader={false} />
-  ) : (
+  return (
     <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>
   );
 }

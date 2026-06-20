@@ -2,6 +2,7 @@ import { Mulish, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 
 import "../assets/styles/tailwind.css";
 import "../assets/styles/global.scss";
+import "../assets/styles/prose.css";
 
 import { GoogleAnalytics } from "@/shared/lib/head/google-analytics";
 import { MetaLinks } from "@/shared/lib/head/meta-links";

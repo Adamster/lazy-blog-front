@@ -1,5 +1,4 @@
 import { RegisterUserRequest } from "@/shared/api/openapi";
-import { Loading } from "@/shared/ui/loading";
 import {
   useAuthActions,
   useAuthState,
@@ -7,6 +6,13 @@ import {
 import React, { createContext } from "react";
 import { UserProvider } from "@/entities/session/provider/user-provider";
 import { AuthState } from "@/shared/lib/auth-storage";
+
+const EMPTY_AUTH: AuthState = {
+  userId: null,
+  accessToken: null,
+  refreshToken: null,
+  accessTokenExpires: null,
+};
 
 interface AuthContextType {
   auth: AuthState;
@@ -22,19 +28,20 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 );
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { data: auth, isLoading: isAuthLoading } = useAuthState();
+  const { data: auth } = useAuthState();
   const { login, logout, register, loginWithGoogle } = useAuthActions();
 
   const isAuthenticated = !!auth?.userId;
 
-  if (isAuthLoading) {
-    return <Loading compensateHeader={false} />;
-  }
-
+  // Render children unconditionally (no blocking spinner): auth is resolved from
+  // localStorage on the client only, so gating on `isLoading` would render an
+  // empty/spinner shell on the server and defeat SSR for crawlers. Until the
+  // query resolves, `auth` falls back to an empty (logged-out) state; the
+  // interactive islands re-render when it lands.
   return (
     <AuthContext.Provider
       value={{
-        auth: auth!,
+        auth: auth ?? EMPTY_AUTH,
         login,
         logout,
         register,

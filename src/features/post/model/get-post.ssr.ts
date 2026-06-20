@@ -5,8 +5,10 @@ const API_URL =
 
 export const getPostSSR = cache(async (slug: string) => {
   try {
+    // ISR: cache the post and revalidate at most once a minute so pages are
+    // crawlable/cacheable (the SEO win) while edits still propagate quickly.
     const response = await fetch(`${API_URL}/api/posts/${slug}`, {
-      cache: "no-store",
+      next: { revalidate: 60 },
     });
 
     if (!response.ok) return null;

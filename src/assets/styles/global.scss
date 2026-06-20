@@ -1,6 +1,9 @@
-@use "./mark.scss";
 @use "./emoji.scss";
-@use "./milk.scss";
+
+/* `@reference` makes Tailwind's theme (variants like `md:`, utilities) available
+   to the `@apply` rules below without emitting duplicate CSS. Previously this was
+   pulled in transitively via the now-removed `mark.scss`. */
+@reference "tailwindcss";
 
 /* Layout */
 

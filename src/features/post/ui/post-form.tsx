@@ -16,7 +16,7 @@ import { UpdatePostRequest } from "@/shared/api/openapi";
 import { Field, Select, Switch, type SelectOption } from "@/shared/ui";
 import { useTags } from "@/entities/tag";
 import { useUser } from "@/entities/session";
-import { Crepe } from "./crepe-wrapper";
+import { MarkdownEditor } from "./markdown-editor";
 import { PostImageUploader } from "./post-image-uploader";
 
 const focusRing =
@@ -75,10 +75,9 @@ export const PostForm = ({
           control={control}
           rules={{ required: "Field is required" }}
           render={({ field }) => (
-            <Crepe
-              key={form.getValues("slug")}
-              placeholder="Start typing, or press / for blocks…"
-              markdown={field.value || ""}
+            <MarkdownEditor
+              placeholder="Write in markdown — # heading, **bold**, - list…"
+              value={field.value || ""}
               onChange={field.onChange}
             />
           )}

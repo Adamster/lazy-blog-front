@@ -1,5 +1,3 @@
-"use client";
-
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,22 +8,32 @@ import {
 } from "@heroicons/react/24/solid";
 import { AuthorPostResponse, PostDetailedResponse } from "@/shared/api/openapi";
 import { formatDate2 } from "@/shared/lib/utils";
-import { useAuth, useUser, IsAuthor } from "@/entities/session";
-import { Avatar, Category, StatusBadge } from "@/shared/ui";
+import { Avatar, Category, PostBody, StatusBadge } from "@/shared/ui";
 import type { Status } from "@/shared/ui";
-import { PostVote } from "./post-vote";
-import { PostHeaderMenu } from "./post-header-menu";
-import { Crepe } from "./crepe-wrapper";
 
 interface IProps {
-  post: PostDetailedResponse | undefined;
+  post: PostDetailedResponse;
+  /**
+   * Author kebab menu (edit / publish / delete). A client island, gated on the
+   * viewer being the author; injected by the route so this server component
+   * stays free of session/`"use client"`.
+   */
+  headerMenu?: ReactNode;
+  /**
+   * Vote band. A client island (needs auth to decide `canVote` and to mutate);
+   * injected by the route.
+   */
+  vote?: ReactNode;
   /**
    * Comments block, injected by the route (the composition root). Keeping the
    * comment feature out of this post-feature file avoids a sideways FSD import.
    */
   comments?: ReactNode;
-  /** Comment count for the byline metric (the route owns the comment query). */
-  commentsCount?: number;
+  /**
+   * Live comment-count metric for the byline. A client island (the route owns
+   * the comment query); slotted so the byline itself stays server-rendered.
+   */
+  commentsCount?: ReactNode;
 }
 
 const nameOf = (u: AuthorPostResponse) =>
@@ -46,7 +54,7 @@ function PostByline({
   commentsCount,
 }: {
   post: PostDetailedResponse;
-  commentsCount: number;
+  commentsCount: ReactNode;
 }) {
   const authorHandle = post.author.userName ?? "";
   const readTime = readTimeOf(post.body);
@@ -94,20 +102,20 @@ function PostByline({
   );
 }
 
-export const PostView = ({ post, comments, commentsCount = 0 }: IProps) => {
-  const { isAuthenticated } = useAuth();
-  const { user } = useUser();
-
-  if (!post) return null;
-
+/**
+ * Server-rendered article: chip, `<h1>`, summary, byline, cover, and the prose
+ * body all reach the HTML so crawlers (and the no-JS path) get real content.
+ * Interactive pieces — the author kebab, the vote band, the comments composer —
+ * are passed in as client islands and slotted into this server tree.
+ */
+export const PostView = ({
+  post,
+  headerMenu,
+  vote,
+  comments,
+  commentsCount,
+}: IProps) => {
   const cat = post.tags?.[0]?.tag ?? "post";
-  const authorHandle = post.author.userName ?? "";
-
-  // Voting is allowed for authenticated readers who are NOT the author. The
-  // section is shown to everyone (logged-out / owner included); the click is
-  // gated inside PostVote via `canVote`.
-  const isAuthor = !!user?.id && user.id === post.author.id;
-  const canVote = isAuthenticated && !isAuthor;
 
   // Status badge slot — pinned top-right of the header, same accent-chip
   // treatment as the home hero. No backing field yet; set this when a
@@ -127,16 +135,7 @@ export const PostView = ({ post, comments, commentsCount = 0 }: IProps) => {
             </span>
           )}
           {status && <StatusBadge status={status} className="ml-auto" />}
-          <IsAuthor userId={post.author.id || ""}>
-            <div className={status ? "" : "ml-auto"}>
-              <PostHeaderMenu
-                postId={post.id}
-                postSlug={post.slug}
-                authorHandle={authorHandle}
-                isPublished={post.isPublished}
-              />
-            </div>
-          </IsAuthor>
+          {headerMenu}
         </div>
 
         {/* Title */}
@@ -170,22 +169,16 @@ export const PostView = ({ post, comments, commentsCount = 0 }: IProps) => {
           </div>
         )}
 
-        {/* Prose — existing body, unchanged */}
-        <div className="mono-prose mt-10">
-          <Crepe readonly markdown={post.body} />
+        {/* Prose — server-rendered markdown, shared with the editor preview. */}
+        <div className="mt-10">
+          <PostBody markdown={post.body} />
         </div>
       </article>
 
-      {/* Rating section — full-bleed band, shown to ALL readers; the vote click
-          is gated via `canVote` (auth'd & non-author). Outside the article text
-          flow so the w-screen break-out can't trigger horizontal scroll. */}
-      <PostVote
-        voteDirection={post.voteDirection}
-        postId={post.id}
-        postSlug={post.slug}
-        rating={post.rating}
-        canVote={canVote}
-      />
+      {/* Rating band — full-bleed, shown to all readers; the vote click is gated
+          inside the island. Outside the article text flow so the w-screen
+          break-out can't trigger horizontal scroll. */}
+      {vote}
 
       {/* Comments — injected by the route to keep the comment feature out of
           this post-feature file (FSD: no sideways feature imports). */}

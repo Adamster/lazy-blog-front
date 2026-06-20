@@ -13,4 +13,5 @@ export { Select } from "./select";
 export type { SelectOption } from "./select";
 export { Switch } from "./switch";
 export { Avatar } from "./avatar";
+export { PostBody } from "./post-body";
 export { Modal, ModalHeader, SubmitButton, useModalTitleId } from "./modal";
