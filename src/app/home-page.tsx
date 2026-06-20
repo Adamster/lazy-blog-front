@@ -109,8 +109,10 @@ export default function HomePageMono() {
       <main className="mx-auto max-w-[1240px] px-10 pt-20 pb-10">
         {posts.length === 0 ? (
           <div className="border-2 border-[var(--m-line)] py-24 text-center">
-            <p className="font-display text-3xl font-bold">{"// EMPTY FEED"}</p>
-            <p className="mt-4 text-sm text-[var(--m-muted)]">
+            <p className="font-display text-[32px] leading-none font-bold tracking-[-0.02em]">
+              {"// EMPTY FEED"}
+            </p>
+            <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
               No posts in the Lazyverse yet.
             </p>
           </div>

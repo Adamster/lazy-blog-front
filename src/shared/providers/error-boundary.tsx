@@ -31,11 +31,17 @@ export class ErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="-mt-16 flex min-h-screen flex-col items-center justify-center gap-4">
-          <h2 className="text-3xl font-bold">
-            A glitch in the Lazyverse... 😢
+        <div
+          className="mono-scope flex min-h-screen flex-col items-center justify-center gap-6 bg-[var(--m-bg)] px-10 text-center text-[var(--m-fg)]"
+          style={{ fontFamily: "var(--font-mono)" }}
+        >
+          <div className="mono-label">{"// ERROR"}</div>
+          <h2 className="font-display text-[32px] leading-none font-bold tracking-[-0.02em]">
+            A glitch in the Lazyverse… 😢
           </h2>
-          <p>{this.state.error?.message || "Unknown Error"}</p>
+          <p className="max-w-[46em] text-[14px] leading-[1.6] text-[var(--m-muted)]">
+            {this.state.error?.message || "Unknown Error"}
+          </p>
         </div>
       );
     }
