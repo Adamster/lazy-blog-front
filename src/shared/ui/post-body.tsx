@@ -84,6 +84,47 @@ function remarkEffectDirectives() {
 }
 
 /**
+ * Bridge our custom text-colour directives (`:primary[…]` / `:muted[…]` /
+ * `:error[…]`) to a `<span>` carrying a FIXED, whitelisted class — the editor
+ * stores each colour as its own inline mark/directive (see
+ * `editor-color-marks.ts`).
+ *
+ * SECURITY: the colour is NEVER taken from a directive-supplied value. We map
+ * the directive NAME (a member of this closed whitelist) to a hard-coded CSS
+ * class (`mono-color-*`), and the actual colour lives in `prose.css` as a token.
+ * Nothing user-controlled reaches an inline `style`, so arbitrary-colour
+ * injection is impossible. Any other directive name keeps no `hName` and renders
+ * nothing (inert), same stance as the small/effect bridges.
+ */
+const COLOR_DIRECTIVE_CLASS = {
+  primary: "mono-color-primary",
+  muted: "mono-color-muted",
+  error: "mono-color-error",
+} as const;
+
+function remarkColorDirectives() {
+  return (tree: MdNode) => {
+    const walk = (node: MdNode) => {
+      if (node.type === "textDirective" && node.name) {
+        const cls =
+          COLOR_DIRECTIVE_CLASS[
+            node.name as keyof typeof COLOR_DIRECTIVE_CLASS
+          ];
+        if (cls) {
+          node.data = {
+            ...node.data,
+            hName: "span",
+            hProperties: { ...node.data?.hProperties, className: cls },
+          };
+        }
+      }
+      node.children?.forEach(walk);
+    };
+    walk(tree);
+  };
+}
+
+/**
  * Flatten a directive's rendered React children to a plain string — both effect
  * components take their text as a string prop (`GlitchText` needs `children:
  * string`, `MatrixText` needs `text: string`), but react-markdown hands us
@@ -176,6 +217,7 @@ export function PostBody({ markdown }: PostBodyProps) {
           remarkDirective,
           remarkSmallDirective,
           remarkEffectDirectives,
+          remarkColorDirectives,
           remarkDropEmptyLines,
         ]}
         components={components}

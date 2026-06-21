@@ -32,12 +32,19 @@ import {
   SparklesIcon,
   BoltIcon,
   CommandLineIcon,
+  SwatchIcon,
 } from "@heroicons/react/24/outline";
 import { toggleSmallCommand } from "./editor-small-mark";
 import {
   toggleGlitchCommand,
   toggleMatrixCommand,
 } from "./editor-effect-marks";
+import {
+  setPrimaryCommand,
+  setMutedCommand,
+  setErrorCommand,
+  clearColorCommand,
+} from "./editor-color-marks";
 
 /** Dispatch a Milkdown command into the live editor (owned by `crepe.tsx`). */
 export type RunCommand = <T>(cmd: $Command<T>, payload?: T) => void;
@@ -97,7 +104,11 @@ function Divider() {
 interface InsertItem {
   id: string;
   label: string;
-  icon: ComponentType<{ className?: string }>;
+  /** Line icon for the row. Optional when a `swatch` colour is supplied. */
+  icon?: ComponentType<{ className?: string }>;
+  /** A CSS colour (token) — renders a small square swatch instead of an icon
+   *  (the Text-colour menu). Takes precedence over `icon` when set. */
+  swatch?: string;
   run: () => void;
 }
 
@@ -177,7 +188,18 @@ function ToolbarMenu({
               className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted)] uppercase transition-colors hover:bg-[var(--m-panel)] hover:text-[var(--m-fg)]"
               style={{ fontFamily: "var(--font-mono)" }}
             >
-              <item.icon className="size-4 shrink-0" />
+              {item.swatch ? (
+                // Brutalist colour swatch — a square 2px-bordered chip filled
+                // with the token (sized to the icon slot). The border keeps a
+                // pale/transparent swatch visible against the row.
+                <span
+                  aria-hidden="true"
+                  className="size-3.5 shrink-0 border border-[var(--m-dim)]"
+                  style={{ backgroundColor: item.swatch }}
+                />
+              ) : item.icon ? (
+                <item.icon className="size-4 shrink-0" />
+              ) : null}
               <span className="truncate">{item.label}</span>
             </button>
           ))}
@@ -258,6 +280,37 @@ export function EditorToolbar({
       label: "Matrix",
       icon: CommandLineIcon,
       run: () => onCommand(toggleMatrixCommand),
+    },
+  ];
+
+  // Text colour — tint the selection one of four brand colours. Each colour is
+  // its own mutually-exclusive inline mark round-tripping as a remark directive
+  // (`:primary[…]` / `:muted[…]` / `:error[…]`); "Default" clears them all
+  // (back to `--m-fg`). Rows show a colour swatch rather than an icon.
+  const colorItems: InsertItem[] = [
+    {
+      id: "color-default",
+      label: "Default",
+      swatch: "var(--m-fg)",
+      run: () => onCommand(clearColorCommand),
+    },
+    {
+      id: "color-primary",
+      label: "Primary",
+      swatch: "var(--m-accent)",
+      run: () => onCommand(setPrimaryCommand),
+    },
+    {
+      id: "color-muted",
+      label: "Muted",
+      swatch: "var(--m-muted)",
+      run: () => onCommand(setMutedCommand),
+    },
+    {
+      id: "color-error",
+      label: "Error",
+      swatch: "var(--m-error)",
+      run: () => onCommand(setErrorCommand),
     },
   ];
 
@@ -379,6 +432,16 @@ export function EditorToolbar({
         icon={SparklesIcon}
         label="Effects"
         items={effectItems}
+        disabled={disabled}
+      />
+
+      {/* Text colour — tint the selection one of four whitelisted brand colours
+          (Default clears any colour mark). Custom marks that round-trip as
+          remark directives, same pattern as Effects. */}
+      <ToolbarMenu
+        icon={SwatchIcon}
+        label="Text colour"
+        items={colorItems}
         disabled={disabled}
       />
     </div>

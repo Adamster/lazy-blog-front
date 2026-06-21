@@ -13,6 +13,7 @@ import { API_URL } from "@/shared/types";
 import { EditorToolbar, type RunCommand } from "./editor-toolbar";
 import { smallMark } from "./editor-small-mark";
 import { effectMarks } from "./editor-effect-marks";
+import { colorMarks } from "./editor-color-marks";
 
 type ImageUploadHandler = (file: File) => Promise<string>;
 
@@ -168,7 +169,11 @@ export default function CrepeEditor({
       // Custom inline brand effects (`:glitch[…]` / `:matrix[…]`) — toolbar
       // Effects ▾ toggles them; they round-trip as remark directives and reuse
       // smallMark's single remark-directive registration. See editor-effect-marks.
-      .use(effectMarks);
+      .use(effectMarks)
+      // Custom inline text-colour marks (`:primary[…]` / `:muted[…]` /
+      // `:error[…]`) — toolbar Text-colour ▾ sets them (mutually exclusive;
+      // Default clears). Same remark-directive reuse. See editor-color-marks.
+      .use(colorMarks);
 
     crepeRef.current = crepe;
     let alive = true;

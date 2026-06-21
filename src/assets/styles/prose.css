@@ -178,3 +178,18 @@
 .mono-prose del {
   color: var(--m-muted);
 }
+
+/* Custom inline text-colour marks — bridged from the `:primary[…]` /
+   `:muted[…]` / `:error[…]` directives to whitelisted classes by
+   `remarkColorDirectives` in post-body.tsx. The colour is a fixed token (never
+   a directive-supplied value), mirroring crepe-overrides.scss so the editor and
+   read view agree. "Default" carries no mark and inherits the `--m-fg` body. */
+.mono-prose .mono-color-primary {
+  color: var(--m-accent);
+}
+.mono-prose .mono-color-muted {
+  color: var(--m-muted);
+}
+.mono-prose .mono-color-error {
+  color: var(--m-error);
+}

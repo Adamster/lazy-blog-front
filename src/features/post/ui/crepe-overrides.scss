@@ -395,6 +395,20 @@
     letter-spacing: 0.08em;
   }
 
+  // Custom inline text-colour marks (`:primary[…]` / `:muted[…]` / `:error[…]`)
+  // — the author sees the tint while editing. The colour comes from a fixed
+  // token (whitelisted directive name → class), mirrored in prose.css for the
+  // read view. "Default" carries no mark, so it inherits the `--m-fg` body.
+  .mono-color-primary {
+    color: var(--m-accent);
+  }
+  .mono-color-muted {
+    color: var(--m-muted);
+  }
+  .mono-color-error {
+    color: var(--m-error);
+  }
+
   ul,
   ol {
     margin: 0 0 20px;
