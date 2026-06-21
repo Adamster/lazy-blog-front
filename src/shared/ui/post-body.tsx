@@ -125,6 +125,49 @@ function remarkColorDirectives() {
 }
 
 /**
+ * Catch-all for directives we DON'T own. `remark-directive` parses any `:name`
+ * in the markdown as a directive — including incidental colons in existing
+ * content (e.g. a "1:30:00" timestamp parses `:00` as a directive). An unhandled
+ * directive is rendered as a block `<div>` by mdast-util-to-hast, which inside a
+ * paragraph is invalid HTML (`<div>` in `<p>`) and crashes hydration. So AFTER
+ * the known-directive bridges (small/effect/colour) have set their `hName`,
+ * convert every remaining (un-`hName`'d) directive back to its literal source
+ * text — it then renders as plain inline text, harmlessly, with no content lost.
+ */
+function remarkLiteralizeUnknownDirectives() {
+  const isDirective = (n: MdNode) =>
+    n.type === "textDirective" ||
+    n.type === "leafDirective" ||
+    n.type === "containerDirective";
+  const textOf = (n: MdNode): string =>
+    (n.children ?? []).map((c) => c.value ?? textOf(c)).join("");
+  const literal = (n: MdNode) => {
+    const prefix =
+      n.type === "containerDirective"
+        ? ":::"
+        : n.type === "leafDirective"
+          ? "::"
+          : ":";
+    const label = n.children?.length ? `[${textOf(n)}]` : "";
+    return `${prefix}${n.name ?? ""}${label}`;
+  };
+
+  return (tree: MdNode) => {
+    const walk = (node: MdNode) => {
+      if (!node.children) return;
+      node.children = node.children.map((c) => {
+        if (isDirective(c) && !c.data?.hName) {
+          return { type: "text", value: literal(c) };
+        }
+        walk(c);
+        return c;
+      });
+    };
+    walk(tree);
+  };
+}
+
+/**
  * Flatten a directive's rendered React children to a plain string — both effect
  * components take their text as a string prop (`GlitchText` needs `children:
  * string`, `MatrixText` needs `text: string`), but react-markdown hands us
@@ -218,6 +261,7 @@ export function PostBody({ markdown }: PostBodyProps) {
           remarkSmallDirective,
           remarkEffectDirectives,
           remarkColorDirectives,
+          remarkLiteralizeUnknownDirectives,
           remarkDropEmptyLines,
         ]}
         components={components}
