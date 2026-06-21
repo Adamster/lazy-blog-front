@@ -21,9 +21,11 @@ import {
   ModalHeader,
   SubmitButton,
   useModalTitleId,
+  Loading,
+  ProgressBar,
+  GlitchText,
   type SelectOption,
 } from "@/shared/ui";
-import { Loading } from "@/shared/ui/loading";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
 import { addToastSuccess, addToastError } from "@/shared/lib/toasts";
@@ -522,7 +524,7 @@ export function ComponentsTab() {
         <Section
           index="06"
           title="FEEDBACK · TOASTS"
-          intro="Notifications go through the module-level toast store; the app-level <Toaster/> renders them. These call the real addToastSuccess / addToastError so the live toast appears bottom-corner."
+          intro="Notifications go through the module-level toast store; the app-level <Toaster/> renders them. These call the real addToastSuccess / addToastError so the live toast appears bottom-right — a single card surface with a 2px type stripe (accent/error) and the status icon between the text and the right edge. The whole toast dismisses on click; it also auto-dismisses."
         >
           <Panel caption="// TOASTS">
             <div className="flex flex-wrap items-center gap-4">
@@ -593,40 +595,51 @@ export function ComponentsTab() {
           </Panel>
         </Section>
 
-        {/* 08 — LOADING */}
+        {/* 08 — LOADING · PROGRESS · ERROR */}
         <Section
           index="08"
-          title="LOADING"
-          intro="The mono spinner — a 2px square ring with an accent top edge. inline centers it in flow; the block form fills the viewport (shown boxed here so it doesn't take over the page)."
+          title="LOADING · PROGRESS · ERROR"
+          intro="Terminal ASCII spinner (│ / ─ \ cycling at 100ms, accent) — inline centers it in flow; the block form pairs it with a LOADING label on one line and fills the viewport. ProgressBar is the [████░░░░] block bar (determinate + indeterminate) for uploads / long tasks. GlitchText is the jittering headline (accent/error ghosts + caret) used on the error / 404 pages."
         >
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
-            <Panel caption="// INLINE">
-              <State caption="inline (20px, in-flow)">
-                <Loading inline />
-              </State>
-            </Panel>
-            <Panel caption="// BLOCK">
-              <State caption="block (28px, fills its container)">
-                <div className="relative h-40 overflow-hidden border-2 border-[var(--m-dim)]">
-                  {/* Block Loading fills min-h-screen; clip it to a demo box. */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span
-                      role="status"
-                      aria-label="Loading"
-                      className="block animate-spin border-2 border-[var(--m-dim)] border-t-[var(--m-accent)]"
-                      style={{ width: 28, height: 28 }}
-                    />
+            <Panel caption="// SPINNER (Loading)">
+              <div className="flex flex-col gap-7">
+                <State caption="inline (14px, in-flow) — real component">
+                  <Loading inline />
+                </State>
+                <State caption="block — spinner + LOADING label, one line (fills the viewport in real use)">
+                  <div className="flex items-center gap-3">
+                    <Loading inline />
+                    <span className="text-[11px] tracking-[0.12em] text-[var(--m-muted2)] uppercase">
+                      Loading
+                    </span>
                   </div>
-                </div>
-              </State>
+                </State>
+              </div>
+            </Panel>
+
+            <Panel caption="// PROGRESSBAR — block fill">
+              <div className="flex flex-col gap-7">
+                <State caption="determinate (64%)">
+                  <ProgressBar value={64} label="Uploading image" />
+                </State>
+                <State caption="indeterminate (animated sweep)">
+                  <ProgressBar label="Processing" />
+                </State>
+              </div>
             </Panel>
           </div>
-          <p className="mt-7 text-[12px] leading-[1.6] text-[var(--m-muted2)]">
-            Note: the real block Loading uses min-h-screen + header
-            compensation, so it can&apos;t render &quot;boxed&quot; without
-            taking over the viewport — the demo box mirrors its exact spinner
-            markup. The inline variant above is the real component.
-          </p>
+
+          <Panel
+            caption="// GLITCHTEXT — error / 404 headline"
+            className="mt-7"
+          >
+            <State caption="jitter + accent/error ghost layers + blinking caret">
+              <h2 className="font-display text-[32px] leading-none font-bold tracking-[-0.02em] text-[var(--m-fg)]">
+                <GlitchText caret>A glitch in the Lazyverse</GlitchText>
+              </h2>
+            </State>
+          </Panel>
         </Section>
 
         {/* 09 — PROSE */}
