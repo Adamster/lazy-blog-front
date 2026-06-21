@@ -74,13 +74,13 @@ const CommentView = ({ comment, postId }: IProps) => {
   const menuItems: MenuItem[] = [
     {
       id: "edit",
-      label: "Редактировать",
+      label: "Edit",
       icon: <PencilSquareIcon className="size-3.5" />,
       onSelect: () => setIsEditComment(true),
     },
     {
       id: "delete",
-      label: "Удалить",
+      label: "Delete",
       icon: <TrashIcon className="size-3.5" />,
       danger: true,
       onSelect: () => setIsModalOpen(true),

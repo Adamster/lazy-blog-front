@@ -143,8 +143,8 @@ function LogoCard({ dark }: { dark: boolean }) {
           className="text-[12px]"
           style={{ color: dark ? "#9a9a9a" : "#6b6b6b" }}
         >
-          {dark ? "светлый вариант" : "тёмный вариант"} — морда только моно, без
-          зелёного
+          {dark ? "light variant" : "dark variant"} — the sloth mark is mono
+          only, no green
         </span>
       </div>
     </div>
@@ -182,23 +182,23 @@ const TYPE: {
   },
   {
     spec: "H3 · 18 / 600 / 0",
-    sample: "Новый режим self-debate",
+    sample: "A new mode of self-debate",
     display: true,
     style: { fontSize: 18, fontWeight: 600, lineHeight: 1.18 },
   },
   {
     spec: "Prose · 14 / 400 · lh 1.85",
-    sample: "Уверенность — это не знание; это стиль.",
+    sample: "Confidence isn't knowledge; it's style.",
     style: { fontSize: 14, fontWeight: 400, lineHeight: 1.85 },
   },
   {
     spec: "UI body · 14 / 400 · lh 1.6",
-    sample: "Саммари, био, кнопки, инпуты, комментарии — всё на 14.",
+    sample: "Summaries, bios, buttons, inputs, comments — all at 14.",
     style: { fontSize: 14, fontWeight: 400, lineHeight: 1.6 },
   },
   {
     spec: "Caption · 12 / 400",
-    sample: "15 июня · 4 мин чтения · @lazy_ela",
+    sample: "Jun 15 · 4 min read · @lazy_ela",
     style: { fontSize: 12, fontWeight: 400, color: "var(--m-muted)" },
   },
   {
@@ -228,13 +228,14 @@ export function BrandTab() {
         </div>
       </div>
       <p className="mt-5 max-w-[46em] text-[14px] leading-[1.7] text-[var(--m-muted)]">
-        Space Grotesk — для идентичности, заголовков и чисел; JetBrains Mono —
-        для данных, кода, body и лейблов. Тёмно-серая база, никогда чистый
-        чёрный. Акцент проекта —{" "}
-        <strong className="text-[var(--m-accent)]">лайм</strong> (оливковый в
-        свете, кислотный в тёмной). Геометрия: квадратные углы, рамки 2px, без
-        скруглений. Foundations здесь; готовые примитивы и их состояния — во
-        вкладке <code className="text-[var(--m-fg)]">Components</code>.
+        Space Grotesk — for identity, headings and numbers; JetBrains Mono — for
+        data, code, body and labels. Dark-grey base, never pure black. The
+        project accent is{" "}
+        <strong className="text-[var(--m-accent)]">lime</strong> (olive in
+        light, acid-green in dark). Geometry: square corners, 2px borders, no
+        rounding. Foundations live here; the ready-made primitives and their
+        states are in the <code className="text-[var(--m-fg)]">Components</code>{" "}
+        tab.
       </p>
 
       <div className="mt-10 flex flex-col gap-10">
@@ -242,7 +243,7 @@ export function BrandTab() {
         <Section
           index="01"
           title="COLOR SYSTEM"
-          intro="Десять токенов на тему. В коде — только var(--m-*); хардкод хексов запрещён. Тема переключается классом .dark на предке (кнопка в хедере)."
+          intro="Ten tokens per theme. In code — only var(--m-*); hard-coded hex is banned. The theme switches via a `.dark` class on an ancestor (the button in the header)."
         >
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
             <Palette title="// LIGHT" hex={LIGHT_HEX} pal={LIGHT} />
@@ -254,7 +255,7 @@ export function BrandTab() {
         <Section
           index="02"
           title="LOGO & MARK"
-          intro="Лок-ап [ TEAM ] NOT LAZY: бракетный бейдж в заливке акцента + словесный знак (NOT — fg, LAZY — accent, Space Grotesk 700). Морда ленивца (LogoSloth) — ТОЛЬКО моно: тёмная на светлом, светлая на тёмном. Зелёного (accent) варианта морды нет — акцент живёт только в лок-апе."
+          intro="The [ TEAM ] NOT LAZY lockup: a bracketed badge in the accent fill + the wordmark (NOT — fg, LAZY — accent, Space Grotesk 700). The sloth mark (LogoSloth) is mono ONLY: dark on light, light on dark. There is no green (accent) variant of the mark — the accent lives only in the lockup."
         >
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
             <LogoCard dark={false} />
@@ -266,7 +267,7 @@ export function BrandTab() {
         <Section
           index="03"
           title="TYPOGRAPHY"
-          intro="Шкала кеглей. Space Grotesk = идентичность/тайтлы/числа. JetBrains Mono = data/code/body/labels. Не выдумывай промежуточных размеров."
+          intro="The type scale. Space Grotesk = identity/titles/numbers. JetBrains Mono = data/code/body/labels. Don't invent intermediate sizes."
         >
           <div className="flex flex-col">
             {TYPE.map((t) => (
@@ -292,7 +293,7 @@ export function BrandTab() {
         <Section
           index="04"
           title="GEOMETRY & LAYOUT"
-          intro="Системные foundations формы и сетки. Квадратные углы (без скруглений), рамки 2px везде (primary --m-line, secondary --m-dim), акцентные кромки тоже 2px (никогда 3px). Контейнеры и контролы — из фиксированной шкалы."
+          intro="The system foundations for shape and grid. Square corners (no rounding), 2px borders everywhere (primary --m-line, secondary --m-dim), accent edges are 2px too (never 3px). Containers and controls come from a fixed scale."
         >
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
             <Panel caption="// FORM & BORDERS" tone="muted">
@@ -339,7 +340,7 @@ export function BrandTab() {
         <Section
           index="05"
           title="SPACING & RHYTHM"
-          intro="Сетка 4px. Секционность держим на 40px; 28px — ТОЛЬКО для повторяющихся item-гэпов (карточки, лента, список, комменты), НИКОГДА для секций. Промежуточные значения (6/14/22) — мимо."
+          intro="A 4px grid. Keep section rhythm at 40px; 28px is ONLY for repeating item gaps (cards, feed, list, comments), NEVER for sections. Intermediate values (6/14/22) are off-limits."
         >
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
             <div className="flex flex-col">
@@ -372,13 +373,13 @@ export function BrandTab() {
         <Section
           index="06"
           title="LETTER-SPACING & LINE-HEIGHT"
-          intro="Все лейблы и категории — трекинг 0.12em на 11px (это и даёт «терминальный» характер; без него — плоско). Бейджи плотнее — 0.06em. Заголовки -0.02em."
+          intro="All labels and categories — 0.12em letter-spacing at 11px (this is what gives the 'terminal' character; without it, it reads flat). Badges are tighter — 0.06em. Headings -0.02em."
         >
           <Panel caption="✕ 0 vs ✓ 0.12em" tone="muted" className="mb-7">
             <div className="grid grid-cols-1 gap-7 sm:grid-cols-2">
               <div>
                 <div className="mb-2 text-[11px] tracking-[0.1em] text-[var(--m-muted2)]">
-                  ✕ tracking 0 — плоско
+                  ✕ tracking 0 — flat
                 </div>
                 <div className="text-[11px] tracking-[0] text-[var(--m-muted)]">
                   {"// MOST ACTIVE USER"}
@@ -386,7 +387,7 @@ export function BrandTab() {
               </div>
               <div>
                 <div className="mb-2 text-[11px] tracking-[0.1em] text-[var(--m-muted2)]">
-                  ✓ tracking 0.12em — стандарт
+                  ✓ tracking 0.12em — standard
                 </div>
                 <div className="text-[11px] tracking-[0.12em] text-[var(--m-accent)]">
                   {"// MOST ACTIVE USER"}

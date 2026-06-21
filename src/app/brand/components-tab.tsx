@@ -81,7 +81,7 @@ export function ComponentsTab() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [filledText, setFilledText] = useState("hello@notlazy.dev");
   const [filledArea, setFilledArea] = useState(
-    "Уверенность — это не знание; это стиль."
+    "Confidence isn't knowledge; it's style."
   );
   const [singleSel, setSingleSel] = useState<string | undefined>("ai");
   const [multiSel, setMultiSel] = useState<string[]>(["design", "code"]);

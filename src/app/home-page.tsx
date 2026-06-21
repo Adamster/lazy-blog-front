@@ -123,9 +123,14 @@ export default function HomePage() {
                   </Label>
                   {topUser && (
                     <div className="min-w-0">
-                      <div className="mono-title block h-[30px] truncate !leading-[30px]">
-                        {nameOf(topUser.author)}
-                      </div>
+                      <Link
+                        href={`/${topUser.author.userName}`}
+                        className="group block"
+                      >
+                        <div className="mono-title block h-[30px] truncate !leading-[30px] transition-colors group-hover:text-[var(--m-accent)]">
+                          {nameOf(topUser.author)}
+                        </div>
+                      </Link>
                       <div className="mt-4 flex items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
                         <Link
                           href={`/${topUser.author.userName}`}
