@@ -517,8 +517,10 @@
   .milkdown-list-item-block li .label-wrapper .label {
     width: 18px;
   }
-  /* Marker colour = text (the read view's native disc/decimal is fg). */
+  /* Marker colour = text (the read view's native disc/decimal is fg). Drop
+     Crepe's fixed 32px marker height — it made list rows taller than the line. */
   .milkdown-list-item-block li .label-wrapper {
+    height: auto;
     color: var(--m-fg);
   }
   /* Crepe wraps each item's text in a <p> (margin 0 0 20px); zero it so tight
