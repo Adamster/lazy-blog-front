@@ -41,8 +41,8 @@ export function SettingsToggles({
   onToggleLang,
 }: SettingsTogglesProps) {
   return (
-    <div className="border-t-2 border-[var(--m-dim)]">
-      <div className="px-4 pt-3 pb-1 text-[11px] tracking-[0.1em] text-[var(--m-muted2)]">
+    <div>
+      <div className="px-4 pt-3 pb-1 text-[11px] tracking-[0.12em] text-[var(--m-muted2)]">
         {"// settings"}
       </div>
 

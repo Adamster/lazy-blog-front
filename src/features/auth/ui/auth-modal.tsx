@@ -483,7 +483,7 @@ export function AuthModal({
       onOpenChange={onOpenChange}
       // Reset to login whenever the modal fully closes, so reopening starts fresh.
       onClose={() => setView("login")}
-      width={view === "register" ? "lg" : "md"}
+      width={view === "register" ? "wide" : "md"}
       labelledBy={titleId}
     >
       {(onClose) => {

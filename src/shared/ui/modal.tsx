@@ -21,6 +21,7 @@ const widthClass = {
   sm: "max-w-[400px]",
   md: "max-w-[432px]",
   lg: "max-w-[480px]",
+  wide: "max-w-[560px]",
   xl: "max-w-[760px]",
 } as const;
 
@@ -51,7 +52,7 @@ export function Modal({
   onOpenChange: () => void;
   /** Fires when the modal fully closes (e.g. to reset internal view state). */
   onClose?: () => void;
-  width?: "sm" | "md" | "lg" | "xl";
+  width?: "sm" | "md" | "lg" | "wide" | "xl";
   /** Top-stripe colour: accent (default) or error (destructive confirms). */
   tone?: "default" | "danger";
   /** id of the heading element, wired to the dialog via `aria-labelledby`. */
