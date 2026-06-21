@@ -345,9 +345,8 @@
     padding: 0;
   }
 
-  // Crepe maps every markdown heading onto h1..h6; the design uses a single
-  // 24px Space Grotesk section heading regardless of source level (matching
-  // prose.css), so the editor preview and the published page agree.
+  // Space Grotesk headings, three distinct sizes (H1 32 · H2 24 · H3+ 18) —
+  // mirrors prose.css so the editor preview and the published page agree.
   h1,
   h2,
   h3,
@@ -355,13 +354,24 @@
   h5,
   h6 {
     font-family: var(--font-display);
-    font-size: 24px;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.01em;
     text-align: left;
     margin: 36px 0 16px;
     padding: 0;
+  }
+  h1 {
+    font-size: 32px;
+  }
+  h2 {
+    font-size: 24px;
+  }
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: 18px;
   }
 
   ul,
@@ -472,5 +482,36 @@
 
   del {
     color: var(--m-muted);
+  }
+}
+
+/* Crepe block-chrome that fights the shared prose styling — neutralize it so the
+   editable surface matches the read view 1:1. */
+.milkdown .ProseMirror {
+  /* Hide Crepe's rounded blockquote bar (::before) — prose.css already draws
+     the 2px accent border-left, so this is a duplicate. */
+  blockquote::before {
+    display: none;
+  }
+
+  /* First block carries no top margin (mirrors `.mono-prose > :first-child`). */
+  > :first-child {
+    margin-top: 0;
+  }
+
+  /* Crepe lays list items out as a flex row (24px marker column + 10px gap),
+     which over-indents vs the read view's native marker (~22px). Drop our list
+     padding (the marker column replaces it) and tighten the column + gap so the
+     content lands at ~22px like prose.css. */
+  ul,
+  ol {
+    padding-left: 0;
+  }
+  .milkdown-list-item-block li {
+    gap: 6px;
+  }
+  .milkdown-list-item-block li .label-wrapper,
+  .milkdown-list-item-block li .label-wrapper .label {
+    width: 18px;
   }
 }

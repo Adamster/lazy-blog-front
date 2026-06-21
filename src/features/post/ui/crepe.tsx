@@ -124,7 +124,9 @@ export default function CrepeEditor({
         [Crepe.Feature.BlockEdit]: true,
         [Crepe.Feature.LinkTooltip]: true,
         [Crepe.Feature.Placeholder]: true,
-        [Crepe.Feature.Cursor]: true,
+        // Virtual cursor OFF — it painted a grey caret over text that disagreed
+        // with the native one; the native accent caret is consistent.
+        [Crepe.Feature.Cursor]: false,
       },
       featureConfigs: {
         [Crepe.Feature.Placeholder]: placeholderRef.current

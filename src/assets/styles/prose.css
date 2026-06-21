@@ -29,8 +29,8 @@
   margin: 0 0 20px;
 }
 
-/* The doc title is the page <h1>; markdown headings render as the design's
-   single 24px Space Grotesk section heading regardless of source level. */
+/* Markdown headings — Space Grotesk, three distinct sizes (H1 32 · H2 24 ·
+   H3+ 18). The doc title is the separate page <h1>. */
 .mono-prose h1,
 .mono-prose h2,
 .mono-prose h3,
@@ -38,12 +38,23 @@
 .mono-prose h5,
 .mono-prose h6 {
   font-family: var(--font-display);
-  font-size: 24px;
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.01em;
   text-align: left;
   margin: 36px 0 16px;
+}
+.mono-prose h1 {
+  font-size: 32px;
+}
+.mono-prose h2 {
+  font-size: 24px;
+}
+.mono-prose h3,
+.mono-prose h4,
+.mono-prose h5,
+.mono-prose h6 {
+  font-size: 18px;
 }
 
 .mono-prose ul,
