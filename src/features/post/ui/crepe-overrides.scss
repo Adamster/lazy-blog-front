@@ -364,7 +364,9 @@
   h1 {
     font-size: 32px;
   }
-  h2,
+  h2 {
+    font-size: 24px;
+  }
   h3,
   h4,
   h5,
@@ -453,6 +455,7 @@
   hr {
     height: 2px;
     border: 0;
+    padding: 0;
     background: var(--m-dim);
     margin: 36px 0;
   }
@@ -513,15 +516,27 @@
   .milkdown-list-item-block li {
     gap: 6px;
   }
-  .milkdown-list-item-block li .label-wrapper,
-  .milkdown-list-item-block li .label-wrapper .label {
-    width: 18px;
-  }
-  /* Marker colour = text (the read view's native disc/decimal is fg). Drop
-     Crepe's fixed 32px marker height — it made list rows taller than the line. */
+  /* Crepe gives the marker a fixed 32px box (height + 4px padding) that makes
+     rows taller than the line and floats the marker below the first line. Size
+     the marker box to the text line (1.85em) and keep Crepe's flex-centering so
+     the marker sits ON the line; colour it fg (native disc/decimal is fg). */
   .milkdown-list-item-block li .label-wrapper {
-    height: auto;
+    width: 20px;
+    height: 1.85em;
     color: var(--m-fg);
+  }
+  .milkdown-list-item-block li .label-wrapper .label {
+    width: 20px;
+    height: auto;
+    padding: 0;
+  }
+  /* Bullet marker is an SVG dot — Crepe fills it with the dim outline colour and
+     it was over-shrunk. Colour it fg (the SVG uses `fill`, not `color`) and size
+     it ~the native disc. */
+  .milkdown-list-item-block li .label-wrapper .label svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--m-fg);
   }
   /* Crepe wraps each item's text in a <p> (margin 0 0 20px); zero it so tight
      lists match the read view, where items aren't wrapped in a <p>. */

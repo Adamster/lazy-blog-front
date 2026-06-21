@@ -6,6 +6,7 @@ import {
   toggleEmphasisCommand,
   toggleInlineCodeCommand,
   wrapInHeadingCommand,
+  turnIntoTextCommand,
   wrapInBulletListCommand,
   wrapInOrderedListCommand,
   wrapInBlockquoteCommand,
@@ -109,13 +110,6 @@ export function EditorToolbar({
 
       {/* Headings */}
       <ToolBtn
-        label="Heading 1"
-        glyph="H1"
-        glyphClass="text-[12px] font-semibold"
-        disabled={disabled}
-        onPress={() => onCommand(wrapInHeadingCommand, 1)}
-      />
-      <ToolBtn
         label="Heading 2"
         glyph="H2"
         glyphClass="text-[12px] font-semibold"
@@ -128,6 +122,13 @@ export function EditorToolbar({
         glyphClass="text-[12px] font-semibold"
         disabled={disabled}
         onPress={() => onCommand(wrapInHeadingCommand, 3)}
+      />
+      <ToolBtn
+        label="Paragraph"
+        glyph="P"
+        glyphClass="text-[12px] font-semibold"
+        disabled={disabled}
+        onPress={() => onCommand(turnIntoTextCommand)}
       />
 
       <Divider />

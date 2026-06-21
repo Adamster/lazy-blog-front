@@ -47,7 +47,9 @@
 .mono-prose h1 {
   font-size: 32px;
 }
-.mono-prose h2,
+.mono-prose h2 {
+  font-size: 24px;
+}
 .mono-prose h3,
 .mono-prose h4,
 .mono-prose h5,

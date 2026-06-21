@@ -2,6 +2,34 @@ import type { ComponentPropsWithoutRef } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+type MdNode = { type: string; value?: string; children?: MdNode[] };
+
+/**
+ * Milkdown's "preserve empty line" plugin serialises blank lines as literal
+ * `<br />` HTML (e.g. the trailing empty paragraph Crepe auto-adds after a
+ * divider). We don't render raw HTML (no `rehype-raw`), so those would show as
+ * the text "<br />". Drop those exact `<br>` nodes (and any paragraph they leave
+ * empty) so only Crepe's real line breaks remain — every other HTML node is
+ * left untouched (still not rendered), so the security posture is unchanged.
+ */
+function remarkDropEmptyLines() {
+  const isBr = (n: MdNode) =>
+    n.type === "html" && /^<br\s*\/?>$/i.test((n.value ?? "").trim());
+  const isEmptyParagraph = (n: MdNode) =>
+    n.type === "paragraph" && (n.children?.length ?? 0) === 0;
+
+  return (tree: MdNode) => {
+    const walk = (node: MdNode) => {
+      if (!node.children) return;
+      node.children.forEach(walk);
+      node.children = node.children.filter(
+        (c) => !isBr(c) && !isEmptyParagraph(c)
+      );
+    };
+    walk(tree);
+  };
+}
+
 /**
  * Shared, server-compatible markdown renderer for the "Brutalist Mono" prose
  * sub-scale. Used by BOTH the server-rendered post read view AND the editor's
@@ -49,7 +77,10 @@ interface PostBodyProps {
 export function PostBody({ markdown }: PostBodyProps) {
   return (
     <div className="mono-prose">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkDropEmptyLines]}
+        components={components}
+      >
         {markdown}
       </ReactMarkdown>
     </div>
