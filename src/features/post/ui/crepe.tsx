@@ -6,6 +6,7 @@ import "./crepe-overrides.scss";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Crepe } from "@milkdown/crepe";
 import { callCommand } from "@milkdown/kit/utils";
+import { insertImageCommand } from "@milkdown/kit/preset/commonmark";
 import { listener, listenerCtx } from "@milkdown/kit/plugin/listener";
 import { useAuth, useUser } from "@/entities/session";
 import { API_URL } from "@/shared/types";
@@ -102,6 +103,18 @@ export default function CrepeEditor({
     }
   };
 
+  // Toolbar Image button → file picker hands the chosen file here. Reuse the
+  // same authed upload as Crepe's own ImageBlock, then dispatch
+  // `insertImageCommand` so the node lands at the selection — the mutation
+  // fires `markdownUpdated` and the body stays synced via the existing path.
+  const onInsertImage = async (file: File) => {
+    const src = await imageUploadHandler(file);
+    if (!src) return;
+    crepeRef.current?.editor.action(
+      callCommand(insertImageCommand.key, { src })
+    );
+  };
+
   // Mount the editor once. Crepe owns the document lifecycle; the form value is
   // synced out via the debounced `onChange`, never pushed back in (avoids cursor
   // jumps / re-mount churn). `markdown`/`placeholder` are read on mount only.
@@ -122,7 +135,9 @@ export default function CrepeEditor({
         [Crepe.Feature.Latex]: false,
         // Floating selection bubble OFF — the persistent toolbar replaces it.
         [Crepe.Feature.Toolbar]: false,
-        [Crepe.Feature.BlockEdit]: true,
+        // Slash menu + block handles OFF — the persistent toolbar is now the
+        // single source of formatting (every block action lives there).
+        [Crepe.Feature.BlockEdit]: false,
         [Crepe.Feature.LinkTooltip]: true,
         [Crepe.Feature.Placeholder]: true,
         // Virtual cursor OFF — it painted a grey caret over text that disagreed
@@ -168,7 +183,11 @@ export default function CrepeEditor({
   return (
     <div>
       {/* Persistent toolbar = the top edge of the framed writing column. */}
-      <EditorToolbar onCommand={runCommand} disabled={!ready} />
+      <EditorToolbar
+        onCommand={runCommand}
+        onInsertImage={onInsertImage}
+        disabled={!ready}
+      />
       {/* Sheet: 2px side walls (open bottom — scrolls into the page), the page
           background, and a 40px inset so text never touches the walls. */}
       <div className="min-h-[60vh] border-x-2 border-[var(--m-line)] bg-[var(--m-bg)] p-7 md:p-10">

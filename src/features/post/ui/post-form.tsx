@@ -228,7 +228,7 @@ export const PostForm = ({
           rules={{ required: "Body is required" }}
           render={({ field }) => (
             <CrepeEditor
-              placeholder="Type something. / for slash commands…"
+              placeholder="Start writing… use the toolbar to format"
               markdown={field.value ?? ""}
               onChange={field.onChange}
             />
