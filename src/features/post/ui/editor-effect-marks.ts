@@ -26,25 +26,28 @@ import { remarkDirective } from "./editor-small-mark";
  * @milkdown/core `Editor.use`/`#usrPluginStore`.)
  *
  * Editor DOM: the JS-driven read-view effects (glitch jitter / matrix scramble)
- * are read-view only. In the editor the marks render as static, styled,
- * STILL-EDITABLE spans (`.mono-glitch` wrapper for glitch so the author sees the
- * brand treatment; a plain styled span for matrix). The full animated effect
- * appears in the published read view (`<PostBody>` → GlitchText / MatrixText).
+ * are read-view only. In the editor BOTH marks render as static, STILL-EDITABLE
+ * spans in their NORMAL text colour, framed with a dotted box + a fast hover hint
+ * (shared `.mono-fx-mark`, styled in crepe-overrides.scss) — no colour tint and
+ * no shake, either of which could be mistaken for real styling. The author sees
+ * the text carries an effect; the full animation appears only in the published
+ * read view (`<PostBody>` → GlitchText / MatrixText).
  */
 
-/** The inline `glitch` mark → `textDirective{name:"glitch"}`. Editor DOM uses
- *  the `.mono-glitch` wrapper structure so the author sees the brand treatment;
- *  text stays editable (the animation is read-view only). */
+/** The inline `glitch` mark → `textDirective{name:"glitch"}`. Editor DOM is a
+ *  flat framed hint span (normal colour, dotted box + hover hint); the shake is
+ *  read-view only. `.mono-glitch` is kept for paste round-trip (parseDOM);
+ *  `.mono-fx-mark` carries the framed-hint styling. */
 export const glitchSchema = $markSchema("glitch", () => ({
   inclusive: true,
   parseDOM: [{ tag: "span.mono-glitch" }],
-  // Editable .mono-glitch wrapper; the read view renders the full animated
-  // GlitchText. We keep the inner editable text in `.mono-glitch-main` (hole 0)
-  // and omit the ghost layers (decorative) so editing stays simple.
   toDOM: () => [
     "span",
-    { class: "mono-glitch" },
-    ["span", { class: "mono-glitch-main" }, 0],
+    {
+      class: "mono-glitch mono-fx-mark",
+      "data-fx-hint": "Glitch — animates in the published post",
+    },
+    0,
   ],
   parseMarkdown: {
     match: (node) => node.type === "textDirective" && node.name === "glitch",
@@ -63,11 +66,20 @@ export const glitchSchema = $markSchema("glitch", () => ({
 }));
 
 /** The inline `matrix` mark → `textDirective{name:"matrix"}`. Editor DOM is a
- *  static styled span (the scramble-decode is read-view only); text editable. */
+ *  flat framed hint span (normal colour, dotted box + hover hint); the scramble-decode
+ *  is read-view only. `.mono-matrix` is kept for paste round-trip (parseDOM);
+ *  `.mono-fx-mark` carries the framed-hint styling. */
 export const matrixSchema = $markSchema("matrix", () => ({
   inclusive: true,
   parseDOM: [{ tag: "span.mono-matrix" }],
-  toDOM: () => ["span", { class: "mono-matrix" }, 0],
+  toDOM: () => [
+    "span",
+    {
+      class: "mono-matrix mono-fx-mark",
+      "data-fx-hint": "Matrix — animates in the published post",
+    },
+    0,
+  ],
   parseMarkdown: {
     match: (node) => node.type === "textDirective" && node.name === "matrix",
     runner: (state, node, markType) => {
