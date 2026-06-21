@@ -196,6 +196,19 @@ export const PostForm = ({
             </div>
           </div>
         </div>
+
+        {/* Forward to the Write step — below the card, outside its frame, so it
+            never stretches the panel. Mirrors the top-bar Cancel link. */}
+        <div className="mt-7 flex justify-end">
+          <button
+            type="button"
+            onClick={goToWrite}
+            className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
+          >
+            Next
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
       </section>
 
       {/* ── STEP 2: WRITE — 780 Crepe column, normal page scroll ── */}
