@@ -3,11 +3,13 @@
 import "@milkdown/crepe/theme/common/style.css";
 import "./crepe-overrides.scss";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Crepe } from "@milkdown/crepe";
+import { callCommand } from "@milkdown/kit/utils";
 import { listener, listenerCtx } from "@milkdown/kit/plugin/listener";
 import { useAuth, useUser } from "@/entities/session";
 import { API_URL } from "@/shared/types";
+import { EditorToolbar, type RunCommand } from "./editor-toolbar";
 
 type ImageUploadHandler = (file: File) => Promise<string>;
 
@@ -44,6 +46,16 @@ export default function CrepeEditor({
   onChange,
 }: CrepeEditorProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const crepeRef = useRef<Crepe | null>(null);
+  // Gates the toolbar until the editor has finished mounting.
+  const [ready, setReady] = useState(false);
+
+  // Dispatch a Milkdown command from the persistent toolbar into the live
+  // editor. Mutations fire the `markdownUpdated` listener → debounced `onChange`,
+  // so the form's `body` stays in sync through the existing path (no new flow).
+  const runCommand = useCallback<RunCommand>((cmd, payload) => {
+    crepeRef.current?.editor.action(callCommand(cmd.key, payload));
+  }, []);
 
   // Mount-once values, captured at first render so the init effect can run with
   // empty deps without reading changing props from a stale closure.
@@ -102,7 +114,8 @@ export default function CrepeEditor({
       features: {
         [Crepe.Feature.CodeMirror]: true,
         [Crepe.Feature.Latex]: true,
-        [Crepe.Feature.Toolbar]: true,
+        // Floating selection bubble OFF — the persistent toolbar replaces it.
+        [Crepe.Feature.Toolbar]: false,
         [Crepe.Feature.BlockEdit]: true,
         [Crepe.Feature.LinkTooltip]: true,
         [Crepe.Feature.Placeholder]: true,
@@ -126,14 +139,30 @@ export default function CrepeEditor({
       })
       .use(listener);
 
-    void crepe.create();
+    crepeRef.current = crepe;
+    let alive = true;
+    void crepe.create().then(() => {
+      if (alive) setReady(true);
+    });
 
     return () => {
+      alive = false;
+      crepeRef.current = null;
       void crepe.destroy();
     };
     // Mount-once: every value the effect reads is a ref (stable identity), so
     // the empty dep array is correct and complete.
   }, []);
 
-  return <div className="milkdown mono-prose" ref={rootRef} />;
+  return (
+    <div>
+      {/* Persistent toolbar = the top edge of the framed writing column. */}
+      <EditorToolbar onCommand={runCommand} disabled={!ready} />
+      {/* Sheet: 2px side walls (open bottom — scrolls into the page), the page
+          background, and a 40px inset so text never touches the walls. */}
+      <div className="min-h-[60vh] border-x-2 border-[var(--m-line)] bg-[var(--m-bg)] p-7 md:p-10">
+        <div className="milkdown mono-prose" ref={rootRef} />
+      </div>
+    </div>
+  );
 }
