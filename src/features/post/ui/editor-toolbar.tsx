@@ -29,8 +29,15 @@ import {
   MinusIcon,
   ChatBubbleBottomCenterTextIcon,
   CodeBracketIcon,
+  SparklesIcon,
+  BoltIcon,
+  CommandLineIcon,
 } from "@heroicons/react/24/outline";
 import { toggleSmallCommand } from "./editor-small-mark";
+import {
+  toggleGlitchCommand,
+  toggleMatrixCommand,
+} from "./editor-effect-marks";
 
 /** Dispatch a Milkdown command into the live editor (owned by `crepe.tsx`). */
 export type RunCommand = <T>(cmd: $Command<T>, payload?: T) => void;
@@ -236,8 +243,26 @@ export function EditorToolbar({
     },
   ];
 
+  // Inline brand effects — toggle a custom mark on the selection. Each
+  // round-trips through markdown as a remark directive (`:glitch[…]` /
+  // `:matrix[…]`) and renders its full animated component in the read view.
+  const effectItems: InsertItem[] = [
+    {
+      id: "glitch",
+      label: "Glitch",
+      icon: BoltIcon,
+      run: () => onCommand(toggleGlitchCommand),
+    },
+    {
+      id: "matrix",
+      label: "Matrix",
+      icon: CommandLineIcon,
+      run: () => onCommand(toggleMatrixCommand),
+    },
+  ];
+
   return (
-    <div className="sticky top-0 z-10 flex items-center gap-1 border-2 border-[var(--m-line)] border-b-[var(--m-dim)] bg-[var(--m-card)] px-4 py-2">
+    <div className="sticky top-0 z-10 flex items-center gap-1 border-2 border-[var(--m-dim)] bg-[var(--m-card)] px-4 py-2">
       {/* Scrollable format buttons. The horizontal scroll lives on THIS inner
           row (not the bar) so the Insert popover — a sibling in the non-overflow
           outer — isn't clipped by `overflow-x-auto`. */}
@@ -345,6 +370,15 @@ export function EditorToolbar({
         icon={PlusIcon}
         label="Insert"
         items={insertItems}
+        disabled={disabled}
+      />
+
+      {/* Inline brand effects (Glitch / Matrix) — custom marks that wrap the
+          selection and round-trip as remark directives. */}
+      <ToolbarMenu
+        icon={SparklesIcon}
+        label="Effects"
+        items={effectItems}
         disabled={disabled}
       />
     </div>

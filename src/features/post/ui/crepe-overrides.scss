@@ -52,6 +52,13 @@
   .ProseMirror {
     padding: 0;
     min-height: 20rem;
+
+    /* Kill the browser's blue `:focus-visible` ring on the editable — the 2px
+       frame around the column is the focus affordance, not a UA outline. */
+    &:focus,
+    &:focus-visible {
+      outline: none;
+    }
   }
 
   .milkdown-block-handle {
@@ -376,6 +383,16 @@
 
   small {
     font-size: 12px;
+  }
+
+  // Custom inline brand-effect marks (`:matrix[…]`). The JS scramble-decode is
+  // read-view only (PostBody → MatrixText); in the editor the text stays static
+  // and editable, styled so the author sees it's special. The `glitch` mark
+  // renders the shared `.mono-glitch` wrapper (animated, from tailwind.css) and
+  // needs no extra rule here. Full animated effects show in the published post.
+  .mono-matrix {
+    color: var(--m-accent);
+    letter-spacing: 0.08em;
   }
 
   ul,

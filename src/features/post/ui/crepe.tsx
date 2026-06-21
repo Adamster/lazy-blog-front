@@ -12,6 +12,7 @@ import { useAuth, useUser } from "@/entities/session";
 import { API_URL } from "@/shared/types";
 import { EditorToolbar, type RunCommand } from "./editor-toolbar";
 import { smallMark } from "./editor-small-mark";
+import { effectMarks } from "./editor-effect-marks";
 
 type ImageUploadHandler = (file: File) => Promise<string>;
 
@@ -163,7 +164,11 @@ export default function CrepeEditor({
       .use(listener)
       // Custom inline "small" mark (`:small[…]`) — toolbar SM toggles it, it
       // round-trips through markdown as a remark directive. See editor-small-mark.
-      .use(smallMark);
+      .use(smallMark)
+      // Custom inline brand effects (`:glitch[…]` / `:matrix[…]`) — toolbar
+      // Effects ▾ toggles them; they round-trip as remark directives and reuse
+      // smallMark's single remark-directive registration. See editor-effect-marks.
+      .use(effectMarks);
 
     crepeRef.current = crepe;
     let alive = true;
@@ -190,7 +195,7 @@ export default function CrepeEditor({
       />
       {/* Sheet: 2px side walls (open bottom — scrolls into the page), the page
           background, and a 40px inset so text never touches the walls. */}
-      <div className="min-h-[60vh] border-x-2 border-[var(--m-line)] bg-[var(--m-bg)] p-7 md:p-10">
+      <div className="min-h-[60vh] border-x-2 border-[var(--m-dim)] bg-[var(--m-bg)] p-7 md:p-10">
         <div className="milkdown mono-prose" ref={rootRef} />
       </div>
     </div>

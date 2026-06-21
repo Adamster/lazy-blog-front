@@ -1,7 +1,9 @@
-import type { ComponentPropsWithoutRef } from "react";
+import { Children, type ComponentPropsWithoutRef, type ReactNode } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkDirective from "remark-directive";
+import { GlitchText } from "./glitch-text";
+import { MatrixText } from "./matrix-text";
 
 type MdNode = {
   type: string;
@@ -60,6 +62,57 @@ function remarkSmallDirective() {
 }
 
 /**
+ * Bridge our custom `:glitch[…]` / `:matrix[…]` text directives to custom hast
+ * tags (`glitch` / `matrix`) so react-markdown routes them to the `GlitchText` /
+ * `MatrixText` components below (via the `components` map). Same pattern and same
+ * safety stance as `remarkSmallDirective`: scoped to the exact directive names
+ * we own — any UNKNOWN directive keeps no `hName` and renders nothing (inert).
+ */
+function remarkEffectDirectives() {
+  return (tree: MdNode) => {
+    const walk = (node: MdNode) => {
+      if (node.type === "textDirective") {
+        if (node.name === "glitch")
+          node.data = { ...node.data, hName: "glitch" };
+        else if (node.name === "matrix")
+          node.data = { ...node.data, hName: "matrix" };
+      }
+      node.children?.forEach(walk);
+    };
+    walk(tree);
+  };
+}
+
+/**
+ * Flatten a directive's rendered React children to a plain string — both effect
+ * components take their text as a string prop (`GlitchText` needs `children:
+ * string`, `MatrixText` needs `text: string`), but react-markdown hands us
+ * React nodes. The directive content is plain inline text, so this recursion
+ * over string/number/array/element-children resolves to the underlying text.
+ */
+function childrenToString(children: ReactNode): string {
+  return Children.toArray(children)
+    .map((child) => {
+      if (typeof child === "string") return child;
+      if (typeof child === "number") return String(child);
+      if (
+        child &&
+        typeof child === "object" &&
+        "props" in child &&
+        child.props != null &&
+        typeof child.props === "object" &&
+        "children" in child.props
+      ) {
+        return childrenToString(
+          (child.props as { children: ReactNode }).children
+        );
+      }
+      return "";
+    })
+    .join("");
+}
+
+/**
  * Shared, server-compatible markdown renderer for the "Brutalist Mono" prose
  * sub-scale. Used by BOTH the server-rendered post read view AND the editor's
  * live preview, so the two are identical by construction.
@@ -76,8 +129,8 @@ function remarkSmallDirective() {
  * stylesheet; here we only set element-level attributes that CSS can't (lazy
  * images, safe link rel, code language hook).
  */
-const components: Components = {
-  a: ({ href, children, ...props }) => {
+const components = {
+  a: ({ href, children, ...props }: ComponentPropsWithoutRef<"a">) => {
     const external = typeof href === "string" && /^https?:\/\//.test(href);
     return (
       <a
@@ -96,7 +149,18 @@ const components: Components = {
     // eslint-disable-next-line @next/next/no-img-element
     <img src={src} alt={alt ?? ""} loading="lazy" {...props} />
   ),
-};
+  // Custom inline brand effects, routed here by `remarkEffectDirectives` (which
+  // sets `hName: "glitch" | "matrix"`). Both pull their text out of `children`
+  // (plain inline text) and hand it to the component as the string prop it
+  // expects. `react-markdown`'s `Components` type only knows HTML tags, so the
+  // custom keys are added via the cast below.
+  glitch: ({ children }: { children?: ReactNode }) => (
+    <GlitchText>{childrenToString(children)}</GlitchText>
+  ),
+  matrix: ({ children }: { children?: ReactNode }) => (
+    <MatrixText text={childrenToString(children)} />
+  ),
+} as Components;
 
 interface PostBodyProps {
   /** Raw markdown source. */
@@ -111,6 +175,7 @@ export function PostBody({ markdown }: PostBodyProps) {
           remarkGfm,
           remarkDirective,
           remarkSmallDirective,
+          remarkEffectDirectives,
           remarkDropEmptyLines,
         ]}
         components={components}
