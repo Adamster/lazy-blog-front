@@ -97,7 +97,10 @@ export function PostCard({ post, href, authorHandle }: PostCardMonoProps) {
         {/* Draft cover overlay — same crossed-eye + label "hidden" cue as the
             post page (only the author's own profile feed shows drafts). */}
         {!post.isPublished && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-[var(--m-bg)]/70">
+          // pointer-events-none: the overlay is purely decorative — let clicks
+          // fall through to the card's stretched title link (so the cover is a
+          // post link too, same as a published card).
+          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-[var(--m-bg)]/70">
             <EyeSlashIcon className="size-8 text-[var(--m-fg)]" />
             <span className="text-[11px] font-semibold tracking-[0.12em] text-[var(--m-fg)] uppercase">
               Unpublished
