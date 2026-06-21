@@ -48,7 +48,7 @@ export default function TagPage({ tag }: { tag: string }) {
         </section>
 
         {/* Publications */}
-        <Label className="mono-label py-10">PUBLICATIONS</Label>
+        <Label className="mono-label pt-10 pb-6">PUBLICATIONS</Label>
 
         {posts.length === 0 ? (
           <div className="border-2 border-[var(--m-line)] py-24 text-center">

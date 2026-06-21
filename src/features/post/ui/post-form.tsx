@@ -131,7 +131,7 @@ export const PostForm = ({
           {/* Form — right panel, on the card background, content vertically
               centered (matches the cover). Tag on top; no slug field (it's
               auto-generated server-side). */}
-          <div className="flex flex-col justify-center bg-[var(--m-card)] p-7 md:p-10">
+          <div className="flex flex-col justify-center border-2 border-t-0 border-[var(--m-dim)] bg-[var(--m-card)] p-7 md:border-t-2 md:border-l-0 md:p-10">
             <Controller
               name="tags"
               control={control}
@@ -216,9 +216,11 @@ export const PostForm = ({
         </div>
       </section>
 
-      {/* ── STEP 2: WRITE — 780 Crepe column, normal page scroll ── */}
+      {/* ── STEP 2: WRITE — 864 column so the editable text measures exactly 700
+          (= the post read view). text = col − gutter(px-10 = 80) − sheet
+          border-x-2 (4) − sheet p-10 inset (80) = col − 164 ⇒ col = 864. ── */}
       <section
-        className={`mx-auto max-w-[780px] px-6 py-10 md:px-10 ${
+        className={`mx-auto max-w-[864px] px-6 py-10 md:px-10 ${
           step === 2 ? "" : "hidden"
         }`}
       >

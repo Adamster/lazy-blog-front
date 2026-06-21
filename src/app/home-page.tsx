@@ -186,7 +186,7 @@ export default function HomePage() {
 
             {/* Section label — above the hero */}
             {rest.length > 0 && (
-              <div className="flex items-center py-10">
+              <div className="flex items-center pt-10 pb-6">
                 <Label>PUBLICATIONS</Label>
               </div>
             )}

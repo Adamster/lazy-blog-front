@@ -128,8 +128,12 @@ export default function UserPage({ userName }: { userName: string }) {
           </div>
         </section>
 
-        {/* Publications — when empty, the scramble takes over the label itself */}
-        <Label className="mono-label py-10">
+        {/* Publications — when empty, the scramble takes over the label itself,
+            so it's a terminal section (symmetric py-10); when populated the
+            eyebrow hugs its content below (pt-10 pb-6). */}
+        <Label
+          className={`mono-label ${posts.length === 0 ? "py-10" : "pt-10 pb-6"}`}
+        >
           {posts.length === 0 ? (
             <MatrixText
               text={`${handle} is still lost in procrastination`.toUpperCase()}

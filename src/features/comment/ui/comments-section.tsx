@@ -51,7 +51,9 @@ export function CommentsSection({
         </div>
       ) : (
         <>
-          <Label className="mono-label py-10">
+          {/* Eyebrow hugs the comment list below (pt-10 pb-6); when empty the
+              scramble IS the content, so it's a terminal section (py-10). */}
+          <Label className={`mono-label ${count > 0 ? "pt-10 pb-6" : "py-10"}`}>
             {count > 0 ? (
               `${count} COMMENTS`
             ) : (
