@@ -22,24 +22,31 @@ export const useTheme = () => {
   return context;
 };
 
+/**
+ * Apply the theme to `<html>` (class `.dark` + `data-theme`) — the single
+ * source the CSS tokens key off. The same is done pre-paint by the inline
+ * script in the root layout, so the first paint is already the right theme
+ * (no light→dark flash).
+ */
+function applyTheme(theme: "light" | "dark") {
+  const html = document.documentElement;
+  html.setAttribute("data-theme", theme);
+  html.classList.toggle("dark", theme === "dark");
+}
+
 export function ThemeProvider({ children }: ProvidersProps) {
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
+  // The inline script already resolved + applied the theme to <html> before
+  // paint; sync React state to it so `isDarkTheme` consumers (logo, toggle)
+  // match without driving the visual theme (which <html> already carries).
   useEffect(() => {
-    const systemPrefersDark = window.matchMedia?.(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-
-    const storedTheme = localStorage.getItem("theme") as
-      | "light"
-      | "dark"
-      | null;
-
-    const finalTheme = storedTheme || (systemPrefersDark ? "dark" : "light");
-    // SSR-safe theme init: localStorage/matchMedia aren't available during
-    // render, so we must resolve the real theme after mount.
+    const applied =
+      document.documentElement.getAttribute("data-theme") === "dark"
+        ? "dark"
+        : "light";
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setTheme(finalTheme);
+    setTheme(applied);
   }, []);
 
   const isDarkTheme = theme === "dark";
@@ -47,8 +54,8 @@ export function ThemeProvider({ children }: ProvidersProps) {
   const changeTheme = () => {
     const newTheme = isDarkTheme ? "light" : "dark";
     setTheme(newTheme);
-
     localStorage.setItem("theme", newTheme);
+    applyTheme(newTheme);
   };
 
   const value: ThemeContextType = {
@@ -58,13 +65,7 @@ export function ThemeProvider({ children }: ProvidersProps) {
 
   return (
     <ThemeContext.Provider value={value}>
-      <div
-        className={"min-h-screen" + " " + theme}
-        data-theme={theme}
-        data-color-mode={theme}
-      >
-        {children}
-      </div>
+      <div className="min-h-screen">{children}</div>
     </ThemeContext.Provider>
   );
 }
