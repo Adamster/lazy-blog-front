@@ -200,7 +200,7 @@ export default function CrepeEditor({
       />
       {/* Sheet: 2px side walls (open bottom — scrolls into the page), the page
           background, and a 40px inset so text never touches the walls. */}
-      <div className="min-h-[60vh] border-x-2 border-[var(--m-dim)] bg-[var(--m-bg)] p-7 md:p-10">
+      <div className="min-h-[50vh] border-x-2 border-[var(--m-dim)] bg-[var(--m-bg)] p-7 md:p-10">
         <div className="milkdown mono-prose" ref={rootRef} />
       </div>
     </div>
