@@ -253,7 +253,7 @@ export function ComponentsTab() {
           intro="Square 2px-border tile. sm (40px / 16px letter) for bylines & comments, lg (128px / 44px letter) for the profile header. Image when set, first-initial fallback on the panel surface otherwise."
         >
           <Panel caption="// SIZE × FALLBACK">
-            <div className="flex flex-wrap items-end gap-7">
+            <div className="flex flex-wrap items-end gap-10">
               <State caption="sm · img">
                 <Avatar
                   size="sm"

@@ -55,7 +55,7 @@ export function Switch({
           }`}
         />
       </span>
-      <span className="text-[14px] leading-none tracking-[0.06em] text-[var(--m-fg)] uppercase">
+      <span className="text-[12px] leading-none tracking-[0.06em] text-[var(--m-fg)] uppercase">
         {label}
       </span>
     </button>
