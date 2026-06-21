@@ -40,7 +40,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             style={{
               marginBottom: 24,
               fontSize: 11,
-              letterSpacing: ".14em",
+              letterSpacing: ".12em",
               color: "#ff6b6b",
               display: "flex",
               alignItems: "center",
@@ -49,7 +49,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           >
             <span
               aria-hidden="true"
-              style={{ width: 7, height: 7, background: "#ff6b6b" }}
+              style={{ width: 8, height: 8, background: "#ff6b6b" }}
             />
             RUNTIME EXCEPTION · 500
           </div>
@@ -58,10 +58,10 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             style={{
               margin: 0,
               fontFamily: display,
-              fontSize: "clamp(32px,6vw,48px)",
+              fontSize: "clamp(32px,6vw,40px)",
               lineHeight: 1.04,
               fontWeight: 700,
-              letterSpacing: "-0.03em",
+              letterSpacing: "-0.02em",
             }}
           >
             A glitch in the Lazyverse

@@ -31,9 +31,7 @@ export const Loading = ({
     <span
       role="status"
       aria-label="Loading"
-      className={`inline-block w-[1ch] text-center leading-none font-bold text-[var(--m-accent)] tabular-nums ${
-        inline ? "text-[14px]" : "text-[15px]"
-      }`}
+      className="inline-block w-[1ch] text-center text-[14px] leading-none font-bold text-[var(--m-accent)] tabular-nums"
       style={{ fontFamily: "var(--font-mono)" }}
     >
       {FRAMES[frame]}
@@ -53,7 +51,7 @@ export const Loading = ({
       }`}
     >
       {glyph}
-      <span className="text-[10px] tracking-[0.18em] text-[var(--m-muted2)] uppercase">
+      <span className="text-[11px] tracking-[0.12em] text-[var(--m-muted2)] uppercase">
         Loading
       </span>
     </div>

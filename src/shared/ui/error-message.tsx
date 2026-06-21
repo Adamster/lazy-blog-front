@@ -78,15 +78,15 @@ export const ErrorMessage = ({
       style={{ fontFamily: "var(--font-mono)" }}
     >
       <div className="mx-auto w-full max-w-[640px]">
-        <div className="mb-6 flex items-center gap-2.5 text-[11px] tracking-[0.14em] text-[var(--m-error)]">
+        <div className="mb-6 flex items-center gap-2.5 text-[11px] tracking-[0.12em] text-[var(--m-error)]">
           <span
             aria-hidden="true"
-            className="inline-block size-[7px] bg-[var(--m-error)]"
+            className="inline-block size-2 bg-[var(--m-error)]"
           />
           {statusLine}
         </div>
 
-        <h1 className="font-display text-[clamp(32px,6vw,48px)] leading-[1.04] font-bold tracking-[-0.03em] text-[var(--m-fg)]">
+        <h1 className="font-display text-[32px] leading-[1.04] font-bold tracking-[-0.02em] text-[var(--m-fg)] md:text-[40px]">
           <GlitchText caret>A glitch in the Lazyverse</GlitchText>
         </h1>
 
@@ -100,11 +100,11 @@ export const ErrorMessage = ({
             <div className="flex items-center gap-2 border-b-2 border-[var(--m-dim)] px-3 py-2">
               <span className="size-2 border-2 border-[var(--m-error)]" />
               <span className="size-2 border-2 border-[var(--m-dim)]" />
-              <span className="ml-1 text-[11px] tracking-[0.08em] text-[var(--m-muted2)]">
+              <span className="ml-1 text-[11px] tracking-[0.06em] text-[var(--m-muted2)]">
                 stacktrace.log
               </span>
             </div>
-            <div className="px-3.5 py-3 text-[11px] leading-[1.85] break-words text-[var(--m-muted)]">
+            <div className="px-3 py-3 text-[11px] leading-[1.6] break-words text-[var(--m-muted)]">
               <span className="text-[var(--m-error)]">Error</span>
               {": "}
               <span className="text-[var(--m-fg)]">{errorMessage}</span>

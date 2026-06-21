@@ -48,12 +48,12 @@ function ToastCard({ toast }: { toast: Toast }) {
       </div>
 
       {/* Content — card surface */}
-      <div className="min-w-0 flex-1 bg-[var(--m-card)] px-3 py-[13px]">
+      <div className="min-w-0 flex-1 bg-[var(--m-card)] px-3 py-3">
         <p className="text-[14px] leading-[1.2] font-semibold text-[var(--m-fg)]">
           {toast.title}
         </p>
         {toast.description ? (
-          <p className="mt-[3px] text-[12px] leading-[1.5] break-words text-[var(--m-muted)]">
+          <p className="mt-1 text-[12px] leading-[1.5] break-words text-[var(--m-muted)]">
             {toast.description}
           </p>
         ) : null}

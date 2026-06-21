@@ -62,7 +62,7 @@ export function ProgressBar({
         aria-valuenow={indeterminate ? undefined : Math.round(value)}
         aria-valuemin={0}
         aria-valuemax={100}
-        className="text-[13px] leading-none tracking-[0.02em] whitespace-nowrap text-[var(--m-dim)]"
+        className="text-[12px] leading-none whitespace-nowrap text-[var(--m-dim)]"
       >
         {"["}
         {"░".repeat(before)}
