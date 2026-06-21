@@ -35,20 +35,11 @@ function ToastCard({ toast }: { toast: Toast }) {
       type="button"
       onClick={() => dismissToast(toast.id)}
       aria-label="Dismiss notification"
-      className="mono-toast-enter pointer-events-auto flex w-[380px] max-w-[calc(100vw-2.5rem)] cursor-pointer items-stretch text-left"
-      style={{ borderLeft: `4px solid ${STRIPE[toast.tone]}` }}
+      className="mono-toast-enter pointer-events-auto flex w-[380px] max-w-[calc(100vw-2.5rem)] cursor-pointer items-center gap-3 bg-[var(--m-card)] px-4 py-3 text-left"
+      style={{ borderLeft: `2px solid ${STRIPE[toast.tone]}` }}
     >
-      {/* Icon column — on the card surface */}
-      <div className="flex w-[52px] flex-none items-center justify-center bg-[var(--m-card)]">
-        {isSuccess ? (
-          <CheckIcon className="size-3.5 text-[var(--m-accent)]" />
-        ) : (
-          <ExclamationCircleIcon className="size-3.5 text-[var(--m-error)]" />
-        )}
-      </div>
-
-      {/* Content — card surface */}
-      <div className="min-w-0 flex-1 bg-[var(--m-card)] px-3 py-3">
+      {/* Content */}
+      <div className="min-w-0 flex-1">
         <p className="text-[14px] leading-[1.2] font-semibold text-[var(--m-fg)]">
           {toast.title}
         </p>
@@ -58,16 +49,23 @@ function ToastCard({ toast }: { toast: Toast }) {
           </p>
         ) : null}
       </div>
+
+      {/* Status icon — sits between the text and the right edge */}
+      {isSuccess ? (
+        <CheckIcon className="size-3.5 flex-none text-[var(--m-accent)]" />
+      ) : (
+        <ExclamationCircleIcon className="size-3.5 flex-none text-[var(--m-error)]" />
+      )}
     </button>
   );
 }
 
 /**
  * Own toast renderer — subscribes to the module-level emitter in
- * `@/shared/lib/toasts` and renders a bottom-right stacked portal of two-tone
- * Brutalist-Mono toasts (4px type stripe · 52px icon col + content on
- * `--m-card`). The whole toast is the dismiss target (no close glyph); they
- * also auto-dismiss. Portals into a `.mono-portal` node so the `--m-*` tokens +
+ * `@/shared/lib/toasts` and renders a bottom-right stacked portal of
+ * Brutalist-Mono toasts (2px type stripe · content · status icon on the right,
+ * all on `--m-card`). The whole toast is the dismiss target (no close glyph);
+ * they also auto-dismiss. Portals into a `.mono-portal` node so the tokens +
  * mono font resolve (mirrors `Modal`).
  */
 export function Toaster() {
