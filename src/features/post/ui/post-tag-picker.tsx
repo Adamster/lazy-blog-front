@@ -149,7 +149,7 @@ export function PostTagPicker({
           className="mono-scrollbar absolute top-7 left-0 z-30 mt-1 max-h-60 min-w-[240px] overflow-auto border-2 border-[var(--m-dim)] bg-[var(--m-card)] py-1 outline-none"
         >
           {options.length === 0 ? (
-            <li className="px-3 py-2 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase">
+            <li className="px-3 py-2 text-[14px] text-[var(--m-muted2)]">
               No tags
             </li>
           ) : (
@@ -164,7 +164,7 @@ export function PostTagPicker({
                   aria-selected={isSelected}
                   onMouseEnter={() => setActiveIndex(index)}
                   onClick={() => toggle(option.value)}
-                  className={`flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-[11px] font-medium tracking-[0.12em] uppercase transition-colors ${
+                  className={`flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-[14px] leading-[1.5] transition-colors ${
                     isActive
                       ? "bg-[var(--m-panel)] text-[var(--m-fg)]"
                       : "text-[var(--m-muted)]"
