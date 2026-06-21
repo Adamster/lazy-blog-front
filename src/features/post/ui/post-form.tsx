@@ -149,6 +149,7 @@ export const PostForm = ({
               <Field
                 id="post-title"
                 label="Title"
+                required
                 error={errors.title?.message}
                 {...register("title", {
                   required: "Title is required",
@@ -164,6 +165,7 @@ export const PostForm = ({
             <div className="mt-5">
               <label htmlFor="post-summary" className="mono-field-label">
                 Summary
+                <span className="ml-1 text-[var(--m-accent)]">*</span>
               </label>
               <textarea
                 id="post-summary"

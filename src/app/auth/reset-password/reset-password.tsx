@@ -16,9 +16,6 @@ import {
   useModalTitleId,
 } from "@/shared/ui";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 // Password strength: ≥6 chars with lower, upper, digit and a special char.
 const PASSWORD_PATTERN = {
   value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/,
@@ -29,8 +26,9 @@ const PASSWORD_PATTERN = {
 /**
  * Reset-password route. The auth {@link Modal} is open by default with the
  * reset form INSIDE it — one visual language for the whole auth flow (no
- * bespoke full-page layout). Closing / "Back to Log in" returns home, where the
- * standard auth modal can take over.
+ * bespoke full-page layout). This is the TERMINAL step of recovery: there's no
+ * "back" control; closing OR a successful reset returns home, where the standard
+ * auth modal can take over.
  */
 export default function ResetPassword() {
   const router = useRouter();
@@ -51,15 +49,17 @@ export default function ResetPassword() {
     shouldUseNativeValidation: false,
   });
 
+  const goHome = () => router.push("/");
+
   const onSubmit = (data: ResetPasswordRequest) => {
     if (token && user?.id) {
-      resetPasswordMutation.mutate(data);
+      // Terminal step of the recovery flow: on success, close the modal and
+      // return home where the standard auth modal can take over.
+      resetPasswordMutation.mutate(data, { onSuccess: goHome });
     } else {
       addToastError("Very Funny :)");
     }
   };
-
-  const goHome = () => router.push("/");
 
   if (!userId) return <ErrorMessage error={"Not Found."} />;
   if (isLoading) return <Loading />;
@@ -118,17 +118,6 @@ export default function ResetPassword() {
               Update password
             </SubmitButton>
           </form>
-
-          <div className="mt-6">
-            <button
-              type="button"
-              onClick={goHome}
-              className={`inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)] ${focusRing}`}
-            >
-              <span aria-hidden="true">←</span>
-              Back to Log in
-            </button>
-          </div>
         </>
       )}
     </Modal>

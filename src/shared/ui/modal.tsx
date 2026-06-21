@@ -181,7 +181,7 @@ export function Modal({
 }
 
 /**
- * Canonical modal header: `// EYEBROW` (mono-label, mb-2) + 32px title + optional
+ * Canonical modal header: `// EYEBROW` (mono-label, mb-6) + 32px title + optional
  * 14px subtitle (mt-4), with a 36px close ✕ control top-right. Returns the
  * heading `id` via `titleId` so the caller can wire `aria-labelledby` on
  * {@link Modal}.
@@ -200,7 +200,7 @@ export function ModalHeader({
   onClose?: () => void;
 }) {
   return (
-    <div className="mb-7 flex items-start justify-between gap-4">
+    <div className="mb-6 flex items-start justify-between gap-4">
       <div>
         <div className="mono-label mb-6">{eyebrow}</div>
         <h2

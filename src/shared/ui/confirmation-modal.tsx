@@ -42,7 +42,7 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
     >
       {(onClose) => (
         <>
-          <div className="mb-7 flex items-start justify-between gap-4">
+          <div className="mb-6 flex items-start justify-between gap-4">
             <div>
               <div className="mb-6 text-[11px] font-medium tracking-[0.12em] text-[var(--m-error)] uppercase">
                 {"// Danger"}

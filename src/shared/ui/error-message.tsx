@@ -91,7 +91,7 @@ export const ErrorMessage = ({
           <GlitchText caret>A glitch in the Lazyverse</GlitchText>
         </h1>
 
-        <p className="mt-5 max-w-[42ch] text-[14px] leading-[1.6] text-[var(--m-muted)]">
+        <p className="mt-4 max-w-[42ch] text-[14px] leading-[1.6] text-[var(--m-muted)]">
           Something broke on our side — not you. Try again; if it keeps
           happening, head back home.
         </p>
@@ -104,7 +104,7 @@ export const ErrorMessage = ({
           </Console>
         ) : null}
 
-        <div className="mt-7 flex flex-wrap gap-3">
+        <div className="mt-6 flex flex-wrap gap-3">
           {reset ? (
             <button
               type="button"

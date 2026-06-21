@@ -173,6 +173,7 @@ function LoginView({
             label="Email"
             type="email"
             autoComplete="email"
+            required
             error={errors.email?.message}
             {...register("email", {
               required: "Email is required",
@@ -192,6 +193,7 @@ function LoginView({
           label="Password"
           type="password"
           autoComplete="current-password"
+          required
           error={errors.password?.message}
           {...register("password", { required: "Password is required" })}
         />
@@ -265,6 +267,7 @@ function ForgotView({
             label="Email"
             type="email"
             autoComplete="email"
+            required
             error={errors.email?.message}
             {...register("email", {
               required: "Email is required",
