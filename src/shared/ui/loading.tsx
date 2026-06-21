@@ -48,7 +48,7 @@ export const Loading = ({
 
   return (
     <div
-      className={`mono-scope flex min-h-screen items-center justify-center gap-2 ${
+      className={`mono-scope flex min-h-screen items-center justify-center gap-3 ${
         compensateHeader ? "-mt-16" : ""
       }`}
     >
