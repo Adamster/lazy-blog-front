@@ -94,6 +94,7 @@ const EditForm = ({ postData }: { postData: PostDetailedResponse }) => {
         onSubmit={onSubmit}
         isPending={updatePostMutation.isPending}
         onDelete={() => setIsModalOpen(true)}
+        viewHref={`/${postData.author.userName}/${postData.slug}`}
       />
 
       {isModalOpen && (

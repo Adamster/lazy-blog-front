@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Controller, type UseFormReturn } from "react-hook-form";
 import type { UpdatePostRequest } from "@/shared/api/openapi";
 import { Field, type SelectOption } from "@/shared/ui";
@@ -10,7 +9,11 @@ import { useUser } from "@/entities/session";
 import { ComposerTopBar } from "./composer-top-bar";
 import { CoverCropModal } from "./cover-crop-modal";
 import { CrepeEditor } from "./crepe-wrapper";
-import { STEP1_FIELDS, type ComposerStep } from "./composer-step";
+import {
+  errorStepsFrom,
+  firstErrorStep,
+  type ComposerStep,
+} from "./composer-step";
 import { PostCoverDropzone } from "./post-cover-dropzone";
 import { PostTagPicker } from "./post-tag-picker";
 
@@ -18,6 +21,8 @@ interface PostFormProps {
   form: UseFormReturn<UpdatePostRequest>;
   onSubmit: () => void;
   onDelete?: () => void;
+  /** Edit-only: link to the live post, surfaced in the top bar. */
+  viewHref?: string;
   isPending: boolean;
 }
 
@@ -44,6 +49,7 @@ export const PostForm = ({
   form,
   onSubmit,
   onDelete,
+  viewHref,
   isPending,
 }: PostFormProps) => {
   const { data: tags } = useTags();
@@ -67,15 +73,31 @@ export const PostForm = ({
 
   const published = Boolean(watch("isPublished"));
 
-  const goToWrite = async () => {
-    const valid = await trigger(STEP1_FIELDS);
-    if (valid) setStep(2);
-  };
+  // Cancel is a CREATE-only abort (exits to the author's profile / home). In
+  // edit mode (signalled by `viewHref`) there's nothing to abort — you leave via
+  // the header or the View-post button — so we drop it (undefined → no Cancel).
+  const cancelHref = viewHref
+    ? undefined
+    : user?.userName
+      ? `/${user.userName}`
+      : "/";
 
-  const cancelHref = user?.userName ? `/${user.userName}` : "/";
-
-  const handleSubmit = (e: React.FormEvent) => {
+  /**
+   * Publish: validate the whole form ourselves so we can POINT the user at the
+   * problem. On failure we jump to the first step holding an error (so its
+   * inline message + highlighted step box are on-screen) and stop — the
+   * parent's `onSubmit` (a guarded `handleSubmit`) is never reached, so the
+   * mutation can't fire and there's no second validation pass on the fail path.
+   * On success we hand off to the parent's `onSubmit` once.
+   */
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const valid = await trigger();
+    if (!valid) {
+      const target = firstErrorStep(form.formState.errors);
+      if (target) setStep(target);
+      return;
+    }
     onSubmit();
   };
 
@@ -97,19 +119,21 @@ export const PostForm = ({
     <form noValidate onSubmit={handleSubmit}>
       <ComposerTopBar
         step={step}
-        onBack={() => setStep(1)}
-        onForward={goToWrite}
+        cancelHref={cancelHref}
+        onSelectStep={setStep}
+        errorSteps={errorStepsFrom(errors)}
         published={published}
         onPublishedChange={(value) =>
           setValue("isPublished", value, { shouldDirty: true })
         }
         onDelete={onDelete}
+        viewHref={viewHref}
         isPending={isPending}
       />
 
       {/* ── STEP 1: SETUP — 1240 canvas, cover | form panel ── */}
       <section
-        className={`mx-auto max-w-[1240px] px-6 pt-10 pb-10 md:px-10 ${
+        className={`mx-auto max-w-[1240px] px-10 pt-10 pb-10 ${
           step === 1 ? "" : "hidden"
         }`}
       >
@@ -198,34 +222,13 @@ export const PostForm = ({
             </div>
           </div>
         </div>
-
-        {/* Footer — Cancel (left, moved off the top bar) · Next (right). Cancel
-            is an ABORT, not a directional "back" — it carries a close ✕ glyph,
-            never an arrow (arrows mark direction/navigation only). */}
-        <div className="mt-7 flex items-center justify-between">
-          <a
-            href={cancelHref}
-            className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
-          >
-            <XMarkIcon aria-hidden="true" className="size-3.5" />
-            Cancel
-          </a>
-          <button
-            type="button"
-            onClick={goToWrite}
-            className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
-          >
-            Next
-            <span aria-hidden="true">→</span>
-          </button>
-        </div>
       </section>
 
       {/* ── STEP 2: WRITE — 864 column so the editable text measures exactly 700
           (= the post read view). text = col − gutter(px-10 = 80) − sheet
           border-x-2 (4) − sheet p-10 inset (80) = col − 164 ⇒ col = 864. ── */}
       <section
-        className={`mx-auto max-w-[864px] px-6 py-10 md:px-10 ${
+        className={`mx-auto max-w-[864px] px-10 py-10 ${
           step === 2 ? "" : "hidden"
         }`}
       >
@@ -249,18 +252,6 @@ export const PostForm = ({
             {`! ${errors.body.message}`}
           </p>
         ) : null}
-
-        {/* Footer — Cancel (the back step is the top-bar stepper). Abort = ✕,
-            never an arrow. */}
-        <div className="mt-7">
-          <a
-            href={cancelHref}
-            className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
-          >
-            <XMarkIcon aria-hidden="true" className="size-3.5" />
-            Cancel
-          </a>
-        </div>
       </section>
 
       <CoverCropModal
