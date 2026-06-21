@@ -158,7 +158,7 @@ export default function UserPage({ userName }: { userName: string }) {
           </section>
         )}
 
-        {query.isFetchingNextPage && <Loading inline />}
+        {query.isFetchingNextPage && <Loading inline section />}
         {query.hasNextPage && <div ref={sentinelRef} className="h-20" />}
       </main>
     </div>

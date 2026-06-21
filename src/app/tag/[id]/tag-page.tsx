@@ -82,7 +82,7 @@ export default function TagPage({ tag }: { tag: string }) {
           </section>
         )}
 
-        {query.isFetchingNextPage && <Loading inline />}
+        {query.isFetchingNextPage && <Loading inline section />}
         {query.hasNextPage && <div ref={sentinelRef} className="h-20" />}
       </main>
     </div>

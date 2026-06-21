@@ -53,6 +53,11 @@ The frontend (home / profile / post / auth) uses the "Brutalist Mono" design sys
 - **Logo / sloth mark** (`LogoSloth`): mark = **mono only** — dark on light, light on dark (two variants); **never the accent/lime tint**. The accent appears only in the `[ TEAM ] NOT LAZY` lockup wordmark (filled `[ TEAM ]` badge + accent "LAZY"), not the sloth itself. Living reference of the whole system lives at `/brand` (`src/app/brand`).
 - Tokens: `var(--m-bg/fg/accent/line/panel/card/muted/muted2/dim/error)`; light + `.dark`. Accent stays lime (not teal).
 
+## Clean code — ALWAYS
+
+- **Extract anything that repeats.** If the same value, class string, prop combo, spacing, markup, or logic appears in more than one place, hoist it — a shared constant, a component prop (prefer a named boolean / variant over re-passing the same `className` at every call site), a helper, or a hook. Do NOT copy-paste the same `className="mt-5"` (or any literal) across call sites — give the component the prop. DRY by default; touching a file is the moment to dedupe what you see in it.
+- Keep names intention-revealing, components small and single-purpose, and reuse the existing primitives before adding new ones.
+
 ## Workflow
 
 - Run `npm run typecheck` and `npm run lint` after changes; keep both at 0 errors.

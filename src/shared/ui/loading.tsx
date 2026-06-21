@@ -5,6 +5,9 @@ import { useEffect, useState } from "react";
 interface IProps {
   inline?: boolean;
   compensateHeader?: boolean;
+  /** Inline spinner uses the feed/section gap (`mt-5`) — the card-padding-aware
+   *  section rhythm — instead of the default `my-6`. */
+  section?: boolean;
 }
 
 /** Terminal ASCII spinner frames — cycled at 100ms. */
@@ -44,6 +47,7 @@ export function Spinner({ className = "" }: { className?: string }) {
 export const Loading = ({
   inline = false,
   compensateHeader = true,
+  section = false,
 }: IProps) => {
   const glyph = (
     <Spinner className="text-[14px] font-bold text-[var(--m-accent)]" />
@@ -52,7 +56,13 @@ export const Loading = ({
   // `mono-scope` so the `--m-*` tokens resolve (the route-level loading UI
   // mounts outside any page scope, where the accent would otherwise be unset).
   if (inline) {
-    return <div className="mono-scope my-6 flex justify-center">{glyph}</div>;
+    return (
+      <div
+        className={`mono-scope flex justify-center ${section ? "mt-5" : "my-6"}`}
+      >
+        {glyph}
+      </div>
+    );
   }
 
   return (

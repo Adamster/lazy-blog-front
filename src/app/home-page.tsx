@@ -270,7 +270,7 @@ export default function HomePage() {
               </section>
             )}
 
-            {query.isFetchingNextPage && <Loading inline />}
+            {query.isFetchingNextPage && <Loading inline section />}
             {query.hasNextPage && <div ref={sentinelRef} className="h-20" />}
           </>
         )}
