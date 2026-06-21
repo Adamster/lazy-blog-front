@@ -75,7 +75,7 @@ export const ErrorMessage = ({
 
   return (
     <div
-      className="mono-scope flex min-h-screen w-full flex-col justify-center bg-[var(--m-bg)] px-10 py-14 text-[var(--m-fg)]"
+      className="mono-scope min-h-app flex w-full flex-col justify-center bg-[var(--m-bg)] px-10 py-14 text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
       <div className="mx-auto w-full max-w-[640px]">

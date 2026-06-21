@@ -51,7 +51,12 @@ export default function RootLayout({
 
       <body className={`${font.variable} ${display.variable} ${mono.variable}`}>
         <AppProviders>
-          <main className="mx-auto max-w-4xl">{children}</main>
+          {/* `pt-16` clears the fixed 64px header bar for EVERY route — pages
+              break out horizontally (`mx-[calc(50%-50vw)]`) but stay in this
+              vertical flow, so each page's own top rhythm sits on top of it. */}
+          <main className="mx-auto max-w-4xl pt-[var(--m-header-h)]">
+            {children}
+          </main>
         </AppProviders>
         <SpeedInsights />
       </body>

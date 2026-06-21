@@ -32,7 +32,7 @@ export class ErrorBoundary extends Component<
     if (this.state.hasError) {
       return (
         <div
-          className="mono-scope flex min-h-screen flex-col items-center justify-center gap-6 bg-[var(--m-bg)] px-10 text-center text-[var(--m-fg)]"
+          className="mono-scope min-h-app flex flex-col items-center justify-center gap-6 bg-[var(--m-bg)] px-10 text-center text-[var(--m-fg)]"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           <div className="mono-label">{"// ERROR"}</div>

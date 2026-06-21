@@ -93,7 +93,7 @@ export const PostForm = ({
   };
 
   return (
-    <form noValidate onSubmit={handleSubmit} className="pt-20">
+    <form noValidate onSubmit={handleSubmit} className="pt-10">
       <ComposerTopBar
         step={step}
         onBack={() => setStep(1)}

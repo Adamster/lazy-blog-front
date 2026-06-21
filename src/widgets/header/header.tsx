@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { useClickOutside } from "react-haiku";
 import { Bars3Icon } from "@heroicons/react/24/solid";
@@ -33,78 +34,80 @@ export function Header() {
 
   return (
     <>
-      <LogoLockup />
+      {/* Fixed full-width header bar — frosted glass (translucent `--m-bg` +
+          backdrop blur, no border) so the page shows through; content
+          constrained to the 1240 column with the 40px page gutter. */}
+      <header className="fixed inset-x-0 top-0 z-50 h-[var(--m-header-h)] bg-[var(--m-bg)]/70 backdrop-blur-md">
+        <div className="mx-auto flex h-full max-w-[1240px] items-center justify-between px-10">
+          <LogoLockup />
 
-      {/* Fixed morphing menu — top right. Anchored by `right-5`, so the
-          container grows leftward/downward: the burger fades out, the box
-          expands, then the console items fade in. */}
-      <div ref={menuRef} className="fixed top-5 right-5 z-50">
-        <motion.div
-          initial={false}
-          animate={{ width: open ? 280 : 36, height: open ? "auto" : 36 }}
-          transition={{ duration: 0.32, ease: [0.2, 0.8, 0.2, 1] }}
-          className={`relative overflow-hidden border-2 bg-[var(--m-card)] transition-colors ${
-            open
-              ? "border-[var(--m-line)]"
-              : isAuthenticated
-                ? "border-[var(--m-accent)]"
-                : "border-[var(--m-dim)]"
-          }`}
-        >
-          {/* Console list — always rendered (so the box can size to it), faded
-              in only after the box has expanded. */}
-          <motion.div
-            animate={{ opacity: open ? 1 : 0 }}
-            transition={{ duration: 0.18, delay: open ? 0.2 : 0 }}
-            aria-hidden={!open}
-            className="w-[276px]"
-          >
-            <PromptHeader
-              userName={user?.userName}
-              open={open}
-              onNavigate={close}
-            />
+          <div className="flex items-center gap-4">
+            {/* Signed-in handle → quick link to your own profile (moved out of
+                the burger; the burger now holds edit_profile instead). */}
+            {isAuthenticated && user?.userName && (
+              <Link
+                href={`/${user.userName}`}
+                className="max-w-[20ch] truncate text-[12px] text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
+              >
+                @{user.userName}
+              </Link>
+            )}
 
-            <AccountCommands
-              isAuthenticated={isAuthenticated}
-              userName={user?.userName}
-              open={open}
-              onNavigate={close}
-              onLogin={() => {
-                auth.open();
-                close();
-              }}
-              onLogout={() => {
-                logout();
-                close();
-              }}
-            />
+            {/* Morphing menu — anchored to the bar's right. The closed 36px box
+              sits in the bar; on open it expands and the console drops BELOW
+              the bar (`top-full`) as an absolute panel above page content. */}
+            <div ref={menuRef} className="relative">
+              <motion.button
+                type="button"
+                aria-label="Menu"
+                aria-expanded={open}
+                onClick={() => setOpen((v) => !v)}
+                className="flex size-9 items-center justify-center bg-[var(--m-card)] text-[var(--m-fg)] transition-colors hover:text-[var(--m-accent)]"
+              >
+                <Bars3Icon className="size-4" />
+              </motion.button>
 
-            <SettingsToggles
-              open={open}
-              isDarkTheme={isDarkTheme}
-              onToggleTheme={changeTheme}
-              lang={lang}
-              onToggleLang={toggleLang}
-            />
-          </motion.div>
+              {/* Console — absolute dropdown below the bar, right-aligned. Always
+                rendered (so the box can size to it), animating open/closed. */}
+              <motion.div
+                initial={false}
+                animate={{
+                  opacity: open ? 1 : 0,
+                  y: open ? 0 : -8,
+                  pointerEvents: open ? "auto" : "none",
+                }}
+                transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
+                aria-hidden={!open}
+                className="absolute top-full right-0 mt-2 w-[280px] border-2 border-[var(--m-line)] bg-[var(--m-card)]"
+              >
+                <PromptHeader />
 
-          {/* Burger — overlay on the closed box; fades out on open. The
-              closed box border goes accent when authed (logged-in cue). */}
-          <motion.button
-            type="button"
-            aria-label="Menu"
-            aria-expanded={open}
-            onClick={() => setOpen(true)}
-            animate={{ opacity: open ? 0 : 1 }}
-            transition={{ duration: 0.12 }}
-            style={{ pointerEvents: open ? "none" : "auto" }}
-            className="absolute top-0 right-0 flex size-8 items-center justify-center text-[var(--m-fg)]"
-          >
-            <Bars3Icon className="size-4" />
-          </motion.button>
-        </motion.div>
-      </div>
+                <AccountCommands
+                  isAuthenticated={isAuthenticated}
+                  open={open}
+                  onNavigate={close}
+                  onLogin={() => {
+                    auth.open();
+                    close();
+                  }}
+                  onLogout={() => {
+                    logout();
+                    close();
+                  }}
+                />
+
+                <SettingsToggles
+                  open={open}
+                  isDarkTheme={isDarkTheme}
+                  onToggleTheme={changeTheme}
+                  lang={lang}
+                  onToggleLang={toggleLang}
+                />
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </header>
 
       <AuthModal isOpen={auth.isOpen} onOpenChange={auth.onOpenChange} />
     </>

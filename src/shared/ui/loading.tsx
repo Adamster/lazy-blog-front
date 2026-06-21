@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 
 interface IProps {
   inline?: boolean;
-  compensateHeader?: boolean;
   /** Inline spinner uses the feed/section gap (`mt-5`) — the card-padding-aware
    *  section rhythm — instead of the default `my-6`. */
   section?: boolean;
@@ -40,15 +39,10 @@ export function Spinner({ className = "" }: { className?: string }) {
 
 /**
  * Brutalist-Mono loading indicator — the {@link Spinner} in the accent colour.
- * `inline` centers a small spinner in flow; the block form fills the viewport
- * (spinner + `LOADING` label on one line) and compensates for the fixed header
- * by default.
+ * `inline` centers a small spinner in flow; the block form fills the content
+ * area below the header (`min-h-app`) with the spinner + `LOADING` label.
  */
-export const Loading = ({
-  inline = false,
-  compensateHeader = true,
-  section = false,
-}: IProps) => {
+export const Loading = ({ inline = false, section = false }: IProps) => {
   const glyph = (
     <Spinner className="text-[14px] font-bold text-[var(--m-accent)]" />
   );
@@ -66,11 +60,7 @@ export const Loading = ({
   }
 
   return (
-    <div
-      className={`mono-scope flex min-h-screen items-center justify-center gap-3 ${
-        compensateHeader ? "-mt-16" : ""
-      }`}
-    >
+    <div className="mono-scope min-h-app flex items-center justify-center gap-3">
       {glyph}
       <span className="text-[11px] tracking-[0.12em] text-[var(--m-muted2)] uppercase">
         Loading

@@ -5,7 +5,7 @@ import type { ComponentType, ReactNode, SVGProps } from "react";
 
 // Terminal command rows: a `>` prompt + the command, hover highlights the line.
 const cmdBase =
-  "flex w-full items-center gap-2 px-4 py-2.5 text-left text-[14px] whitespace-nowrap transition-colors hover:bg-[var(--m-panel)]";
+  "flex w-full items-center gap-2 px-4 py-2.5 text-left text-[12px] whitespace-nowrap transition-colors hover:bg-[var(--m-panel)]";
 const cmdTone = "text-[var(--m-fg)] hover:text-[var(--m-accent)]";
 const cmdDangerTone = "text-[var(--m-error)] hover:text-[var(--m-error)]";
 
@@ -28,7 +28,7 @@ export function BracketIcon({
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
 }) {
   return (
-    <span className="ml-auto inline-flex items-center gap-1.5 text-[11px] text-[var(--m-muted2)]">
+    <span className="ml-auto inline-flex items-center gap-1.5 text-[12px] text-[var(--m-muted2)]">
       [<Icon className="size-3.5" />]
     </span>
   );

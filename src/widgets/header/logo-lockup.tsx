@@ -4,17 +4,13 @@ import Link from "next/link";
 import { LogoSloth } from "@/shared/ui/logo-sloth";
 
 /**
- * Peeking sloth — tucked off the left edge (tilted CCW); on hover it slides out
- * and rotates clockwise to upright. Links home.
+ * In-bar brand mark — the mono sloth, linking home. Mark only (no wordmark): the
+ * sloth is MONO (dark on light / light on dark), never the accent tint.
  */
 export function LogoLockup() {
   return (
-    <Link
-      href="/"
-      aria-label="Home"
-      className="fixed top-5 left-0 z-50 -translate-x-[72%] -rotate-[15deg] transition-all duration-300 ease-out hover:-translate-x-[12%] hover:rotate-0"
-    >
-      <LogoSloth className="size-10 text-[var(--m-fg)]" />
+    <Link href="/" aria-label="Home" className="group inline-flex">
+      <LogoSloth className="size-9 shrink-0 text-[var(--m-fg)] transition-transform duration-200 ease-out group-hover:-rotate-6" />
     </Link>
   );
 }

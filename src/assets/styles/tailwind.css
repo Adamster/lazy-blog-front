@@ -6,6 +6,21 @@
   --font-display: var(--font-display);
 }
 
+/* Fixed header bar height — the SINGLE source for the bar (`h-[var(--m-header-h)]`),
+   its clearance (`pt-[var(--m-header-h)]` on the layout main) and the below-header
+   min-height utility below. */
+:root {
+  --m-header-h: 4rem;
+}
+
+/* Min height = viewport MINUS the fixed header. Page roots / full-screen states
+   live inside the `pt-[--m-header-h]` content area, so a plain `min-h-screen`
+   (100vh) would overflow the viewport by the header height and create a stray
+   scroll. Use this instead. */
+@utility min-h-app {
+  min-height: calc(100vh - var(--m-header-h));
+}
+
 /* "Brutalist Mono" (variant B) palette — light by default, dark via the theme
    provider's `.dark` class. Components reference these via var(--m-*).
    `.mono-portal` mirrors the tokens for HeroUI overlays (Dropdown, etc.) that

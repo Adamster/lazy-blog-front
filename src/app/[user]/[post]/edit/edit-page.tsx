@@ -29,7 +29,7 @@ const EditPage = () => {
       fallback={<ErrorMessage error={"Not Found."} />}
     >
       <div
-        className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
+        className="mono-scope min-h-app mx-[calc(50%-50vw)] w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
         style={{ fontFamily: "var(--font-mono)" }}
       >
         <IsAuthor

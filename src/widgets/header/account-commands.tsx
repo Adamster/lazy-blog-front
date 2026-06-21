@@ -10,7 +10,6 @@ import { BracketIcon, CommandButton, CommandLink } from "./command-row";
 
 interface AccountCommandsProps {
   isAuthenticated: boolean;
-  userName?: string;
   /** Whether the menu is open (gates tab-reachability of the rows). */
   open: boolean;
   /** Close the menu after navigating. */
@@ -22,13 +21,12 @@ interface AccountCommandsProps {
 }
 
 /**
- * Account command block — profile / create_post / logout when authed, or a
+ * Account command block — create_post / edit_profile / logout when authed, or a
  * single login row when not. Kept together so the right-column icons stay
  * uniform.
  */
 export function AccountCommands({
   isAuthenticated,
-  userName,
   open,
   onNavigate,
   onLogin,
@@ -49,20 +47,22 @@ export function AccountCommands({
   return (
     <>
       <CommandLink
-        href={`/${userName ?? ""}`}
-        onClick={onNavigate}
-        tabbable={open}
-        trailing={<BracketIcon Icon={UserIcon} />}
-      >
-        profile
-      </CommandLink>
-      <CommandLink
         href="/create"
         onClick={onNavigate}
         tabbable={open}
         trailing={<BracketIcon Icon={PencilSquareIcon} />}
       >
         create_post
+      </CommandLink>
+      {/* edit_profile → the profile settings page (redesign pending). The PUBLIC
+          profile is reachable via the `@handle` in the header bar now. */}
+      <CommandLink
+        href="/profile"
+        onClick={onNavigate}
+        tabbable={open}
+        trailing={<BracketIcon Icon={UserIcon} />}
+      >
+        edit_profile
       </CommandLink>
       <CommandButton
         onClick={onLogout}

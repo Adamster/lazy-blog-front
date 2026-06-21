@@ -47,10 +47,10 @@ export default function BrandPage() {
 
   return (
     <div
-      className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
+      className="mono-scope min-h-app mx-[calc(50%-50vw)] w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <main className="mx-auto max-w-[1240px] px-10 pt-20 pb-10">
+      <main className="mx-auto max-w-[1240px] px-10 pt-10 pb-10">
         {/* Mono tab bar — 2px dim baseline, accent underline on the active tab. */}
         <div
           role="tablist"
