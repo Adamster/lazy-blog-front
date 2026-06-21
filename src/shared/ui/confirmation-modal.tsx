@@ -73,6 +73,13 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
           <div className="flex gap-3">
             <button
               type="button"
+              onClick={onClose}
+              className={`mono-btn-outline inline-flex h-9 flex-1 items-center justify-center text-[14px] font-semibold tracking-[0.06em] ${focusRing}`}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
               onClick={() => {
                 onConfirm();
                 onClose();
@@ -80,13 +87,6 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
               className={`inline-flex h-9 flex-1 items-center justify-center border-2 border-[var(--m-error)] bg-[var(--m-error)] text-[14px] font-bold tracking-[0.06em] text-[var(--m-bg)] uppercase transition-colors hover:bg-transparent hover:text-[var(--m-error)] ${focusRing}`}
             >
               {confirmLabel}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className={`mono-btn-outline inline-flex h-9 flex-1 items-center justify-center text-[14px] font-semibold tracking-[0.06em] ${focusRing}`}
-            >
-              Cancel
             </button>
           </div>
         </>
