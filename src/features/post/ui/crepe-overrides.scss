@@ -517,4 +517,13 @@
   .milkdown-list-item-block li .label-wrapper .label {
     width: 18px;
   }
+  /* Marker colour = text (the read view's native disc/decimal is fg). */
+  .milkdown-list-item-block li .label-wrapper {
+    color: var(--m-fg);
+  }
+  /* Crepe wraps each item's text in a <p> (margin 0 0 20px); zero it so tight
+     lists match the read view, where items aren't wrapped in a <p>. */
+  .milkdown-list-item-block li p {
+    margin: 0;
+  }
 }
