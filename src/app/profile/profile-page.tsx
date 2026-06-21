@@ -44,7 +44,10 @@ export default function Profile() {
   if (isLoading) return <Loading />;
 
   return (
-    <IsAuth fallback={<ErrorMessage error={"Not Found"} />}>
+    <IsAuth
+      loadingFallback={<Loading />}
+      fallback={<ErrorMessage error={"Not Found"} />}
+    >
       <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-10 px-10 pt-10 pb-10 md:flex-row md:gap-0">
         <div className="w-full md:w-3/5 md:pr-10">
           {/* Mono tab bar — 2px dim baseline, accent underline on the active tab. */}
