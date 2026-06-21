@@ -28,7 +28,7 @@ export function Stepper({
   return (
     <nav
       aria-label="Steps"
-      className={`flex items-center gap-2.5 ${className}`}
+      className={`flex items-center gap-1.5 md:gap-2.5 ${className}`}
     >
       {steps.map((label, i) => {
         const step = i + 1;

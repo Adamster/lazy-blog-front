@@ -7,6 +7,11 @@ import { TrashIcon } from "@heroicons/react/24/outline";
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
 
+/** Diagonal film-hatch fill — the empty drop-zone + the letterbox behind a
+ *  centered 16:9 cover when the column is taller than the image. */
+const FILM_BG =
+  "repeating-linear-gradient(135deg,var(--m-panel) 0 1px,transparent 1px 10px)";
+
 interface PostCoverDropzoneProps {
   /** Current cover URL (empty string when unset). */
   coverUrl: string;
@@ -37,11 +42,12 @@ function UploadGlyph() {
 }
 
 /**
- * Step-1 cover slot, full-column 16:9. Empty = the design's "film frame"
- * drop-zone (diagonal hatch + accent markers + upload prompt). Filled = the
- * image with a hover "replace" overlay + a remove control. Clicking opens the
- * OS file picker and emits the chosen `File` up; the parent owns the crop +
- * upload modal (so cropping never blows up this block's height).
+ * Step-1 cover slot. On mobile it's a plain 16:9 tile; on desktop it stretches
+ * to the form panel's height (`md:h-full`) and the 16:9 cover is centered
+ * vertically, with the design's "film frame" hatch filling the letterbox so the
+ * column never looks half-empty. Empty = the hatch + upload prompt. Clicking
+ * opens the OS file picker and emits the chosen `File` up; the parent owns the
+ * crop + upload modal (so cropping never blows up this block's height).
  */
 export function PostCoverDropzone({
   coverUrl,
@@ -61,49 +67,37 @@ export function PostCoverDropzone({
   };
 
   return (
-    <div className="group relative aspect-[16/9] w-full border-2 border-[var(--m-dim)]">
+    <div
+      className="group relative aspect-[16/9] w-full border-2 border-[var(--m-dim)] md:aspect-auto md:h-full"
+      style={{ background: FILM_BG }}
+    >
       <button
         type="button"
         onClick={openPicker}
         aria-label={hasCover ? "Replace cover image" : "Add cover image"}
-        className={`relative flex size-full flex-col items-center justify-center gap-3.5 overflow-hidden ${focusRing}`}
-        style={
-          hasCover
-            ? undefined
-            : {
-                background:
-                  "repeating-linear-gradient(135deg,var(--m-panel) 0 1px,transparent 1px 10px)",
-              }
-        }
+        className={`relative flex size-full items-center justify-center overflow-hidden ${focusRing}`}
       >
-        {/* Film frame markers */}
-        <span
-          aria-hidden="true"
-          className="absolute top-0 bottom-0 left-3 w-0.5 bg-[var(--m-accent)] opacity-50"
-        />
-        <span
-          aria-hidden="true"
-          className="absolute top-0 right-3 bottom-0 w-0.5 bg-[var(--m-accent)] opacity-50"
-        />
-
         {hasCover ? (
           <>
-            <Image
-              src={coverUrl}
-              alt="Post cover"
-              fill
-              sizes="(max-width: 768px) 100vw, 780px"
-              unoptimized
-              className="object-cover [filter:contrast(1.03)]"
-            />
-            <span className="absolute inset-0 flex items-center justify-center bg-[var(--m-bg)]/0 opacity-0 transition-opacity group-focus-within:bg-[var(--m-bg)]/70 group-focus-within:opacity-100 group-hover:bg-[var(--m-bg)]/70 group-hover:opacity-100">
+            {/* The 16:9 cover, centered in the (possibly taller) column. */}
+            <span className="relative block aspect-[16/9] w-full">
+              <Image
+                src={coverUrl}
+                alt="Post cover"
+                fill
+                sizes="(max-width: 768px) 100vw, 620px"
+                unoptimized
+                className="object-cover [filter:contrast(1.03)]"
+              />
+            </span>
+            <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-focus-within:bg-[var(--m-bg)]/70 group-focus-within:opacity-100 group-hover:bg-[var(--m-bg)]/70 group-hover:opacity-100">
               <span className="text-[11px] tracking-[0.12em] text-[var(--m-fg)] uppercase">
                 Replace cover
               </span>
             </span>
           </>
         ) : (
-          <>
+          <span className="flex flex-col items-center gap-3.5">
             <UploadGlyph />
             <span className="text-center">
               <span className="mb-2 block text-[11px] tracking-[0.12em] text-[var(--m-muted2)]">
@@ -113,7 +107,7 @@ export function PostCoverDropzone({
                 16:9 · PNG / JPG
               </span>
             </span>
-          </>
+          </span>
         )}
       </button>
 

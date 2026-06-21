@@ -98,7 +98,6 @@ export const PostForm = ({
         step={step}
         onBack={() => setStep(1)}
         onForward={goToWrite}
-        cancelHref={cancelHref}
         published={published}
         onPublishedChange={(value) =>
           setValue("isPublished", value, { shouldDirty: true })
@@ -197,9 +196,15 @@ export const PostForm = ({
           </div>
         </div>
 
-        {/* Forward to the Write step — below the card, outside its frame, so it
-            never stretches the panel. Mirrors the top-bar Cancel link. */}
-        <div className="mt-7 flex justify-end">
+        {/* Footer — Cancel (left, moved off the top bar) · Next (right). */}
+        <div className="mt-7 flex items-center justify-between">
+          <a
+            href={cancelHref}
+            className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
+          >
+            <span aria-hidden="true">←</span>
+            Cancel
+          </a>
           <button
             type="button"
             onClick={goToWrite}
@@ -237,6 +242,17 @@ export const PostForm = ({
             {`! ${errors.body.message}`}
           </p>
         ) : null}
+
+        {/* Footer — Cancel (the back step is the top-bar stepper). */}
+        <div className="mt-7">
+          <a
+            href={cancelHref}
+            className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
+          >
+            <span aria-hidden="true">←</span>
+            Cancel
+          </a>
+        </div>
       </section>
 
       <CoverCropModal

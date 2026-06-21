@@ -14,8 +14,6 @@ interface ComposerTopBarProps {
   onBack: () => void;
   /** Request the validated forward jump to step 2. */
   onForward: () => void;
-  /** Exit the composer (Cancel) — the author profile or home. */
-  cancelHref: string;
   /** Publish toggle state + setter (RHF-controlled by the parent). */
   published: boolean;
   onPublishedChange: (value: boolean) => void;
@@ -25,18 +23,16 @@ interface ComposerTopBarProps {
 }
 
 /**
- * The composer command bar — one full-bleed `--m-card` band. LEFT: `← Cancel`
- * link · a 2px vertical divider · two numbered step boxes (1/2, generous
- * connector). RIGHT: the visibility eye (open = published/visible, slashed =
- * draft/hidden; toggles `isPublished`) · delete (icon-only, edit) · Publish
- * (icon-only rocket submit). Purely presentational; the parent owns the form,
- * validation, and the delete modal.
+ * The composer command bar — one full-bleed `--m-card` band. LEFT: the two
+ * numbered step boxes (1/2). RIGHT: the visibility eye (open = published/
+ * visible, slashed = draft/hidden; toggles `isPublished`) · delete (icon-only,
+ * edit) · Publish (icon-only rocket submit). Cancel lives in the step footer.
+ * Purely presentational; the parent owns the form, validation, delete modal.
  */
 export function ComposerTopBar({
   step,
   onBack,
   onForward,
-  cancelHref,
   published,
   onPublishedChange,
   onDelete,
@@ -45,24 +41,12 @@ export function ComposerTopBar({
   return (
     <div className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
       <div className="mx-auto flex max-w-[1240px] items-center px-6 py-5 md:px-10">
-        {/* LEFT — cancel · divider · stepper */}
-        <div className="flex items-center gap-5">
-          <a
-            href={cancelHref}
-            className={`inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)] ${focusRing}`}
-          >
-            <span aria-hidden="true">←</span>
-            Cancel
-          </a>
-
-          <span aria-hidden="true" className="h-5 w-0.5 bg-[var(--m-dim)]" />
-
-          <Stepper
-            steps={["Setup", "Write"]}
-            current={step}
-            onSelect={(s) => (s === 1 ? onBack() : onForward())}
-          />
-        </div>
+        {/* LEFT — stepper (Cancel moved to the step footer) */}
+        <Stepper
+          steps={["Setup", "Write"]}
+          current={step}
+          onSelect={(s) => (s === 1 ? onBack() : onForward())}
+        />
 
         {/* RIGHT — visibility (eye) · delete · Publish */}
         <div className="ml-auto flex items-center gap-3">
