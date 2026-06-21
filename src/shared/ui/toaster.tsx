@@ -35,7 +35,7 @@ function ToastCard({ toast }: { toast: Toast }) {
       type="button"
       onClick={() => dismissToast(toast.id)}
       aria-label="Dismiss notification"
-      className="mono-toast-enter pointer-events-auto flex w-[380px] max-w-[calc(100vw-2.5rem)] cursor-pointer items-center gap-3 bg-[var(--m-card)] px-4 py-3 text-left"
+      className="mono-toast-enter pointer-events-auto flex w-[380px] max-w-[calc(100vw-2.5rem)] cursor-pointer items-center gap-3 bg-[var(--m-card)] px-5 py-3 text-left"
       style={{ borderLeft: `2px solid ${STRIPE[toast.tone]}` }}
     >
       {/* Content */}
