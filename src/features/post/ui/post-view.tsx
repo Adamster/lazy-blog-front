@@ -177,8 +177,10 @@ export const PostView = ({
           </div>
         )}
 
-        {/* Prose — server-rendered markdown, shared with the editor preview. */}
-        <div className="mt-10">
+        {/* Prose — server-rendered markdown, shared with the editor preview.
+            The mt-10 only separates the prose from the COVER; with no cover the
+            article's own pt-10 is the single top gap (else they double up). */}
+        <div className={post.coverUrl ? "mt-10" : ""}>
           <PostBody markdown={post.body} />
         </div>
       </article>
