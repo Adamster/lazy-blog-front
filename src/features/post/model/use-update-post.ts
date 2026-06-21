@@ -7,6 +7,7 @@ import { useUser } from "@/entities/session";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { postKeys } from "./post-keys";
+import { revalidatePost } from "./revalidate-post.action";
 
 export const useUpdatePost = () => {
   const router = useRouter();
@@ -19,7 +20,7 @@ export const useUpdatePost = () => {
         id,
         updatePostRequest,
       }),
-    onSuccess: (_data, { updatePostRequest }) => {
+    onSuccess: async (_data, { updatePostRequest }) => {
       addToastSuccess("Post has been updated");
 
       queryClient.invalidateQueries({
@@ -28,6 +29,11 @@ export const useUpdatePost = () => {
       queryClient.invalidateQueries({ queryKey: postKeys.list() });
       queryClient.invalidateQueries({ queryKey: postKeys.byUser() });
       queryClient.invalidateQueries({ queryKey: postKeys.byTag() });
+
+      // The post page + feeds are SSR (getPostSSR, tagged post:<slug>) — client
+      // invalidation alone can't refresh them. Bust the SSR caches so the
+      // redirect (and the feeds) reflect the edit, not the cached version.
+      await revalidatePost(updatePostRequest.slug, user?.userName ?? "");
 
       if (updatePostRequest.isPublished) {
         router.push(`/${user?.userName}/${updatePostRequest.slug}`);
