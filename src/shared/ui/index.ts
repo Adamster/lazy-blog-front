@@ -18,3 +18,5 @@ export { Modal, ModalHeader, SubmitButton, useModalTitleId } from "./modal";
 export { Loading } from "./loading";
 export { ProgressBar } from "./progress-bar";
 export { GlitchText } from "./glitch-text";
+export { Stepper } from "./stepper";
+export { Console } from "./console";

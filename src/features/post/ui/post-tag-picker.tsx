@@ -146,10 +146,10 @@ export function PostTagPicker({
               : undefined
           }
           onKeyDown={onListKeyDown}
-          className="mono-scrollbar absolute top-7 left-0 z-20 max-h-[252px] min-w-[240px] overflow-y-auto border-2 border-[var(--m-dim)] bg-[var(--m-bg)] outline-none"
+          className="mono-scrollbar absolute top-7 left-0 z-30 mt-1 max-h-60 min-w-[240px] overflow-auto border-2 border-[var(--m-dim)] bg-[var(--m-card)] py-1 outline-none"
         >
           {options.length === 0 ? (
-            <li className="px-3.5 py-2.5 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase">
+            <li className="px-3 py-2 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase">
               No tags
             </li>
           ) : (
@@ -164,11 +164,11 @@ export function PostTagPicker({
                   aria-selected={isSelected}
                   onMouseEnter={() => setActiveIndex(index)}
                   onClick={() => toggle(option.value)}
-                  className={`flex cursor-pointer items-center justify-between gap-2 border-b-2 border-[var(--m-dim)] px-3.5 py-2.5 text-[11px] font-medium tracking-[0.12em] uppercase last:border-b-0 ${
+                  className={`flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-[11px] font-medium tracking-[0.12em] uppercase transition-colors ${
                     isActive
                       ? "bg-[var(--m-panel)] text-[var(--m-fg)]"
-                      : "text-[var(--m-fg)]"
-                  }`}
+                      : "text-[var(--m-muted)]"
+                  } ${isSelected ? "text-[var(--m-fg)]" : ""}`}
                   style={{ fontFamily: "var(--font-mono)" }}
                 >
                   <span>{option.label}</span>

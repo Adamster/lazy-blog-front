@@ -16,31 +16,19 @@ interface TextareaProps extends NativeTextareaProps {
   id?: string;
   /** Validation message; presence switches the field to its error state. */
   error?: string;
-  /** Start as a single row and auto-grow with content (like the comment
-   *  composer) instead of a fixed `rows` box. */
-  autoGrow?: boolean;
 }
 
 /**
- * Multiline sibling of {@link Field} — same underline + Material floating label,
- * for longer prose (e.g. a profile biography). The float is driven purely by CSS
- * `:not(:placeholder-shown)` (invisible `" "` placeholder), so it tracks any
- * value source — typed, `value`, `defaultValue`, react-hook-form, autofill.
- * Underline turns accent on focus (error → `--m-error`).
+ * Multiline sibling of {@link Field} — same underline + Material floating label.
+ * Always auto-grows with its content (`field-sizing: content`) and has no manual
+ * resize handle, so every textarea behaves like the comment composer (grows as
+ * you type / on Enter) for consistency. `rows` sets the minimum height. The
+ * float is CSS-driven via `:not(:placeholder-shown)` (invisible `" "`
+ * placeholder); underline turns accent on focus (error → `--m-error`).
  */
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   function Textarea(
-    {
-      label,
-      value,
-      onChange,
-      id,
-      error,
-      required,
-      rows = 3,
-      autoGrow = false,
-      ...rest
-    },
+    { label, value, onChange, id, error, required, rows = 2, ...rest },
     ref
   ) {
     const reactId = useId();
@@ -65,24 +53,19 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           <textarea
             id={fieldId}
             ref={ref}
-            rows={autoGrow ? 1 : rows}
+            rows={rows}
             value={value}
             onChange={onChange}
             required={required}
             placeholder=" "
             aria-invalid={hasError}
             aria-describedby={hasError ? errorId : undefined}
-            className={`block w-full border-0 border-b-2 bg-transparent px-0 pt-5 pb-2 text-[14px] leading-[1.6] text-[var(--m-fg)] caret-[var(--m-accent)] transition-all outline-none placeholder:text-transparent ${
-              autoGrow ? "resize-none overflow-hidden" : "resize-y"
-            } ${
+            className={`block w-full resize-none overflow-hidden border-0 border-b-2 bg-transparent px-0 pt-5 pb-2 text-[14px] leading-[1.6] text-[var(--m-fg)] caret-[var(--m-accent)] transition-all outline-none placeholder:text-transparent ${
               hasError
                 ? "border-[var(--m-error)]"
                 : "border-[var(--m-dim)] focus:border-[var(--m-accent)]"
             }`}
-            style={{
-              fontFamily: "var(--font-mono)",
-              ...(autoGrow ? { fieldSizing: "content" } : {}),
-            }}
+            style={{ fontFamily: "var(--font-mono)", fieldSizing: "content" }}
             {...rest}
           />
         </div>

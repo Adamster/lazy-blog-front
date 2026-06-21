@@ -2,46 +2,11 @@
 
 import { EyeIcon, EyeSlashIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { RocketLaunchIcon } from "@heroicons/react/24/solid";
+import { Stepper } from "@/shared/ui";
 import type { ComposerStep } from "./composer-step";
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
-interface StepDotProps {
-  index: ComposerStep;
-  label: string;
-  active: boolean;
-  onSelect: () => void;
-}
-
-/**
- * A numbered square step box (`1` / `2`) inside a 40px hit target. Active =
- * filled accent with a bg-coloured number; inactive = dim border + muted2
- * number that goes accent on hover. Both are always clickable (free jump);
- * forward navigation is validated by the parent before it advances.
- */
-function StepDot({ index, label, active, onSelect }: StepDotProps) {
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      aria-current={active ? "step" : undefined}
-      aria-label={`Go to step ${index}: ${label}`}
-      className={`group flex size-10 items-center justify-center ${focusRing}`}
-    >
-      <span
-        aria-hidden="true"
-        className={`flex size-8 items-center justify-center border-2 text-[12px] leading-none font-semibold transition-colors ${
-          active
-            ? "border-[var(--m-accent)] bg-[var(--m-accent)] text-[var(--m-bg)]"
-            : "border-[var(--m-dim)] bg-transparent text-[var(--m-muted2)] group-hover:border-[var(--m-accent)] group-hover:text-[var(--m-accent)]"
-        }`}
-      >
-        {index}
-      </span>
-    </button>
-  );
-}
 
 interface ComposerTopBarProps {
   step: ComposerStep;
@@ -92,29 +57,11 @@ export function ComposerTopBar({
 
           <span aria-hidden="true" className="h-5 w-0.5 bg-[var(--m-dim)]" />
 
-          <nav
-            aria-label="Composer steps"
-            className="flex items-center gap-2.5"
-          >
-            <StepDot
-              index={1}
-              label="Setup"
-              active={step === 1}
-              onSelect={onBack}
-            />
-            <span
-              aria-hidden="true"
-              className={`h-0.5 w-14 transition-colors ${
-                step === 2 ? "bg-[var(--m-accent)]" : "bg-[var(--m-dim)]"
-              }`}
-            />
-            <StepDot
-              index={2}
-              label="Write"
-              active={step === 2}
-              onSelect={onForward}
-            />
-          </nav>
+          <Stepper
+            steps={["Setup", "Write"]}
+            current={step}
+            onSelect={(s) => (s === 1 ? onBack() : onForward())}
+          />
         </div>
 
         {/* RIGHT — visibility (eye) · delete · Publish */}

@@ -24,6 +24,8 @@ import {
   Loading,
   ProgressBar,
   GlitchText,
+  Stepper,
+  Console,
   type SelectOption,
 } from "@/shared/ui";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
@@ -85,6 +87,7 @@ export function ComponentsTab() {
   const [multiSel, setMultiSel] = useState<string[]>(["design", "code"]);
   const [emptySel, setEmptySel] = useState<string | undefined>(undefined);
   const [switchOn, setSwitchOn] = useState(true);
+  const [stepDemo, setStepDemo] = useState(1);
 
   const demoTitleId = useModalTitleId();
 
@@ -437,7 +440,7 @@ export function ComponentsTab() {
               <State caption="on" className="sm:w-56">
                 <Switch
                   id="cs-sw-on"
-                  label="Published"
+                  label="Notifications"
                   checked={switchOn}
                   onChange={setSwitchOn}
                 />
@@ -445,7 +448,7 @@ export function ComponentsTab() {
               <State caption="off" className="sm:w-56">
                 <Switch
                   id="cs-sw-off"
-                  label="Published"
+                  label="Notifications"
                   checked={false}
                   onChange={() => {}}
                 />
@@ -453,7 +456,7 @@ export function ComponentsTab() {
               <State caption="disabled (on)" className="sm:w-56">
                 <Switch
                   id="cs-sw-dis"
-                  label="Published"
+                  label="Notifications"
                   checked
                   disabled
                   onChange={() => {}}
@@ -481,6 +484,12 @@ export function ComponentsTab() {
                         label: "Edit",
                         icon: <PencilIcon />,
                         onSelect: () => addToastSuccess("Edit clicked"),
+                      },
+                      {
+                        id: "hide",
+                        label: "Hide",
+                        icon: <EyeSlashIcon />,
+                        onSelect: () => addToastSuccess("Hidden"),
                       },
                       {
                         id: "delete",
@@ -537,7 +546,7 @@ export function ComponentsTab() {
               </button>
               <button
                 type="button"
-                className={outlineCls}
+                className={dangerCls}
                 onClick={() => addToastError("Something went wrong")}
               >
                 Show error
@@ -572,13 +581,20 @@ export function ComponentsTab() {
               </div>
             </Panel>
 
-            <Panel caption="// MATRIXTEXT (animated decode)">
-              <State caption="cycles forever · respects reduced-motion">
-                <MatrixText
-                  text="// SIGNAL SENT ... NO REPLY YET"
-                  className="mono-label"
-                />
-              </State>
+            <Panel caption="// MATRIXTEXT · GLITCHTEXT (animated text)">
+              <div className="flex flex-col gap-7">
+                <State caption="MatrixText — decode cycle · respects reduced-motion">
+                  <MatrixText
+                    text="// SIGNAL SENT ... NO REPLY YET"
+                    className="mono-label"
+                  />
+                </State>
+                <State caption="GlitchText — jitter + accent/error ghosts + caret (error pages)">
+                  <span className="font-display text-[32px] leading-none font-bold tracking-[-0.02em] text-[var(--m-fg)]">
+                    <GlitchText caret>Glitch</GlitchText>
+                  </span>
+                </State>
+              </div>
             </Panel>
           </div>
 
@@ -595,11 +611,11 @@ export function ComponentsTab() {
           </Panel>
         </Section>
 
-        {/* 08 — LOADING · PROGRESS · ERROR */}
+        {/* 08 — LOADING · PROGRESS · STEPPER · CONSOLE */}
         <Section
           index="08"
-          title="LOADING · PROGRESS · ERROR"
-          intro="Terminal ASCII spinner (│ / ─ \ cycling at 100ms, accent) — inline centers it in flow; the block form pairs it with a LOADING label on one line and fills the viewport. ProgressBar is the [████░░░░] block bar (determinate + indeterminate) for uploads / long tasks. GlitchText is the jittering headline (accent/error ghosts + caret) used on the error / 404 pages."
+          title="LOADING · PROGRESS · STEPPER · CONSOLE"
+          intro="Terminal ASCII spinner (│ / ─ \ cycling at 100ms, accent) — inline centers it in flow; the block form pairs it with a LOADING label on one line. ProgressBar is the [████░░░░] block bar (determinate + indeterminate). Stepper = the composer's numbered step boxes (free-jump, forward gated by the parent). Console = the faux-terminal panel from the error page, reusable anywhere."
         >
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
             <Panel caption="// SPINNER (Loading)">
@@ -630,16 +646,29 @@ export function ComponentsTab() {
             </Panel>
           </div>
 
-          <Panel
-            caption="// GLITCHTEXT — error / 404 headline"
-            className="mt-7"
-          >
-            <State caption="jitter + accent/error ghost layers + blinking caret">
-              <h2 className="font-display text-[32px] leading-none font-bold tracking-[-0.02em] text-[var(--m-fg)]">
-                <GlitchText caret>A glitch in the Lazyverse</GlitchText>
-              </h2>
-            </State>
-          </Panel>
+          <div className="mt-7 grid grid-cols-1 gap-7 lg:grid-cols-2">
+            <Panel caption="// STEPPER (composer)">
+              <State caption="numbered boxes · click to jump (forward gated by the parent)">
+                <Stepper
+                  steps={["Setup", "Write"]}
+                  current={stepDemo}
+                  onSelect={setStepDemo}
+                />
+              </State>
+            </Panel>
+
+            <Panel caption="// CONSOLE (terminal panel)">
+              <State caption="title bar + monospace body — reused from the error page">
+                <Console title="stacktrace.log">
+                  <span className="text-[var(--m-error)]">Error</span>
+                  {": "}
+                  <span className="text-[var(--m-fg)]">
+                    Cannot read &apos;energy&apos; of undefined
+                  </span>
+                </Console>
+              </State>
+            </Panel>
+          </div>
         </Section>
 
         {/* 09 — PROSE */}

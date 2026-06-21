@@ -4,6 +4,7 @@ import { ResponseError } from "@/shared/api/openapi";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { GlitchText } from "./glitch-text";
+import { Console } from "./console";
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
@@ -96,20 +97,11 @@ export const ErrorMessage = ({
         </p>
 
         {errorMessage ? (
-          <div className="mt-6 border-2 border-[var(--m-dim)] bg-[var(--m-card)]">
-            <div className="flex items-center gap-2 border-b-2 border-[var(--m-dim)] px-3 py-2">
-              <span className="size-2 border-2 border-[var(--m-error)]" />
-              <span className="size-2 border-2 border-[var(--m-dim)]" />
-              <span className="ml-1 text-[11px] tracking-[0.06em] text-[var(--m-muted2)]">
-                stacktrace.log
-              </span>
-            </div>
-            <div className="px-3 py-3 text-[11px] leading-[1.6] break-words text-[var(--m-muted)]">
-              <span className="text-[var(--m-error)]">Error</span>
-              {": "}
-              <span className="text-[var(--m-fg)]">{errorMessage}</span>
-            </div>
-          </div>
+          <Console title="stacktrace.log" className="mt-6">
+            <span className="text-[var(--m-error)]">Error</span>
+            {": "}
+            <span className="text-[var(--m-fg)]">{errorMessage}</span>
+          </Console>
         ) : null}
 
         <div className="mt-7 flex flex-wrap gap-3">

@@ -222,7 +222,7 @@ export function Select(props: SelectProps) {
               : undefined
           }
           onKeyDown={onListKeyDown}
-          className="absolute z-30 mt-1 max-h-60 w-full overflow-auto border-2 border-[var(--m-dim)] bg-[var(--m-card)] py-1 shadow-none outline-none"
+          className="mono-scrollbar absolute z-30 mt-1 max-h-60 w-full overflow-auto border-2 border-[var(--m-dim)] bg-[var(--m-card)] py-1 shadow-none outline-none"
         >
           {options.length === 0 ? (
             <li className="px-3 py-2 text-[14px] text-[var(--m-muted2)]">
