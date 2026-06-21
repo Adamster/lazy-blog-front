@@ -32,7 +32,7 @@ export const Loading = ({
       role="status"
       aria-label="Loading"
       className={`inline-block w-[1ch] text-center leading-none font-bold text-[var(--m-accent)] tabular-nums ${
-        inline ? "text-[16px]" : "text-[22px]"
+        inline ? "text-[14px]" : "text-[15px]"
       }`}
       style={{ fontFamily: "var(--font-mono)" }}
     >
@@ -48,12 +48,12 @@ export const Loading = ({
 
   return (
     <div
-      className={`mono-scope flex min-h-screen flex-col items-center justify-center gap-3 ${
+      className={`mono-scope flex min-h-screen items-center justify-center gap-2 ${
         compensateHeader ? "-mt-16" : ""
       }`}
     >
       {glyph}
-      <span className="text-[11px] tracking-[0.18em] text-[var(--m-muted2)] uppercase">
+      <span className="text-[10px] tracking-[0.18em] text-[var(--m-muted2)] uppercase">
         Loading
       </span>
     </div>
