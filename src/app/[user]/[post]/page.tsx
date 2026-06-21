@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { PostDetailedResponse } from "@/shared/api/openapi";
 import { generateMeta } from "@/shared/lib/head/meta-data";
-import { Header } from "@/widgets/header";
 import { PostView } from "@/features/post/ui/post-view";
 import { PostHeaderMenuIsland } from "@/features/post/ui/post-header-menu-island";
 import { PostVoteIsland } from "@/features/post/ui/post-vote-island";
@@ -48,7 +47,6 @@ export default async function Page({ params }: PageProps) {
       className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <Header />
       <PostView
         post={postData}
         commentsCount={<PostCommentsCount postId={postData.id} />}

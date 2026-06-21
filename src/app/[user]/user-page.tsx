@@ -6,7 +6,6 @@ import { UserResponse } from "@/shared/api/openapi";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { usePostsByUserName } from "@/features/post/model/use-posts-by-username";
-import { Header } from "@/widgets/header";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
 import { Label, MatrixText, Avatar, fmt } from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
@@ -52,8 +51,6 @@ export default function UserPage({ userName }: { userName: string }) {
       className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <Header />
-
       <main className="mx-auto max-w-[1240px] px-10 pt-10 pb-10">
         {/* Profile header */}
         <section className="flex flex-col gap-8 pb-10 sm:flex-row sm:items-start">

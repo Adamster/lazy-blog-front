@@ -32,7 +32,7 @@ export const Loading = ({
       role="status"
       aria-label="Loading"
       className={`inline-block w-[1ch] text-center leading-none font-bold text-[var(--m-accent)] tabular-nums ${
-        inline ? "text-[20px]" : "text-[32px]"
+        inline ? "text-[16px]" : "text-[22px]"
       }`}
       style={{ fontFamily: "var(--font-mono)" }}
     >
@@ -40,13 +40,15 @@ export const Loading = ({
     </span>
   );
 
+  // `mono-scope` so the `--m-*` tokens resolve (the route-level loading UI
+  // mounts outside any page scope, where the accent would otherwise be unset).
   if (inline) {
-    return <div className="my-6 flex justify-center">{glyph}</div>;
+    return <div className="mono-scope my-6 flex justify-center">{glyph}</div>;
   }
 
   return (
     <div
-      className={`flex min-h-screen flex-col items-center justify-center gap-4 ${
+      className={`mono-scope flex min-h-screen flex-col items-center justify-center gap-3 ${
         compensateHeader ? "-mt-16" : ""
       }`}
     >

@@ -5,7 +5,6 @@ import { UpdatePostRequest } from "@/shared/api/openapi";
 import { PostForm } from "@/features/post/ui/post-form";
 import { useCreatePost } from "@/features/post/model/use-create-post";
 import { ProtectedRoute } from "@/entities/session";
-import { Header } from "@/widgets/header";
 
 const CreatePage = () => {
   const form = useForm<UpdatePostRequest>({
@@ -31,7 +30,6 @@ const CreatePage = () => {
         className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
         style={{ fontFamily: "var(--font-mono)" }}
       >
-        <Header />
         <PostForm
           form={form}
           onSubmit={onSubmit}

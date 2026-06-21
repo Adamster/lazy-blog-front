@@ -11,7 +11,6 @@ import {
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { useAllPosts } from "@/features/post/model/use-all-posts";
-import { Header } from "@/widgets/header";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
 import { Label, Category, Metric, StatusBadge, Dot } from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
@@ -103,8 +102,6 @@ export default function HomePage() {
       className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <Header />
-
       <main className="mx-auto max-w-[1240px] px-10 pt-20 pb-10">
         {posts.length === 0 ? (
           <div className="border-2 border-[var(--m-line)] py-24 text-center">

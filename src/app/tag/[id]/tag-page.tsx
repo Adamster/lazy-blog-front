@@ -4,7 +4,6 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { snakeToTitle } from "@/shared/lib/utils";
-import { Header } from "@/widgets/header";
 import { Label, Category } from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { PostCard } from "@/features/post/ui/post-card";
@@ -31,8 +30,6 @@ export default function TagPage({ tag }: { tag: string }) {
       className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <Header />
-
       <main className="mx-auto max-w-[1240px] px-10 pt-10 pb-10">
         {/* Tag header band — full-bleed, filled like the home/profile stats */}
         <section className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">

@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Header } from "@/widgets/header";
 import { BrandTab } from "./brand-tab";
 import { ComponentsTab } from "./components-tab";
 
@@ -51,8 +50,6 @@ export default function BrandPage() {
       className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <Header />
-
       <main className="mx-auto max-w-[1240px] px-10 pt-20 pb-10">
         {/* Mono tab bar — 2px dim baseline, accent underline on the active tab. */}
         <div

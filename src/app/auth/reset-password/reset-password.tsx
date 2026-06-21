@@ -10,7 +10,6 @@ import { useUserById } from "@/entities/session";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { useResetPassword } from "@/features/auth/model/use-reset-password";
 import { Field, SubmitButton } from "@/shared/ui";
-import { Header } from "@/widgets/header";
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
@@ -49,8 +48,6 @@ export default function ResetPassword() {
       className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <Header />
-
       <main className="mx-auto max-w-[468px] px-10 pt-28 pb-24">
         <div className="mono-label mb-2">{"// RESET PASSWORD"}</div>
         <h1 className="font-display text-[40px] leading-[1.04] font-bold tracking-[-0.02em]">

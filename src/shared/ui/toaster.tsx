@@ -31,8 +31,11 @@ function ToastCard({ toast }: { toast: Toast }) {
   const isSuccess = toast.tone === "success";
 
   return (
-    <div
-      className="mono-toast-enter pointer-events-auto flex w-[380px] max-w-[calc(100vw-2.5rem)] items-stretch"
+    <button
+      type="button"
+      onClick={() => dismissToast(toast.id)}
+      aria-label="Dismiss notification"
+      className="mono-toast-enter pointer-events-auto flex w-[380px] max-w-[calc(100vw-2.5rem)] cursor-pointer items-stretch text-left"
       style={{ borderLeft: `4px solid ${STRIPE[toast.tone]}` }}
     >
       {/* Icon column — on the card surface */}
@@ -55,26 +58,17 @@ function ToastCard({ toast }: { toast: Toast }) {
           </p>
         ) : null}
       </div>
-
-      {/* Close panel — page-bg, 2px dim left rule */}
-      <button
-        type="button"
-        onClick={() => dismissToast(toast.id)}
-        aria-label="Dismiss notification"
-        className="flex w-[52px] flex-none items-center justify-center border-l-2 border-[var(--m-dim)] bg-[var(--m-bg)] text-[18px] leading-none text-[var(--m-muted2)] transition-colors hover:text-[var(--m-fg)]"
-      >
-        ✕
-      </button>
-    </div>
+    </button>
   );
 }
 
 /**
  * Own toast renderer — subscribes to the module-level emitter in
- * `@/shared/lib/toasts` and renders a top-right stacked portal of two-tone
+ * `@/shared/lib/toasts` and renders a bottom-right stacked portal of two-tone
  * Brutalist-Mono toasts (4px type stripe · 52px icon col + content on
- * `--m-card` · 52px close panel on `--m-bg`). Portals into a `.mono-portal`
- * node so the `--m-*` tokens + mono font resolve (mirrors `Modal`).
+ * `--m-card`). The whole toast is the dismiss target (no close glyph); they
+ * also auto-dismiss. Portals into a `.mono-portal` node so the `--m-*` tokens +
+ * mono font resolve (mirrors `Modal`).
  */
 export function Toaster() {
   const mounted = useIsMounted();
@@ -89,7 +83,7 @@ export function Toaster() {
   return createPortal(
     <div
       aria-live="polite"
-      className="mono-portal pointer-events-none fixed top-16 right-5 z-[70] flex flex-col items-end gap-2"
+      className="mono-portal pointer-events-none fixed right-5 bottom-5 z-[70] flex flex-col items-end gap-2"
       style={{ fontFamily: "var(--font-mono)" }}
     >
       {toasts.map((toast) => (

@@ -33,9 +33,12 @@ const statusOf = (error: unknown): number | undefined => {
 export const ErrorMessage = ({
   error,
   reset,
+  status: statusProp,
 }: {
   error: unknown;
   reset?: () => void;
+  /** Force the status line (e.g. 404 for the not-found page). */
+  status?: number;
 }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -65,7 +68,7 @@ export const ErrorMessage = ({
     fetchErrorMessage();
   }, [error]);
 
-  const status = statusOf(error);
+  const status = statusProp ?? statusOf(error);
   const statusLine =
     status === 404 ? "NOT FOUND · 404" : `RUNTIME EXCEPTION · ${status ?? 500}`;
 

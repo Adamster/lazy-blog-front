@@ -5,7 +5,6 @@ import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
 import { PostForm } from "@/features/post/ui/post-form";
-import { Header } from "@/widgets/header";
 import { IsAuth, IsAuthor, useUser } from "@/entities/session";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -70,7 +69,6 @@ const EditPage = () => {
         className="mono-scope mx-[calc(50%-50vw)] min-h-screen w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
         style={{ fontFamily: "var(--font-mono)" }}
       >
-        <Header />
         <IsAuthor
           userId={postData?.author.id || ""}
           fallback={

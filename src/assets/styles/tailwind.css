@@ -30,7 +30,11 @@
   --m-error: #b91c1c;
 }
 .dark .mono-scope,
-.dark .mono-portal {
+.dark .mono-portal,
+/* Body-level portals (toasts, modals) mount OUTSIDE the `.dark` theme wrapper,
+   so the descendant selector above can't reach them — match them by the
+   document carrying a dark `[data-theme]` anywhere. */
+html:has([data-theme="dark"]) .mono-portal {
   --m-bg: #1a1a1a;
   --m-fg: #dcdcdc;
   --m-accent: #cdff48;
