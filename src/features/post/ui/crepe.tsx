@@ -116,7 +116,9 @@ export default function CrepeEditor({
         // the read view's plain `<pre>`. A plain code block styled by
         // `.mono-prose .ProseMirror pre` matches the published page 1:1.
         [Crepe.Feature.CodeMirror]: false,
-        [Crepe.Feature.Latex]: true,
+        // LaTeX depends on CodeMirror (and the blog doesn't need math), so it's
+        // off too — leaving it on throws "enable CodeMirror to use LaTeX".
+        [Crepe.Feature.Latex]: false,
         // Floating selection bubble OFF — the persistent toolbar replaces it.
         [Crepe.Feature.Toolbar]: false,
         [Crepe.Feature.BlockEdit]: true,
