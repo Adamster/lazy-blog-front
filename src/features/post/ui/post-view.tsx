@@ -128,7 +128,7 @@ export const PostView = ({
   return (
     <>
       {/* Above — on normal --m-bg: chip, title, summary */}
-      <div className="mx-auto max-w-[780px] px-10 pt-10">
+      <div className="mx-auto max-w-[780px] px-10">
         {/* Tag + draft + owner kebab */}
         <div className="mb-2 flex flex-wrap items-center gap-3">
           <Category>{cat}</Category>

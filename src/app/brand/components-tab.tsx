@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { LinkIcon, TrashIcon, PencilIcon } from "@heroicons/react/24/solid";
-import { EyeSlashIcon } from "@heroicons/react/24/outline";
+import { EyeSlashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
   Label,
   Category,
@@ -175,19 +175,66 @@ export function ComponentsTab() {
               <div className="flex flex-col gap-7">
                 <State caption="default">
                   <form onSubmit={(e) => e.preventDefault()}>
-                    <SubmitButton>Log in →</SubmitButton>
+                    <SubmitButton>Log in</SubmitButton>
                   </form>
                 </State>
                 <State caption="pending / loading">
                   <form onSubmit={(e) => e.preventDefault()}>
                     <SubmitButton pending pendingLabel="Signing in…">
-                      Log in →
+                      Log in
                     </SubmitButton>
                   </form>
                 </State>
               </div>
             </Panel>
           </div>
+
+          {/* The arrow rule — directional vs action. */}
+          <Panel
+            caption="// ARROWS — direction only, never on action buttons"
+            className="mt-7"
+          >
+            <div className="grid grid-cols-1 gap-x-7 gap-y-9 sm:grid-cols-2">
+              <State caption="directional / navigation — arrows belong here">
+                <div className="flex flex-wrap items-center gap-4">
+                  <button type="button" className={outlineCls}>
+                    <span aria-hidden="true" className="mr-2">
+                      ←
+                    </span>
+                    Back
+                  </button>
+                  <button type="button" className={ctaCls}>
+                    Next
+                    <span aria-hidden="true" className="ml-2">
+                      →
+                    </span>
+                  </button>
+                  <button type="button" className={`${outlineCls} gap-2`}>
+                    <XMarkIcon className="size-3.5" />
+                    Cancel
+                  </button>
+                </div>
+              </State>
+              <State caption="action — NO arrow (login / submit / send / save)">
+                <div className="flex flex-wrap items-center gap-4">
+                  <button type="button" className={ctaCls}>
+                    Log in
+                  </button>
+                  <button type="button" className={ctaCls}>
+                    Send reset link
+                  </button>
+                  <button type="button" className={ctaCls}>
+                    Save
+                  </button>
+                </div>
+              </State>
+            </div>
+            <p className="mt-7 text-[12px] leading-[1.6] text-[var(--m-muted2)]">
+              Arrows are for DIRECTION / navigation only — Next (→), Back (←),
+              go-home. An abort (Cancel) is a close ✕, not a back arrow. Action
+              buttons (login / submit / send / save) never carry an arrow.
+            </p>
+          </Panel>
         </Section>
 
         {/* 02 — LABELS · CATEGORIES · BADGES */}
@@ -702,7 +749,7 @@ export function ComponentsTab() {
                 close();
               }}
             >
-              <SubmitButton>Save →</SubmitButton>
+              <SubmitButton>Save</SubmitButton>
             </form>
           </>
         )}

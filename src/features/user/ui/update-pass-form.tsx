@@ -89,7 +89,7 @@ export const UpdatePasswordForm = () => {
           pending={changePasswordMutation.isPending}
           pendingLabel="Saving…"
         >
-          Change password →
+          Change password
         </SubmitButton>
       </div>
     </form>

@@ -91,7 +91,7 @@ export const UpdateUserForm = ({ userData }: UpdateUserFormProps) => {
         pending={updateUserMutation.isPending}
         pendingLabel="Saving…"
       >
-        Save changes →
+        Save changes
       </SubmitButton>
     </form>
   );

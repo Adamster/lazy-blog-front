@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Controller, type UseFormReturn } from "react-hook-form";
 import type { UpdatePostRequest } from "@/shared/api/openapi";
 import { Field, type SelectOption } from "@/shared/ui";
@@ -93,7 +94,7 @@ export const PostForm = ({
   };
 
   return (
-    <form noValidate onSubmit={handleSubmit} className="pt-10">
+    <form noValidate onSubmit={handleSubmit}>
       <ComposerTopBar
         step={step}
         onBack={() => setStep(1)}
@@ -196,13 +197,15 @@ export const PostForm = ({
           </div>
         </div>
 
-        {/* Footer — Cancel (left, moved off the top bar) · Next (right). */}
+        {/* Footer — Cancel (left, moved off the top bar) · Next (right). Cancel
+            is an ABORT, not a directional "back" — it carries a close ✕ glyph,
+            never an arrow (arrows mark direction/navigation only). */}
         <div className="mt-7 flex items-center justify-between">
           <a
             href={cancelHref}
             className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
           >
-            <span aria-hidden="true">←</span>
+            <XMarkIcon aria-hidden="true" className="size-3.5" />
             Cancel
           </a>
           <button
@@ -245,13 +248,14 @@ export const PostForm = ({
           </p>
         ) : null}
 
-        {/* Footer — Cancel (the back step is the top-bar stepper). */}
+        {/* Footer — Cancel (the back step is the top-bar stepper). Abort = ✕,
+            never an arrow. */}
         <div className="mt-7">
           <a
             href={cancelHref}
             className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
           >
-            <span aria-hidden="true">←</span>
+            <XMarkIcon aria-hidden="true" className="size-3.5" />
             Cancel
           </a>
         </div>

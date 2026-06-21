@@ -202,7 +202,7 @@ export function ModalHeader({
   return (
     <div className="mb-7 flex items-start justify-between gap-4">
       <div>
-        <div className="mono-label mb-2">{eyebrow}</div>
+        <div className="mono-label mb-6">{eyebrow}</div>
         <h2
           id={titleId}
           className="font-display text-[32px] leading-none font-bold tracking-[-0.02em] text-[var(--m-fg)]"
@@ -248,7 +248,7 @@ export function SubmitButton({
     <button
       type="submit"
       disabled={pending}
-      className={`font-display flex h-9 w-full items-center justify-center gap-2 bg-[var(--m-accent)] text-[14px] leading-none font-bold text-[var(--m-bg)] transition-[filter] hover:brightness-110 disabled:pointer-events-none disabled:opacity-80 ${focusRing}`}
+      className={`font-display flex h-9 w-full items-center justify-center gap-2 bg-[var(--m-accent)] text-[14px] leading-none font-bold tracking-[0.06em] text-[var(--m-bg)] uppercase transition-[filter] hover:brightness-110 disabled:pointer-events-none disabled:opacity-80 ${focusRing}`}
     >
       {pending ? (
         <>

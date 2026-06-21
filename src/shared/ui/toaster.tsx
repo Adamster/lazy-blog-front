@@ -52,9 +52,9 @@ function ToastCard({ toast }: { toast: Toast }) {
 
       {/* Status icon — sits between the text and the right edge */}
       {isSuccess ? (
-        <CheckIcon className="size-3.5 flex-none text-[var(--m-accent)]" />
+        <CheckIcon className="size-5 flex-none text-[var(--m-accent)]" />
       ) : (
-        <ExclamationCircleIcon className="size-3.5 flex-none text-[var(--m-error)]" />
+        <ExclamationCircleIcon className="size-5 flex-none text-[var(--m-error)]" />
       )}
     </button>
   );

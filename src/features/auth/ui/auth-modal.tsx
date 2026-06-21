@@ -98,6 +98,33 @@ function HelperLine({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * Left-aligned, muted "← Back" navigation link — the SAME treatment as the
+ * composer Cancel link (11px / 0.12em uppercase, muted → muted hover). The `←`
+ * is a directional/navigation marker (per the arrow rule: arrows are for
+ * direction only, never on action buttons).
+ */
+function BackLink({
+  children,
+  onClick,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <div className="mt-6">
+      <button
+        type="button"
+        onClick={onClick}
+        className={`inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)] ${focusRing}`}
+      >
+        <span aria-hidden="true">←</span>
+        {children}
+      </button>
+    </div>
+  );
+}
+
 /* ------------------------------- LOGIN ------------------------------- */
 
 type LoginFields = { email: string; password: string };
@@ -154,10 +181,12 @@ function LoginView({
           />
         </div>
 
-        {/* Password + a right-aligned "Forgot?" link. Field no longer
-            reserves space below the underline, so add a deliberate `mt-2` gap
-            between the field and the link, then the canonical 16 (`mt-4`)
-            before the submit — stays clean in both empty and error states. */}
+        {/* Password + a right-aligned "Forgot?" link. Field no longer reserves
+            space below the underline, so add a deliberate 16 (`mt-4`) gap
+            between the field and the link so it isn't cramped, then the
+            canonical 24 (`mt-6`) before the submit — matches the field→submit
+            rhythm across every auth view, clean in both empty and error
+            states. */}
         <Field
           id="login-password"
           label="Password"
@@ -166,7 +195,7 @@ function LoginView({
           error={errors.password?.message}
           {...register("password", { required: "Password is required" })}
         />
-        <div className="mt-2 flex justify-end">
+        <div className="mt-4 flex justify-end">
           <button
             type="button"
             onClick={goForgot}
@@ -176,9 +205,9 @@ function LoginView({
           </button>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-6">
           <SubmitButton pending={loading} pendingLabel="Logging in…">
-            Log in →
+            Log in
           </SubmitButton>
         </div>
       </form>
@@ -230,7 +259,7 @@ function ForgotView({
       />
 
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
-        <div className="mb-4">
+        <div className="mb-6">
           <Field
             id="forgot-email"
             label="Email"
@@ -245,16 +274,11 @@ function ForgotView({
         </div>
 
         <SubmitButton pending={isPending} pendingLabel="Sending…">
-          Send reset link →
+          Send reset link
         </SubmitButton>
       </form>
 
-      <HelperLine>
-        ←{" "}
-        <button type="button" onClick={goLogin} className={accentLink}>
-          Back to Log in
-        </button>
-      </HelperLine>
+      <BackLink onClick={goLogin}>Back to Log in</BackLink>
     </>
   );
 }
@@ -408,9 +432,9 @@ function RegisterView({
           />
         </div>
 
-        <div className="mt-4">
+        <div className="mt-6">
           <SubmitButton pending={loading} pendingLabel="Creating…">
-            Create account →
+            Create account
           </SubmitButton>
         </div>
       </form>

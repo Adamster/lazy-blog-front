@@ -51,7 +51,7 @@ export default function UserPage({ userName }: { userName: string }) {
       className="mono-scope min-h-app mx-[calc(50%-50vw)] w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <main className="mx-auto max-w-[1240px] px-10 pt-10 pb-10">
+      <main className="mx-auto max-w-[1240px] px-10 pb-10">
         {/* Profile header */}
         <section className="flex flex-col gap-8 pb-10 sm:flex-row sm:items-start">
           <Avatar src={user?.avatarUrl} name={nameOf(user)} size="lg" />

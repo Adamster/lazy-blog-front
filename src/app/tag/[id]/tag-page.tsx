@@ -30,7 +30,7 @@ export default function TagPage({ tag }: { tag: string }) {
       className="mono-scope min-h-app mx-[calc(50%-50vw)] w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <main className="mx-auto max-w-[1240px] px-10 pt-10 pb-10">
+      <main className="mx-auto max-w-[1240px] px-10 pb-10">
         {/* Tag header band — full-bleed, filled like the home/profile stats */}
         <section className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
           <div className="mx-auto max-w-[1240px] px-10 py-10">
