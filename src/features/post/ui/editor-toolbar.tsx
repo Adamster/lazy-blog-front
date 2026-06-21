@@ -13,6 +13,7 @@ import {
   insertHrCommand,
 } from "@milkdown/kit/preset/commonmark";
 import { toggleStrikethroughCommand } from "@milkdown/kit/preset/gfm";
+import { toggleSmallCommand } from "./editor-small-mark";
 
 /** Dispatch a Milkdown command into the live editor (owned by `crepe.tsx`). */
 export type RunCommand = <T>(cmd: $Command<T>, payload?: T) => void;
@@ -104,6 +105,13 @@ export function EditorToolbar({
         glyphClass="text-[12px]"
         disabled={disabled}
         onPress={() => onCommand(toggleInlineCodeCommand)}
+      />
+      <ToolBtn
+        label="Small text"
+        glyph="SM"
+        glyphClass="text-[11px] font-semibold tracking-[0.06em]"
+        disabled={disabled}
+        onPress={() => onCommand(toggleSmallCommand)}
       />
 
       <Divider />

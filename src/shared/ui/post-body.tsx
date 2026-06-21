@@ -1,8 +1,15 @@
 import type { ComponentPropsWithoutRef } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkDirective from "remark-directive";
 
-type MdNode = { type: string; value?: string; children?: MdNode[] };
+type MdNode = {
+  type: string;
+  value?: string;
+  children?: MdNode[];
+  name?: string;
+  data?: { hName?: string; hProperties?: Record<string, unknown> };
+};
 
 /**
  * Milkdown's "preserve empty line" plugin serialises blank lines as literal
@@ -25,6 +32,28 @@ function remarkDropEmptyLines() {
       node.children = node.children.filter(
         (c) => !isBr(c) && !isEmptyParagraph(c)
       );
+    };
+    walk(tree);
+  };
+}
+
+/**
+ * Bridge our custom `:small[…]` text directive to a `<small>` element. The
+ * editor stores the "small" inline mark as a remark `textDirective` named
+ * `small` (see `editor-small-mark.ts`); here we set its hast name so
+ * react-markdown renders `<small>` (styled 12px by `.mono-prose small`).
+ *
+ * Scoped to the ONE directive name we own — any UNKNOWN directive is left as a
+ * bare `textDirective` mdast node with no `hName`, so react-markdown renders
+ * nothing for it (it executes nothing): the directive syntax stays inert/safe.
+ */
+function remarkSmallDirective() {
+  return (tree: MdNode) => {
+    const walk = (node: MdNode) => {
+      if (node.type === "textDirective" && node.name === "small") {
+        node.data = { ...node.data, hName: "small" };
+      }
+      node.children?.forEach(walk);
     };
     walk(tree);
   };
@@ -78,7 +107,12 @@ export function PostBody({ markdown }: PostBodyProps) {
   return (
     <div className="mono-prose">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkDropEmptyLines]}
+        remarkPlugins={[
+          remarkGfm,
+          remarkDirective,
+          remarkSmallDirective,
+          remarkDropEmptyLines,
+        ]}
         components={components}
       >
         {markdown}

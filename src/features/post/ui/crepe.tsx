@@ -10,6 +10,7 @@ import { listener, listenerCtx } from "@milkdown/kit/plugin/listener";
 import { useAuth, useUser } from "@/entities/session";
 import { API_URL } from "@/shared/types";
 import { EditorToolbar, type RunCommand } from "./editor-toolbar";
+import { smallMark } from "./editor-small-mark";
 
 type ImageUploadHandler = (file: File) => Promise<string>;
 
@@ -144,7 +145,10 @@ export default function CrepeEditor({
       .config((ctx) => {
         ctx.get(listenerCtx).markdownUpdated((_, md) => emit(md));
       })
-      .use(listener);
+      .use(listener)
+      // Custom inline "small" mark (`:small[…]`) — toolbar SM toggles it, it
+      // round-trips through markdown as a remark directive. See editor-small-mark.
+      .use(smallMark);
 
     crepeRef.current = crepe;
     let alive = true;

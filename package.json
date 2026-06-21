@@ -43,6 +43,7 @@
     "react-haiku": "^2.4.1",
     "react-hook-form": "^7.72.1",
     "react-markdown": "^10.1.0",
+    "remark-directive": "^4.0.0",
     "remark-gfm": "^4.0.1",
     "sass": "^1.99.0"
   },
