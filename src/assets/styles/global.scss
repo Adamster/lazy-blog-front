@@ -11,11 +11,6 @@
    <html> itself, set pre-paint by the layout's inline script. */
 html {
   background-color: #f4f4f4; /* --m-bg, light */
-  /* Always reserve the scrollbar gutter so `100vw` vs `100%` stays consistent
-     between scrollable and non-scrollable pages — otherwise the full-bleed
-     `mx-[calc(50%-50vw)] w-screen` breakout (composer canvas) shifts a
-     scrollbar-width when one page scrolls and another doesn't (create vs edit). */
-  scrollbar-gutter: stable;
 }
 html[data-theme="dark"] {
   background-color: #1a1a1a; /* --m-bg, dark */
