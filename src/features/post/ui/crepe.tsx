@@ -112,7 +112,10 @@ export default function CrepeEditor({
       root,
       defaultValue: initialMarkdownRef.current,
       features: {
-        [Crepe.Feature.CodeMirror]: true,
+        // CodeMirror OFF — its gutter/line-numbers/syntax theme diverged from
+        // the read view's plain `<pre>`. A plain code block styled by
+        // `.mono-prose .ProseMirror pre` matches the published page 1:1.
+        [Crepe.Feature.CodeMirror]: false,
         [Crepe.Feature.Latex]: true,
         // Floating selection bubble OFF — the persistent toolbar replaces it.
         [Crepe.Feature.Toolbar]: false,

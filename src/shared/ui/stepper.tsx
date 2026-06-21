@@ -38,7 +38,7 @@ export function Stepper({
             {i > 0 ? (
               <span
                 aria-hidden="true"
-                className={`h-0.5 w-14 transition-colors ${
+                className={`h-0.5 w-7 transition-colors md:w-14 ${
                   current >= step ? "bg-[var(--m-accent)]" : "bg-[var(--m-dim)]"
                 }`}
               />
