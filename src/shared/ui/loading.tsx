@@ -11,15 +11,11 @@ interface IProps {
 const FRAMES = ["│", "/", "─", "\\"];
 
 /**
- * Brutalist-Mono loading indicator — a terminal ASCII spinner (`│ / ─ \`
- * cycling at 100ms) in the accent colour, instead of a soft spinning ring.
- * `inline` centers a small spinner in flow; the block form fills the viewport
- * (spinner + `LOADING` label) and compensates for the fixed header by default.
+ * Bare animated ASCII spinner glyph (`│ / ─ \` at 100ms). Inherits colour/size
+ * from the caller — drop it inline anywhere (buttons, status rows). The mono
+ * font is pinned so the box-drawing frames align.
  */
-export const Loading = ({
-  inline = false,
-  compensateHeader = true,
-}: IProps) => {
+export function Spinner({ className = "" }: { className?: string }) {
   const [frame, setFrame] = useState(0);
 
   useEffect(() => {
@@ -27,15 +23,30 @@ export const Loading = ({
     return () => clearInterval(id);
   }, []);
 
-  const glyph = (
+  return (
     <span
       role="status"
       aria-label="Loading"
-      className="inline-block w-[1ch] text-center text-[14px] leading-none font-bold text-[var(--m-accent)] tabular-nums"
+      className={`inline-block w-[1ch] text-center leading-none tabular-nums ${className}`}
       style={{ fontFamily: "var(--font-mono)" }}
     >
       {FRAMES[frame]}
     </span>
+  );
+}
+
+/**
+ * Brutalist-Mono loading indicator — the {@link Spinner} in the accent colour.
+ * `inline` centers a small spinner in flow; the block form fills the viewport
+ * (spinner + `LOADING` label on one line) and compensates for the fixed header
+ * by default.
+ */
+export const Loading = ({
+  inline = false,
+  compensateHeader = true,
+}: IProps) => {
+  const glyph = (
+    <Spinner className="text-[14px] font-bold text-[var(--m-accent)]" />
   );
 
   // `mono-scope` so the `--m-*` tokens resolve (the route-level loading UI

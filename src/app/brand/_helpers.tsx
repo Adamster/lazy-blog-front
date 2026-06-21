@@ -76,7 +76,7 @@ export function State({
 }) {
   return (
     <div className={className}>
-      <div className="mb-4 text-[11px] tracking-[0.12em] text-[var(--m-muted2)] uppercase">
+      <div className="mb-2.5 text-[11px] tracking-[0.12em] text-[var(--m-muted2)] uppercase">
         {caption}
       </div>
       {children}

@@ -253,25 +253,25 @@ export function ComponentsTab() {
           intro="Square 2px-border tile. sm (40px / 16px letter) for bylines & comments, lg (128px / 44px letter) for the profile header. Image when set, first-initial fallback on the panel surface otherwise."
         >
           <Panel caption="// SIZE × FALLBACK">
-            <div className="flex flex-wrap items-end gap-10">
-              <State caption="sm · image">
+            <div className="flex flex-wrap items-end gap-7">
+              <State caption="sm · img">
                 <Avatar
                   size="sm"
                   name="Elvira Nosova"
                   src="https://i.pravatar.cc/128?img=47"
                 />
               </State>
-              <State caption="sm · initial fallback">
+              <State caption="sm · letter">
                 <Avatar size="sm" name="Konstantin" />
               </State>
-              <State caption="lg · image">
+              <State caption="lg · img">
                 <Avatar
                   size="lg"
                   name="Elvira Nosova"
                   src="https://i.pravatar.cc/256?img=12"
                 />
               </State>
-              <State caption="lg · initial fallback">
+              <State caption="lg · letter">
                 <Avatar size="lg" name="Anna" />
               </State>
             </div>
@@ -634,15 +634,10 @@ export function ComponentsTab() {
               </div>
             </Panel>
 
-            <Panel caption="// PROGRESSBAR — block fill">
-              <div className="flex flex-col gap-7">
-                <State caption="determinate (64%)">
-                  <ProgressBar value={64} label="Uploading image" />
-                </State>
-                <State caption="indeterminate (animated sweep)">
-                  <ProgressBar label="Processing" />
-                </State>
-              </div>
+            <Panel caption="// PROGRESSBAR — indeterminate">
+              <State caption="processing · unknown-duration sweep">
+                <ProgressBar label="Processing" />
+              </State>
             </Panel>
           </div>
 

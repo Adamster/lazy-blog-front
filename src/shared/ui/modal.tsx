@@ -9,6 +9,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useIsMounted } from "@/shared/lib/use-is-mounted";
+import { Spinner } from "./loading";
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
@@ -247,9 +248,16 @@ export function SubmitButton({
     <button
       type="submit"
       disabled={pending}
-      className={`font-display flex h-9 w-full items-center justify-center bg-[var(--m-accent)] text-[14px] leading-none font-bold text-[var(--m-bg)] transition-[filter] hover:brightness-110 disabled:pointer-events-none disabled:opacity-80 ${focusRing}`}
+      className={`font-display flex h-9 w-full items-center justify-center gap-2 bg-[var(--m-accent)] text-[14px] leading-none font-bold text-[var(--m-bg)] transition-[filter] hover:brightness-110 disabled:pointer-events-none disabled:opacity-80 ${focusRing}`}
     >
-      {pending ? (pendingLabel ?? children) : children}
+      {pending ? (
+        <>
+          <Spinner className="text-[14px]" />
+          {pendingLabel ?? children}
+        </>
+      ) : (
+        children
+      )}
     </button>
   );
 }

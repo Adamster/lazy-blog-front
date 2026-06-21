@@ -31,7 +31,7 @@ export function Console({ title, children, className = "" }: ConsoleProps) {
           {title}
         </span>
       </div>
-      <div className="px-3 py-3 text-[11px] leading-[1.6] break-words text-[var(--m-muted)]">
+      <div className="px-3 py-3 text-[12px] leading-[1.6] break-words text-[var(--m-muted)]">
         {children}
       </div>
     </div>

@@ -45,13 +45,13 @@ export const PostHeaderMenu = ({
   const items: MenuItem[] = [
     {
       id: "edit",
-      label: "Редактировать",
+      label: "Edit",
       icon: <PencilSquareIcon className={iconCls} />,
       onSelect: () => router.push(`/${authorHandle}/${postSlug}/edit`),
     },
     {
       id: "publish",
-      label: isPublished ? "Снять с публикации" : "Опубликовать",
+      label: isPublished ? "Unpublish" : "Publish",
       icon: isPublished ? (
         <EyeSlashIcon className={iconCls} />
       ) : (
@@ -61,7 +61,7 @@ export const PostHeaderMenu = ({
     },
     {
       id: "delete",
-      label: "Удалить",
+      label: "Delete",
       icon: <TrashIcon className={iconCls} />,
       danger: true,
       onSelect: () => setConfirmOpen(true),
