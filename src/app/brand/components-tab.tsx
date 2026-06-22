@@ -40,6 +40,10 @@ const outlineCls =
   "mono-btn-outline inline-flex h-9 items-center justify-center px-4 text-[14px] font-semibold tracking-[0.06em]";
 const dangerCls =
   "inline-flex h-9 items-center justify-center border-2 border-[var(--m-error)] bg-[var(--m-error)] px-4 text-[14px] font-bold tracking-[0.06em] text-[var(--m-bg)] uppercase transition-colors hover:bg-transparent hover:text-[var(--m-error)] disabled:opacity-60";
+// Directional / abort nav (Back · Next · Cancel) — LINK treatment, never a boxed
+// button: 11px label, muted2 → muted, no border / fill.
+const navLinkCls =
+  "inline-flex items-center gap-2 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)]";
 
 /* ------------------------------ static data ------------------------------ */
 const CAT_OPTIONS: SelectOption[] = [
@@ -196,20 +200,16 @@ export function ComponentsTab() {
           >
             <div className="grid grid-cols-1 gap-x-7 gap-y-9 sm:grid-cols-2">
               <State caption="directional / navigation — arrows belong here">
-                <div className="flex flex-wrap items-center gap-4">
-                  <button type="button" className={outlineCls}>
-                    <span aria-hidden="true" className="mr-2">
-                      ←
-                    </span>
+                <div className="flex flex-wrap items-center gap-6">
+                  <button type="button" className={navLinkCls}>
+                    <span aria-hidden="true">←</span>
                     Back
                   </button>
-                  <button type="button" className={ctaCls}>
+                  <button type="button" className={navLinkCls}>
                     Next
-                    <span aria-hidden="true" className="ml-2">
-                      →
-                    </span>
+                    <span aria-hidden="true">→</span>
                   </button>
-                  <button type="button" className={`${outlineCls} gap-2`}>
+                  <button type="button" className={navLinkCls}>
                     <XMarkIcon className="size-3.5" />
                     Cancel
                   </button>
@@ -231,8 +231,10 @@ export function ComponentsTab() {
             </div>
             <p className="mt-7 text-[12px] leading-[1.6] text-[var(--m-muted2)]">
               Arrows are for DIRECTION / navigation only — Next (→), Back (←),
-              go-home. An abort (Cancel) is a close ✕, not a back arrow. Action
-              buttons (login / submit / send / save) never carry an arrow.
+              go-home — and they are LINK-style (11px label, muted2 → muted, NO
+              border / box / fill), never boxed buttons. An abort (Cancel) is a
+              close ✕ link, not a back arrow. Action buttons (login / submit /
+              send / save) are the filled buttons and never carry an arrow.
             </p>
           </Panel>
         </Section>
@@ -606,7 +608,7 @@ export function ComponentsTab() {
         <Section
           index="07"
           title="META · DATA"
-          intro="Metric (icon + tabular number, each kind), the MatrixText decode animation, and the Sparkline (monthly series). One caption size — 12px; icons 14px; one colour — muted. Byline rule: the @handle is the profile link (+ the avatar), the name is plain text; handle is muted everywhere with a muted→accent hover (never underline). Only the profile-page header @handle is accent."
+          intro="Metric (icon + tabular number, each kind), the MatrixText decode animation, and the Sparkline (monthly series). One caption size — 12px; icons 14px; one colour — muted (except the rating kind, which is sign-coloured: ↑ accent / ↓ error / muted at 0). Byline rule: the @handle is the profile link (+ the avatar), the name is plain text; handle is muted everywhere with a muted→accent hover (never underline). Only the profile-page header @handle is accent."
         >
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
             <Panel caption="// METRIC — every kind">
@@ -623,6 +625,13 @@ export function ComponentsTab() {
                   <div className="flex flex-wrap items-center gap-4 text-[12px] text-[var(--m-muted)]">
                     <Metric kind="likes" value={413} accent />
                     <Metric kind="views" value={18241} />
+                  </div>
+                </State>
+                <State caption="rating — sign-coloured (↑ accent / ↓ error / 0 muted)">
+                  <div className="flex flex-wrap items-center gap-4 text-[12px] text-[var(--m-muted)]">
+                    <Metric kind="rating" value={42} />
+                    <Metric kind="rating" value={-7} />
+                    <Metric kind="rating" value={0} />
                   </div>
                 </State>
               </div>

@@ -2,22 +2,23 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { IsAuth, useUser, useUserById } from "@/entities/session";
-import { UpdateAvatar } from "@/features/user/ui/update-avatar";
-import { UpdatePasswordForm } from "@/features/user/ui/update-pass-form";
-import { UpdateUserForm } from "@/features/user/ui/update-user-form";
+import { EditProfileTopBar } from "@/features/user/ui/edit-profile-top-bar";
+import { ProfileAvatarZone } from "@/features/user/ui/profile-avatar-zone";
+import { ProfileIdentityForm } from "@/features/user/ui/profile-identity-form";
+import { ProfileSecurityForm } from "@/features/user/ui/profile-security-form";
+import type { ProfileTab } from "@/features/user/ui/profile-tabs";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
-const TABS = [
-  { id: "profile", label: "Edit profile" },
-  { id: "password", label: "Change password" },
-] as const;
-
-type TabId = (typeof TABS)[number]["id"];
-
+/**
+ * Edit-profile screen — the composer's visual language re-dressed for settings.
+ * A full-bleed {@link EditProfileTopBar} command band (P / S tab boxes) caps a
+ * 1240 two-panel card that mirrors the composer Step-1 cover|form layout: the
+ * avatar zone (left, the constant identity anchor — present on both tabs) and
+ * the active section form (right). The active tab lives in the URL (`?tab=…`) so
+ * it survives refresh / back-forward. Breaks out of the legacy clamped `<main>`
+ * via `mono-scope … mx-[calc(50%-50vw)] w-screen` (same as the composer route).
+ */
 export default function Profile() {
   const { user } = useUser();
   const userId = user?.id ?? "";
@@ -27,11 +28,10 @@ export default function Profile() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Active tab lives in the URL (`?tab=…`) so it survives refresh / back-forward.
-  const requested = searchParams.get("tab");
-  const activeTab: TabId = requested === "password" ? "password" : "profile";
+  const activeTab: ProfileTab =
+    searchParams.get("tab") === "security" ? "security" : "profile";
 
-  const selectTab = (tab: TabId) => {
+  const selectTab = (tab: ProfileTab) => {
     const params = new URLSearchParams(searchParams);
     if (tab === "profile") params.delete("tab");
     else params.set("tab", tab);
@@ -48,56 +48,34 @@ export default function Profile() {
       loadingFallback={<Loading />}
       fallback={<ErrorMessage error={"Not Found"} />}
     >
-      <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-10 px-10 pb-10 md:flex-row md:gap-0">
-        <div className="w-full md:w-3/5 md:pr-10">
-          {/* Mono tab bar — 2px dim baseline, accent underline on the active tab. */}
-          <div
-            role="tablist"
-            aria-label="Profile settings"
-            className="flex items-stretch gap-7 border-b-2 border-[var(--m-dim)]"
-          >
-            {TABS.map((tab) => {
-              const isActive = tab.id === activeTab;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  role="tab"
-                  id={`tab-${tab.id}`}
-                  aria-selected={isActive}
-                  aria-controls={`panel-${tab.id}`}
-                  onClick={() => selectTab(tab.id)}
-                  className={`-mb-0.5 border-b-2 pb-3 text-[11px] font-medium tracking-[0.12em] uppercase transition-colors ${focusRing} ${
-                    isActive
-                      ? "border-[var(--m-accent)] text-[var(--m-fg)]"
-                      : "border-transparent text-[var(--m-muted2)] hover:text-[var(--m-fg)]"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
+      <div
+        className="mono-scope min-h-app mx-[calc(50%-50vw)] w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
+        style={{ fontFamily: "var(--font-mono)" }}
+      >
+        <EditProfileTopBar current={activeTab} onSelect={selectTab} />
 
-          <div
-            role="tabpanel"
-            id={`panel-${activeTab}`}
-            aria-labelledby={`tab-${activeTab}`}
-            className="pt-10"
-          >
-            {activeTab === "password" ? (
-              <UpdatePasswordForm />
-            ) : (
-              <UpdateUserForm userData={userData} />
-            )}
-          </div>
-        </div>
+        {/* 1240 canvas — two adjacent equal-height panels (grid stretch): the
+            avatar (left, fills via `md:h-full`) and the active section form
+            (right, on `--m-card`, sets the row height). One closed 2px box with
+            a continuous accent top edge across both panels. */}
+        <section className="mx-auto max-w-[1240px] px-10 pt-10 pb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            <ProfileAvatarZone userData={userData} />
 
-        <div className="w-full md:w-2/5 md:border-l-2 md:border-[var(--m-dim)] md:pl-10">
-          <div className="md:sticky md:top-[5.5rem]">
-            <UpdateAvatar userData={userData} />
+            <div
+              role="tabpanel"
+              id={`panel-${activeTab}`}
+              aria-labelledby={`tab-${activeTab}`}
+              className="border-2 border-t-0 border-[var(--m-dim)] bg-[var(--m-card)] p-7 md:border-t-2 md:border-l-0 md:border-t-[var(--m-accent)] md:p-10"
+            >
+              {activeTab === "security" ? (
+                <ProfileSecurityForm />
+              ) : (
+                <ProfileIdentityForm userData={userData} />
+              )}
+            </div>
           </div>
-        </div>
+        </section>
       </div>
     </IsAuth>
   );

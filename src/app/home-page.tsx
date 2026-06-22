@@ -3,11 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  DisplayPostResponse,
-  UserResponse,
-  VotePostDirectionEnum,
-} from "@/shared/api/openapi";
+import { DisplayPostResponse, UserResponse } from "@/shared/api/openapi";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { useAllPosts } from "@/features/post/model/use-all-posts";
@@ -139,8 +135,10 @@ export default function HomePage() {
                           @{topUser.author.userName}
                         </Link>
                         <Dot />
-                        <Metric kind="posts" value={topUser.count} />
-                        <Metric kind="likes" value={topUser.likes} />
+                        <span className="flex items-center gap-4">
+                          <Metric kind="posts" value={topUser.count} />
+                          <Metric kind="rating" value={topUser.likes} />
+                        </span>
                       </div>
                     </div>
                   )}
@@ -163,8 +161,10 @@ export default function HomePage() {
                           @{topPost.author.userName}
                         </Link>
                         <Dot />
-                        <Metric kind="views" value={topPost.views} />
-                        <Metric kind="likes" value={topPost.rating} />
+                        <span className="flex items-center gap-4">
+                          <Metric kind="views" value={topPost.views} />
+                          <Metric kind="rating" value={topPost.rating} />
+                        </span>
                       </div>
                     </div>
                   )}
@@ -232,13 +232,11 @@ export default function HomePage() {
                     <Dot />
                     <span>{formatDate2(hero.createdAtUtc)}</span>
                     <Dot />
-                    <Metric
-                      kind="likes"
-                      value={hero.rating}
-                      accent={hero.voteDirection === VotePostDirectionEnum.Up}
-                    />
-                    <Metric kind="views" value={hero.views} />
-                    <Metric kind="comments" value={hero.comments} />
+                    <span className="flex items-center gap-4">
+                      <Metric kind="views" value={hero.views} />
+                      <Metric kind="comments" value={hero.comments} />
+                      <Metric kind="rating" value={hero.rating} />
+                    </span>
                   </div>
                 </div>
               </section>

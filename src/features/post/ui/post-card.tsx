@@ -1,12 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { EyeSlashIcon } from "@heroicons/react/24/outline";
-import {
-  DisplayPostResponse,
-  UserPostItem,
-  VotePostDirectionEnum,
-} from "@/shared/api/openapi";
-import { Category, Metric } from "@/shared/ui";
+import { DisplayPostResponse, UserPostItem } from "@/shared/api/openapi";
+import { Category, Metric, DraftOverlay } from "@/shared/ui";
 import { formatDate2 } from "@/shared/lib/utils";
 
 /** Feed row shared by the home feed (`DisplayPostResponse`) and a user's
@@ -71,13 +66,9 @@ function CardMeta({
         <span className="truncate">{formatDate2(post.createdAtUtc)}</span>
       )}
       <span className="ml-auto flex items-center gap-4">
-        <Metric
-          kind="likes"
-          value={post.rating}
-          accent={post.voteDirection === VotePostDirectionEnum.Up}
-        />
         <Metric kind="views" value={post.views} />
         <Metric kind="comments" value={post.comments} />
+        <Metric kind="rating" value={post.rating} />
       </span>
     </>
   );
@@ -94,19 +85,10 @@ export function PostCard({ post, href, authorHandle }: PostCardMonoProps) {
     <article className="group relative flex h-full flex-col bg-[var(--m-card)] transition-colors hover:bg-[var(--m-panel)]">
       <div className="relative aspect-[16/10] overflow-hidden bg-[var(--m-panel)]">
         <Cover post={post} />
-        {/* Draft cover overlay — same crossed-eye + label "hidden" cue as the
-            post page (only the author's own profile feed shows drafts). */}
-        {!post.isPublished && (
-          // pointer-events-none: the overlay is purely decorative — let clicks
-          // fall through to the card's stretched title link (so the cover is a
-          // post link too, same as a published card).
-          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-[var(--m-bg)]/70">
-            <EyeSlashIcon className="size-8 text-[var(--m-fg)]" />
-            <span className="text-[11px] font-semibold tracking-[0.12em] text-[var(--m-fg)] uppercase">
-              Unpublished
-            </span>
-          </div>
-        )}
+        {/* Draft cover overlay — only the author's own profile feed shows
+            drafts. `pointerThrough` lets clicks fall to the stretched title
+            link, so the cover stays a post link like a published card. */}
+        {!post.isPublished && <DraftOverlay size="card" pointerThrough />}
       </div>
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-2">

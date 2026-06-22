@@ -185,7 +185,7 @@ function ToolbarMenu({
                 setOpen(false);
                 item.run();
               }}
-              className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted)] uppercase transition-colors hover:bg-[var(--m-panel)] hover:text-[var(--m-fg)]"
+              className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted)] uppercase transition-colors hover:bg-[var(--m-panel)] hover:text-[var(--m-fg)]"
               style={{ fontFamily: "var(--font-mono)" }}
             >
               {item.swatch ? (
@@ -194,7 +194,7 @@ function ToolbarMenu({
                 // pale/transparent swatch visible against the row.
                 <span
                   aria-hidden="true"
-                  className="size-3.5 shrink-0 border border-[var(--m-dim)]"
+                  className="size-3.5 shrink-0 border-2 border-[var(--m-dim)]"
                   style={{ backgroundColor: item.swatch }}
                 />
               ) : item.icon ? (

@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { apiClient } from "@/shared/api/api-client";
 import { revalidatePost } from "./revalidate-post.action";
 import { PostDetailedResponse } from "@/shared/api/openapi";
@@ -22,7 +21,6 @@ function usePublishToggle(
   messages: { success: string; error: string }
 ) {
   const queryClient = useQueryClient();
-  const router = useRouter();
   const key = postKeys.detail(postSlug);
 
   return useMutation({
@@ -51,12 +49,11 @@ function usePublishToggle(
 
     onSuccess: async () => {
       addToastSuccess(messages.success);
-      // The post page + feeds are server-rendered (ISR) — `isPublished` comes
-      // from SSR props, not the client cache. Bust the tagged caches (post +
-      // home + this author's profile), THEN re-run the server component so the
-      // current view updates (refresh alone re-reads the still-cached fetch).
-      await revalidatePost(postSlug, authorHandle);
-      router.refresh();
+      // The post page is client-rendered: the optimistic cache flip + the
+      // onSettled invalidations below update every client surface. Only the
+      // still-tag-cached server reads (sitemap / feed / profile meta) need
+      // busting.
+      await revalidatePost(authorHandle);
     },
 
     onSettled: () => {

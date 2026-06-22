@@ -24,4 +24,6 @@ export const postKeys = {
       : ["getPostsByTag", tag]) as readonly [string, string?],
   /** A single detailed post, keyed by slug (matches `usePostBySlug`). */
   detail: (slug: string) => ["getPostBySlug", slug] as const,
+  /** A post's rating history — up/down counts + cumulative series, keyed by slug. */
+  ratingHistory: (slug: string) => ["getPostRatingHistory", slug] as const,
 };

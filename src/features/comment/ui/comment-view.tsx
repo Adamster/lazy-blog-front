@@ -89,7 +89,7 @@ const CommentView = ({ comment, postId }: IProps) => {
 
   return (
     <div>
-      <div className="flex items-center gap-3.5">
+      <div className="flex items-center gap-4">
         <Link
           href={`/${handle}`}
           aria-label={`${nameOf(comment.user)} profile`}

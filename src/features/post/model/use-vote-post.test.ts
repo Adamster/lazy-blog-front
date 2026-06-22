@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { PostDetailedResponse } from "@/shared/api/openapi";
-import { VotePostDirectionEnum } from "@/shared/api/openapi";
+import { VoteDirection } from "@/shared/api/openapi";
 import { applyVote } from "./use-vote-post";
 
 // Minimal post fixture — `applyVote` only reads `rating` + `voteDirection`, but
@@ -19,23 +19,23 @@ function makePost(
 
 describe("applyVote", () => {
   it("up-votes an unvoted post (+1, direction Up)", () => {
-    const next = applyVote(makePost({ rating: 5 }), VotePostDirectionEnum.Up);
+    const next = applyVote(makePost({ rating: 5 }), VoteDirection.Up);
     expect(next.rating).toBe(6);
-    expect(next.voteDirection).toBe(VotePostDirectionEnum.Up);
+    expect(next.voteDirection).toBe(VoteDirection.Up);
   });
 
   it("down-votes an unvoted post (-1, direction Down)", () => {
-    const next = applyVote(makePost({ rating: 5 }), VotePostDirectionEnum.Down);
+    const next = applyVote(makePost({ rating: 5 }), VoteDirection.Down);
     expect(next.rating).toBe(4);
-    expect(next.voteDirection).toBe(VotePostDirectionEnum.Down);
+    expect(next.voteDirection).toBe(VoteDirection.Down);
   });
 
   it("toggles an active up-vote off (-1, direction null)", () => {
     const post = makePost({
       rating: 6,
-      voteDirection: VotePostDirectionEnum.Up,
+      voteDirection: VoteDirection.Up,
     });
-    const next = applyVote(post, VotePostDirectionEnum.Up);
+    const next = applyVote(post, VoteDirection.Up);
     expect(next.rating).toBe(5);
     expect(next.voteDirection).toBeNull();
   });
@@ -43,9 +43,9 @@ describe("applyVote", () => {
   it("toggles an active down-vote off (+1, direction null)", () => {
     const post = makePost({
       rating: 4,
-      voteDirection: VotePostDirectionEnum.Down,
+      voteDirection: VoteDirection.Down,
     });
-    const next = applyVote(post, VotePostDirectionEnum.Down);
+    const next = applyVote(post, VoteDirection.Down);
     expect(next.rating).toBe(5);
     expect(next.voteDirection).toBeNull();
   });
@@ -53,33 +53,33 @@ describe("applyVote", () => {
   it("flips down → up as a +2 swing", () => {
     const post = makePost({
       rating: 4,
-      voteDirection: VotePostDirectionEnum.Down,
+      voteDirection: VoteDirection.Down,
     });
-    const next = applyVote(post, VotePostDirectionEnum.Up);
+    const next = applyVote(post, VoteDirection.Up);
     expect(next.rating).toBe(6);
-    expect(next.voteDirection).toBe(VotePostDirectionEnum.Up);
+    expect(next.voteDirection).toBe(VoteDirection.Up);
   });
 
   it("flips up → down as a -2 swing", () => {
     const post = makePost({
       rating: 6,
-      voteDirection: VotePostDirectionEnum.Up,
+      voteDirection: VoteDirection.Up,
     });
-    const next = applyVote(post, VotePostDirectionEnum.Down);
+    const next = applyVote(post, VoteDirection.Down);
     expect(next.rating).toBe(4);
-    expect(next.voteDirection).toBe(VotePostDirectionEnum.Down);
+    expect(next.voteDirection).toBe(VoteDirection.Down);
   });
 
   it("is pure — does not mutate the input post", () => {
     const post = makePost({ rating: 5 });
     const snapshot = { ...post };
-    applyVote(post, VotePostDirectionEnum.Up);
+    applyVote(post, VoteDirection.Up);
     expect(post).toEqual(snapshot);
   });
 
   it("preserves unrelated fields", () => {
     const post = makePost({ rating: 5, title: "Kept", slug: "kept-slug" });
-    const next = applyVote(post, VotePostDirectionEnum.Up);
+    const next = applyVote(post, VoteDirection.Up);
     expect(next.title).toBe("Kept");
     expect(next.slug).toBe("kept-slug");
   });

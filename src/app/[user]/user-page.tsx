@@ -1,13 +1,13 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { HeartIcon, EyeIcon } from "@heroicons/react/24/solid";
+import { EyeIcon, ArrowUpIcon, ArrowDownIcon } from "@heroicons/react/24/solid";
 import { UserResponse } from "@/shared/api/openapi";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { usePostsByUserName } from "@/features/post/model/use-posts-by-username";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
-import { Label, MatrixText, Avatar, fmt } from "@/shared/ui";
+import { Label, MatrixText, Avatar, Dot, fmt } from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { formatDate2 } from "@/shared/lib/utils";
 import { PostCard } from "@/features/post/ui/post-card";
@@ -33,9 +33,9 @@ export default function UserPage({ userName }: { userName: string }) {
   const user = query.data?.pages[0]?.user;
   const handle = user?.userName ?? userName;
 
-  // Likes / views / activity are derived from the loaded posts until a
-  // dedicated aggregate API exists; they grow as more pages load in.
-  const totalLikes = posts.reduce((sum, p) => sum + (p.rating ?? 0), 0);
+  // Karma (net rating) / views / activity are derived from the loaded posts
+  // until a dedicated aggregate API exists; they grow as more pages load in.
+  const totalKarma = posts.reduce((sum, p) => sum + (p.rating ?? 0), 0);
   const totalViews = posts.reduce((sum, p) => sum + (p.views ?? 0), 0);
 
   // Activity: a rolling "last 6 months" window anchored at the current month
@@ -60,18 +60,19 @@ export default function UserPage({ userName }: { userName: string }) {
             <h1 className="font-display text-[40px] leading-none font-bold tracking-[-0.02em]">
               {nameOf(user)}
             </h1>
-            <div className="mt-4 text-[12px] text-[var(--m-muted)]">
+            <div className="mt-4 flex flex-wrap items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
               <span className="font-medium text-[var(--m-accent)]">
                 @{handle}
               </span>
               {user?.createdOnUtc && (
-                <span> · joined {formatDate2(user.createdOnUtc)}</span>
+                <>
+                  <Dot />
+                  <span>joined {formatDate2(user.createdOnUtc)}</span>
+                </>
               )}
-              <span>
-                {" · "}
-                <span className="font-semibold text-[var(--m-fg)]">
-                  {fmt(totalPosts)} posts
-                </span>
+              <Dot />
+              <span className="font-semibold text-[var(--m-fg)]">
+                {fmt(totalPosts)} posts
               </span>
             </div>
             {user?.biography ? (
@@ -86,17 +87,31 @@ export default function UserPage({ userName }: { userName: string }) {
           </div>
         </section>
 
-        {/* Stat row — likes / views / activity sparkline */}
+        {/* Stat row — karma / views / activity sparkline */}
         <section className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
           <div className="mx-auto grid max-w-[1240px] gap-10 px-10 py-10 sm:grid-cols-3">
             <div>
-              <Label>TOTAL LIKES</Label>
-              <div className="font-display mt-2 text-[46px] leading-none font-bold tracking-[-0.02em] text-[var(--m-accent)] tabular-nums">
-                {fmt(totalLikes)}
+              <Label>KARMA</Label>
+              <div
+                className="font-display mt-2 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums"
+                style={{
+                  color:
+                    totalKarma > 0
+                      ? "var(--m-accent)"
+                      : totalKarma < 0
+                        ? "var(--m-error)"
+                        : "var(--m-muted)",
+                }}
+              >
+                {fmt(totalKarma)}
               </div>
-              <div className="mt-2 flex items-center gap-1.5 text-[11px] tracking-[0.12em] text-[var(--m-muted2)]">
-                <HeartIcon className="size-3.5" />
-                likes received
+              <div className="mt-2 flex items-center gap-1.5 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)]">
+                {totalKarma >= 0 ? (
+                  <ArrowUpIcon className="size-3.5" />
+                ) : (
+                  <ArrowDownIcon className="size-3.5" />
+                )}
+                net rating
               </div>
             </div>
 
@@ -105,7 +120,7 @@ export default function UserPage({ userName }: { userName: string }) {
               <div className="font-display mt-2 text-[46px] leading-none font-bold tracking-[-0.02em] text-[var(--m-accent)] tabular-nums">
                 {fmt(totalViews)}
               </div>
-              <div className="mt-2 flex items-center gap-1.5 text-[11px] tracking-[0.12em] text-[var(--m-muted2)]">
+              <div className="mt-2 flex items-center gap-1.5 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)]">
                 <EyeIcon className="size-3.5" />
                 views total
               </div>

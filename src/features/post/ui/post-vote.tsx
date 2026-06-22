@@ -1,32 +1,28 @@
 "use client";
 
-import { HeartIcon } from "@heroicons/react/24/solid";
 import {
-  NullableOfVoteDirection,
-  VotePostDirectionEnum,
-} from "@/shared/api/openapi";
+  HeartIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
+} from "@heroicons/react/24/solid";
+import { VoteDirection } from "@/shared/api/openapi";
 import { useVotePost } from "../model/use-vote-post";
 
 interface IProps {
   postId: string;
   postSlug: string;
-  voteDirection: NullableOfVoteDirection | null;
+  voteDirection: VoteDirection | null;
   /** REAL net rating from the API (upvotes − downvotes). */
   rating: number;
+  /** Total upvotes (likes) the post has received. */
+  likes: number;
+  /** Total downvotes (dislikes) the post has received. */
+  dislikes: number;
+  /** Cumulative-rating series over time (drives the sparkline). */
+  ratingSeries: readonly number[];
   /** Whether the current viewer is allowed to vote (auth'd & not the author). */
   canVote: boolean;
 }
-
-// TODO(api): backend doesn't expose separate up/down counts or a rating
-// time-series yet. Stubbed for the new design — swap these for real fields
-// when the API lands. Net `rating` + `voteDirection` below are REAL.
-const STUB = {
-  likes: 412,
-  dislikes: 18,
-  // Seeded curve (like the design's mock) so the sparkline looks alive; the
-  // tail trends toward the real net rating. Replace with the real series.
-  ratingSeries: [-4, 5, 2, -3, 9, 15, 24],
-} as const;
 
 const fmt = (n: number) => n.toLocaleString("ru-RU");
 
@@ -78,38 +74,54 @@ export const PostVote = ({
   postSlug,
   voteDirection,
   rating,
+  likes,
+  dislikes,
+  ratingSeries,
   canVote,
 }: IProps) => {
   const handleVote = useVotePost(postId, postSlug);
 
-  const liked = voteDirection === VotePostDirectionEnum.Up;
-  const disliked = voteDirection === VotePostDirectionEnum.Down;
+  const liked = voteDirection === VoteDirection.Up;
+  const disliked = voteDirection === VoteDirection.Down;
 
   // Send the clicked direction as-is; the backend toggles: no vote → set it,
   // same direction again → clear it (reset to 0), other direction → switch.
   // The optimistic `applyVote` mirrors that exact behaviour.
-  const onVote = (direction: VotePostDirectionEnum) => {
+  const onVote = (direction: VoteDirection) => {
     if (!canVote || handleVote.isPending) return;
     handleVote.mutate({ direction });
   };
 
   const net = rating ?? 0;
-  const { d, dotLeft, dotTop } = buildRatingPath(STUB.ratingSeries);
+  // Pin the curve's endpoint to the LIVE net rating so the sparkline follows a
+  // vote without fabricating history: the server `ratingSeries` stays truthful;
+  // only its last point tracks the current (optimistic) net.
+  const chartSeries = ratingSeries.length
+    ? [...ratingSeries.slice(0, -1), net]
+    : [net];
+  const { d, dotLeft, dotTop } = buildRatingPath(chartSeries);
+
+  // Colour by sign: accent (positive) / error (negative) / muted (zero) — matches
+  // the Metric. The end dot sits on the net point, so it shares the net's colour.
+  const signColor = (v: number) =>
+    v > 0 ? "var(--m-accent)" : v < 0 ? "var(--m-error)" : "var(--m-muted)";
+  const netColor = signColor(net);
+  const dotColor = netColor;
 
   const labelCls =
-    "text-[11px] tracking-[0.12em] text-[var(--m-muted2)] uppercase";
+    "text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)] uppercase";
   const subRowCls =
-    "mt-2 flex items-center gap-1.5 text-[11px] tracking-[0.12em] whitespace-nowrap text-[var(--m-muted2)]";
+    "mt-2 flex items-center gap-1.5 text-[11px] leading-none tracking-[0.12em] whitespace-nowrap text-[var(--m-muted2)]";
 
   return (
     <section className="mx-[calc(50%-50vw)] mt-12 w-screen bg-[var(--m-card)]">
       <div className="mx-auto grid max-w-[780px] items-start gap-10 px-10 py-10 sm:grid-cols-3">
-        {/* // LIKE IT — upvote toggle (REAL vote, STUB count) */}
+        {/* // LOVE IT — upvote toggle + total likes (left) */}
         <div className="min-w-0">
           <div className={labelCls}>{"// love it"}</div>
           <button
             type="button"
-            onClick={() => onVote(VotePostDirectionEnum.Up)}
+            onClick={() => onVote(VoteDirection.Up)}
             aria-pressed={liked}
             aria-label="Like this post"
             disabled={!canVote || handleVote.isPending}
@@ -121,7 +133,7 @@ export const PostVote = ({
                   (canVote ? "hover:text-[var(--m-accent)]" : "cursor-default"))
             }
           >
-            {fmt(STUB.likes)}
+            {fmt(likes)}
             <HeartIcon className="size-5 flex-none" />
           </button>
           <div className={subRowCls}>
@@ -130,12 +142,12 @@ export const PostVote = ({
           </div>
         </div>
 
-        {/* // DISLIKE IT — downvote toggle (REAL vote, STUB count) */}
+        {/* // HATE IT — downvote toggle + total dislikes (middle) */}
         <div className="min-w-0">
           <div className={labelCls}>{"// hate it"}</div>
           <button
             type="button"
-            onClick={() => onVote(VotePostDirectionEnum.Down)}
+            onClick={() => onVote(VoteDirection.Down)}
             aria-pressed={disliked}
             aria-label="Dislike this post"
             disabled={!canVote || handleVote.isPending}
@@ -147,7 +159,7 @@ export const PostVote = ({
                   (canVote ? "hover:text-[var(--m-error)]" : "cursor-default"))
             }
           >
-            {fmt(STUB.dislikes)}
+            {fmt(dislikes)}
             <BrokenHeartIcon className="size-5 flex-none" />
           </button>
           <div className={subRowCls}>
@@ -156,7 +168,7 @@ export const PostVote = ({
           </div>
         </div>
 
-        {/* // RATING — STUB sparkline + REAL net rating */}
+        {/* // RATING — cumulative-rating sparkline (green ≥0 / red <0) + net (right) */}
         <div className="min-w-0">
           <div className={labelCls}>{"// rating"}</div>
           <div className="relative mt-2 h-[46px] w-full overflow-visible">
@@ -167,10 +179,25 @@ export const PostVote = ({
               className="absolute inset-0 h-full w-full overflow-visible"
               aria-hidden
             >
+              <defs>
+                <linearGradient
+                  id="ratingSignGrad"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="52"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop offset="0" stopColor="var(--m-accent)" />
+                  <stop offset="0.5" stopColor="var(--m-accent)" />
+                  <stop offset="0.5" stopColor="var(--m-error)" />
+                  <stop offset="1" stopColor="var(--m-error)" />
+                </linearGradient>
+              </defs>
               <path
                 d={d}
                 fill="none"
-                stroke="var(--m-accent)"
+                stroke="url(#ratingSignGrad)"
                 strokeWidth={1.5}
                 strokeLinejoin="round"
                 strokeLinecap="round"
@@ -179,15 +206,29 @@ export const PostVote = ({
             </svg>
             <span
               aria-hidden
-              className="absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--m-accent)]"
-              style={{ left: dotLeft, top: dotTop }}
+              className="absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{ left: dotLeft, top: dotTop, backgroundColor: dotColor }}
             />
           </div>
           <div className={subRowCls}>
-            <span className="font-semibold text-[var(--m-accent)]">
-              {net >= 0 ? `▲ +${fmt(net)}` : `▼ ${fmt(net)}`}
-            </span>
+            {net < 0 ? (
+              <ArrowDownIcon
+                className="size-3.5 shrink-0"
+                style={{ color: netColor }}
+              />
+            ) : (
+              <ArrowUpIcon
+                className="size-3.5 shrink-0"
+                style={{ color: netColor }}
+              />
+            )}
             net rating
+            <span
+              className="font-semibold tabular-nums"
+              style={{ color: netColor }}
+            >
+              {net >= 0 ? `+${fmt(net)}` : fmt(net)}
+            </span>
           </div>
         </div>
       </div>

@@ -30,10 +30,10 @@ export const useUpdatePost = () => {
       queryClient.invalidateQueries({ queryKey: postKeys.byUser() });
       queryClient.invalidateQueries({ queryKey: postKeys.byTag() });
 
-      // The post page + feeds are SSR (getPostSSR, tagged post:<slug>) — client
-      // invalidation alone can't refresh them. Bust the SSR caches so the
-      // redirect (and the feeds) reflect the edit, not the cached version.
-      await revalidatePost(updatePostRequest.slug, user?.userName ?? "");
+      // The sitemap / feed (and profile meta) are still tag-cached server reads;
+      // bust them so they reflect the edit. The post page itself is
+      // client-rendered, so the client cache (invalidated above) is enough.
+      await revalidatePost(user?.userName ?? "");
 
       if (updatePostRequest.isPublished) {
         router.push(`/${user?.userName}/${updatePostRequest.slug}`);

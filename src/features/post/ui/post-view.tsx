@@ -1,15 +1,18 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  EyeIcon,
-  HeartIcon,
-  ChatBubbleLeftIcon,
-} from "@heroicons/react/24/solid";
-import { EyeSlashIcon } from "@heroicons/react/24/outline";
+import { ChatBubbleLeftIcon } from "@heroicons/react/24/solid";
 import { AuthorPostResponse, PostDetailedResponse } from "@/shared/api/openapi";
 import { formatDate2 } from "@/shared/lib/utils";
-import { Avatar, Category, PostBody, StatusBadge } from "@/shared/ui";
+import {
+  Avatar,
+  Category,
+  Dot,
+  DraftOverlay,
+  Metric,
+  PostBody,
+  StatusBadge,
+} from "@/shared/ui";
 import type { Status } from "@/shared/ui";
 
 interface IProps {
@@ -47,8 +50,6 @@ const readTimeOf = (body: string) => {
   return Math.max(1, Math.round(words / 200));
 };
 
-const fmtMetric = (n: number) => n.toLocaleString("ru-RU");
-
 /** Author tile + name/handle/date + view·like·comment metrics band. */
 function PostByline({
   post,
@@ -74,31 +75,30 @@ function PostByline({
           <span className="font-display block truncate text-[14px] font-semibold">
             {nameOf(post.author)}
           </span>
-          <span className="text-[12px] text-[var(--m-muted)]">
+          <span className="flex flex-wrap items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
             <Link
               href={`/${authorHandle}`}
               className="transition-colors hover:text-[var(--m-accent)]"
             >
               @{authorHandle}
             </Link>
-            {` · ${formatDate2(post.createdAtUtc)} · ${readTime} min read`}
+            <Dot />
+            <span>{formatDate2(post.createdAtUtc)}</span>
+            <Dot />
+            <span>{readTime} min read</span>
           </span>
         </div>
 
-        {/* Right side: metrics */}
-        <div className="ml-auto flex items-center gap-4 text-[12px] text-[var(--m-muted)] tabular-nums">
-          <span className="inline-flex items-center gap-1.5">
-            <EyeIcon className="size-3.5 shrink-0" />
-            {fmtMetric(post.views ?? 0)}
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <HeartIcon className="size-3.5 shrink-0" />
-            {fmtMetric(post.rating ?? 0)}
-          </span>
-          <span className="inline-flex items-center gap-1.5">
+        {/* Right side: metrics cluster — between-metrics gap 16 (gap-4). */}
+        <div className="ml-auto flex items-center gap-4 text-[12px] text-[var(--m-muted)]">
+          <Metric kind="views" value={post.views ?? 0} />
+          {/* Comment count is a slotted client island (live query) — hand-rolled
+              to match the Metric primitive (gap-1 icon→number, size-3.5 icon). */}
+          <span className="inline-flex items-center gap-1 tabular-nums">
             <ChatBubbleLeftIcon className="size-3.5 shrink-0" />
             {commentsCount}
           </span>
+          <Metric kind="rating" value={post.rating ?? 0} />
         </div>
       </div>
     </section>
@@ -164,16 +164,9 @@ export const PostView = ({
               unoptimized
               className="object-cover [filter:contrast(1.03)]"
             />
-            {/* Draft overlay — a crossed-out eye makes the hidden state obvious
-                (the cover is dimmed; only the author sees this page anyway). */}
-            {!post.isPublished && (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2.5 bg-[var(--m-bg)]/75">
-                <EyeSlashIcon className="size-10 text-[var(--m-fg)]" />
-                <span className="text-[11px] font-semibold tracking-[0.12em] text-[var(--m-fg)] uppercase">
-                  Unpublished
-                </span>
-              </div>
-            )}
+            {/* Draft overlay — the hidden state is obvious; only the author
+                ever sees this page anyway. */}
+            {!post.isPublished && <DraftOverlay size="page" />}
           </div>
         )}
 

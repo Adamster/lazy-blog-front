@@ -11,6 +11,11 @@
    <html> itself, set pre-paint by the layout's inline script. */
 html {
   background-color: #f4f4f4; /* --m-bg, light */
+  /* Always reserve the vertical-scrollbar gutter. The fixed header centers its
+     1240 column in the full viewport while flow content centers in the
+     viewport-minus-scrollbar; `stable` makes both share the same containing
+     block so the header column aligns with the page column under it. */
+  scrollbar-gutter: stable;
 }
 html[data-theme="dark"] {
   background-color: #1a1a1a; /* --m-bg, dark */

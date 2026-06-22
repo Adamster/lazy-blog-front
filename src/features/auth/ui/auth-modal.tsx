@@ -31,7 +31,7 @@ const PASSWORD_PATTERN = {
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
 
-const accentLink = `text-[var(--m-accent)] font-semibold underline-offset-2 hover:underline ${focusRing}`;
+const accentLink = `text-[var(--m-fg)] font-semibold transition-colors hover:text-[var(--m-accent)] ${focusRing}`;
 
 /* ----------------------------- shared bits ----------------------------- */
 
@@ -116,7 +116,7 @@ function BackLink({
       <button
         type="button"
         onClick={onClick}
-        className={`inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)] ${focusRing}`}
+        className={`inline-flex items-center gap-2 text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)] ${focusRing}`}
       >
         <span aria-hidden="true">←</span>
         {children}
@@ -201,7 +201,7 @@ function LoginView({
           <button
             type="button"
             onClick={goForgot}
-            className={`text-[11px] tracking-[0.12em] uppercase ${accentLink}`}
+            className={`text-[11px] leading-none tracking-[0.12em] uppercase ${accentLink}`}
           >
             Forgot password?
           </button>

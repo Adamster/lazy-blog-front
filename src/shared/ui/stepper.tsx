@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { STEP_BOX, stepBoxClass } from "./step-box";
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
@@ -39,13 +40,13 @@ export function Stepper({
         const step = i + 1;
         const active = step === current;
         const hasError = errorSteps?.includes(step) ?? false;
+        // Error layer overrides the shared active/inactive box language with
+        // `--m-error`; otherwise it's the canonical step box (shared with TabNav).
         const boxClass = hasError
           ? active
             ? "border-[var(--m-error)] bg-[var(--m-error)] text-[var(--m-bg)]"
             : "border-[var(--m-error)] bg-transparent text-[var(--m-error)]"
-          : active
-            ? "border-[var(--m-accent)] bg-[var(--m-accent)] text-[var(--m-bg)]"
-            : "border-[var(--m-dim)] bg-transparent text-[var(--m-muted2)] group-hover:border-[var(--m-accent)] group-hover:text-[var(--m-accent)]";
+          : stepBoxClass(active);
         const reached = current >= step;
         // Connector matches the boxes it bridges: red if either reached end
         // holds an error (so a green line never runs between red boxes),
@@ -75,10 +76,7 @@ export function Stepper({
               }
               className={`group flex size-10 items-center justify-center ${focusRing}`}
             >
-              <span
-                aria-hidden="true"
-                className={`flex size-8 items-center justify-center border-2 text-[12px] leading-none font-semibold transition-colors ${boxClass}`}
-              >
+              <span aria-hidden="true" className={`${STEP_BOX} ${boxClass}`}>
                 {step}
               </span>
             </button>
