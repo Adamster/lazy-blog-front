@@ -1,5 +1,5 @@
 /* tslint:disable */
-/* eslint-disable */
+ 
 export * from './AddCommentRequest';
 export * from './AuthorPostResponse';
 export * from './ChangePasswordRequest';
@@ -11,9 +11,10 @@ export * from './LoginRequest';
 export * from './LoginResponse';
 export * from './MediaItemResponse';
 export * from './NoContent';
-export * from './NullableOfVoteDirection';
 export * from './PostCreatedResponse';
 export * from './PostDetailedResponse';
+export * from './PostRatingHistoryPoint';
+export * from './PostRatingHistoryResponse';
 export * from './PostResponse';
 export * from './ProblemDetails';
 export * from './RefreshTokenRequest';
@@ -29,3 +30,4 @@ export * from './UserCommentResponse';
 export * from './UserPostItem';
 export * from './UserPostResponse';
 export * from './UserResponse';
+export * from './VoteDirection';

@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { VoteDirection } from './VoteDirection';
+import {
+    VoteDirectionFromJSON,
+    VoteDirectionFromJSONTyped,
+    VoteDirectionToJSON,
+    VoteDirectionToJSONTyped,
+} from './VoteDirection';
 import type { TagPostResponse } from './TagPostResponse';
 import {
     TagPostResponseFromJSON,
@@ -27,13 +34,6 @@ import {
     AuthorPostResponseToJSON,
     AuthorPostResponseToJSONTyped,
 } from './AuthorPostResponse';
-import type { NullableOfVoteDirection } from './NullableOfVoteDirection';
-import {
-    NullableOfVoteDirectionFromJSON,
-    NullableOfVoteDirectionFromJSONTyped,
-    NullableOfVoteDirectionToJSON,
-    NullableOfVoteDirectionToJSONTyped,
-} from './NullableOfVoteDirection';
 
 /**
  * 
@@ -115,10 +115,10 @@ export interface PostDetailedResponse {
     isPublished: boolean;
     /**
      * 
-     * @type {NullableOfVoteDirection}
+     * @type {VoteDirection}
      * @memberof PostDetailedResponse
      */
-    voteDirection: NullableOfVoteDirection | null;
+    voteDirection: VoteDirection | null;
     /**
      * 
      * @type {Date}
@@ -172,7 +172,7 @@ export function PostDetailedResponseFromJSONTyped(json: any, ignoreDiscriminator
         'rating': json['rating'],
         'views': json['views'],
         'isPublished': json['isPublished'],
-        'voteDirection': NullableOfVoteDirectionFromJSON(json['voteDirection']),
+        'voteDirection': VoteDirectionFromJSON(json['voteDirection']),
         'createdAtUtc': (new Date(json['createdAtUtc'])),
     };
 }
@@ -200,7 +200,7 @@ export function PostDetailedResponseToJSONTyped(value?: PostDetailedResponse | n
         'rating': value['rating'],
         'views': value['views'],
         'isPublished': value['isPublished'],
-        'voteDirection': NullableOfVoteDirectionToJSON(value['voteDirection']),
+        'voteDirection': VoteDirectionToJSON(value['voteDirection']),
         'createdAtUtc': ((value['createdAtUtc']).toISOString()),
     };
 }

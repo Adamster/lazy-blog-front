@@ -20,10 +20,12 @@ import type {
   NoContent,
   PostCreatedResponse,
   PostDetailedResponse,
+  PostRatingHistoryResponse,
   PostResponse,
   ProblemDetails,
   UpdatePostRequest,
   UserPostResponse,
+  VoteDirection,
 } from '../models/index';
 import {
     CreatePostRequestFromJSON,
@@ -36,6 +38,8 @@ import {
     PostCreatedResponseToJSON,
     PostDetailedResponseFromJSON,
     PostDetailedResponseToJSON,
+    PostRatingHistoryResponseFromJSON,
+    PostRatingHistoryResponseToJSON,
     PostResponseFromJSON,
     PostResponseToJSON,
     ProblemDetailsFromJSON,
@@ -44,6 +48,8 @@ import {
     UpdatePostRequestToJSON,
     UserPostResponseFromJSON,
     UserPostResponseToJSON,
+    VoteDirectionFromJSON,
+    VoteDirectionToJSON,
 } from '../models/index';
 
 export interface CreatePostOperationRequest {
@@ -63,6 +69,10 @@ export interface GetPostByIdRequest {
 }
 
 export interface GetPostBySlugRequest {
+    slug: string;
+}
+
+export interface GetPostRatingHistoryRequest {
     slug: string;
 }
 
@@ -95,7 +105,7 @@ export interface UpdatePostOperationRequest {
 
 export interface VotePostRequest {
     id: string;
-    direction?: VotePostDirectionEnum;
+    direction?: VoteDirection;
 }
 
 /**
@@ -169,6 +179,19 @@ export interface PostsApiInterface {
     /**
      */
     getPostBySlug(requestParameters: GetPostBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetailedResponse>;
+
+    /**
+     * 
+     * @param {string} slug 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PostsApiInterface
+     */
+    getPostRatingHistoryRaw(requestParameters: GetPostRatingHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostRatingHistoryResponse>>;
+
+    /**
+     */
+    getPostRatingHistory(requestParameters: GetPostRatingHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostRatingHistoryResponse>;
 
     /**
      * 
@@ -254,7 +277,7 @@ export interface PostsApiInterface {
     /**
      * 
      * @param {string} id 
-     * @param {'Up' | 'Down'} [direction] 
+     * @param {VoteDirection} [direction] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PostsApiInterface
@@ -423,6 +446,37 @@ export class PostsApi extends runtime.BaseAPI implements PostsApiInterface {
      */
     async getPostBySlug(requestParameters: GetPostBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetailedResponse> {
         const response = await this.getPostBySlugRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getPostRatingHistoryRaw(requestParameters: GetPostRatingHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostRatingHistoryResponse>> {
+        if (requestParameters['slug'] == null) {
+            throw new runtime.RequiredError(
+                'slug',
+                'Required parameter "slug" was null or undefined when calling getPostRatingHistory().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/posts/{slug}/rating-history`.replace(`{${"slug"}}`, encodeURIComponent(String(requestParameters['slug']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PostRatingHistoryResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getPostRatingHistory(requestParameters: GetPostRatingHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostRatingHistoryResponse> {
+        const response = await this.getPostRatingHistoryRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -662,12 +716,3 @@ export class PostsApi extends runtime.BaseAPI implements PostsApiInterface {
     }
 
 }
-
-/**
- * @export
- */
-export const VotePostDirectionEnum = {
-    Up: 'Up',
-    Down: 'Down'
-} as const;
-export type VotePostDirectionEnum = typeof VotePostDirectionEnum[keyof typeof VotePostDirectionEnum];

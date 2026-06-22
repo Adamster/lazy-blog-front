@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { VoteDirection } from './VoteDirection';
+import {
+    VoteDirectionFromJSON,
+    VoteDirectionFromJSONTyped,
+    VoteDirectionToJSON,
+    VoteDirectionToJSONTyped,
+} from './VoteDirection';
 import type { TagPostResponse } from './TagPostResponse';
 import {
     TagPostResponseFromJSON,
@@ -27,13 +34,6 @@ import {
     AuthorPostResponseToJSON,
     AuthorPostResponseToJSONTyped,
 } from './AuthorPostResponse';
-import type { NullableOfVoteDirection } from './NullableOfVoteDirection';
-import {
-    NullableOfVoteDirectionFromJSON,
-    NullableOfVoteDirectionFromJSONTyped,
-    NullableOfVoteDirectionToJSON,
-    NullableOfVoteDirectionToJSONTyped,
-} from './NullableOfVoteDirection';
 
 /**
  * 
@@ -97,10 +97,10 @@ export interface DisplayPostResponse {
     rating: number;
     /**
      * 
-     * @type {NullableOfVoteDirection}
+     * @type {VoteDirection}
      * @memberof DisplayPostResponse
      */
-    voteDirection: NullableOfVoteDirection | null;
+    voteDirection: VoteDirection | null;
     /**
      * 
      * @type {string}
@@ -162,7 +162,7 @@ export function DisplayPostResponseFromJSONTyped(json: any, ignoreDiscriminator:
         'views': json['views'],
         'comments': json['comments'],
         'rating': json['rating'],
-        'voteDirection': NullableOfVoteDirectionFromJSON(json['voteDirection']),
+        'voteDirection': VoteDirectionFromJSON(json['voteDirection']),
         'coverUrl': json['coverUrl'],
         'tags': ((json['tags'] as Array<any>).map(TagPostResponseFromJSON)),
         'createdAtUtc': (new Date(json['createdAtUtc'])),
@@ -189,7 +189,7 @@ export function DisplayPostResponseToJSONTyped(value?: DisplayPostResponse | nul
         'views': value['views'],
         'comments': value['comments'],
         'rating': value['rating'],
-        'voteDirection': NullableOfVoteDirectionToJSON(value['voteDirection']),
+        'voteDirection': VoteDirectionToJSON(value['voteDirection']),
         'coverUrl': value['coverUrl'],
         'tags': ((value['tags'] as Array<any>).map(TagPostResponseToJSON)),
         'createdAtUtc': ((value['createdAtUtc']).toISOString()),
