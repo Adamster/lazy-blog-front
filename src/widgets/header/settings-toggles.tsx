@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import type { Theme } from "@/shared/providers/theme-providers";
 import { CommandButton } from "./command-row";
 
 /** Bracketed `[ value ]` indicator on the right of a settings toggle row. */
@@ -23,25 +24,26 @@ function ToggleIndicator({
 
 interface SettingsTogglesProps {
   open: boolean;
-  isDarkTheme: boolean;
-  onToggleTheme: () => void;
-  crtOn: boolean;
-  onToggleCrt: () => void;
+  theme: Theme;
+  onCycleTheme: () => void;
   lang: "en" | "ru";
   onToggleLang: () => void;
 }
 
 /**
- * Settings block — the dark_mode + crt_mode + lang toggles grouped under a
- * `// settings` console comment. All keep the menu open so the user can flip
- * them in place.
+ * Settings block — the lang + theme controls grouped under a `// settings`
+ * console comment. Both keep the menu open so the user can flip them in place.
+ * Order: theme → lang.
+ *
+ * `theme` is a single cycling control (light → dark → neo → light) — a theme is
+ * mutually-exclusive by nature, so neo is just a third theme value here, not a
+ * separate toggle. The indicator is accent whenever the canvas is dark
+ * (dark/neo), muted on light.
  */
 export function SettingsToggles({
   open,
-  isDarkTheme,
-  onToggleTheme,
-  crtOn,
-  onToggleCrt,
+  theme,
+  onCycleTheme,
   lang,
   onToggleLang,
 }: SettingsTogglesProps) {
@@ -51,28 +53,17 @@ export function SettingsToggles({
         {"// settings"}
       </div>
 
+      {/* theme — cycles light → dark → neo → light. */}
       <CommandButton
-        onClick={onToggleTheme}
+        onClick={onCycleTheme}
         tabbable={open}
         trailing={
-          <ToggleIndicator active={isDarkTheme}>
-            {isDarkTheme ? "[ on ]" : "[ off ]"}
+          <ToggleIndicator active={theme !== "light"}>
+            [ {theme} ]
           </ToggleIndicator>
         }
       >
-        dark_mode
-      </CommandButton>
-
-      <CommandButton
-        onClick={onToggleCrt}
-        tabbable={open}
-        trailing={
-          <ToggleIndicator active={crtOn}>
-            {crtOn ? "[ on ]" : "[ off ]"}
-          </ToggleIndicator>
-        }
-      >
-        crt_mode
+        theme
       </CommandButton>
 
       {/* lang — flips the indicator (i18n wiring pending) */}

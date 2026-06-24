@@ -82,14 +82,23 @@ export function CommandButton({
   onClick,
   danger = false,
   tabbable,
+  disabled = false,
+  title,
   children,
   trailing,
-}: CommandRowProps & { onClick: () => void }) {
+}: CommandRowProps & {
+  onClick: () => void;
+  /** Non-interactive + muted (a locked / unavailable command row). */
+  disabled?: boolean;
+  title?: string;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={rowClass(danger)}
+      disabled={disabled}
+      title={title}
+      className={`${rowClass(danger)} disabled:pointer-events-none disabled:text-[var(--m-muted2)] disabled:opacity-60`}
       tabIndex={tabbable ? 0 : -1}
     >
       <Caret danger={danger} />

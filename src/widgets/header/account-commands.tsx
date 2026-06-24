@@ -2,7 +2,6 @@
 
 import {
   UserIcon,
-  AtSymbolIcon,
   PencilSquareIcon,
   ArrowRightStartOnRectangleIcon,
   ArrowRightEndOnRectangleIcon,
@@ -11,8 +10,6 @@ import { BracketIcon, CommandButton, CommandLink } from "./command-row";
 
 interface AccountCommandsProps {
   isAuthenticated: boolean;
-  /** Signed-in handle → links to the public profile (a menu row now). */
-  userName?: string;
   /** Whether the menu is open (gates tab-reachability of the rows). */
   open: boolean;
   /** Close the menu after navigating. */
@@ -30,7 +27,6 @@ interface AccountCommandsProps {
  */
 export function AccountCommands({
   isAuthenticated,
-  userName,
   open,
   onNavigate,
   onLogin,
@@ -50,18 +46,8 @@ export function AccountCommands({
 
   return (
     <>
-      {/* Signed-in handle → the PUBLIC profile (`/username`). A menu row now,
-          one of the items — no longer pinned atop the menu / the header bar. */}
-      {userName && (
-        <CommandLink
-          href={`/${userName}`}
-          onClick={onNavigate}
-          tabbable={open}
-          trailing={<BracketIcon Icon={AtSymbolIcon} />}
-        >
-          @{userName}
-        </CommandLink>
-      )}
+      {/* create_post leads the menu — the primary authoring action, pinned to
+          the top with no label above it. */}
       <CommandLink
         href="/create"
         onClick={onNavigate}
@@ -70,6 +56,14 @@ export function AccountCommands({
       >
         create_post
       </CommandLink>
+
+      {/* `// account` console comment — mirrors the `// settings` group label
+          below; only shown when signed in. The @handle profile link now lives
+          in the header bar, so the account group here is edit_profile + logout. */}
+      <div className="px-4 pt-3 pb-1 text-[11px] tracking-[0.12em] text-[var(--m-muted2)]">
+        {"// account"}
+      </div>
+
       {/* edit_profile → the profile settings page (redesign pending). */}
       <CommandLink
         href="/profile"
