@@ -14,7 +14,7 @@ interface ProgressBarProps {
 const RUN = 4;
 
 /**
- * Terminal indeterminate progress bar — `[░░██░░]` (a filled accent run sweeping
+ * Terminal indeterminate progress bar — `░░██░░` (a filled accent run sweeping
  * across an empty dim track). For "working / processing" states of unknown
  * duration. Saved for future long-task UIs — not yet wired anywhere.
  */
@@ -44,13 +44,11 @@ export function ProgressBar({
       <div
         role="progressbar"
         aria-label={label ?? "Working"}
-        className="text-[12px] leading-none whitespace-nowrap text-[var(--m-dim)]"
+        className="flex h-3 items-center overflow-hidden text-[12px] leading-none whitespace-nowrap text-[var(--m-dim)]"
       >
-        {"["}
         {"░".repeat(before)}
         <span className="text-[var(--m-accent)]">{"█".repeat(filled)}</span>
         {"░".repeat(after)}
-        {"]"}
       </div>
     </div>
   );

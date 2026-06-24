@@ -9,23 +9,26 @@ import {
   StatusBadge,
   Metric,
   Dot,
-  MatrixText,
   Menu,
   Field,
   Textarea,
   Select,
   Switch,
   Avatar,
-  PostBody,
   Modal,
   ModalHeader,
   SubmitButton,
   useModalTitleId,
   Loading,
   ProgressBar,
-  GlitchText,
+  StatBar,
   Stepper,
+  UnderlineTabs,
   Console,
+  Checkbox,
+  RadioGroup,
+  Skeleton,
+  PostCardSkeleton,
   type SelectOption,
 } from "@/shared/ui";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
@@ -53,20 +56,6 @@ const CAT_OPTIONS: SelectOption[] = [
   { value: "code", label: "Code" },
 ];
 
-const PROSE_SAMPLE = `### Self-debate as a method
-
-A short sample of the **mono-prose** render — heading, list, blockquote,
-inline \`code\`, a [link](https://example.com), and a fenced block.
-
-- First point, stated plainly.
-- Second point, with \`inline code\`.
-
-> Confidence isn't knowledge; it's style.
-
-\`\`\`ts
-const decode = (glyphs: string[]) => glyphs.join("");
-\`\`\``;
-
 const SPARK_DATES = [
   "2025-01-04",
   "2025-01-22",
@@ -92,6 +81,9 @@ export function ComponentsTab() {
   const [emptySel, setEmptySel] = useState<string | undefined>(undefined);
   const [switchOn, setSwitchOn] = useState(true);
   const [stepDemo, setStepDemo] = useState(1);
+  const [tabDemo, setTabDemo] = useState("overview");
+  const [checks, setChecks] = useState({ replies: true, drafts: false });
+  const [feedSort, setFeedSort] = useState("standard");
 
   const demoTitleId = useModalTitleId();
 
@@ -104,7 +96,7 @@ export function ComponentsTab() {
       <h1 className="font-display mt-7 text-[40px] leading-none font-bold tracking-[-0.02em]">
         Components
       </h1>
-      <p className="mt-5 max-w-[46em] text-[14px] leading-[1.7] text-[var(--m-muted)]">
+      <p className="mt-5 text-[14px] leading-[1.7] text-[var(--m-muted)]">
         Every Brutalist-Mono primitive from{" "}
         <code className="text-[var(--m-fg)]">src/shared/ui</code> and every
         state, side by side. A living reference — these are the real components,
@@ -118,117 +110,75 @@ export function ComponentsTab() {
         <Section
           index="01"
           title="BUTTONS"
-          intro="36px controls (h-9). Primary (.mono-cta), outline (.mono-btn-outline), icon (.mono-icon-btn), destructive (--m-error), and the full-width auth SubmitButton. Hover is CSS; disabled + pending are shown."
+          intro="36px controls (h-9). Primary (.mono-cta), outline (.mono-btn-outline), destructive (--m-error) and icon (.mono-icon-btn) — shown default, then a single disabled example, then the loading/pending submit (spinner + label, action disabled). Hover is CSS. Arrows are direction-only and live below as LINK-style nav, never on action buttons."
         >
-          <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
-            <Panel caption="// PRIMARY · OUTLINE · ICON · DESTRUCTIVE">
-              <div className="grid grid-cols-2 gap-x-7 gap-y-7">
-                <State caption="default">
-                  <div className="flex flex-wrap items-center gap-4">
-                    <button type="button" className={ctaCls}>
-                      Primary
-                    </button>
-                    <button type="button" className={outlineCls}>
-                      Outline
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="Copy link"
-                      className="mono-icon-btn size-9"
-                    >
-                      <LinkIcon className="size-4" />
-                    </button>
-                    <button type="button" className={dangerCls}>
-                      Delete
-                    </button>
-                  </div>
-                </State>
-                <State caption="disabled">
-                  <div className="flex flex-wrap items-center gap-4">
-                    <button type="button" disabled className={ctaCls}>
-                      Primary
-                    </button>
-                    <button
-                      type="button"
-                      disabled
-                      className={`${outlineCls} disabled:opacity-60`}
-                    >
-                      Outline
-                    </button>
-                    <button
-                      type="button"
-                      disabled
-                      aria-label="Copy link"
-                      className="mono-icon-btn size-9 disabled:opacity-60"
-                    >
-                      <LinkIcon className="size-4" />
-                    </button>
-                    <button type="button" disabled className={dangerCls}>
-                      Delete
-                    </button>
-                  </div>
-                </State>
-              </div>
-              <p className="mt-7 text-[12px] leading-[1.6] text-[var(--m-muted2)]">
-                Hover (CSS): primary inverts to hollow accent; outline/icon
-                borders go accent.
-              </p>
-            </Panel>
-
-            <Panel caption="// FULL-WIDTH SUBMIT (SubmitButton)">
-              <div className="flex flex-col gap-7">
-                <State caption="default">
-                  <form onSubmit={(e) => e.preventDefault()}>
-                    <SubmitButton>Log in</SubmitButton>
-                  </form>
-                </State>
-                <State caption="pending / loading">
-                  <form onSubmit={(e) => e.preventDefault()}>
-                    <SubmitButton pending pendingLabel="Signing in…">
-                      Log in
-                    </SubmitButton>
-                  </form>
-                </State>
-              </div>
-            </Panel>
-          </div>
+          <Panel caption="// PRIMARY · OUTLINE · DESTRUCTIVE · ICON">
+            <div className="grid grid-cols-1 gap-x-7 gap-y-9 sm:grid-cols-3">
+              <State caption="default">
+                <div className="flex flex-wrap items-center gap-4">
+                  <button type="button" className={ctaCls}>
+                    Primary
+                  </button>
+                  <button type="button" className={outlineCls}>
+                    Outline
+                  </button>
+                  <button type="button" className={dangerCls}>
+                    Delete
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Copy link"
+                    className="mono-icon-btn size-9"
+                  >
+                    <LinkIcon className="size-4" />
+                  </button>
+                </div>
+              </State>
+              <State caption="disabled">
+                <button type="button" disabled className={ctaCls}>
+                  Primary
+                </button>
+              </State>
+              <State caption="pending — spinner + label, action disabled">
+                <form onSubmit={(e) => e.preventDefault()}>
+                  <SubmitButton
+                    fullWidth={false}
+                    pending
+                    pendingLabel="Signing in…"
+                  >
+                    Log in
+                  </SubmitButton>
+                </form>
+              </State>
+            </div>
+            <p className="mt-7 text-[12px] leading-[1.6] text-[var(--m-muted2)]">
+              Hover (CSS): primary inverts to hollow accent; outline/icon
+              borders go accent. Pending disables the action and swaps the label
+              for the spinner + pending text.
+            </p>
+          </Panel>
 
           {/* The arrow rule — directional vs action. */}
           <Panel
             caption="// ARROWS — direction only, never on action buttons"
             className="mt-7"
           >
-            <div className="grid grid-cols-1 gap-x-7 gap-y-9 sm:grid-cols-2">
-              <State caption="directional / navigation — arrows belong here">
-                <div className="flex flex-wrap items-center gap-6">
-                  <button type="button" className={navLinkCls}>
-                    <span aria-hidden="true">←</span>
-                    Back
-                  </button>
-                  <button type="button" className={navLinkCls}>
-                    Next
-                    <span aria-hidden="true">→</span>
-                  </button>
-                  <button type="button" className={navLinkCls}>
-                    <XMarkIcon className="size-3.5" />
-                    Cancel
-                  </button>
-                </div>
-              </State>
-              <State caption="action — NO arrow (login / submit / send / save)">
-                <div className="flex flex-wrap items-center gap-4">
-                  <button type="button" className={ctaCls}>
-                    Log in
-                  </button>
-                  <button type="button" className={ctaCls}>
-                    Send reset link
-                  </button>
-                  <button type="button" className={ctaCls}>
-                    Save
-                  </button>
-                </div>
-              </State>
-            </div>
+            <State caption="directional / navigation — arrows belong here">
+              <div className="flex flex-wrap items-center gap-6">
+                <button type="button" className={navLinkCls}>
+                  <span aria-hidden="true">←</span>
+                  Back
+                </button>
+                <button type="button" className={navLinkCls}>
+                  Next
+                  <span aria-hidden="true">→</span>
+                </button>
+                <button type="button" className={navLinkCls}>
+                  <XMarkIcon className="size-3.5" />
+                  Cancel
+                </button>
+              </div>
+            </State>
             <p className="mt-7 text-[12px] leading-[1.6] text-[var(--m-muted2)]">
               Arrows are for DIRECTION / navigation only — Next (→), Back (←),
               go-home — and they are LINK-style (11px label, muted2 → muted, NO
@@ -239,11 +189,11 @@ export function ComponentsTab() {
           </Panel>
         </Section>
 
-        {/* 02 — LABELS · CATEGORIES · BADGES */}
+        {/* 02 — LABELS · CATEGORY · EYEBROWS */}
         <Section
           index="02"
-          title="LABELS · CATEGORIES · BADGES"
-          intro="Terminal markers — Label (// X, optional blinking caret), Category ([ x ]), StatusBadge (LATEST DROP / PINNED), and the unpublished/draft cover overlay (dim + crossed-eye + UNPUBLISHED — shown on the author's own feed cards & their post page). Labels/categories 11px / 0.12em; badges 0.06em uppercase."
+          title="LABELS · CATEGORY · EYEBROWS"
+          intro="Terminal markers — Label (// X, optional blinking caret), Category ([ x ]), and the status line + dot separator that thread through every meta row. Labels/categories 11px / 0.12em; the draft/unpublished cover overlay (dim + crossed-eye + UNPUBLISHED) renders on the author's own feed cards & their post page."
         >
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
             <Panel caption="// LABELS & CATEGORY">
@@ -265,7 +215,7 @@ export function ComponentsTab() {
               </div>
             </Panel>
 
-            <Panel caption="// STATUS · DRAFT · SEPARATOR">
+            <Panel caption="// TERMINAL MARKERS — status · separator · draft">
               <div className="grid grid-cols-2 gap-x-7 gap-y-7">
                 <State caption="status · latest drop">
                   <StatusBadge status="LATEST DROP" />
@@ -327,14 +277,13 @@ export function ComponentsTab() {
           </Panel>
         </Section>
 
-        {/* 04 — INPUTS */}
+        {/* 04 — INPUTS: FIELD */}
         <Section
           index="04"
-          title="INPUTS"
-          intro="The headline coverage. Underline Field (text / email / password), Textarea, custom Select (single + multiple) and Switch — each shown empty, filled, errored, disabled, side by side. Error text (! …, 11px / --m-error) renders only when present; the floating label always reads uppercase."
+          title="INPUTS — FIELD"
+          intro="Underline Field (text / email), shown empty (required *) → filled → error → disabled, side by side. Error text (! …, 11px / --m-error) renders only when present; the floating label always reads uppercase and only animates POSITION."
         >
-          {/* Field */}
-          <Panel caption="// FIELD — text · email · password" className="mb-7">
+          <Panel caption="// FIELD — text · email">
             <div className="grid grid-cols-1 gap-x-7 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
               <State caption="empty (required *)">
                 <Field id="cs-f-empty" label="Email" type="email" required />
@@ -366,41 +315,18 @@ export function ComponentsTab() {
                   disabled
                 />
               </State>
-              <State caption="password · eye toggle">
-                <Field
-                  id="cs-f-pass"
-                  label="Password"
-                  type="password"
-                  defaultValue="hunter2hunter2"
-                />
-              </State>
-              <State caption="password · error">
-                <Field
-                  id="cs-f-pass-err"
-                  label="Password"
-                  type="password"
-                  defaultValue="123"
-                  error="Too short — min 8 characters"
-                />
-              </State>
-              <State caption="text · empty">
-                <Field id="cs-f-text" label="Display name" type="text" />
-              </State>
-              <State caption="text · disabled filled">
-                <Field
-                  id="cs-f-text-dis"
-                  label="Username"
-                  type="text"
-                  defaultValue="lazy_ela"
-                  disabled
-                />
-              </State>
             </div>
           </Panel>
+        </Section>
 
-          {/* Textarea */}
-          <Panel caption="// TEXTAREA" className="mb-7">
-            <div className="grid grid-cols-1 gap-x-7 gap-y-9 lg:grid-cols-3">
+        {/* 05 — TEXTAREA */}
+        <Section
+          index="05"
+          title="TEXTAREA"
+          intro="The multi-line Field sibling — same underline + floating label, shown empty → filled → error → disabled."
+        >
+          <Panel caption="// TEXTAREA">
+            <div className="grid grid-cols-1 gap-x-7 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
               <State caption="empty">
                 <Textarea id="cs-ta-empty" label="Biography" />
               </State>
@@ -420,22 +346,27 @@ export function ComponentsTab() {
                   error="Bio must be at least 20 characters"
                 />
               </State>
-            </div>
-          </Panel>
-
-          {/* Select */}
-          <Panel caption="// SELECT — single · multiple" className="mb-7">
-            <div className="grid grid-cols-1 gap-x-7 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
-              <State caption="single · selected value">
-                <Select
-                  id="cs-sel-single"
-                  label="Category"
-                  options={CAT_OPTIONS}
-                  value={singleSel}
-                  onChange={setSingleSel}
+              <State caption="disabled">
+                <Textarea
+                  id="cs-ta-disabled"
+                  label="Biography"
+                  defaultValue="Read-only bio."
+                  disabled
                 />
               </State>
-              <State caption="single · empty (placeholder)">
+            </div>
+          </Panel>
+        </Section>
+
+        {/* 06 — SELECT */}
+        <Section
+          index="06"
+          title="SELECT"
+          intro="The custom Select (single + multiple), shown empty (placeholder) → filled → error (a multiple-select, required) → disabled. Click to open the listbox — ↑/↓ to move, Enter/Space to toggle, Esc to close, type-ahead supported."
+        >
+          <Panel caption="// SELECT — single · multiple">
+            <div className="grid grid-cols-1 gap-x-7 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
+              <State caption="empty (placeholder)">
                 <Select
                   id="cs-sel-empty"
                   label="Category"
@@ -445,25 +376,25 @@ export function ComponentsTab() {
                   onChange={setEmptySel}
                 />
               </State>
-              <State caption="multiple · selected">
+              <State caption="filled · single">
+                <Select
+                  id="cs-sel-single"
+                  label="Category"
+                  options={CAT_OPTIONS}
+                  value={singleSel}
+                  onChange={setSingleSel}
+                />
+              </State>
+              <State caption="error · multiple (required)">
                 <Select
                   id="cs-sel-multi"
                   label="Categories"
                   multiple
+                  required
                   options={CAT_OPTIONS}
                   value={multiSel}
                   onChange={setMultiSel}
-                />
-              </State>
-              <State caption="error">
-                <Select
-                  id="cs-sel-error"
-                  label="Category"
-                  required
-                  options={CAT_OPTIONS}
-                  value={undefined}
-                  onChange={() => {}}
-                  error="Choose a category"
+                  error="Pick at least one category"
                 />
               </State>
               <State caption="disabled">
@@ -477,14 +408,16 @@ export function ComponentsTab() {
                 />
               </State>
             </div>
-            <p className="mt-7 text-[12px] leading-[1.6] text-[var(--m-muted2)]">
-              Click a Select to open its listbox — ↑/↓ to move, Enter/Space to
-              toggle, Esc to close, type-ahead supported.
-            </p>
           </Panel>
+        </Section>
 
-          {/* Switch */}
-          <Panel caption="// SWITCH">
+        {/* 07 — FORM CONTROLS: SWITCH · CHECKBOX · RADIO */}
+        <Section
+          index="07"
+          title="FORM CONTROLS — SWITCH · CHECKBOX · RADIO"
+          intro="Square selection controls — no circles in this system. Switch (on → off → disabled), Checkbox (fills accent with a ✓) and RadioGroup (inner filled square). All wrap native inputs (sr-only peer) for a11y, draw the accent focus-visible ring, and render the required asterisk from the same rule as the form fields. Error reddens the box + an 11px / 0.12em message."
+        >
+          <Panel caption="// SWITCH" className="mb-7">
             <div className="flex flex-col gap-7 sm:flex-row sm:gap-10">
               <State caption="on" className="sm:w-56">
                 <Switch
@@ -513,11 +446,60 @@ export function ComponentsTab() {
               </State>
             </div>
           </Panel>
+
+          <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
+            <Panel caption="// CHECKBOX">
+              <div className="flex flex-col gap-4">
+                <Checkbox
+                  id="cs-chk-replies"
+                  label="Email me on replies"
+                  checked={checks.replies}
+                  onChange={(v) => setChecks((c) => ({ ...c, replies: v }))}
+                />
+                <Checkbox
+                  id="cs-chk-drafts"
+                  label="Show my drafts publicly"
+                  checked={checks.drafts}
+                  onChange={(v) => setChecks((c) => ({ ...c, drafts: v }))}
+                />
+                <Checkbox
+                  id="cs-chk-terms"
+                  label="Accept the house rules"
+                  checked={false}
+                  onChange={() => {}}
+                  required
+                  error="You must accept to continue"
+                />
+                <Checkbox
+                  id="cs-chk-dis"
+                  label="Beta features (locked)"
+                  checked
+                  disabled
+                  onChange={() => {}}
+                />
+              </div>
+            </Panel>
+
+            <Panel caption="// RADIO (RadioGroup)">
+              <RadioGroup
+                name="cs-feed-sort"
+                label="Feed sort"
+                required
+                value={feedSort}
+                onChange={setFeedSort}
+                options={[
+                  { value: "standard", label: "Standard feed" },
+                  { value: "chrono", label: "Chronological" },
+                  { value: "top", label: "Top this week" },
+                ]}
+              />
+            </Panel>
+          </div>
         </Section>
 
-        {/* 05 — MENU & OVERLAYS */}
+        {/* 08 — MENU · MODALS */}
         <Section
-          index="05"
+          index="08"
           title="MENU · MODALS"
           intro="The kebab Menu (opens an inline icon-row to the left, including a destructive item) and the real Modal shell — a demo confirm via Modal/ModalHeader/SubmitButton plus the actual ConfirmDeleteModal. Buttons below open them for real."
         >
@@ -578,9 +560,9 @@ export function ComponentsTab() {
           </div>
         </Section>
 
-        {/* 06 — FEEDBACK / TOASTS */}
+        {/* 09 — FEEDBACK · TOASTS */}
         <Section
-          index="06"
+          index="09"
           title="FEEDBACK · TOASTS"
           intro="Notifications go through the module-level toast store; the app-level <Toaster/> renders them. These call the real addToastSuccess / addToastError so the live toast appears bottom-right — a single card surface with a 2px type stripe (accent/error) and the status icon between the text and the right edge. The whole toast dismisses on click; it also auto-dismisses."
         >
@@ -604,11 +586,11 @@ export function ComponentsTab() {
           </Panel>
         </Section>
 
-        {/* 07 — META & DATA */}
+        {/* 10 — STATUSES · METADATA */}
         <Section
-          index="07"
-          title="META · DATA"
-          intro="Metric (icon + tabular number, each kind), the MatrixText decode animation, and the Sparkline (monthly series). One caption size — 12px; icons 14px; one colour — muted (except the rating kind, which is sign-coloured: ↑ accent / ↓ error / muted at 0). Byline rule: the @handle is the profile link (+ the avatar), the name is plain text; handle is muted everywhere with a muted→accent hover (never underline). Only the profile-page header @handle is accent."
+          index="10"
+          title="STATUSES · METADATA"
+          intro="Metric (icon + tabular number, each kind) and the Sparkline (monthly series). One caption size — 12px; icons 14px; one colour — muted (except the rating kind, which is sign-coloured: ↑ accent / ↓ error / muted at 0). Byline rule: the @handle is the profile link (+ the avatar), the name is plain text; handle is muted everywhere with a muted→accent hover (never underline). Only the profile-page header @handle is accent."
         >
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
             <Panel caption="// METRIC — every kind">
@@ -637,49 +619,31 @@ export function ComponentsTab() {
               </div>
             </Panel>
 
-            <Panel caption="// MATRIXTEXT · GLITCHTEXT (animated text)">
-              <div className="flex flex-col gap-7">
-                <State caption="MatrixText — decode cycle · respects reduced-motion">
-                  <MatrixText
-                    text="// SIGNAL SENT ... NO REPLY YET"
-                    className="mono-label"
-                  />
-                </State>
-                <State caption="GlitchText — jitter + accent/error ghosts + caret (error pages)">
-                  <span className="font-display text-[32px] leading-none font-bold tracking-[-0.02em] text-[var(--m-fg)]">
-                    <GlitchText caret>Glitch</GlitchText>
-                  </span>
-                </State>
-              </div>
-            </Panel>
-          </div>
-
-          <Panel caption="// SPARKLINE — monthly series" className="mt-7">
-            <State caption="6-month rolling counts · accent curve + dots">
-              <div className="max-w-[420px]">
+            <Panel caption="// SPARKLINE — monthly series">
+              <State caption="6-month rolling counts · accent curve + dots">
                 <Sparkline
                   series={buildMonthlySeries(SPARK_DATES, 6)}
                   gradientId="cs-spark"
                   ariaLabel="Posts per month over the last six months"
                 />
-              </div>
-            </State>
-          </Panel>
+              </State>
+            </Panel>
+          </div>
         </Section>
 
-        {/* 08 — LOADING · PROGRESS · STEPPER · CONSOLE */}
+        {/* 11 — LOADERS · PROGRESS */}
         <Section
-          index="08"
-          title="LOADING · PROGRESS · STEPPER · CONSOLE"
-          intro="Terminal ASCII spinner (│ / ─ \ cycling at 100ms, accent) — inline centers it in flow; the block form pairs it with a LOADING label on one line. ProgressBar is the [████░░░░] block bar (determinate + indeterminate). Stepper = the composer's numbered step boxes (free-jump, forward gated by the parent). Console = the faux-terminal panel from the error page, reusable anywhere."
+          index="11"
+          title="LOADERS · PROGRESS"
+          intro="Terminal ASCII spinner (│ / ─ \ cycling at 100ms, accent) — inline centers it in flow; the block form pairs it with a LOADING label. ProgressBar is the ████░░░░ block bar (indeterminate sweep); StatBar is its determinate sibling — a labelled stat with a dotted-fill remainder + a right-aligned %, low values flipping to --m-error. Stepper = the composer's numbered step boxes (free-jump, forward gated by the parent). Every bar reads as one 12px data row."
         >
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
             <Panel caption="// SPINNER (Loading)">
-              <div className="flex flex-col gap-7">
-                <State caption="inline (14px, in-flow) — real component">
+              <div className="grid grid-cols-2 gap-x-7">
+                <State caption="inline (14px, in-flow)">
                   <Loading inline />
                 </State>
-                <State caption="block — spinner + LOADING label, one line (fills the viewport in real use)">
+                <State caption="block — spinner + LOADING label">
                   <div className="flex items-center gap-3">
                     <Loading inline />
                     <span className="text-[11px] tracking-[0.12em] text-[var(--m-muted2)] uppercase">
@@ -690,49 +654,98 @@ export function ComponentsTab() {
               </div>
             </Panel>
 
-            <Panel caption="// PROGRESSBAR — indeterminate">
-              <State caption="processing · unknown-duration sweep">
-                <ProgressBar label="Processing" />
-              </State>
-            </Panel>
-          </div>
-
-          <div className="mt-7 grid grid-cols-1 gap-7 lg:grid-cols-2">
             <Panel caption="// STEPPER (composer)">
               <State caption="numbered boxes · click to jump (forward gated by the parent)">
                 <Stepper
                   steps={["Setup", "Write"]}
                   current={stepDemo}
                   onSelect={setStepDemo}
+                  className="justify-center"
                 />
               </State>
             </Panel>
-
-            <Panel caption="// CONSOLE (terminal panel)">
-              <State caption="title bar + monospace body — reused from the error page">
-                <Console title="stacktrace.log">
-                  <span className="text-[var(--m-error)]">Error</span>
-                  {": "}
-                  <span className="text-[var(--m-fg)]">
-                    Cannot read &apos;energy&apos; of undefined
-                  </span>
-                </Console>
-              </State>
-            </Panel>
           </div>
+
+          <Panel caption="// PROGRESSBAR — indeterminate" className="mt-7">
+            <State caption="processing · unknown-duration sweep">
+              <ProgressBar label="Processing" cells={48} />
+            </State>
+          </Panel>
+
+          <Panel
+            caption="// STATBAR — statistics (determinate)"
+            className="mt-7"
+          >
+            <State caption="labelled stat · dotted remainder · low values go --m-error">
+              <div className="flex flex-col gap-2.5">
+                <StatBar label="CPU" value={38} cells={48} />
+                <StatBar label="RAM" value={52} cells={48} />
+                <StatBar label="Motivation" value={4} cells={48} />
+                <StatBar label="Caffeine" value={98} cells={48} />
+              </div>
+            </State>
+          </Panel>
+
+          <Panel caption="// CONSOLE (terminal panel)" className="mt-7">
+            <State caption="title bar + monospace body — reused from the error page">
+              <Console title="stacktrace.log">
+                <span className="text-[var(--m-error)]">Error</span>
+                {": "}
+                <span className="text-[var(--m-fg)]">
+                  Cannot read &apos;energy&apos; of undefined
+                </span>
+              </Console>
+            </State>
+          </Panel>
         </Section>
 
-        {/* 09 — PROSE */}
+        {/* 12 — TABS */}
         <Section
-          index="09"
-          title="PROSE (PostBody)"
-          intro="The shared markdown renderer (.mono-prose). Same component for the server-rendered read view and the editor preview — heading, list, blockquote, inline + fenced code, and a safe external link. Raw HTML is intentionally not rendered."
+          index="12"
+          title="TABS (UnderlineTabs)"
+          intro="The shared UnderlineTabs — a 2px --m-dim baseline with an accent underline on the active tab (no marker boxes; the lighter chrome of a reference index). This is the variant driving this /brand page's own top bar. Full tab a11y (role=tablist / tab / aria-selected) + roving-tabindex arrow nav. (The letter-box TabNav variant — the composer step-box language re-dressed as tabs — drives edit-profile; it's a real component, just not shown here.)"
         >
-          <Panel caption="// MARKDOWN → MONO-PROSE">
-            <div className="max-w-[780px]">
-              <PostBody markdown={PROSE_SAMPLE} />
-            </div>
+          <Panel caption="// UNDERLINETABS — accent baseline, no marker boxes">
+            <State caption="click to switch · arrow keys roam the tablist">
+              <UnderlineTabs
+                ariaLabel="Demo tabs"
+                current={tabDemo}
+                onSelect={setTabDemo}
+                tabs={[
+                  { id: "overview", label: "Overview" },
+                  { id: "activity", label: "Activity" },
+                  { id: "settings", label: "Settings" },
+                ]}
+              />
+              <p className="mt-5 text-[12px] text-[var(--m-muted2)]">
+                Panel:{" "}
+                <span className="text-[var(--m-accent)] uppercase">
+                  {tabDemo}
+                </span>
+              </p>
+            </State>
           </Panel>
+        </Section>
+
+        {/* 13 — SKELETON */}
+        <Section
+          index="13"
+          title="SKELETON"
+          intro="Square block placeholders for loading states — a --m-dim → --m-panel shimmer that flattens to a static --m-dim block under reduced-motion. Size each block with utilities; PostCardSkeleton composes them into a feed-card placeholder. (Wiring into the real feed loading states is a follow-up.)"
+        >
+          <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
+            <Panel caption="// BLOCKS">
+              <div className="flex flex-col gap-4">
+                <Skeleton className="h-3 w-2/5" />
+                <Skeleton className="h-3.5 w-4/5" />
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-3/5" />
+              </div>
+            </Panel>
+            <Panel caption="// POSTCARDSKELETON">
+              <PostCardSkeleton />
+            </Panel>
+          </div>
         </Section>
       </div>
 

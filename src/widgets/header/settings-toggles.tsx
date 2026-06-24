@@ -25,18 +25,23 @@ interface SettingsTogglesProps {
   open: boolean;
   isDarkTheme: boolean;
   onToggleTheme: () => void;
+  crtOn: boolean;
+  onToggleCrt: () => void;
   lang: "en" | "ru";
   onToggleLang: () => void;
 }
 
 /**
- * Settings block — the dark_mode + lang toggles grouped under a `// settings`
- * console comment. Both keep the menu open so the user can flip them in place.
+ * Settings block — the dark_mode + crt_mode + lang toggles grouped under a
+ * `// settings` console comment. All keep the menu open so the user can flip
+ * them in place.
  */
 export function SettingsToggles({
   open,
   isDarkTheme,
   onToggleTheme,
+  crtOn,
+  onToggleCrt,
   lang,
   onToggleLang,
 }: SettingsTogglesProps) {
@@ -56,6 +61,18 @@ export function SettingsToggles({
         }
       >
         dark_mode
+      </CommandButton>
+
+      <CommandButton
+        onClick={onToggleCrt}
+        tabbable={open}
+        trailing={
+          <ToggleIndicator active={crtOn}>
+            {crtOn ? "[ on ]" : "[ off ]"}
+          </ToggleIndicator>
+        }
+      >
+        crt_mode
       </CommandButton>
 
       {/* lang — flips the indicator (i18n wiring pending) */}

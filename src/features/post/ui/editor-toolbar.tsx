@@ -33,11 +33,25 @@ import {
   BoltIcon,
   CommandLineIcon,
   SwatchIcon,
+  EyeSlashIcon,
+  NoSymbolIcon,
+  ArrowDownTrayIcon,
+  Square3Stack3DIcon,
+  ViewfinderCircleIcon,
+  BackspaceIcon,
+  CursorArrowRaysIcon,
 } from "@heroicons/react/24/outline";
 import { toggleSmallCommand } from "./editor-small-mark";
 import {
   toggleGlitchCommand,
   toggleMatrixCommand,
+  toggleRedactCommand,
+  toggleSpoilerCommand,
+  toggleTypeCommand,
+  toggleKbdCommand,
+  toggleScanCommand,
+  toggleStrikeFxCommand,
+  toggleWaveCommand,
 } from "./editor-effect-marks";
 import {
   setPrimaryCommand,
@@ -267,7 +281,14 @@ export function EditorToolbar({
 
   // Inline brand effects — toggle a custom mark on the selection. Each
   // round-trips through markdown as a remark directive (`:glitch[…]` /
-  // `:matrix[…]`) and renders its full animated component in the read view.
+  // `:matrix[…]` / `:redact[…]` / `:spoiler[…]` / `:type[…]` / `:kbd[…]` /
+  // `:scan[…]`) and renders its full component in the read view.
+  // TODO(block-fx): the BLOCK directives (`::divider`, `:::quote`,
+  // `:::callout`, `:::terminal`) already render in the read view (post-body.tsx
+  // + prose.css), but have NO editor authoring UI yet — Crepe block nodes are
+  // non-trivial plumbing (a node schema + a slash-menu entry each, vs the 1:1
+  // inline-mark pattern these toggles reuse). Author them by typing the raw
+  // directive for now; wire the Crepe nodes in a follow-up.
   const effectItems: InsertItem[] = [
     {
       id: "glitch",
@@ -280,6 +301,48 @@ export function EditorToolbar({
       label: "Matrix",
       icon: CommandLineIcon,
       run: () => onCommand(toggleMatrixCommand),
+    },
+    {
+      id: "redact",
+      label: "Redact",
+      icon: NoSymbolIcon,
+      run: () => onCommand(toggleRedactCommand),
+    },
+    {
+      id: "spoiler",
+      label: "Spoiler",
+      icon: EyeSlashIcon,
+      run: () => onCommand(toggleSpoilerCommand),
+    },
+    {
+      id: "type",
+      label: "Type (decode)",
+      icon: ArrowDownTrayIcon,
+      run: () => onCommand(toggleTypeCommand),
+    },
+    {
+      id: "kbd",
+      label: "Keycap",
+      icon: Square3Stack3DIcon,
+      run: () => onCommand(toggleKbdCommand),
+    },
+    {
+      id: "scan",
+      label: "Scan",
+      icon: ViewfinderCircleIcon,
+      run: () => onCommand(toggleScanCommand),
+    },
+    {
+      id: "strike-fx",
+      label: "Strike (edit)",
+      icon: BackspaceIcon,
+      run: () => onCommand(toggleStrikeFxCommand),
+    },
+    {
+      id: "wave",
+      label: "Wave",
+      icon: CursorArrowRaysIcon,
+      run: () => onCommand(toggleWaveCommand),
     },
   ];
 

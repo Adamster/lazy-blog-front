@@ -8,7 +8,14 @@ import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { useAllPosts } from "@/features/post/model/use-all-posts";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
-import { Label, Category, Metric, StatusBadge, Dot } from "@/shared/ui";
+import {
+  Label,
+  Category,
+  Metric,
+  StatusBadge,
+  Dot,
+  HomeSkeleton,
+} from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { formatDate2 } from "@/shared/lib/utils";
 import { PostCard } from "@/features/post/ui/post-card";
@@ -55,7 +62,11 @@ export default function HomePage() {
     isFetching: query.isFetchingNextPage,
   });
 
-  if (query.isLoading) return <Loading />;
+  // Only a true COLD start (no cached pages yet) — on a warm return the infinite
+  // query is non-pending, so the cached feed renders instantly with no fallback.
+  // The skeleton mirrors the route-level `(home)/loading.tsx` so cold-load and
+  // navigation share one shell (and stay CLS-free).
+  if (query.isLoading) return <HomeSkeleton />;
   if (query.error) return <ErrorMessage error={query.error} />;
 
   // Defensive: the public home feed only ever shows published posts (drafts are
@@ -114,7 +125,7 @@ export default function HomePage() {
             <section className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
               <div className="mx-auto grid max-w-[1240px] gap-10 px-10 py-10 lg:grid-cols-3">
                 <div className="hidden lg:block">
-                  <Label caret className="mono-label mb-4">
+                  <Label className="mono-label mb-4">
                     MOST ACTIVE USER · JUN
                   </Label>
                   {topUser && (

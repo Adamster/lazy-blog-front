@@ -1,11 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!<>-_/\\[]{}=+*#%&".split(
-  ""
-);
-const pick = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+import { useCallback, useEffect, useRef, useState } from "react";
+import { pick } from "@/shared/lib/glyphs";
+import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 
 interface Props {
   /** The message that resolves out of the scramble. */
@@ -17,12 +14,22 @@ interface Props {
   holdMs?: number;
   /** ms of pure scramble before the decode begins. */
   scrambleMs?: number;
+  /**
+   * `"loop"` (default) — scramble forever; `"hover"` — rest as plain text and
+   * run ONE decode pass on pointer-enter / focus; `"scroll"` — rest as plain
+   * text and run ONE decode pass when first scrolled into view (the `:type`
+   * post directive + LAB "decode on scroll").
+   */
+  trigger?: "loop" | "hover" | "scroll";
 }
 
 /**
- * "Matrix" decode text — cycles forever: random glyphs scramble, resolve
- * left-to-right into `text`, hold, then scramble again. Reusable across the
- * mono surfaces (empty states, etc.). Respects reduced-motion (stays static).
+ * "Matrix" decode text — random glyphs (from the shared {@link MATRIX_GLYPHS})
+ * scramble and resolve left-to-right into `text`. `trigger="loop"` cycles
+ * forever (empty states, etc.); `trigger="hover"` runs a single decode on
+ * enter/focus; `trigger="scroll"` runs a single decode the first time it scrolls
+ * into view. Reusable across the mono surfaces. Respects reduced-motion: in
+ * every mode the static `text` is shown and no scramble runs.
  */
 export function MatrixText({
   text,
@@ -30,16 +37,16 @@ export function MatrixText({
   speed = 55,
   holdMs = 2200,
   scrambleMs = 2700,
+  trigger = "loop",
 }: Props) {
   const [out, setOut] = useState(text);
+  const frameRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const spanRef = useRef<HTMLSpanElement>(null);
 
+  // Looping decode — runs while mounted (loop mode only).
   useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      return; // keep the static message for reduced-motion users
-    }
+    if (trigger !== "loop") return;
+    if (prefersReducedMotion()) return; // keep the static message
 
     const chars = [...text];
     const revealDur = chars.length * speed;
@@ -63,10 +70,69 @@ export function MatrixText({
     }, FRAME);
 
     return () => clearInterval(id);
-  }, [text, speed, holdMs, scrambleMs]);
+  }, [text, speed, holdMs, scrambleMs, trigger]);
+
+  // One decode pass — shared by the hover/focus and scroll-in triggers.
+  const runOnce = useCallback(() => {
+    if (trigger === "loop" || prefersReducedMotion()) return;
+    if (frameRef.current) clearInterval(frameRef.current);
+
+    const chars = [...text];
+    const total = 16;
+    let frame = 0;
+    frameRef.current = setInterval(() => {
+      frame++;
+      const reveal = Math.floor((frame / total) * chars.length);
+      if (frame >= total) {
+        if (frameRef.current) clearInterval(frameRef.current);
+        frameRef.current = null;
+        setOut(text);
+        return;
+      }
+      setOut(
+        chars
+          .map((c, i) => (c === " " ? " " : i < reveal ? c : pick()))
+          .join("")
+      );
+    }, 40);
+  }, [text, trigger]);
+
+  useEffect(() => {
+    // Cleanup any in-flight one-shot pass on unmount.
+    return () => {
+      if (frameRef.current) clearInterval(frameRef.current);
+    };
+  }, []);
+
+  // Scroll trigger — run the single decode the first time the span is in view.
+  useEffect(() => {
+    if (trigger !== "scroll") return;
+    const node = spanRef.current;
+    if (!node) return;
+    if (typeof IntersectionObserver === "undefined") {
+      runOnce();
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          runOnce();
+          io.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -10% 0px" }
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, [trigger, runOnce]);
+
+  const hoverProps =
+    trigger === "hover"
+      ? { onMouseEnter: runOnce, onFocus: runOnce, tabIndex: 0 }
+      : undefined;
 
   return (
-    <span className={className} aria-label={text}>
+    <span ref={spanRef} className={className} aria-label={text} {...hoverProps}>
       {out}
     </span>
   );

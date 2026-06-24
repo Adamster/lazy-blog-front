@@ -23,7 +23,7 @@ export function Section({
         {index} — {title}
       </div>
       {intro ? (
-        <p className="mt-7 max-w-[46em] text-[14px] leading-[1.7] text-[var(--m-muted)]">
+        <p className="mt-7 text-[14px] leading-[1.7] text-[var(--m-muted)]">
           {intro}
         </p>
       ) : null}

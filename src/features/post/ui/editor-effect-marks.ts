@@ -96,6 +96,73 @@ export const matrixSchema = $markSchema("matrix", () => ({
   },
 }));
 
+/**
+ * Inline mark factory — the redact / spoiler / type / kbd / scan marks are all
+ * identical in shape to glitch/matrix (an inclusive inline mark round-tripping as
+ * a `textDirective` of the same name, framed in the editor by `.mono-fx-mark`);
+ * only the directive name and the hover hint differ. Hoisted so the five marks
+ * don't copy-paste the same 25-line schema each.
+ */
+function makeEffectMark(name: string, hint: string) {
+  return $markSchema(name, () => ({
+    inclusive: true,
+    parseDOM: [{ tag: `span.mono-${name}` }],
+    toDOM: () => [
+      "span",
+      { class: `mono-${name} mono-fx-mark`, "data-fx-hint": hint },
+      0,
+    ],
+    parseMarkdown: {
+      match: (node) => node.type === "textDirective" && node.name === name,
+      runner: (state, node, markType) => {
+        state.openMark(markType);
+        state.next(node.children);
+        state.closeMark(markType);
+      },
+    },
+    toMarkdown: {
+      match: (mark) => mark.type.name === name,
+      runner: (state, mark) => {
+        state.withMark(mark, "textDirective", undefined, { name });
+      },
+    },
+  }));
+}
+
+/** The five new inline effect marks (read-view animated; editor = framed hint). */
+export const redactSchema = makeEffectMark(
+  "redact",
+  "Redact — a censor bar in the published post"
+);
+export const spoilerSchema = makeEffectMark(
+  "spoiler",
+  "Spoiler — blurred until clicked in the published post"
+);
+export const typeSchema = makeEffectMark(
+  "type",
+  "Type — decodes on scroll in the published post"
+);
+export const kbdSchema = makeEffectMark(
+  "kbd",
+  "Keycap — renders as a key in the published post"
+);
+export const scanSchema = makeEffectMark(
+  "scan",
+  "Scan — highlighted with a sweep in the published post"
+);
+// Batch 2 attribute-free inline marks (same wrap shape — no extra UI to author).
+// The attribute-carrying marks (`:cite`/`:ref`/`:stat`/`:link`) are deferred:
+// they need a note/href/number input surface, so for now they round-trip only as
+// hand-written directives (fully rendered in the read view).
+export const strikeSchema = makeEffectMark(
+  "strike",
+  "Strike — a self-redacting edit in the published post"
+);
+export const waveSchema = makeEffectMark(
+  "wave",
+  "Wave — a caret sweep highlight in the published post"
+);
+
 /** Toggle the `glitch` mark on the current selection (toolbar Effects ▾). */
 export const toggleGlitchCommand = $command(
   "ToggleGlitch",
@@ -106,6 +173,35 @@ export const toggleGlitchCommand = $command(
 export const toggleMatrixCommand = $command(
   "ToggleMatrix",
   (ctx) => () => toggleMark(matrixSchema.type(ctx))
+);
+
+export const toggleRedactCommand = $command(
+  "ToggleRedact",
+  (ctx) => () => toggleMark(redactSchema.type(ctx))
+);
+export const toggleSpoilerCommand = $command(
+  "ToggleSpoiler",
+  (ctx) => () => toggleMark(spoilerSchema.type(ctx))
+);
+export const toggleTypeCommand = $command(
+  "ToggleType",
+  (ctx) => () => toggleMark(typeSchema.type(ctx))
+);
+export const toggleKbdCommand = $command(
+  "ToggleKbd",
+  (ctx) => () => toggleMark(kbdSchema.type(ctx))
+);
+export const toggleScanCommand = $command(
+  "ToggleScan",
+  (ctx) => () => toggleMark(scanSchema.type(ctx))
+);
+export const toggleStrikeFxCommand = $command(
+  "ToggleStrikeFx",
+  (ctx) => () => toggleMark(strikeSchema.type(ctx))
+);
+export const toggleWaveCommand = $command(
+  "ToggleWave",
+  (ctx) => () => toggleMark(waveSchema.type(ctx))
 );
 
 /**
@@ -119,4 +215,18 @@ export const effectMarks = [
   toggleGlitchCommand,
   matrixSchema,
   toggleMatrixCommand,
+  redactSchema,
+  toggleRedactCommand,
+  spoilerSchema,
+  toggleSpoilerCommand,
+  typeSchema,
+  toggleTypeCommand,
+  kbdSchema,
+  toggleKbdCommand,
+  scanSchema,
+  toggleScanCommand,
+  strikeSchema,
+  toggleStrikeFxCommand,
+  waveSchema,
+  toggleWaveCommand,
 ].flat();

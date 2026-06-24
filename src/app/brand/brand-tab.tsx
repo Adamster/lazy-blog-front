@@ -227,7 +227,7 @@ export function BrandTab() {
           NOT <span className="text-[var(--m-accent)]">LAZY</span>
         </div>
       </div>
-      <p className="mt-5 max-w-[46em] text-[14px] leading-[1.7] text-[var(--m-muted)]">
+      <p className="mt-5 text-[14px] leading-[1.7] text-[var(--m-muted)]">
         Space Grotesk — for identity, headings and numbers; JetBrains Mono — for
         data, code, body and labels. Dark-grey base, never pure black. The
         project accent is{" "}

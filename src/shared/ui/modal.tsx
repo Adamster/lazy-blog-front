@@ -146,7 +146,7 @@ export function Modal({
   if (!mounted || !isOpen) return null;
 
   return createPortal(
-    <div className="mono-portal fixed inset-0 z-[60]">
+    <div className="mono-portal fixed inset-0 z-[var(--m-z-modal)]">
       {/* Backdrop — click closes; clicks inside the dialog don't bubble here. */}
       <div
         className="mono-backdrop-enter absolute inset-0 bg-[#0a0a0a]/70 backdrop-blur-[2px]"
@@ -232,24 +232,29 @@ export function ModalHeader({
 }
 
 /**
- * Full-width accent submit button — the canonical auth/reset primary action.
- * 36px (`h-9`), Space Grotesk 700 / 14px, accent fill. Shows `pendingLabel`
- * while disabled-pending.
+ * Accent submit button — the canonical auth/reset primary action. 36px (`h-9`),
+ * Space Grotesk 700 / 14px, accent fill. Full-width by default (the auth form
+ * primary); pass `fullWidth={false}` for an inline `px-4` button (e.g. the
+ * /brand demo). Shows `pendingLabel` while disabled-pending.
  */
 export function SubmitButton({
   children,
   pending = false,
   pendingLabel,
+  fullWidth = true,
 }: {
   children: ReactNode;
   pending?: boolean;
   pendingLabel?: ReactNode;
+  fullWidth?: boolean;
 }) {
   return (
     <button
       type="submit"
       disabled={pending}
-      className={`font-display flex h-9 w-full items-center justify-center gap-2 bg-[var(--m-accent)] text-[14px] leading-none font-bold tracking-[0.06em] text-[var(--m-bg)] uppercase transition-[filter] hover:brightness-110 disabled:pointer-events-none disabled:opacity-80 ${focusRing}`}
+      className={`font-display flex h-9 items-center justify-center gap-2 ${
+        fullWidth ? "w-full" : "px-4"
+      } bg-[var(--m-accent)] text-[14px] leading-none font-bold tracking-[0.06em] text-[var(--m-bg)] uppercase transition-[filter] hover:brightness-110 disabled:pointer-events-none disabled:opacity-80 ${focusRing}`}
     >
       {pending ? (
         <>

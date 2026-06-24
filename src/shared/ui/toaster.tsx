@@ -81,7 +81,7 @@ export function Toaster() {
   return createPortal(
     <div
       aria-live="polite"
-      className="mono-portal pointer-events-none fixed right-5 bottom-5 z-[70] flex flex-col items-end gap-2"
+      className="mono-portal pointer-events-none fixed right-5 bottom-5 z-[var(--m-z-toast)] flex flex-col items-end gap-2"
       style={{ fontFamily: "var(--font-mono)" }}
     >
       {toasts.map((toast) => (

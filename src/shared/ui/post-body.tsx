@@ -4,12 +4,28 @@ import remarkGfm from "remark-gfm";
 import remarkDirective from "remark-directive";
 import { GlitchText } from "./glitch-text";
 import { MatrixText } from "./matrix-text";
+import { RevealMark } from "./reveal-mark";
+import { Kbd } from "./kbd";
+import { ScanText } from "./scan-text";
+import { AsciiDivider, PullQuote, Callout } from "./prose-blocks";
+import { Transcript, type TranscriptLine } from "./transcript";
+import { CiteTooltip } from "./cite-tooltip";
+import { MarginRef } from "./margin-ref";
+import { CountUp } from "./count-up";
+import { WaveHighlight } from "./wave-highlight";
+import { ScanLink } from "./scan-link";
+import { DiffBlock } from "./diff-block";
+import { PollBlock, type PollRow } from "./poll-block";
+import { AnsiBlock } from "./ansi-block";
+import { FoldBlock } from "./fold-block";
+import { CompareSlider } from "./compare-slider";
 
 type MdNode = {
   type: string;
   value?: string;
   children?: MdNode[];
   name?: string;
+  attributes?: Record<string, string | null | undefined>;
   data?: { hName?: string; hProperties?: Record<string, unknown> };
 };
 
@@ -68,14 +84,116 @@ function remarkSmallDirective() {
  * safety stance as `remarkSmallDirective`: scoped to the exact directive names
  * we own — any UNKNOWN directive keeps no `hName` and renders nothing (inert).
  */
+const INLINE_EFFECT_TAGS = new Set([
+  "glitch",
+  "matrix",
+  "redact",
+  "spoiler",
+  "type",
+  "kbd",
+  "scan",
+  // Batch 2 inline marks.
+  "cite",
+  "ref",
+  "stat",
+  "strike",
+  "wave",
+  "link",
+]);
+
 function remarkEffectDirectives() {
   return (tree: MdNode) => {
     const walk = (node: MdNode) => {
-      if (node.type === "textDirective") {
-        if (node.name === "glitch")
-          node.data = { ...node.data, hName: "glitch" };
-        else if (node.name === "matrix")
-          node.data = { ...node.data, hName: "matrix" };
+      if (
+        node.type === "textDirective" &&
+        node.name &&
+        INLINE_EFFECT_TAGS.has(node.name)
+      ) {
+        // Forward directive ATTRIBUTES as plain string props (e.g. `:cite[x]{note}`
+        // note text, `:link[x]{href}`). Same safety stance as the block bridge:
+        // attributes are passed as strings, never as colours/styles.
+        node.data = {
+          ...node.data,
+          hName: node.name,
+          hProperties: { ...node.attributes },
+        };
+      }
+      node.children?.forEach(walk);
+    };
+    walk(tree);
+  };
+}
+
+/**
+ * Bridge our BLOCK effect directives — the leaf `::divider` and the container
+ * `:::quote` / `:::callout` / `:::terminal` — to custom hast tags routed to the
+ * block primitives below. Same safety stance as the inline bridge: scoped to the
+ * exact names we own (any other leaf/container directive keeps no `hName` and is
+ * literalised by `remarkLiteralizeUnknownDirectives`). Directive ATTRIBUTES (the
+ * `{variant}` / `{type}` / `{cite}` braces remark-directive parses into
+ * `attributes`) are forwarded as plain string props — never as colours/styles.
+ */
+const LEAF_BLOCK_TAGS = new Set(["divider", "ansi"]);
+const CONTAINER_BLOCK_TAGS = new Set([
+  "quote",
+  "callout",
+  "terminal",
+  // Batch 2 line-based blocks — collapsed to a `\n`-joined `lines` string below.
+  "diff",
+  "poll",
+  "fold",
+  "compare",
+]);
+
+/** Flatten a directive node's text content to one trimmed line per child block
+ *  (paragraph) — used to turn a `:::terminal` body into transcript rows. */
+function blockTextLines(node: MdNode): string[] {
+  const text = (n: MdNode): string =>
+    n.value ?? (n.children ?? []).map(text).join("");
+  return (node.children ?? [])
+    .map((child) => text(child).trim())
+    .filter((line) => line.length > 0);
+}
+
+function remarkBlockDirectives() {
+  return (tree: MdNode) => {
+    const walk = (node: MdNode) => {
+      if (
+        node.type === "leafDirective" &&
+        node.name &&
+        LEAF_BLOCK_TAGS.has(node.name)
+      ) {
+        node.data = {
+          ...node.data,
+          hName: node.name,
+          hProperties: { ...node.attributes },
+        };
+      } else if (
+        node.type === "containerDirective" &&
+        node.name &&
+        CONTAINER_BLOCK_TAGS.has(node.name)
+      ) {
+        // `:::terminal` / `:::diff` / `:::poll` / `:::fold` / `:::compare` are
+        // line-based: collapse each child block to a single line of text here (at
+        // mdast level, where paragraph boundaries still exist) and pass them as a
+        // `\n`-joined `lines` string — the rendered React children would otherwise
+        // lose the line breaks. `:::quote` / `:::callout` keep their rendered
+        // children (real prose).
+        const LINE_BASED = new Set([
+          "terminal",
+          "diff",
+          "poll",
+          "fold",
+          "compare",
+        ]);
+        const extra = LINE_BASED.has(node.name)
+          ? { lines: blockTextLines(node).join("\n") }
+          : {};
+        node.data = {
+          ...node.data,
+          hName: node.name,
+          hProperties: { ...node.attributes, ...extra },
+        };
       }
       node.children?.forEach(walk);
     };
@@ -244,6 +362,127 @@ const components = {
   matrix: ({ children }: { children?: ReactNode }) => (
     <MatrixText text={childrenToString(children)} />
   ),
+  redact: ({ children }: { children?: ReactNode }) => (
+    <RevealMark variant="redact">{childrenToString(children)}</RevealMark>
+  ),
+  spoiler: ({ children }: { children?: ReactNode }) => (
+    <RevealMark variant="blur">{childrenToString(children)}</RevealMark>
+  ),
+  // `:type[…]` — one MatrixText decode pass when scrolled into view, then rests
+  // as plain text.
+  type: ({ children }: { children?: ReactNode }) => (
+    <MatrixText text={childrenToString(children)} trigger="scroll" />
+  ),
+  kbd: ({ children }: { children?: ReactNode }) => (
+    <Kbd>{childrenToString(children)}</Kbd>
+  ),
+  scan: ({ children }: { children?: ReactNode }) => (
+    <ScanText>{childrenToString(children)}</ScanText>
+  ),
+  // `:cite[term]{note}` — dotted term + decode tooltip. The note text comes from
+  // the directive attribute (a plain string, never a style).
+  cite: ({ children, note }: { children?: ReactNode; note?: string }) => (
+    <CiteTooltip note={note ?? ""}>{childrenToString(children)}</CiteTooltip>
+  ),
+  // `:ref[n]` — superscript footnote tag (jump-links to `#note-n`).
+  ref: ({ children }: { children?: ReactNode }) => (
+    <MarginRef n={childrenToString(children)} />
+  ),
+  // `:stat[1240]` — counting readout (rolls up on scroll-in). Non-numeric content
+  // falls back to 0.
+  stat: ({ children }: { children?: ReactNode }) => {
+    const n = parseInt(childrenToString(children).replace(/[^0-9-]/g, ""), 10);
+    return <CountUp value={Number.isFinite(n) ? n : 0} />;
+  },
+  // `:strike[…]` — self-redacting edit (strike draws on scroll-in).
+  strike: ({ children }: { children?: ReactNode }) => (
+    <RevealMark variant="strike">{childrenToString(children)}</RevealMark>
+  ),
+  // `:wave[…]` — caret sweep highlight.
+  wave: ({ children }: { children?: ReactNode }) => (
+    <WaveHighlight>{childrenToString(children)}</WaveHighlight>
+  ),
+  // `:link[label]{href}` — scanline hover link. `href` is a plain string prop;
+  // ScanLink applies the safe external-link rel.
+  link: ({ children, href }: { children?: ReactNode; href?: string }) => (
+    <ScanLink href={href}>{childrenToString(children)}</ScanLink>
+  ),
+  // BLOCK directives. `::divider{variant}` → an ASCII section break; the
+  // whitelisted variant comes from the directive attribute (never a style).
+  divider: ({ variant }: { variant?: string }) => (
+    <AsciiDivider
+      variant={variant === "slash" || variant === "mark" ? variant : "dots"}
+    />
+  ),
+  // `:::quote{cite}` → a terminal pull-quote (its content is the quote body).
+  quote: ({ children, cite }: { children?: ReactNode; cite?: string }) => (
+    <PullQuote cite={cite}>{children}</PullQuote>
+  ),
+  // `:::callout{type}` → a console callout (note | warn); content is prose.
+  callout: ({ children, type }: { children?: ReactNode; type?: string }) => (
+    <Callout type={type === "warn" ? "warn" : "note"}>{children}</Callout>
+  ),
+  // `:::terminal` → a read-only transcript. The `lines` prop (set by
+  // `remarkBlockDirectives`) is the `\n`-joined body; a leading `$ ` marks a
+  // prompt (accent), `! ` an error, otherwise output.
+  terminal: ({ lines }: { lines?: string }) => {
+    const rows: TranscriptLine[] = (lines ?? "")
+      .split("\n")
+      .filter((l) => l.length > 0)
+      .map((l) => {
+        if (l.startsWith("$ ")) return { text: l, tone: "prompt" as const };
+        if (l.startsWith("! "))
+          return { text: l.slice(2), tone: "error" as const };
+        return { text: l, tone: "output" as const };
+      });
+    return <Transcript lines={rows} />;
+  },
+  // `:::diff` → a redline/patch block. `lines` (set by `remarkBlockDirectives`)
+  // is the `\n`-joined body; `+ ` / `- ` prefixes mark added/removed lines.
+  diff: ({ lines }: { lines?: string }) => <DiffBlock body={lines ?? ""} />,
+  // `:::poll` → an ASCII bar readout. Each body line is `Label | 62` (label, then
+  // a `|`-separated numeric percentage). Lines without a number are skipped.
+  poll: ({ lines }: { lines?: string }) => {
+    const rows: PollRow[] = (lines ?? "")
+      .split("\n")
+      .map((l) => {
+        const [label, raw] = l.split("|");
+        const value = parseInt((raw ?? "").replace(/[^0-9]/g, ""), 10);
+        return { label: (label ?? "").trim(), value };
+      })
+      .filter((r) => r.label.length > 0 && Number.isFinite(r.value));
+    return <PollBlock rows={rows} />;
+  },
+  // `::ansi{tokens}` → a leaf colour-swatch block. The whitelisted token names
+  // come from the directive attribute (AnsiBlock ignores any non-whitelisted
+  // name — the colour is a fixed token, never user-supplied).
+  ansi: ({ tokens }: { tokens?: string }) => <AnsiBlock tokens={tokens} />,
+  // `:::fold{summary}` → a terminal spoiler. The body decodes once on first open;
+  // `summary` is the closed-state label.
+  fold: ({ lines, summary }: { lines?: string; summary?: string }) => (
+    <FoldBlock summary={summary} decode={lines ?? ""} />
+  ),
+  // `:::compare{before,after}` → a before/after slider. Body is two lines: the
+  // first is the BEFORE panel text, the second the AFTER; labels come from attrs.
+  compare: ({
+    lines,
+    before,
+    after,
+  }: {
+    lines?: string;
+    before?: string;
+    after?: string;
+  }) => {
+    const [b = "", a = ""] = (lines ?? "").split("\n");
+    return (
+      <CompareSlider
+        before={b}
+        after={a}
+        beforeLabel={before}
+        afterLabel={after}
+      />
+    );
+  },
 } as Components;
 
 interface PostBodyProps {
@@ -260,6 +499,7 @@ export function PostBody({ markdown }: PostBodyProps) {
           remarkDirective,
           remarkSmallDirective,
           remarkEffectDirectives,
+          remarkBlockDirectives,
           remarkColorDirectives,
           remarkLiteralizeUnknownDirectives,
           remarkDropEmptyLines,

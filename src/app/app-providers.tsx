@@ -5,6 +5,7 @@ import { ErrorBoundary } from "@/shared/providers/error-boundary";
 import { ReactQueryProvider } from "@/shared/providers/query-provider";
 import { ThemeProvider } from "@/shared/providers/theme-providers";
 import { Toaster } from "@/shared/ui/toaster";
+import { CrtOverlay } from "@/shared/ui/crt-overlay";
 import { Header } from "@/widgets/header";
 
 export const AppProviders = ({ children }: { children: React.ReactNode }) => {
@@ -20,6 +21,9 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => {
               <Header />
             </div>
             {children}
+            {/* CRT scanline drape — always mounted, CSS-gated by `html.crt`
+                (set pre-paint by the layout inline script). */}
+            <CrtOverlay />
             <Toaster />
           </ThemeProvider>
         </AuthProvider>
