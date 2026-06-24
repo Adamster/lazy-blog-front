@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import type { ChangePasswordRequest } from "@/shared/api/openapi";
-import { Field } from "@/shared/ui";
+import { Field, InfoBox } from "@/shared/ui";
 import { useUpdatePassword } from "../model/use-update-password";
 import { ProfileFormSection } from "./profile-form-section";
 
@@ -21,8 +21,9 @@ const PASSWORD_PATTERN = {
  * Security-tab password form — RHF over the {@link useUpdatePassword} mutation
  * (success toast + home redirect + sign-out), wrapped in the shared
  * {@link ProfileFormSection} chrome. The password-rules info box reuses the
- * accent-left-edge treatment from the brand sheet / auth lead, and the sign-out
- * note matches the auth helper-line tone.
+ * accent-left-edge treatment from the brand sheet / auth lead. The sign-out
+ * heads-up lives on the left {@link ProfileSecurityIntro} context panel, so the
+ * form starts at the Current-password field.
  */
 export function ProfileSecurityForm() {
   const changePassword = useUpdatePassword();
@@ -40,7 +41,6 @@ export function ProfileSecurityForm() {
         changePassword.mutate({ oldPassword, newPassword })
       )}
       actionLabel="Update password"
-      pendingLabel="Updating…"
       pending={changePassword.isPending}
     >
       <Field
@@ -69,10 +69,6 @@ export function ProfileSecurityForm() {
             pattern: PASSWORD_PATTERN,
           })}
         />
-        <div className="mt-4 border-l-2 border-l-[var(--m-accent)] bg-[var(--m-accent)]/[0.06] px-4 py-3 text-[14px] leading-[1.6] text-[var(--m-muted)]">
-          Use 6+ characters with at least one uppercase, one lowercase, a
-          number, and a special character.
-        </div>
       </div>
 
       <div className="mt-4">
@@ -91,9 +87,12 @@ export function ProfileSecurityForm() {
         />
       </div>
 
-      <p className="mt-4 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)] uppercase">
-        {"// you will be signed out after changing your password"}
-      </p>
+      {/* Requirements hint sits BELOW all the inputs (consistent with the auth
+          register form), not wedged between New and Confirm. */}
+      <InfoBox className="mt-4">
+        Use 6+ characters with at least one uppercase, one lowercase, a number,
+        and a special character.
+      </InfoBox>
     </ProfileFormSection>
   );
 }

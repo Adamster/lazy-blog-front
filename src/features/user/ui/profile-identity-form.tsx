@@ -44,7 +44,6 @@ export function ProfileIdentityForm({ userData }: ProfileIdentityFormProps) {
     <ProfileFormSection
       onSubmit={handleSubmit((data) => updateUser.mutate(data))}
       actionLabel="Save changes"
-      pendingLabel="Saving…"
       pending={updateUser.isPending}
     >
       <Field
