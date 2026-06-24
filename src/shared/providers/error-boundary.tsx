@@ -1,4 +1,5 @@
 import { Component, ReactNode } from "react";
+import { ErrorMessage } from "@/shared/ui/error-message";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -30,19 +31,12 @@ export class ErrorBoundary extends Component<
 
   render() {
     if (this.state.hasError) {
+      // One error surface: the runtime boundary renders the SAME glitch page
+      // (`ErrorMessage`) the route error / 404 use, instead of its own variant.
       return (
-        <div
-          className="mono-scope min-h-app flex flex-col items-center justify-center gap-6 bg-[var(--m-bg)] px-10 text-center text-[var(--m-fg)]"
-          style={{ fontFamily: "var(--font-mono)" }}
-        >
-          <div className="mono-label">{"// ERROR"}</div>
-          <h2 className="font-display text-[32px] leading-none font-bold tracking-[-0.02em]">
-            A glitch in the Lazyverse… 😢
-          </h2>
-          <p className="max-w-[46em] text-[14px] leading-[1.6] text-[var(--m-muted)]">
-            {this.state.error?.message || "Unknown Error"}
-          </p>
-        </div>
+        this.props.fallback ?? (
+          <ErrorMessage error={this.state.error} reset={this.resetError} />
+        )
       );
     }
     return this.props.children;

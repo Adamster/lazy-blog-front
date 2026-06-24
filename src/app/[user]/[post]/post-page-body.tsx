@@ -5,7 +5,7 @@ import { PostView } from "@/features/post/ui/post-view";
 import { PostHeaderMenuIsland } from "@/features/post/ui/post-header-menu-island";
 import { PostVoteIsland } from "@/features/post/ui/post-vote-island";
 import { ErrorMessage } from "@/shared/ui/error-message";
-import { Loading } from "@/shared/ui/loading";
+import { Loading } from "@/shared/ui";
 import { PostComments } from "./post-comments";
 import { PostCommentsCount } from "./post-comments-count";
 

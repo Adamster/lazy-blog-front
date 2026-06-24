@@ -5,7 +5,7 @@ import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
 import { PostForm } from "@/features/post/ui/post-form";
-import { IsAuth, IsAuthor } from "@/entities/session";
+import { IsAuthor, ProtectedRoute } from "@/entities/session";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -24,10 +24,7 @@ const EditPage = () => {
   if (!postData) return <ErrorMessage error={"Not Found."} />;
 
   return (
-    <IsAuth
-      loadingFallback={<Loading />}
-      fallback={<ErrorMessage error={"Not Found."} />}
-    >
+    <ProtectedRoute>
       <div
         className="mono-scope min-h-app mx-[calc(50%-50vw)] w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
         style={{ fontFamily: "var(--font-mono)" }}
@@ -45,7 +42,7 @@ const EditPage = () => {
           <EditForm postData={postData} />
         </IsAuthor>
       </div>
-    </IsAuth>
+    </ProtectedRoute>
   );
 };
 

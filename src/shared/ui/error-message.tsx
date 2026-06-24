@@ -33,10 +33,11 @@ const statusOf = (error: unknown): number | undefined => {
  */
 export const ErrorMessage = ({
   error,
-  reset,
   status: statusProp,
 }: {
   error: unknown;
+  /** Accepted for API compat (error.tsx passes Next's reset) but unused — the
+   *  page only offers Go home now. */
   reset?: () => void;
   /** Force the status line (e.g. 404 for the not-found page). */
   status?: number;
@@ -91,7 +92,7 @@ export const ErrorMessage = ({
           <GlitchText caret>A glitch in the Lazyverse</GlitchText>
         </h1>
 
-        <p className="mt-4 max-w-[42ch] text-[14px] leading-[1.6] text-[var(--m-muted)]">
+        <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
           Something broke on our side — not you. Try again; if it keeps
           happening, head back home.
         </p>
@@ -105,20 +106,9 @@ export const ErrorMessage = ({
         ) : null}
 
         <div className="mt-6 flex flex-wrap gap-3">
-          {reset ? (
-            <button
-              type="button"
-              onClick={reset}
-              className={`mono-cta inline-flex h-9 items-center justify-center px-4 text-[14px] font-bold tracking-[0.06em] ${focusRing}`}
-            >
-              Try again
-            </button>
-          ) : null}
           <Link
             href="/"
-            className={`inline-flex h-9 items-center justify-center px-4 text-[14px] font-semibold tracking-[0.06em] ${
-              reset ? "mono-btn-outline" : "mono-cta font-bold"
-            } ${focusRing}`}
+            className={`mono-cta inline-flex h-9 items-center justify-center px-4 text-[14px] font-bold tracking-[0.06em] ${focusRing}`}
           >
             Go home
           </Link>

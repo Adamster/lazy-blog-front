@@ -16,7 +16,6 @@ import {
   StatusBadge,
   Dot,
   MatrixText,
-  HomeSkeleton,
 } from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { formatDate2 } from "@/shared/lib/utils";
@@ -71,9 +70,9 @@ export default function HomePage() {
 
   // Only a true COLD start (no cached pages yet) — on a warm return the infinite
   // query is non-pending, so the cached feed renders instantly with no fallback.
-  // The skeleton mirrors the route-level `(home)/loading.tsx` so cold-load and
-  // navigation share one shell (and stay CLS-free).
-  if (query.isLoading) return <HomeSkeleton />;
+  // One plain loader (no skeleton) so cold-load + navigation share a single
+  // spinner with no loader→skeleton→content flicker.
+  if (query.isLoading) return <Loading />;
   if (query.error) return <ErrorMessage error={query.error} />;
 
   // Defensive: the public home feed only ever shows published posts (drafts are

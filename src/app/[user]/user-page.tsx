@@ -52,7 +52,7 @@ export default function UserPage({ userName }: { userName: string }) {
     >
       <main className="mx-auto max-w-[1240px] px-10 pb-10">
         {/* Profile header */}
-        <section className="flex flex-col gap-8 pt-10 pb-10 sm:flex-row sm:items-start">
+        <section className="flex flex-col gap-8 pt-10 pb-10 sm:flex-row sm:items-center">
           <Avatar src={user?.avatarUrl} name={nameOf(user)} size="lg" />
 
           <div className="min-w-0 flex-1">
@@ -78,11 +78,7 @@ export default function UserPage({ userName }: { userName: string }) {
               <p className="mt-4 max-w-[40em] text-[14px] leading-[1.6] whitespace-pre-line text-[var(--m-muted)]">
                 {user.biography}
               </p>
-            ) : (
-              <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted2)]">
-                404: bio not found
-              </p>
-            )}
+            ) : null}
           </div>
         </section>
 
