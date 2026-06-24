@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { InfoBox } from "@/shared/ui";
 import { LogoSloth } from "@/shared/ui/logo-sloth";
 import { Section, Panel, Spec } from "./_helpers";
 
@@ -360,13 +361,13 @@ export function BrandTab() {
               <Spec label="Stats grid gap (gap-10)" value="40" />
             </div>
           </div>
-          <div className="mt-7 border-l-2 border-l-[var(--m-accent)] bg-[var(--m-accent)]/[0.06] px-4 py-3 text-[14px] leading-[1.6] text-[var(--m-muted)]">
+          <InfoBox className="mt-7">
             Text-block rhythm: category → title{" "}
             <strong className="text-[var(--m-accent)]">8</strong> (mb-2) · label
             → value / title → body{" "}
             <strong className="text-[var(--m-accent)]">16</strong> (mt-4) · body
             → meta <strong className="text-[var(--m-accent)]">24</strong>.
-          </div>
+          </InfoBox>
         </Section>
 
         {/* 06 LETTER-SPACING & LINE-HEIGHT */}

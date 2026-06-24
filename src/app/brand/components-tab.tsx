@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { LinkIcon, TrashIcon, PencilIcon } from "@heroicons/react/24/solid";
+import {
+  AdjustmentsHorizontalIcon,
+  LinkIcon,
+  TrashIcon,
+  PencilIcon,
+} from "@heroicons/react/24/solid";
 import { EyeSlashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
   Label,
@@ -27,8 +32,6 @@ import {
   Console,
   Checkbox,
   RadioGroup,
-  Skeleton,
-  PostCardSkeleton,
   type SelectOption,
 } from "@/shared/ui";
 import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
@@ -536,7 +539,7 @@ export function ComponentsTab() {
             </Panel>
 
             <Panel caption="// MODALS">
-              <div className="flex flex-wrap items-center gap-4">
+              <div className="flex flex-wrap items-center gap-3">
                 <button
                   type="button"
                   className={outlineCls}
@@ -567,7 +570,7 @@ export function ComponentsTab() {
           intro="Notifications go through the module-level toast store; the app-level <Toaster/> renders them. These call the real addToastSuccess / addToastError so the live toast appears bottom-right — a single card surface with a 2px type stripe (accent/error) and the status icon between the text and the right edge. The whole toast dismisses on click; it also auto-dismisses."
         >
           <Panel caption="// TOASTS">
-            <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 className={ctaCls}
@@ -655,10 +658,12 @@ export function ComponentsTab() {
             </Panel>
 
             <Panel caption="// STEPPER (composer)">
-              <State caption="numbered boxes · click to jump (forward gated by the parent)">
+              <State caption="icon boxes · click to jump (forward gated by the parent) · a COMPLETE-but-inactive step gets the accent OUTLINE">
                 <Stepper
                   steps={["Setup", "Write"]}
+                  icons={[AdjustmentsHorizontalIcon, PencilIcon]}
                   current={stepDemo}
+                  completeSteps={[1]}
                   onSelect={setStepDemo}
                   className="justify-center"
                 />
@@ -725,27 +730,6 @@ export function ComponentsTab() {
               </p>
             </State>
           </Panel>
-        </Section>
-
-        {/* 13 — SKELETON */}
-        <Section
-          index="13"
-          title="SKELETON"
-          intro="Square block placeholders for loading states — a --m-dim → --m-panel shimmer that flattens to a static --m-dim block under reduced-motion. Size each block with utilities; PostCardSkeleton composes them into a feed-card placeholder. (Wiring into the real feed loading states is a follow-up.)"
-        >
-          <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
-            <Panel caption="// BLOCKS">
-              <div className="flex flex-col gap-4">
-                <Skeleton className="h-3 w-2/5" />
-                <Skeleton className="h-3.5 w-4/5" />
-                <Skeleton className="h-3 w-full" />
-                <Skeleton className="h-3 w-3/5" />
-              </div>
-            </Panel>
-            <Panel caption="// POSTCARDSKELETON">
-              <PostCardSkeleton />
-            </Panel>
-          </div>
         </Section>
       </div>
 
