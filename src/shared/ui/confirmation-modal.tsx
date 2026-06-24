@@ -1,13 +1,22 @@
 import React from "react";
 import { Modal, useModalTitleId } from "@/shared/ui";
 
-interface ConfirmDeleteModalProps {
+interface ConfirmModalProps {
   /** 32px headline question, e.g. "Delete post?". */
   title: string;
   /** Optional 14px body explaining the consequence. */
   description?: string;
-  /** Destructive button label (default "Delete"). */
+  /** Confirm button label (default "Delete"). */
   confirmLabel?: string;
+  /**
+   * Severity. `"danger"` (default) = destructive: error top-stripe + `// DANGER`
+   * eyebrow + filled-error confirm. `"default"` = a neutral confirm (a reversible
+   * action like unpublish): accent top-stripe + `// CONFIRM` eyebrow + the accent
+   * `.mono-cta` confirm.
+   */
+  tone?: "danger" | "default";
+  /** Override the eyebrow label (defaults from `tone`). */
+  eyebrow?: string;
   isOpen: boolean;
   onOpenChange: () => void;
   onConfirm: () => void;
@@ -17,35 +26,43 @@ const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
 
 /**
- * Destructive-confirm modal — Brutalist-Mono "DANGER" variant. Error top stripe
- * (`tone="danger"`) + `// DANGER` error eyebrow + 32px title + optional 14px
- * body, and two equal-width actions: a filled-error confirm and an outline
- * Cancel.
+ * Confirm modal — Brutalist-Mono. Two tones: destructive (`danger`, the default)
+ * with the error stripe + filled-error action, and a neutral `default` (accent
+ * stripe + `.mono-cta`) for reversible confirms like unpublish. Eyebrow → 32px
+ * title → optional 14px body, then two equal-width actions (Cancel + confirm).
  */
-const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
   title,
   description,
   confirmLabel = "Delete",
+  tone = "danger",
+  eyebrow,
   isOpen,
   onOpenChange,
   onConfirm,
 }) => {
   const titleId = useModalTitleId();
+  const isDanger = tone === "danger";
+  const eyebrowText = eyebrow ?? (isDanger ? "// Danger" : "// Confirm");
 
   return (
     <Modal
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       width="sm"
-      tone="danger"
+      tone={tone}
       labelledBy={titleId}
     >
       {(onClose) => (
         <>
           <div className="mb-6 flex items-start justify-between gap-4">
             <div>
-              <div className="mb-6 text-[11px] font-medium tracking-[0.12em] text-[var(--m-error)] uppercase">
-                {"// Danger"}
+              <div
+                className={`mb-6 text-[11px] font-medium tracking-[0.12em] uppercase ${
+                  isDanger ? "text-[var(--m-error)]" : "text-[var(--m-accent)]"
+                }`}
+              >
+                {eyebrowText}
               </div>
               <h2
                 id={titleId}
@@ -84,7 +101,11 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
                 onConfirm();
                 onClose();
               }}
-              className={`inline-flex h-9 flex-1 items-center justify-center border-2 border-[var(--m-error)] bg-[var(--m-error)] text-[14px] font-bold tracking-[0.06em] text-[var(--m-bg)] uppercase transition-colors hover:bg-transparent hover:text-[var(--m-error)] ${focusRing}`}
+              className={
+                isDanger
+                  ? `inline-flex h-9 flex-1 items-center justify-center border-2 border-[var(--m-error)] bg-[var(--m-error)] text-[14px] font-bold tracking-[0.06em] text-[var(--m-bg)] uppercase transition-colors hover:bg-transparent hover:text-[var(--m-error)] ${focusRing}`
+                  : `mono-cta inline-flex h-9 flex-1 items-center justify-center text-[14px] font-bold tracking-[0.06em] ${focusRing}`
+              }
             >
               {confirmLabel}
             </button>
@@ -95,4 +116,4 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   );
 };
 
-export default ConfirmDeleteModal;
+export default ConfirmModal;

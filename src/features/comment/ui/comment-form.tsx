@@ -5,6 +5,7 @@ import { useUser } from "@/entities/session";
 import { useAddComment } from "@/features/comment/model/use-add-comment";
 import { useUpdateComment } from "@/features/comment/model/use-update-comment";
 import { FaceSmileIcon } from "@heroicons/react/24/outline";
+import { IconSubmitButton } from "@/shared/ui";
 import {
   useCallback,
   useEffect,
@@ -164,7 +165,7 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           aria-label={labelText}
-          className="block w-full resize-none overflow-hidden border-0 border-b-2 border-[var(--m-accent)] bg-transparent px-0 pt-5 pb-2 text-[14px] leading-[1.6] text-[var(--m-fg)] caret-[var(--m-accent)] outline-none"
+          className="block w-full resize-none overflow-hidden border-0 border-b-2 border-[var(--m-dim)] bg-transparent px-0 pt-5 pb-2 text-[14px] leading-[1.6] text-[var(--m-fg)] caret-[var(--m-accent)] transition-colors outline-none focus:border-[var(--m-accent)]"
           style={{ fontFamily: "var(--font-mono)", fieldSizing: "content" }}
         />
       </div>
@@ -220,15 +221,11 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
           </button>
         )}
 
-        <button
-          type="submit"
-          disabled={isPending}
-          className={`mono-cta inline-flex h-9 items-center px-4 text-[14px] font-bold tracking-[0.06em] ${focusRing} ${
-            editComment ? "" : "ml-auto"
-          }`}
-        >
-          {isPending ? "Sending" : editComment ? "Update" : "Send"}
-        </button>
+        <IconSubmitButton
+          label={editComment ? "Update" : "Send"}
+          pending={isPending}
+          className={editComment ? "" : "ml-auto"}
+        />
       </div>
     </form>
   );

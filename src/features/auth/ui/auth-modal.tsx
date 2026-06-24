@@ -6,6 +6,7 @@ import { RegisterUserRequest } from "@/shared/api/openapi";
 import { addToastError } from "@/shared/lib/toasts";
 import {
   Field,
+  InfoBox,
   Modal,
   ModalHeader,
   SubmitButton,
@@ -434,6 +435,12 @@ function RegisterView({
             })}
           />
         </div>
+
+        {/* Password requirements — chrome info-box (same as reset / edit-profile). */}
+        <InfoBox className="mt-4">
+          Use 6+ characters with at least one uppercase, one lowercase, a
+          number, and a special character.
+        </InfoBox>
 
         <div className="mt-6">
           <SubmitButton pending={loading} pendingLabel="Creating…">

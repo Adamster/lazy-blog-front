@@ -10,6 +10,7 @@ import { ErrorMessage } from "@/shared/ui/error-message";
 import { useResetPassword } from "@/features/auth/model/use-reset-password";
 import {
   Field,
+  InfoBox,
   Modal,
   ModalHeader,
   SubmitButton,
@@ -73,7 +74,6 @@ export default function ResetPassword() {
             eyebrow="// RESET PASSWORD"
             title="Set a new password"
             titleId={titleId}
-            subtitle="Make it count: 6+ characters with at least one uppercase, one lowercase, a number, and a special character."
             onClose={onClose}
           />
 
@@ -94,7 +94,7 @@ export default function ResetPassword() {
               />
             </div>
 
-            <div className="mb-6">
+            <div className="mb-4">
               <Field
                 id="confirm-password"
                 label="Confirm new password"
@@ -110,6 +110,12 @@ export default function ResetPassword() {
                 })}
               />
             </div>
+
+            {/* Requirements hint BELOW all inputs (consistent with register). */}
+            <InfoBox className="mb-6">
+              Use 6+ characters with at least one uppercase, one lowercase, a
+              number, and a special character.
+            </InfoBox>
 
             <SubmitButton
               pending={resetPasswordMutation.isPending}
