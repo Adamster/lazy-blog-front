@@ -198,15 +198,18 @@ export default function CrepeEditor({
 
   return (
     <div>
-      {/* Persistent toolbar = the top edge of the framed writing column. */}
+      {/* Persistent toolbar = a self-closed 2px bar spanning the full canvas. */}
       <EditorToolbar
         onCommand={runCommand}
         onInsertImage={onInsertImage}
         disabled={!ready}
       />
-      {/* Sheet: a closed 2px box (the toolbar caps the top), the page background,
-          and a 40px inset so text never touches the walls. */}
-      <div className="min-h-[40vh] border-x-2 border-b-2 border-[var(--m-dim)] bg-[var(--m-bg)] p-7 md:p-10">
+      {/* Boxless writing area: no border / no fill, AUTO height (grows with the
+          content, no fixed minimum) — the text sits on the plain page like the
+          read view. `pt-10` gives the toolbar→text breathing room. The 700
+          measure isn't derived from this wrapper — it lives ON `.ProseMirror`
+          (centered), 1:1 with the read view (see crepe-overrides.scss). */}
+      <div className="pt-10">
         <div className="milkdown mono-prose" ref={rootRef} />
       </div>
     </div>

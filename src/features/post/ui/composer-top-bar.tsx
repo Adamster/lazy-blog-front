@@ -1,14 +1,14 @@
 "use client";
 
 import {
+  AdjustmentsHorizontalIcon,
   ArrowTopRightOnSquareIcon,
   EyeIcon,
   EyeSlashIcon,
+  PencilIcon,
   TrashIcon,
-  XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { RocketLaunchIcon } from "@heroicons/react/24/solid";
-import { Stepper } from "@/shared/ui";
+import { IconSubmitButton, Stepper } from "@/shared/ui";
 import type { ComposerStep } from "./composer-step";
 
 const focusRing =
@@ -16,13 +16,12 @@ const focusRing =
 
 interface ComposerTopBarProps {
   step: ComposerStep;
-  /** Where the ✕ Cancel abort link exits to (CREATE only — author profile /
-   *  home). Omit in edit mode to hide Cancel entirely (nothing to abort). */
-  cancelHref?: string;
   /** Jump to a step (unconditional — switching is free, no validation gate). */
   onSelectStep: (step: ComposerStep) => void;
   /** 1-based steps that currently hold validation errors (Stepper error layer). */
   errorSteps: number[];
+  /** 1-based steps whose required data is filled (Stepper accent-outline layer). */
+  completeSteps: number[];
   /** Publish toggle state + setter (RHF-controlled by the parent). */
   published: boolean;
   onPublishedChange: (value: boolean) => void;
@@ -35,18 +34,16 @@ interface ComposerTopBarProps {
 
 /**
  * The composer command bar — one full-bleed `--m-card` band. LEFT: the two
- * numbered step boxes (1/2), preceded by the ✕ Cancel abort link + a 2px
- * divider. RIGHT: the visibility eye (open = published/visible, slashed =
- * draft/hidden; toggles `isPublished`) · delete (icon-only, edit) · Publish
- * (icon-only rocket submit). Cancel is an ABORT, so it carries a close ✕ glyph,
- * never a directional arrow (arrows mark navigation only — that's the step
- * boxes). Purely presentational; the parent owns the form, validation, modal.
+ * numbered step boxes (1/2). RIGHT: view-live-post (edit) · the visibility eye
+ * (open = published/visible, slashed = draft/hidden; toggles `isPublished`) ·
+ * delete (icon-only, edit) · a 2px divider · Publish (icon-only rocket submit).
+ * Purely presentational; the parent owns the form, validation, modal.
  */
 export function ComposerTopBar({
   step,
-  cancelHref,
   onSelectStep,
   errorSteps,
+  completeSteps,
   published,
   onPublishedChange,
   onDelete,
@@ -56,31 +53,15 @@ export function ComposerTopBar({
   return (
     <div className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
       <div className="mx-auto flex max-w-[1240px] items-center px-10 py-5">
-        {/* LEFT — ✕ Cancel (create only) · 2px divider · stepper */}
-        <div className="flex items-center gap-5">
-          {cancelHref ? (
-            <>
-              <a
-                href={cancelHref}
-                aria-label="Cancel"
-                className={`inline-flex items-center gap-2.5 text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)] ${focusRing}`}
-              >
-                <XMarkIcon aria-hidden="true" className="size-3.5" />
-                <span className="hidden md:inline">Cancel</span>
-              </a>
-              <span
-                aria-hidden="true"
-                className="h-5 w-0.5 bg-[var(--m-dim)]"
-              />
-            </>
-          ) : null}
-          <Stepper
-            steps={["Setup", "Write"]}
-            current={step}
-            errorSteps={errorSteps}
-            onSelect={(s) => onSelectStep(s as ComposerStep)}
-          />
-        </div>
+        {/* LEFT — the stepper nav (Setup / Write) */}
+        <Stepper
+          steps={["Setup", "Write"]}
+          icons={[AdjustmentsHorizontalIcon, PencilIcon]}
+          current={step}
+          errorSteps={errorSteps}
+          completeSteps={completeSteps}
+          onSelect={(s) => onSelectStep(s as ComposerStep)}
+        />
 
         {/* RIGHT — view live post (edit) · visibility (eye) · delete · Publish */}
         <div className="ml-auto flex items-center gap-3">
@@ -126,16 +107,13 @@ export function ComposerTopBar({
             </button>
           ) : null}
 
-          <button
-            type="submit"
-            disabled={isPending}
-            aria-label="Publish"
-            aria-busy={isPending}
-            title="Publish"
-            className={`mono-cta inline-flex size-9 shrink-0 items-center justify-center ${focusRing}`}
-          >
-            <RocketLaunchIcon className="size-3.5" />
-          </button>
+          {/* Vertical divider isolating the Publish rocket (primary commit) from
+              the tool actions (view / eye / delete) — the SAME divider as the
+              LEFT Cancel│stepper split — so the destructive delete never sits
+              flush against the primary. */}
+          <span aria-hidden="true" className="h-5 w-0.5 bg-[var(--m-dim)]" />
+
+          <IconSubmitButton label="Publish" pending={isPending} />
         </div>
       </div>
     </div>

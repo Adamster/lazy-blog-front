@@ -33,6 +33,8 @@ export const PostHeaderMenu = ({
 }: IProps) => {
   const router = useRouter();
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [unpublishOpen, setUnpublishOpen] = useState(false);
+  const [publishOpen, setPublishOpen] = useState(false);
 
   const publishPost = usePublishPost(postId, postSlug, authorHandle);
   const hidePost = useHidePost(postId, postSlug, authorHandle);
@@ -57,7 +59,8 @@ export const PostHeaderMenu = ({
       ) : (
         <EyeIcon className={iconCls} />
       ),
-      onSelect: () => (isPublished ? hidePost.mutate() : publishPost.mutate()),
+      onSelect: () =>
+        isPublished ? setUnpublishOpen(true) : setPublishOpen(true),
     },
     {
       id: "delete",
@@ -80,6 +83,32 @@ export const PostHeaderMenu = ({
         onConfirm={() => {
           setConfirmOpen(false);
           deletePost.mutate();
+        }}
+      />
+      <ConfirmDeleteModal
+        tone="default"
+        eyebrow="// Visibility"
+        title="Unpublish post?"
+        description="It'll be hidden from everyone but you and pulled from feeds. You can republish it anytime."
+        confirmLabel="Unpublish"
+        isOpen={unpublishOpen}
+        onOpenChange={() => setUnpublishOpen(false)}
+        onConfirm={() => {
+          setUnpublishOpen(false);
+          hidePost.mutate();
+        }}
+      />
+      <ConfirmDeleteModal
+        tone="default"
+        eyebrow="// Visibility"
+        title="Publish post?"
+        description="It'll go live and show up in feeds for everyone. You can unpublish it anytime."
+        confirmLabel="Publish"
+        isOpen={publishOpen}
+        onOpenChange={() => setPublishOpen(false)}
+        onConfirm={() => {
+          setPublishOpen(false);
+          publishPost.mutate();
         }}
       />
     </>

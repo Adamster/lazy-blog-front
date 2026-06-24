@@ -51,7 +51,9 @@
 
   .ProseMirror {
     padding: 0;
-    min-height: 20rem;
+    /* AUTO height — no fixed minimum; the boxless editor grows with its content
+       instead of reserving a tall empty canvas (was `20rem`). */
+    min-height: 0;
 
     /* Kill the browser's blue `:focus-visible` ring on the editable — the 2px
        frame around the column is the focus affordance, not a UA outline. */
@@ -343,6 +345,12 @@
   line-height: 1.85;
   color: var(--m-fg);
   caret-color: var(--m-accent);
+
+  /* The editable text carries its OWN fixed 700 measure, centered in the wider
+     (1240) boxless canvas — so the editing column matches the read view's 700
+     (780 − px-10 gutter) EXACTLY. Editing should read like reading. */
+  max-width: 700px;
+  margin-inline: auto;
 
   p {
     font-size: 14px;

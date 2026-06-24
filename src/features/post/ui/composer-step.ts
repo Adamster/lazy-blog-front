@@ -24,3 +24,21 @@ export const errorStepsFrom = (
 export const firstErrorStep = (
   errors: FieldErrors<UpdatePostRequest>
 ): ComposerStep | null => errorStepsFrom(errors)[0] ?? null;
+
+/**
+ * The 1-based steps whose required DATA is present (filled) — drives the
+ * Stepper's accent-outline "complete" layer. This is data-PRESENCE, not full
+ * validation: a step is complete once its required content exists (title +
+ * summary for Setup, real body content for Write). Setup requires the
+ * caller-supplied predicates so the "real content" rule (whitespace / empty-doc
+ * stripping) stays owned by the form.
+ */
+export const completeStepsFrom = (filled: {
+  setup: boolean;
+  write: boolean;
+}): ComposerStep[] => {
+  const steps: ComposerStep[] = [];
+  if (filled.setup) steps.push(1);
+  if (filled.write) steps.push(2);
+  return steps;
+};

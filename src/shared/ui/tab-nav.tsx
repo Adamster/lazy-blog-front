@@ -1,15 +1,17 @@
-import { Fragment } from "react";
+import { Fragment, type ComponentType } from "react";
 import { STEP_BOX, stepBoxClass } from "./step-box";
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
 
+type TabIcon = ComponentType<{ className?: string }>;
+
 export interface TabItem {
   /** Stable id — the value reported by `onSelect` and matched against `current`. */
   id: string;
-  /** Single-letter box marker (e.g. `P` / `S`). */
-  marker: string;
-  /** Visible uppercase label beside the marker. */
+  /** Icon rendered INSIDE the box (replaces the old letter marker). */
+  icon: TabIcon;
+  /** Accessible name (`aria-label`) — the visible box content is the icon. */
   label: string;
 }
 
@@ -25,13 +27,14 @@ interface TabNavProps {
 }
 
 /**
- * The edit-profile tab band — the composer {@link Stepper}'s visual language
- * (the shared `STEP_BOX` + `stepBoxClass` active/inactive tokens) re-dressed as
- * free-switch tabs: a LETTER marker box + an uppercase text label, joined by a
- * dashed connector. Carries true tab a11y (`role="tablist"` / `role="tab"` /
- * `aria-selected` / `aria-controls`) rather than the stepper's `aria-current`,
- * and switching is unconditional (no forward/back gate). Box sizing/colours stay
- * byte-identical to the composer steps via the shared `step-box` helpers.
+ * The edit-profile tab band — TABS, not a progress stepper. It borrows the
+ * composer {@link Stepper}'s box language (the shared `STEP_BOX` +
+ * `stepBoxClass` tokens), but reads as tabs: only the ACTIVE box highlights
+ * (accent), the inactive boxes stay dim, and the connector is a STATIC dim rule
+ * (NOT a progress bar — it never goes accent). The section name is a11y-only
+ * (`aria-label`), so there's no visible text (icons only). Carries true tab a11y
+ * (`role="tablist"` / `role="tab"` / `aria-selected` / `aria-controls`) and
+ * switching is unconditional (no forward/back gate).
  */
 export function TabNav({
   tabs,
@@ -44,16 +47,17 @@ export function TabNav({
     <div
       role="tablist"
       aria-label="Edit profile sections"
-      className={`flex items-center gap-2.5 ${className}`}
+      className={`flex items-center gap-1.5 md:gap-2.5 ${className}`}
     >
       {tabs.map((tab, i) => {
         const active = tab.id === current;
+        const Icon = tab.icon;
         return (
           <Fragment key={tab.id}>
             {i > 0 ? (
               <span
                 aria-hidden="true"
-                className="h-0 w-7 border-t-2 border-dashed border-[var(--m-dim)] md:w-14"
+                className="h-0.5 w-7 bg-[var(--m-dim)] md:w-14"
               />
             ) : null}
             <button
@@ -61,27 +65,19 @@ export function TabNav({
               role="tab"
               id={`tab-${tab.id}`}
               aria-selected={active}
+              aria-label={tab.label}
               aria-controls={
                 panelIdPrefix ? `${panelIdPrefix}${tab.id}` : undefined
               }
               tabIndex={active ? 0 : -1}
               onClick={() => onSelect(tab.id)}
-              className={`group flex min-h-10 items-center gap-2.5 ${focusRing}`}
+              className={`group flex size-10 items-center justify-center ${focusRing}`}
             >
               <span
                 aria-hidden="true"
                 className={`${STEP_BOX} ${stepBoxClass(active)}`}
               >
-                {tab.marker}
-              </span>
-              <span
-                className={`text-[11px] leading-none font-medium tracking-[0.12em] uppercase transition-colors ${
-                  active
-                    ? "text-[var(--m-accent)]"
-                    : "text-[var(--m-muted2)] group-hover:text-[var(--m-accent)]"
-                }`}
-              >
-                {tab.label}
+                <Icon className="size-4" />
               </span>
             </button>
           </Fragment>
