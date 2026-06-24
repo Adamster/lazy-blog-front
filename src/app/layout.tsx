@@ -40,7 +40,7 @@ export default function RootLayout({
             light→dark flash). Runs synchronously ahead of body render. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}var e=document.documentElement;e.setAttribute('data-theme',t);e.classList.toggle('dark',t==='dark');}catch(e){}})();`,
+            __html: `(function(){try{var e=document.documentElement;var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}e.setAttribute('data-theme',t);e.classList.toggle('dark',t==='dark');e.classList.toggle('crt',localStorage.getItem('crt')==='on');}catch(e){}})();`,
           }}
         />
 
@@ -51,12 +51,13 @@ export default function RootLayout({
 
       <body className={`${font.variable} ${display.variable} ${mono.variable}`}>
         <AppProviders>
-          {/* `pt-16` clears the fixed 64px header bar for EVERY route — pages
-              break out horizontally (`mx-[calc(50%-50vw)]`) but stay in this
-              vertical flow, so each page's own top rhythm sits on top of it. */}
-          <main className="mx-auto max-w-4xl pt-[var(--m-header-h)]">
-            {children}
-          </main>
+          {/* This `<main>` clears the fixed header bar for EVERY route
+              (`pt-[var(--m-header-h)]`); pages add no own page-top padding.
+              Intentionally full-width: every page owns its own horizontal
+              constraint (the `mono-scope` breakout pages re-constrain to
+              `max-w-[1240px]` / `780` / `864`; `ErrorMessage`/`Loading`/the auth
+              `Modal` portal self-cap). */}
+          <main className="pt-[var(--m-header-h)]">{children}</main>
         </AppProviders>
         <SpeedInsights />
       </body>
