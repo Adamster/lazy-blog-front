@@ -36,7 +36,6 @@ export function ProfileSecurityForm() {
 
   return (
     <ProfileFormSection
-      eyebrow="// SECURITY"
       onSubmit={handleSubmit(({ oldPassword, newPassword }) =>
         changePassword.mutate({ oldPassword, newPassword })
       )}
@@ -92,7 +91,7 @@ export function ProfileSecurityForm() {
         />
       </div>
 
-      <p className="mt-4 text-[11px] tracking-[0.12em] text-[var(--m-muted2)] uppercase">
+      <p className="mt-4 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)] uppercase">
         {"// you will be signed out after changing your password"}
       </p>
     </ProfileFormSection>

@@ -1,11 +1,10 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import type { UserResponse } from "@/shared/api/openapi";
 import { Avatar } from "@/shared/ui";
-import { ImageCropper } from "@/shared/ui/image-cropper-dynamic";
-import { useUploadAvatar } from "../model/use-upload-avatar";
+import { AvatarCropModal } from "./avatar-crop-modal";
 import { useDeleteAvatar } from "../model/use-delete-avatar";
 
 const focusRing =
@@ -24,12 +23,14 @@ const nameOf = (u?: UserResponse) =>
 
 /**
  * Step-1 LEFT panel of the edit-profile card — the avatar equivalent of
- * {@link PostCoverDropzone}. Same closed 2px box + diagonal film-hatch fill +
- * `md:h-full` stretch (the form panel sets the row height), with a 2px accent
- * top stripe echoing the card's accent edge. Holds a centered 128px avatar (its
- * own letter fallback), a `// AVATAR` label + a drag/format hint, Change / Remove
- * controls, and a `128×128px` caption. Owns the cropper + the
- * {@link useUploadAvatar} / {@link useDeleteAvatar} mutations.
+ * {@link PostCoverDropzone}, same INTERACTION model: the centered 128px avatar
+ * IS the click target (click → replace), hover reveals a `Replace`/`Add` overlay
+ * and, when an avatar is set, a corner trash — no standalone hint or `Change`
+ * button. Unlike the cover it stays centered (not stretched to the column).
+ * Closed 2px box + diagonal film-hatch fill + `md:h-full` stretch. Picking a
+ * file opens the {@link AvatarCropModal} (the composer's cover-crop modal
+ * language — never an inline cropper). Owns the {@link useDeleteAvatar} mutation;
+ * the modal owns the upload.
  */
 export function ProfileAvatarZone({ userData }: ProfileAvatarZoneProps) {
   const userId = userData?.id ?? "";
@@ -37,7 +38,6 @@ export function ProfileAvatarZone({ userData }: ProfileAvatarZoneProps) {
   const [preview, setPreview] = useState("");
   const [cropperOpen, setCropperOpen] = useState(false);
 
-  const uploadAvatar = useUploadAvatar(userId);
   const deleteAvatar = useDeleteAvatar(userId);
 
   const hasAvatar = Boolean(userData?.avatarUrl);
@@ -56,52 +56,45 @@ export function ProfileAvatarZone({ userData }: ProfileAvatarZoneProps) {
     setPreview("");
   };
 
-  const onCrop = (blob: Blob) => {
-    uploadAvatar.mutate(
-      new File([blob], `avatar-${Date.now()}.png`, { type: "image/png" })
-    );
-    closeCropper();
-  };
-
   return (
     <>
       <div
-        className="flex flex-col items-center justify-center gap-6 border-2 border-t-2 border-[var(--m-dim)] border-t-[var(--m-accent)] p-10 md:h-full"
+        className="flex items-center justify-center border-2 border-[var(--m-dim)] p-10 md:h-full"
         style={{ background: FILM_BG }}
       >
-        <Avatar src={userData?.avatarUrl} name={nameOf(userData)} size="lg" />
-
-        <div className="text-center">
-          <div className="mono-label text-[var(--m-muted2)]">{"// AVATAR"}</div>
-          <p className="mt-4 text-[12px] leading-[1.6] text-[var(--m-muted)]">
-            Drag to replace · PNG / JPG · 1:1
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-center gap-3">
+        {/* The avatar IS the click target — same model as the cover dropzone:
+            click to replace, hover reveals the overlay + (when set) a corner
+            trash. Centered (NOT stretched to the column like the cover). */}
+        <div className="group relative">
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className={`mono-btn-outline inline-flex h-9 items-center gap-2 px-4 text-[14px] leading-none font-semibold tracking-[0.06em] ${focusRing}`}
+            aria-label={hasAvatar ? "Replace avatar" : "Add avatar"}
+            className={`relative block overflow-hidden ${focusRing}`}
           >
-            <PencilIcon className="size-3.5" />
-            Change
+            <Avatar
+              src={userData?.avatarUrl}
+              name={nameOf(userData)}
+              size="lg"
+            />
+            <span className="absolute inset-0 flex items-center justify-center bg-[var(--m-bg)]/70 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+              <span className="text-[11px] tracking-[0.12em] text-[var(--m-fg)] uppercase">
+                {hasAvatar ? "Replace" : "Add"}
+              </span>
+            </span>
           </button>
+
           {hasAvatar ? (
             <button
               type="button"
               onClick={() => deleteAvatar.mutate()}
               aria-label="Remove avatar"
-              className={`mono-icon-btn size-9 text-[var(--m-error)] hover:border-[var(--m-error)] hover:text-[var(--m-error)] ${focusRing}`}
+              className={`absolute -top-3 -right-3 z-10 flex size-9 items-center justify-center border-2 border-[var(--m-dim)] bg-[var(--m-bg)] text-[var(--m-error)] opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 hover:border-[var(--m-error)] ${focusRing}`}
             >
               <TrashIcon className="size-3.5" />
             </button>
           ) : null}
         </div>
-
-        <span className="text-[11px] tracking-[0.12em] text-[var(--m-muted2)] uppercase">
-          128 × 128px
-        </span>
 
         <input
           ref={inputRef}
@@ -112,22 +105,13 @@ export function ProfileAvatarZone({ userData }: ProfileAvatarZoneProps) {
         />
       </div>
 
-      {cropperOpen ? (
-        <ImageCropper
-          src={preview}
-          stencilProps={{ aspectRatio: 1 }}
-          sizeRestrictions={{
-            minWidth: 150,
-            minHeight: 150,
-            maxWidth: 4000,
-            maxHeight: 4000,
-          }}
-          canvasWidth={150}
-          canvasHeight={150}
-          onCrop={onCrop}
-          onCancel={closeCropper}
-        />
-      ) : null}
+      <AvatarCropModal
+        src={preview}
+        isOpen={cropperOpen}
+        onOpenChange={closeCropper}
+        userId={userId}
+        onUploaded={closeCropper}
+      />
     </>
   );
 }

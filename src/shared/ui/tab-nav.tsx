@@ -66,7 +66,7 @@ export function TabNav({
               }
               tabIndex={active ? 0 : -1}
               onClick={() => onSelect(tab.id)}
-              className={`group flex items-center gap-2.5 ${focusRing}`}
+              className={`group flex min-h-10 items-center gap-2.5 ${focusRing}`}
             >
               <span
                 aria-hidden="true"

@@ -12,12 +12,13 @@ import { Loading } from "@/shared/ui/loading";
 
 /**
  * Edit-profile screen — the composer's visual language re-dressed for settings.
- * A full-bleed {@link EditProfileTopBar} command band (P / S tab boxes) caps a
- * 1240 two-panel card that mirrors the composer Step-1 cover|form layout: the
- * avatar zone (left, the constant identity anchor — present on both tabs) and
- * the active section form (right). The active tab lives in the URL (`?tab=…`) so
- * it survives refresh / back-forward. Breaks out of the legacy clamped `<main>`
- * via `mono-scope … mx-[calc(50%-50vw)] w-screen` (same as the composer route).
+ * A full-bleed {@link EditProfileTopBar} command band (P / S tab boxes) caps the
+ * active step. Identity (step 1) mirrors the composer Step-1 cover|form layout —
+ * a 1240 two-panel card: avatar zone (left) + identity form (right). Security
+ * (step 2) is a single narrower column (the composer editor measure,
+ * `max-w-[864px]`), no avatar. The active tab lives in the URL (`?tab=…`) so it
+ * survives refresh / back-forward. Breaks out of the legacy clamped `<main>` via
+ * `mono-scope … mx-[calc(50%-50vw)] w-screen` (same as the composer route).
  */
 export default function Profile() {
   const { user } = useUser();
@@ -52,30 +53,44 @@ export default function Profile() {
         className="mono-scope min-h-app mx-[calc(50%-50vw)] w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
         style={{ fontFamily: "var(--font-mono)" }}
       >
-        <EditProfileTopBar current={activeTab} onSelect={selectTab} />
+        <EditProfileTopBar
+          current={activeTab}
+          onSelect={selectTab}
+          cancelHref={user?.userName ? `/${user.userName}` : "/"}
+        />
 
-        {/* 1240 canvas — two adjacent equal-height panels (grid stretch): the
-            avatar (left, fills via `md:h-full`) and the active section form
-            (right, on `--m-card`, sets the row height). One closed 2px box with
-            a continuous accent top edge across both panels. */}
-        <section className="mx-auto max-w-[1240px] px-10 pt-10 pb-10">
-          <div className="grid grid-cols-1 md:grid-cols-2">
-            <ProfileAvatarZone userData={userData} />
-
+        {activeTab === "security" ? (
+          /* Security step — ONE narrower column (the composer editor measure,
+             `max-w-[864px]`), no avatar; a single closed 2px `--m-dim` box. */
+          <section className="mx-auto max-w-[864px] px-10 pt-10 pb-10">
             <div
               role="tabpanel"
               id={`panel-${activeTab}`}
               aria-labelledby={`tab-${activeTab}`}
-              className="border-2 border-t-0 border-[var(--m-dim)] bg-[var(--m-card)] p-7 md:border-t-2 md:border-l-0 md:border-t-[var(--m-accent)] md:p-10"
+              className="border-2 border-[var(--m-dim)] bg-[var(--m-card)] p-7 md:p-10"
             >
-              {activeTab === "security" ? (
-                <ProfileSecurityForm />
-              ) : (
-                <ProfileIdentityForm userData={userData} />
-              )}
+              <ProfileSecurityForm />
             </div>
-          </div>
-        </section>
+          </section>
+        ) : (
+          /* Identity step — 1240 two-panel card (grid stretch): the avatar
+             (left, fills via `md:h-full`) and the identity form (right, on
+             `--m-card`, sets the row height). One closed 2px `--m-dim` box. */
+          <section className="mx-auto max-w-[1240px] px-10 pt-10 pb-10">
+            <div className="grid grid-cols-1 md:grid-cols-2">
+              <ProfileAvatarZone userData={userData} />
+
+              <div
+                role="tabpanel"
+                id={`panel-${activeTab}`}
+                aria-labelledby={`tab-${activeTab}`}
+                className="border-2 border-t-0 border-[var(--m-dim)] bg-[var(--m-card)] p-7 md:border-t-2 md:border-l-0 md:p-10"
+              >
+                <ProfileIdentityForm userData={userData} />
+              </div>
+            </div>
+          </section>
+        )}
       </div>
     </IsAuth>
   );

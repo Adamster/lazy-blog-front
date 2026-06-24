@@ -15,8 +15,8 @@ interface ProfileIdentityFormProps {
 /**
  * Profile-tab identity form — RHF over the {@link useUpdateUser} mutation
  * (success toast + cache invalidation), wrapped in the shared
- * {@link ProfileFormSection} chrome (`// IDENTITY` eyebrow → fields → divider →
- * Save changes). About carries a live char counter like the composer Summary.
+ * {@link ProfileFormSection} chrome (fields → Save changes). About carries a
+ * live char counter like the composer Summary.
  */
 export function ProfileIdentityForm({ userData }: ProfileIdentityFormProps) {
   const updateUser = useUpdateUser(userData?.id ?? "");
@@ -42,7 +42,6 @@ export function ProfileIdentityForm({ userData }: ProfileIdentityFormProps) {
 
   return (
     <ProfileFormSection
-      eyebrow="// IDENTITY"
       onSubmit={handleSubmit((data) => updateUser.mutate(data))}
       actionLabel="Save changes"
       pendingLabel="Saving…"
@@ -98,7 +97,7 @@ export function ProfileIdentityForm({ userData }: ProfileIdentityFormProps) {
             },
           })}
         />
-        <div className="mt-1.5 text-right text-[11px] tracking-[0.12em] text-[var(--m-muted2)] tabular-nums">
+        <div className="mt-1.5 text-right text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)] tabular-nums">
           {aboutLength} / {ABOUT_MAX}
         </div>
       </div>
