@@ -13,12 +13,10 @@
   --m-header-h: 4rem;
 
   /* Layering scale — ONE source for every fixed/portaled overlay so they stack
-     predictably: content < header < CRT < modal < fullscreen-rain < toast. The
-     CRT scanline drape sits over page content + header but under modals/toasts
-     (it's ambience, not chrome); the fullscreen matrix rain is a full takeover
-     above modals but under toasts so the konami unlock toast still reads. */
+     predictably: content < header < modal < fullscreen-rain < toast. The
+     fullscreen matrix rain is a full takeover above modals but under toasts so
+     the konami unlock toast still reads. */
   --m-z-header: 50;
-  --m-z-crt: 55;
   --m-z-modal: 60;
   --m-z-rain: 65;
   --m-z-toast: 70;
@@ -69,6 +67,39 @@
   --m-muted2: #7a7a7a;
   --m-dim: #383838;
   --m-error: #ff6b6b;
+}
+
+/* neo — the third theme ("Matrix"). It is the dark theme PLUS this layer: neo
+   always boots `.dark` + `.neo` (set pre-paint), so it inherits the `.dark`
+   tokens above and overrides on TOP:
+   1. Page roots (`.mono-scope`) drop their `bg-[var(--m-bg)]` to transparent so
+      the fixed Matrix-rain drape shows through the whole canvas. The header
+      wrapper is also a `.mono-scope` but carries no bg, so this is a no-op there.
+   2. The `--m-card` / `--m-panel` surface tokens go more translucent (the dark
+      #232323 / #2a2a2a at 0.70 alpha) so EVERY card/band surface (post byline
+      band, home/profile stat bands, hero, feed cards, menu hover) gets a strong,
+      cohesive rain bleed. `--m-bg` stays opaque, so the dropdown console + the
+      modals (`bg-[var(--m-bg)]`) stay fully solid and readable. Text (`--m-fg`
+      #dcdcdc) over a 0.70 #232323 card composited over the dim rain stays well
+      above AA on the dark canvas. */
+html.neo .mono-scope {
+  background-color: transparent;
+}
+html.neo .mono-scope,
+html.neo .mono-portal {
+  --m-card: rgba(35, 35, 35, 0.7);
+  --m-panel: rgba(42, 42, 42, 0.7);
+}
+/* …but OVERLAYS must stay OPAQUE — dropdowns/menus (`role="menu"`), selects
+   (`role="listbox"`) and the editor (`.milkdown` — toolbar + popovers read
+   `--m-card`/`--m-panel` directly or via `--crepe-color-surface`). Content
+   scrolls behind them, so the translucent rain bleed turns their text
+   unreadable. Reset the surface tokens to their SOLID dark values on them. */
+html.neo [role="menu"],
+html.neo [role="listbox"],
+html.neo .milkdown {
+  --m-card: #232323;
+  --m-panel: #2a2a2a;
 }
 
 /* Cover crop modal — tint react-advanced-cropper's chrome to the Brutalist-Mono
@@ -323,83 +354,13 @@
   }
 }
 
-/* CRT / scanline monitor mode — drape the whole page in scanlines + a soft
-   vignette + a slow flicker. Gated by `html.crt` (set pre-paint by the layout
-   inline script) so it never causes a hydration mismatch; the React overlay is
-   always mounted and merely hidden via this class. */
-@keyframes mono-crt-flicker {
-  0%,
-  100% {
-    opacity: 0.5;
-  }
-  8% {
-    opacity: 0.42;
-  }
-  50% {
-    opacity: 0.62;
-  }
-}
-.mono-crt-scan {
-  position: fixed;
-  inset: 0;
-  z-index: var(--m-z-crt);
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.22) 0px,
-    rgba(0, 0, 0, 0.22) 1px,
-    transparent 2px,
-    transparent 4px
-  );
-  mix-blend-mode: multiply;
-  animation: mono-crt-flicker 3.2s linear infinite;
-}
-.mono-crt-vignette {
-  position: fixed;
-  inset: 0;
-  z-index: var(--m-z-crt);
-  pointer-events: none;
-  box-shadow: inset 0 0 180px 40px rgba(0, 0, 0, 0.55);
-}
-/* Only paint while CRT mode is on. */
-html:not(.crt) .mono-crt-scan,
-html:not(.crt) .mono-crt-vignette {
+/* Ambient Matrix-rain backdrop — NEO THEME ONLY. The rain (the global drape +
+   the error-page backdrop) is the headline visual of the `neo` theme; outside
+   neo it's hidden so the light/dark themes look exactly as before. neo always
+   carries `.dark` + `.neo` (set pre-paint), so the rain only ever paints on the
+   dark canvas. The `neo` class is set pre-paint, so no flash. */
+html:not(.neo) .mono-rain-bg {
   display: none;
-}
-@media (prefers-reduced-motion: reduce) {
-  /* Reduced motion: keep the static scanlines + vignette, drop the flicker. */
-  .mono-crt-scan {
-    animation: none;
-    opacity: 0.5;
-  }
-}
-
-/* Skeleton shimmer — square loading placeholders. A `--m-dim → --m-panel`
-   highlight sweep across the block. */
-@keyframes mono-skeleton {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-.mono-skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--m-dim) 25%,
-    var(--m-panel) 50%,
-    var(--m-dim) 75%
-  );
-  background-size: 200% 100%;
-  animation: mono-skeleton 1.4s linear infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  /* Reduced motion: a flat dim block, no sweep. */
-  .mono-skeleton {
-    animation: none;
-    background: var(--m-dim);
-  }
 }
 
 /* Redaction bar (`:redact[…]` / RevealMark variant="redact") — a solid `--m-fg`
@@ -1110,6 +1071,9 @@ html:not(.crt) .mono-crt-vignette {
 
   /* Square icon-only button — dim border, accent on hover (no uppercase). */
   .mono-icon-btn {
+    /* Pure border, NO fill — consistent everywhere (the floating kebab/dropdown
+       no longer carries an ad-hoc `--m-card` bg either, so all icon buttons read
+       the same: a 2px box, transparent interior). */
     @apply flex flex-none items-center justify-center border-2 border-[var(--m-dim)] text-[var(--m-muted)] transition-colors hover:border-[var(--m-accent)] hover:text-[var(--m-accent)];
   }
 

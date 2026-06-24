@@ -44,7 +44,6 @@ import {
   BootSplash,
 } from "@/shared/ui";
 import { Section, Panel, Spec, State } from "./_helpers";
-import { useCrtMode } from "@/shared/lib/use-crt-mode";
 import { addToastSuccess } from "@/shared/lib/toasts";
 
 /* ------------------------------- shared bits ------------------------------- */
@@ -129,42 +128,6 @@ function TextFxSection() {
           </State>
         </Panel>
       </div>
-    </Section>
-  );
-}
-
-/* -------------------------------- 04 · CRT -------------------------------- */
-
-function CrtSection() {
-  const { crtOn, toggleCrt } = useCrtMode();
-  return (
-    <Section
-      index="04"
-      title="CRT / SCANLINE MODE"
-      intro="Drape the whole page in scanlines + a vignette + a slow flicker, like an old terminal monitor. This is the SAME toggle as the header's crt_mode setting (one source of truth, persisted). Reduced motion keeps the static scanlines, drops the flicker."
-    >
-      <Panel caption="// MONITOR">
-        <div className="flex items-center gap-4">
-          <button
-            type="button"
-            onClick={toggleCrt}
-            aria-pressed={crtOn}
-            className={`inline-flex h-9 items-center justify-center border-2 px-4 text-[11px] font-semibold tracking-[0.12em] uppercase transition-colors ${
-              crtOn
-                ? "border-[var(--m-accent)] bg-[var(--m-accent)] text-[var(--m-bg)]"
-                : "border-[var(--m-dim)] text-[var(--m-muted)] hover:border-[var(--m-accent)] hover:text-[var(--m-accent)]"
-            }`}
-          >
-            {crtOn ? "Turn off CRT" : "Turn on CRT"}
-          </button>
-          <span className="text-[12px] text-[var(--m-muted2)]">
-            {crtOn
-              ? "monitor engaged — scanlines + flicker live"
-              : "flip the switch to feel the 90s"}
-          </span>
-        </div>
-        <Spec label="state" value="useCrtMode · html.crt" />
-      </Panel>
     </Section>
   );
 }
@@ -887,7 +850,6 @@ export function LabTab() {
         <RainSection onFullscreen={openRain} />
         <GlitchHoverSection />
         <TextFxSection />
-        <CrtSection />
         <TerminalSection onTheme={onTermTheme} onMatrix={openRain} />
         <PostInlineFxSection />
         <PostBlockFxSection />
