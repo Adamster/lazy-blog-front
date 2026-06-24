@@ -11,7 +11,11 @@ import {
   getAuthState,
   saveAuthState,
 } from "@/shared/lib/auth-storage";
-import { AUTH_CHANGED_EVENT, expiryFromToken } from "@/shared/lib/auth-refresh";
+import {
+  AUTH_CHANGED_EVENT,
+  expiryFromToken,
+  revokeRefreshToken,
+} from "@/shared/lib/auth-refresh";
 import { userKeys } from "./user-keys";
 
 export function useAuth() {
@@ -112,6 +116,11 @@ export const useAuthActions = () => {
   };
 
   const logout = () => {
+    // Best-effort server-side revocation FIRST, then tear down locally. The
+    // revoke is fire-and-forget (never awaited, errors swallowed) so a network
+    // failure or an expired-access-token 401 can't keep the user logged in.
+    revokeRefreshToken(getAuthState());
+
     clearAuthState();
 
     queryClient.setQueryData(["auth"], getAuthState());

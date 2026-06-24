@@ -99,6 +99,23 @@ export const refreshAccessToken = (): Promise<string | null> => {
   return inFlightRefresh;
 };
 
+/**
+ * Return a currently-valid access token, proactively refreshing first when the
+ * stored one is expired. For authed callers OUTSIDE the api-client middleware
+ * that still issue a raw `fetch` (e.g. the Crepe in-post image upload), so they
+ * don't send a dead token after an idle session — the same proactive-refresh
+ * guarantee the middleware `pre` hook gives normal requests. Returns null when
+ * there's no session.
+ */
+export const getValidAccessToken = async (): Promise<string | null> => {
+  const auth = getAuthState();
+  if (!auth.accessToken) return null;
+  if (isAccessTokenExpired(auth) && auth.refreshToken) {
+    return refreshAccessToken();
+  }
+  return auth.accessToken;
+};
+
 const LOCK_NAME = "auth-refresh";
 
 const runRefreshSerialized = (): Promise<string | null> => {
@@ -111,6 +128,39 @@ const runRefreshSerialized = (): Promise<string | null> => {
   }
 
   return locks.request(LOCK_NAME, () => doRefresh());
+};
+
+/**
+ * Best-effort, single-session refresh-token revocation on logout (closes the
+ * audit's H2 gap: a logout that left the refresh token live server-side).
+ *
+ * Plain `fetch` OUT OF BAND of `apiClient` — deliberately, for two reasons:
+ *   1. The endpoint isn't in the deployed OpenAPI spec yet, so the generated
+ *      client (`gen:api`) doesn't know it.
+ *   2. We do NOT want the api-client token middleware (proactive refresh /
+ *      401 retry) wrapping a logout — we're tearing the session down, not
+ *      keeping it alive.
+ *
+ * FIRE-AND-FORGET: the caller never awaits this. Any failure (network down, an
+ * expired-access-token 401, a 5xx) is swallowed so it can NEVER block or fail
+ * the local logout. The backend is idempotent (an already-used / unknown /
+ * not-owned token still answers 204), so a stale token here is harmless.
+ *
+ * No-ops when either token is missing (already logged out / partial state).
+ */
+export const revokeRefreshToken = (auth: AuthState): void => {
+  if (!auth.accessToken || !auth.refreshToken) return;
+
+  void fetch(`${API_URL}/api/users/logout`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${auth.accessToken}`,
+    },
+    body: JSON.stringify({ refreshToken: auth.refreshToken }),
+  }).catch((error) => {
+    if (isDev) console.error("Logout Revoke Error:", error);
+  });
 };
 
 const doRefresh = async (): Promise<string | null> => {

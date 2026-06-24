@@ -10,6 +10,7 @@ import { insertImageCommand } from "@milkdown/kit/preset/commonmark";
 import { listener, listenerCtx } from "@milkdown/kit/plugin/listener";
 import { useAuth, useUser } from "@/entities/session";
 import { API_URL } from "@/shared/types";
+import { getValidAccessToken } from "@/shared/lib/auth-refresh";
 import { EditorToolbar, type RunCommand } from "./editor-toolbar";
 import { smallMark } from "./editor-small-mark";
 import { effectMarks } from "./editor-effect-marks";
@@ -79,8 +80,13 @@ export default function CrepeEditor({
   });
 
   const imageUploadHandler: ImageUploadHandler = async (file) => {
-    const { auth: a, user: u } = authRef.current;
-    if (!u || !a?.accessToken) return "";
+    const { user: u } = authRef.current;
+    if (!u) return "";
+
+    // Proactively refresh an expired token (this upload bypasses the api-client
+    // middleware) so an in-post image upload after idle doesn't silently 401.
+    const accessToken = await getValidAccessToken();
+    if (!accessToken) return "";
 
     const formData = new FormData();
     formData.append("file", file);
@@ -88,7 +94,7 @@ export default function CrepeEditor({
     try {
       const response = await fetch(`${API_URL}/api/media/${u.id}/upload`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${a.accessToken}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
         body: formData,
       });
 
