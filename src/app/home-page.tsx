@@ -7,13 +7,15 @@ import { DisplayPostResponse, UserResponse } from "@/shared/api/openapi";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { useAllPosts } from "@/features/post/model/use-all-posts";
-import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
+import { useHomeStats } from "@/features/post/model/use-home-stats";
+import { Sparkline, seriesFromMonths } from "@/shared/ui/sparkline";
 import {
   Label,
   Category,
   Metric,
   StatusBadge,
   Dot,
+  MatrixText,
   HomeSkeleton,
 } from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
@@ -28,6 +30,10 @@ const hrefOf = (p: DisplayPostResponse) => `/${p.author.userName}/${p.slug}`;
 // shows a real character).
 const firstLetter = (s?: string) =>
   (s?.match(/[\p{L}\p{N}]/u)?.[0] ?? "•").toUpperCase();
+// Current month, short + uppercase (JAN…DEC) — drives the live `// … · <MONTH>`
+// eyebrow so the highlight period never goes stale.
+const currentMonthLabel = () =>
+  new Date().toLocaleDateString("en-US", { month: "short" }).toUpperCase();
 
 function HeroCover({ post }: { post: DisplayPostResponse }) {
   if (post.coverUrl) {
@@ -54,6 +60,7 @@ function HeroCover({ post }: { post: DisplayPostResponse }) {
 
 export default function HomePage() {
   const query = useAllPosts();
+  const stats = useHomeStats();
   const reduceMotion = useReducedMotion();
 
   const sentinelRef = useInfiniteScroll({
@@ -82,27 +89,13 @@ export default function HomePage() {
     ? rest.slice(0, Math.floor(rest.length / 3) * 3)
     : rest;
 
-  // Monthly stats are derived from the loaded feed until a dedicated API exists.
-  const topPost = posts.reduce(
-    (best, p) => (p.views > best.views ? p : best),
-    posts[0]
-  );
-  const activity = new Map<
-    string,
-    { author: UserResponse; count: number; likes: number }
-  >();
-  posts.forEach((p) => {
-    const key = p.author.userName ?? p.author.id ?? "";
-    const cur = activity.get(key) ?? { author: p.author, count: 0, likes: 0 };
-    cur.count += 1;
-    cur.likes += p.rating ?? 0;
-    activity.set(key, cur);
-  });
-  const topUser = [...activity.values()].sort((a, b) => b.count - a.count)[0];
-
-  // Posts-per-month series: 6 consecutive months (0 for empty), anchored at the
-  // most recent post. Derived from the loaded feed until a dedicated API exists.
-  const series = buildMonthlySeries(posts.map((p) => p.createdAtUtc));
+  // Stats band data comes from the dedicated aggregate endpoint, NOT the feed.
+  // Highlights are null when the current UTC month has no data (backend reports
+  // the month truthfully — the FRONTEND owns the empty state, Option A).
+  const topUser = stats.data?.mostActiveUser;
+  const topPost = stats.data?.topPost;
+  const series = seriesFromMonths(stats.data?.postsByMonth ?? []);
+  const month = currentMonthLabel();
 
   return (
     <div
@@ -126,59 +119,74 @@ export default function HomePage() {
               <div className="mx-auto grid max-w-[1240px] gap-10 px-10 py-10 lg:grid-cols-3">
                 <div className="hidden lg:block">
                   <Label className="mono-label mb-4">
-                    MOST ACTIVE USER · JUN
+                    {`MOST ACTIVE USER · ${month}`}
                   </Label>
-                  {topUser && (
-                    <div className="min-w-0">
-                      <Link
-                        href={`/${topUser.author.userName}`}
-                        className="group block"
-                      >
-                        <div className="mono-title block h-[30px] truncate !leading-[30px] transition-colors group-hover:text-[var(--m-accent)]">
-                          {nameOf(topUser.author)}
-                        </div>
-                      </Link>
-                      <div className="mt-4 flex items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
+                  {!stats.isLoading &&
+                    (topUser ? (
+                      <div className="min-w-0">
                         <Link
-                          href={`/${topUser.author.userName}`}
-                          className="transition-colors hover:text-[var(--m-accent)]"
+                          href={`/${topUser.user.userName}`}
+                          className="group block"
                         >
-                          @{topUser.author.userName}
+                          <div className="mono-title block h-[30px] truncate !leading-[30px] transition-colors group-hover:text-[var(--m-accent)]">
+                            {nameOf(topUser.user)}
+                          </div>
                         </Link>
-                        <Dot />
-                        <span className="flex items-center gap-4">
-                          <Metric kind="posts" value={topUser.count} />
-                          <Metric kind="rating" value={topUser.likes} />
-                        </span>
+                        <div className="mt-4 flex items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
+                          <Link
+                            href={`/${topUser.user.userName}`}
+                            className="transition-colors hover:text-[var(--m-accent)]"
+                          >
+                            @{topUser.user.userName}
+                          </Link>
+                          <Dot />
+                          <span className="flex items-center gap-4">
+                            <Metric kind="posts" value={topUser.postCount} />
+                            <Metric kind="rating" value={topUser.netRating} />
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    ) : (
+                      <Label className="mono-label flex h-[30px] items-center text-[var(--m-muted2)]">
+                        <MatrixText text="NO LEADER YET" />
+                      </Label>
+                    ))}
                 </div>
 
                 <div className="hidden min-w-0 lg:block">
-                  <Label className="mono-label mb-4">TOP POST · JUN</Label>
-                  {topPost && (
-                    <div className="min-w-0">
-                      <Link href={hrefOf(topPost)} className="group block">
-                        <div className="mono-title h-[30px] truncate !leading-[30px] transition-colors group-hover:text-[var(--m-accent)]">
-                          {topPost.title}
-                        </div>
-                      </Link>
-                      <div className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px] text-[var(--m-muted)]">
+                  <Label className="mono-label mb-4">
+                    {`TOP POST · ${month}`}
+                  </Label>
+                  {!stats.isLoading &&
+                    (topPost ? (
+                      <div className="min-w-0">
                         <Link
-                          href={`/${topPost.author.userName}`}
-                          className="transition-colors hover:text-[var(--m-accent)]"
+                          href={`/${topPost.userName}/${topPost.slug}`}
+                          className="group block"
                         >
-                          @{topPost.author.userName}
+                          <div className="mono-title h-[30px] truncate !leading-[30px] transition-colors group-hover:text-[var(--m-accent)]">
+                            {topPost.title}
+                          </div>
                         </Link>
-                        <Dot />
-                        <span className="flex items-center gap-4">
-                          <Metric kind="views" value={topPost.views} />
-                          <Metric kind="rating" value={topPost.rating} />
-                        </span>
+                        <div className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px] text-[var(--m-muted)]">
+                          <Link
+                            href={`/${topPost.userName}`}
+                            className="transition-colors hover:text-[var(--m-accent)]"
+                          >
+                            @{topPost.userName}
+                          </Link>
+                          <Dot />
+                          <span className="flex items-center gap-4">
+                            <Metric kind="views" value={topPost.views} />
+                            <Metric kind="rating" value={topPost.netRating} />
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    ) : (
+                      <Label className="mono-label flex h-[30px] items-center text-[var(--m-muted2)]">
+                        <MatrixText text="WARMING UP ..." />
+                      </Label>
+                    ))}
                 </div>
 
                 <div>

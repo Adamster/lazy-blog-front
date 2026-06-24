@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { buildMonthlySeries } from "./sparkline";
+import { buildMonthlySeries, seriesFromMonths } from "./sparkline";
 
 describe("buildMonthlySeries", () => {
   it("returns a continuous run of N consecutive months (oldest → newest)", () => {
@@ -66,5 +66,47 @@ describe("buildMonthlySeries", () => {
       // Anchored at "now" (June), not the 2020 data point.
       expect(series.at(-1)?.label).toBe("Jun");
     });
+  });
+});
+
+describe("seriesFromMonths", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2024-06-15T00:00:00Z"));
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("maps 1-based PostsPerMonth onto a rolling window anchored at now", () => {
+    // April(4) and June(6); the window is Jan → Jun anchored at the clock.
+    const series = seriesFromMonths([
+      { year: 2024, month: 4, count: 3 },
+      { year: 2024, month: 6, count: 5 },
+    ]);
+    expect(series.map((s) => s.label)).toEqual([
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+    ]);
+    expect(series.map((s) => s.count)).toEqual([0, 0, 0, 3, 0, 5]);
+  });
+
+  it("zero-fills an empty input across the whole window", () => {
+    const series = seriesFromMonths([]);
+    expect(series).toHaveLength(6);
+    expect(series.every((s) => s.count === 0)).toBe(true);
+  });
+
+  it("drops months outside the rolling window", () => {
+    const series = seriesFromMonths([{ year: 2023, month: 1, count: 9 }]);
+    expect(series.every((s) => s.count === 0)).toBe(true);
+  });
+
+  it("respects a custom window length", () => {
+    expect(seriesFromMonths([], 3)).toHaveLength(3);
   });
 });

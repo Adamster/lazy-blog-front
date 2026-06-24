@@ -1,6 +1,38 @@
+import type { PostsPerMonth } from "@/shared/api/openapi";
+
 interface SparklinePoint {
   label: string;
   count: number;
+}
+
+/**
+ * Map a backend `PostsPerMonth[]` (`{ year, month, count }`, month is 1-based
+ * like .NET `DateTime.Month`) onto a CONTINUOUS run of `months` consecutive
+ * buckets (oldest → newest), zero-filling empty months and anchoring the window
+ * at the CURRENT month — the rolling "last N months" view shared by the home
+ * stats band and the profile activity chart. Replaces the old feed-derived
+ * `buildMonthlySeries` for API-backed data.
+ */
+export function seriesFromMonths(
+  months: PostsPerMonth[],
+  count = 6
+): SparklinePoint[] {
+  const counts = new Map<string, number>();
+  for (const m of months) {
+    // month is 1-based on the wire; key on the 0-based JS month.
+    counts.set(`${m.year}-${m.month - 1}`, m.count);
+  }
+
+  const end = new Date();
+  const series: SparklinePoint[] = [];
+  for (let offset = count - 1; offset >= 0; offset--) {
+    const d = new Date(end.getFullYear(), end.getMonth() - offset, 1);
+    series.push({
+      label: d.toLocaleDateString("en-US", { month: "short" }),
+      count: counts.get(`${d.getFullYear()}-${d.getMonth()}`) ?? 0,
+    });
+  }
+  return series;
 }
 
 /**

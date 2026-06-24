@@ -7,6 +7,7 @@ apis/MediaApi.ts
 apis/PostsApi.ts
 apis/ResetPasswordApi.ts
 apis/RoleApi.ts
+apis/StatsApi.ts
 apis/TagsApi.ts
 apis/UsersApi.ts
 apis/index.ts
@@ -18,15 +19,18 @@ models/CommentResponse.ts
 models/CreatePostRequest.ts
 models/DisplayPostResponse.ts
 models/ForgotPasswordRequest.ts
+models/HomeStatsResponse.ts
 models/LoginRequest.ts
 models/LoginResponse.ts
 models/MediaItemResponse.ts
+models/MostActiveUserResponse.ts
 models/NoContent.ts
 models/PostCreatedResponse.ts
 models/PostDetailedResponse.ts
 models/PostRatingHistoryPoint.ts
 models/PostRatingHistoryResponse.ts
 models/PostResponse.ts
+models/PostsPerMonth.ts
 models/ProblemDetails.ts
 models/RefreshTokenRequest.ts
 models/RefreshTokenResponse.ts
@@ -34,6 +38,7 @@ models/RegisterUserRequest.ts
 models/ResetPasswordRequest.ts
 models/TagPostResponse.ts
 models/TagResponse.ts
+models/TopPostResponse.ts
 models/UpdateCommentRequest.ts
 models/UpdatePostRequest.ts
 models/UpdateUserRequest.ts

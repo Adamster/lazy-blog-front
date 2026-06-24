@@ -6,7 +6,7 @@ import { UserResponse } from "@/shared/api/openapi";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { usePostsByUserName } from "@/features/post/model/use-posts-by-username";
-import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
+import { Sparkline, seriesFromMonths } from "@/shared/ui/sparkline";
 import { Label, MatrixText, Avatar, Dot, fmt } from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { formatDate2 } from "@/shared/lib/utils";
@@ -29,22 +29,21 @@ export default function UserPage({ userName }: { userName: string }) {
   if (query.error) return <ErrorMessage error={query.error} />;
 
   const posts = query.data?.pages.flatMap((page) => page.postItems) ?? [];
-  const totalPosts = query.data?.pages[0]?.totalPostCount ?? 0;
-  const user = query.data?.pages[0]?.user;
+  const profile = query.data?.pages[0];
+  const totalPosts = profile?.totalPostCount ?? 0;
+  const user = profile?.user;
   const handle = user?.userName ?? userName;
 
-  // Karma (net rating) / views / activity are derived from the loaded posts
-  // until a dedicated aggregate API exists; they grow as more pages load in.
-  const totalKarma = posts.reduce((sum, p) => sum + (p.rating ?? 0), 0);
-  const totalViews = posts.reduce((sum, p) => sum + (p.views ?? 0), 0);
+  // Karma (net rating) / views / activity are whole-account aggregates off the
+  // profile response — NOT summed from the loaded page (which only sees what's
+  // paginated in so far).
+  const totalKarma =
+    (profile?.totalUpVotes ?? 0) - (profile?.totalDownVotes ?? 0);
+  const totalViews = profile?.totalViews ?? 0;
 
-  // Activity: a rolling "last 6 months" window anchored at the current month
-  // (0 for empty months). Derived from loaded posts until a dedicated API exists.
-  const series = buildMonthlySeries(
-    posts.map((p) => p.createdAtUtc),
-    6,
-    true
-  );
+  // Activity: rolling "last 6 months" window (0 for empty months), mapped from
+  // the per-month post counts the backend returns.
+  const series = seriesFromMonths(profile?.activity ?? []);
 
   return (
     <div

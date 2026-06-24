@@ -26,4 +26,6 @@ export const postKeys = {
   detail: (slug: string) => ["getPostBySlug", slug] as const,
   /** A post's rating history — up/down counts + cumulative series, keyed by slug. */
   ratingHistory: (slug: string) => ["getPostRatingHistory", slug] as const,
+  /** Aggregate home stats — most-active user / top post / posts-by-month. */
+  homeStats: () => ["getHomeStats"] as const,
 };

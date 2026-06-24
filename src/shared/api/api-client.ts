@@ -11,6 +11,7 @@ import {
   MediaApi,
   PostsApi,
   ResetPasswordApi,
+  StatsApi,
   TagsApi,
   UsersApi,
 } from "./openapi";
@@ -102,6 +103,7 @@ export const apiClient = {
   posts: new PostsApi(configuration),
   comments: new CommentsApi(configuration),
   tags: new TagsApi(configuration),
+  stats: new StatsApi(configuration),
   media: new MediaApi(configuration),
   changePassword: new ChangePasswordApi(configuration),
   forgotPassword: new ForgotPasswordApi(configuration),
