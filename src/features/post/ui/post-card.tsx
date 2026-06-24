@@ -3,6 +3,7 @@ import Link from "next/link";
 import { DisplayPostResponse, UserPostItem } from "@/shared/api/openapi";
 import { Category, Metric, DraftOverlay } from "@/shared/ui";
 import { formatDate2 } from "@/shared/lib/utils";
+import { UNTAGGED_LABEL } from "../lib/untagged-label";
 
 /** Feed row shared by the home feed (`DisplayPostResponse`) and a user's
  *  profile feed (`UserPostItem`) — the two models share every card field. */
@@ -17,7 +18,7 @@ interface PostCardMonoProps {
   authorHandle?: string;
 }
 
-const catOf = (p: FeedPost) => p.tags?.[0]?.tag ?? "post";
+const catOf = (p: FeedPost) => p.tags?.[0]?.tag ?? UNTAGGED_LABEL;
 
 // First letter/digit of a title (skips punctuation) for the no-cover fallback.
 const firstLetter = (s?: string) =>

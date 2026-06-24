@@ -39,7 +39,7 @@ export function Menu({ items, triggerLabel }: MenuProps) {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex size-8 items-center justify-center bg-transparent text-[var(--m-muted2)] transition-colors hover:text-[var(--m-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
+        className="mono-icon-btn size-9 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
       >
         <EllipsisVerticalIcon className="size-[18px]" />
       </button>
@@ -49,7 +49,7 @@ export function Menu({ items, triggerLabel }: MenuProps) {
       {open && (
         <div
           role="menu"
-          className="absolute top-0 right-full z-30 mr-2 flex items-center gap-2"
+          className="absolute top-0 right-full z-30 mr-3 flex items-center gap-2"
         >
           {items.map((item) => {
             const label = typeof item.label === "string" ? item.label : item.id;
@@ -65,7 +65,7 @@ export function Menu({ items, triggerLabel }: MenuProps) {
                   item.onSelect();
                 }}
                 className={
-                  "mono-icon-btn size-9 bg-[var(--m-card)] [&>svg]:size-[18px] " +
+                  "mono-icon-btn size-9 [&>svg]:size-[18px] " +
                   (item.danger
                     ? "text-[var(--m-error)] hover:border-[var(--m-error)] hover:text-[var(--m-error)]"
                     : "")

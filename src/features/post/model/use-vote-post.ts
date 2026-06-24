@@ -136,6 +136,10 @@ export const useVotePost = (postId: string, postSlug: string) => {
         queryKey: historyKey,
         refetchType: "none",
       });
+      // A vote moves net rating → the home highlights (top post / most active
+      // user / monthly net) can shift, so mark the home stats stale. Default
+      // refetchType: refetch if home is mounted, else reconcile on next visit.
+      queryClient.invalidateQueries({ queryKey: postKeys.homeStats() });
     },
   });
 };

@@ -14,6 +14,7 @@ import {
   StatusBadge,
 } from "@/shared/ui";
 import type { Status } from "@/shared/ui";
+import { UNTAGGED_LABEL } from "../lib/untagged-label";
 
 interface IProps {
   post: PostDetailedResponse;
@@ -118,7 +119,7 @@ export const PostView = ({
   comments,
   commentsCount,
 }: IProps) => {
-  const cat = post.tags?.[0]?.tag ?? "post";
+  const cat = post.tags?.[0]?.tag ?? UNTAGGED_LABEL;
 
   // Status badge slot — pinned top-right of the header, same accent-chip
   // treatment as the home hero. No backing field yet; set this when a
