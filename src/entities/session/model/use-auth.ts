@@ -5,17 +5,13 @@ import { AuthContext } from "@/entities/session/provider/auth-provider";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect } from "react";
 import {
+  AUTH_STORAGE_KEY,
   AuthState,
   clearAuthState,
   getAuthState,
   saveAuthState,
 } from "@/shared/lib/auth-storage";
-import {
-  ACCESS_TOKEN_TTL_MS,
-  AUTH_CHANGED_EVENT,
-  isAccessTokenExpired,
-  refreshAccessToken,
-} from "@/shared/lib/auth-refresh";
+import { AUTH_CHANGED_EVENT, expiryFromToken } from "@/shared/lib/auth-refresh";
 import { userKeys } from "./user-keys";
 
 export function useAuth() {
@@ -29,29 +25,40 @@ export function useAuth() {
 export const useAuthState = () => {
   const queryClient = useQueryClient();
 
-  // Re-sync the `["auth"]` cache whenever the api-client middleware refreshes or
-  // clears the session out of band (it writes localStorage but not the query
-  // cache). On a failed refresh this drops the UI to logged-out instead of
-  // leaving authed chrome that 401s on every call; on a successful refresh it's
-  // a harmless re-read (userId is unchanged).
+  // Keep the `["auth"]` cache in sync with localStorage from BOTH directions of
+  // out-of-band change:
+  //   • `auth-changed` (same tab) — the api-client middleware refreshes/clears
+  //     the session by writing localStorage, not the query cache. On a failed
+  //     refresh this drops the UI to logged-out instead of leaving authed chrome
+  //     that 401s on every call; on a success it's a harmless re-read.
+  //   • `storage` (OTHER tabs) — a refresh/clear in a sibling tab rotates the
+  //     token in localStorage but fires NO `auth-changed` here. Without this,
+  //     this tab would keep serving the now-rotated token from its cache and
+  //     401-loop. The `storage` event only fires in tabs OTHER than the writer,
+  //     so it's exactly the cross-tab gap the same-tab event misses.
   useEffect(() => {
     const sync = () => queryClient.setQueryData(["auth"], getAuthState());
+
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === AUTH_STORAGE_KEY || event.key === null) sync();
+    };
+
     window.addEventListener(AUTH_CHANGED_EVENT, sync);
-    return () => window.removeEventListener(AUTH_CHANGED_EVENT, sync);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener(AUTH_CHANGED_EVENT, sync);
+      window.removeEventListener("storage", onStorage);
+    };
   }, [queryClient]);
 
+  // PURE READER: just mirror localStorage into the cache. The api-client
+  // middleware now guarantees no request leaves with a dead token (proactive
+  // `pre` refresh + 401 safety net), so the cache no longer needs to pre-refresh
+  // on read. `isAuthenticated` keys off `userId`, so a momentarily-stale token
+  // sitting in the cache is harmless — the next request refreshes it in-band.
   return useQuery<AuthState>({
     queryKey: ["auth"],
-    queryFn: async () => {
-      const storedAuth = getAuthState();
-
-      if (storedAuth.refreshToken && isAccessTokenExpired(storedAuth)) {
-        await refreshToken(queryClient);
-        return getAuthState();
-      }
-
-      return storedAuth;
-    },
+    queryFn: () => getAuthState(),
     staleTime: Infinity,
   });
 };
@@ -69,7 +76,9 @@ export const useAuthActions = () => {
         userId: response.user.id!,
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
-        accessTokenExpires: Date.now() + ACCESS_TOKEN_TTL_MS,
+        // Anchor expiry to the token's own `exp` (scheduling only), not a
+        // hardcoded TTL + the client clock at receipt.
+        accessTokenExpires: expiryFromToken(response.accessToken),
       };
 
       saveAuthState(authState);
@@ -89,7 +98,10 @@ export const useAuthActions = () => {
     }
   };
 
-  const loginWithGoogle = async () => {
+  // Synchronous: this only navigates the browser away (the page unloads), so the
+  // old `async`/`Promise<void>` signature was misleading — there's nothing to
+  // await.
+  const loginWithGoogle = () => {
     const returnUrl = `${window.location.origin}/api/auth/external-callback`;
 
     const loginUrl =
@@ -120,22 +132,4 @@ export const useAuthActions = () => {
   };
 
   return { login, logout, register, loginWithGoogle };
-};
-
-/**
- * React-aware wrapper over the shared, deduped `refreshAccessToken()`: it owns
- * the network refresh + localStorage write; this only syncs the result into the
- * query cache. On a failed refresh (`null`) the session is over, so drop the
- * user cache too.
- */
-export const refreshToken = async (
-  queryClient: ReturnType<typeof useQueryClient>
-) => {
-  const newToken = await refreshAccessToken();
-
-  queryClient.setQueryData(["auth"], getAuthState());
-
-  if (!newToken) {
-    queryClient.removeQueries({ queryKey: userKeys.byId() });
-  }
 };

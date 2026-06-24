@@ -5,14 +5,7 @@ import {
 } from "@/entities/session/model/use-auth";
 import React, { createContext } from "react";
 import { UserProvider } from "@/entities/session/provider/user-provider";
-import { AuthState } from "@/shared/lib/auth-storage";
-
-const EMPTY_AUTH: AuthState = {
-  userId: null,
-  accessToken: null,
-  refreshToken: null,
-  accessTokenExpires: null,
-};
+import { AuthState, EMPTY_AUTH } from "@/shared/lib/auth-storage";
 
 /**
  * Three-state auth resolution. `"loading"` is distinct from `"unauthenticated"`
@@ -27,7 +20,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   register: (registerData: RegisterUserRequest) => Promise<void>;
-  loginWithGoogle: () => Promise<void>;
+  loginWithGoogle: () => void;
   isAuthenticated: boolean;
   authStatus: AuthStatus;
 }
