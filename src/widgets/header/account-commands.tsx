@@ -2,6 +2,7 @@
 
 import {
   UserIcon,
+  AtSymbolIcon,
   PencilSquareIcon,
   ArrowRightStartOnRectangleIcon,
   ArrowRightEndOnRectangleIcon,
@@ -10,6 +11,8 @@ import { BracketIcon, CommandButton, CommandLink } from "./command-row";
 
 interface AccountCommandsProps {
   isAuthenticated: boolean;
+  /** Signed-in handle → links to the public profile (a menu row now). */
+  userName?: string;
   /** Whether the menu is open (gates tab-reachability of the rows). */
   open: boolean;
   /** Close the menu after navigating. */
@@ -27,6 +30,7 @@ interface AccountCommandsProps {
  */
 export function AccountCommands({
   isAuthenticated,
+  userName,
   open,
   onNavigate,
   onLogin,
@@ -46,6 +50,18 @@ export function AccountCommands({
 
   return (
     <>
+      {/* Signed-in handle → the PUBLIC profile (`/username`). A menu row now,
+          one of the items — no longer pinned atop the menu / the header bar. */}
+      {userName && (
+        <CommandLink
+          href={`/${userName}`}
+          onClick={onNavigate}
+          tabbable={open}
+          trailing={<BracketIcon Icon={AtSymbolIcon} />}
+        >
+          @{userName}
+        </CommandLink>
+      )}
       <CommandLink
         href="/create"
         onClick={onNavigate}
@@ -54,8 +70,7 @@ export function AccountCommands({
       >
         create_post
       </CommandLink>
-      {/* edit_profile → the profile settings page (redesign pending). The PUBLIC
-          profile is reachable via the `@handle` in the header bar now. */}
+      {/* edit_profile → the profile settings page (redesign pending). */}
       <CommandLink
         href="/profile"
         onClick={onNavigate}
