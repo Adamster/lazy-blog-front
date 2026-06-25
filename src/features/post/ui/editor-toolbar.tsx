@@ -33,25 +33,11 @@ import {
   BoltIcon,
   CommandLineIcon,
   SwatchIcon,
-  EyeSlashIcon,
-  NoSymbolIcon,
-  ArrowDownTrayIcon,
-  Square3Stack3DIcon,
-  ViewfinderCircleIcon,
-  BackspaceIcon,
-  CursorArrowRaysIcon,
 } from "@heroicons/react/24/outline";
 import { toggleSmallCommand } from "./editor-small-mark";
 import {
   toggleGlitchCommand,
   toggleMatrixCommand,
-  toggleRedactCommand,
-  toggleSpoilerCommand,
-  toggleTypeCommand,
-  toggleKbdCommand,
-  toggleScanCommand,
-  toggleStrikeFxCommand,
-  toggleWaveCommand,
 } from "./editor-effect-marks";
 import {
   setPrimaryCommand,
@@ -279,10 +265,13 @@ export function EditorToolbar({
     },
   ];
 
-  // Inline brand effects — toggle a custom mark on the selection. Each
+  // Inline brand effects — toggle a custom mark on the selection. The Effects ▾
+  // menu offers ONLY the two approved marks (Glitch + Matrix); the other inline
+  // directives (`:redact` / `:spoiler` / `:type` / `:kbd` / `:scan` / `:strike` /
+  // `:wave`) still RENDER in the read view but are no longer authored here
+  // (pulled from the Lab prematurely, pending owner approval). Each approved mark
   // round-trips through markdown as a remark directive (`:glitch[…]` /
-  // `:matrix[…]` / `:redact[…]` / `:spoiler[…]` / `:type[…]` / `:kbd[…]` /
-  // `:scan[…]`) and renders its full component in the read view.
+  // `:matrix[…]`) and renders its full component in the read view.
   // TODO(block-fx): the BLOCK directives (`::divider`, `:::quote`,
   // `:::callout`, `:::terminal`) already render in the read view (post-body.tsx
   // + prose.css), but have NO editor authoring UI yet — Crepe block nodes are
@@ -301,48 +290,6 @@ export function EditorToolbar({
       label: "Matrix",
       icon: CommandLineIcon,
       run: () => onCommand(toggleMatrixCommand),
-    },
-    {
-      id: "redact",
-      label: "Redact",
-      icon: NoSymbolIcon,
-      run: () => onCommand(toggleRedactCommand),
-    },
-    {
-      id: "spoiler",
-      label: "Spoiler",
-      icon: EyeSlashIcon,
-      run: () => onCommand(toggleSpoilerCommand),
-    },
-    {
-      id: "type",
-      label: "Type (decode)",
-      icon: ArrowDownTrayIcon,
-      run: () => onCommand(toggleTypeCommand),
-    },
-    {
-      id: "kbd",
-      label: "Keycap",
-      icon: Square3Stack3DIcon,
-      run: () => onCommand(toggleKbdCommand),
-    },
-    {
-      id: "scan",
-      label: "Scan",
-      icon: ViewfinderCircleIcon,
-      run: () => onCommand(toggleScanCommand),
-    },
-    {
-      id: "strike-fx",
-      label: "Strike (edit)",
-      icon: BackspaceIcon,
-      run: () => onCommand(toggleStrikeFxCommand),
-    },
-    {
-      id: "wave",
-      label: "Wave",
-      icon: CursorArrowRaysIcon,
-      run: () => onCommand(toggleWaveCommand),
     },
   ];
 
