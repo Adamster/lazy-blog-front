@@ -5,7 +5,7 @@ import { useUser } from "@/entities/session";
 import { useAddComment } from "@/features/comment/model/use-add-comment";
 import { useUpdateComment } from "@/features/comment/model/use-update-comment";
 import { FaceSmileIcon } from "@heroicons/react/24/outline";
-import { IconSubmitButton } from "@/shared/ui";
+import { IconSubmitButton, UnderlineTabs } from "@/shared/ui";
 import {
   useCallback,
   useEffect,
@@ -14,6 +14,9 @@ import {
   useState,
 } from "react";
 import { useClickOutside } from "react-haiku";
+import { GifPicker } from "@/features/comment/ui/gif-picker";
+import { appendGif } from "@/features/comment/lib/comment-gif";
+import type { GifResult } from "@/features/comment/lib/giphy";
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
@@ -69,9 +72,16 @@ interface IProps {
   setIsEditComment?: (param: boolean) => void;
 }
 
+const PICKER_TABS = [
+  { id: "emoji", label: "Emoji" },
+  { id: "gif", label: "GIF" },
+] as const;
+type PickerTab = (typeof PICKER_TABS)[number]["id"];
+
 function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
   const [body, setBody] = useState(editComment?.body || "");
   const [showEmoji, setShowEmoji] = useState(false);
+  const [pickerTab, setPickerTab] = useState<PickerTab>("emoji");
   const [focused, setFocused] = useState(false);
   const { user } = useUser();
   const pickerRef = useRef<HTMLDivElement>(null);
@@ -110,6 +120,12 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
 
   const insertEmoji = (emoji: string) => {
     setBody((prev) => prev + emoji);
+    setShowEmoji(false);
+    taRef.current?.focus();
+  };
+
+  const insertGif = (gif: GifResult) => {
+    setBody((prev) => appendGif(prev, gif.fullUrl));
     setShowEmoji(false);
     taRef.current?.focus();
   };
@@ -176,7 +192,7 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
           <button
             ref={emojiButtonRef}
             type="button"
-            aria-label="Insert emoji"
+            aria-label="Insert emoji or GIF"
             aria-haspopup="dialog"
             aria-expanded={showEmoji}
             onClick={() => setShowEmoji((state) => !state)}
@@ -188,24 +204,43 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
           {showEmoji && (
             <div
               role="dialog"
-              aria-label="Emoji picker"
-              className="absolute bottom-full left-0 z-50 mb-2 w-72 border-2 border-[var(--m-dim)] bg-[var(--m-dim)]"
+              aria-label="Emoji and GIF picker"
+              className="absolute bottom-full left-0 z-50 mb-2 w-72 max-w-[calc(100vw-2rem)] border-2 border-[var(--m-dim)] bg-[var(--m-bg)]"
             >
-              {/* Faint brutalist grid — the outer border AND the 2px gap rules
-                  are both `--m-dim` (cells `--m-card`), so the whole thing reads
-                  subtly, edge to edge. */}
-              <div className="grid grid-cols-8 gap-[2px]">
-                {EMOJIS.map((emoji) => (
-                  <button
-                    key={emoji}
-                    type="button"
-                    aria-label={`Insert ${emoji}`}
-                    onClick={() => insertEmoji(emoji)}
-                    className={`flex aspect-square items-center justify-center bg-[var(--m-card)] text-[20px] leading-none transition-colors hover:bg-[var(--m-panel)] ${focusRing}`}
-                  >
-                    {emoji}
-                  </button>
-                ))}
+              <UnderlineTabs
+                tabs={PICKER_TABS}
+                current={pickerTab}
+                onSelect={(id) => setPickerTab(id as PickerTab)}
+                ariaLabel="Emoji or GIF"
+                panelIdPrefix="comment-picker-"
+                className="px-3 pt-2.5"
+              />
+
+              <div
+                role="tabpanel"
+                id={`comment-picker-${pickerTab}`}
+                aria-labelledby={`tab-${pickerTab}`}
+              >
+                {pickerTab === "emoji" ? (
+                  // Faint brutalist grid — the outer border AND the 2px gap
+                  // rules are both `--m-dim` (cells `--m-card`), so it reads
+                  // subtly, edge to edge.
+                  <div className="grid grid-cols-8 gap-[2px] bg-[var(--m-dim)]">
+                    {EMOJIS.map((emoji) => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        aria-label={`Insert ${emoji}`}
+                        onClick={() => insertEmoji(emoji)}
+                        className={`flex aspect-square items-center justify-center bg-[var(--m-card)] text-[20px] leading-none transition-colors hover:bg-[var(--m-panel)] ${focusRing}`}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <GifPicker onPick={insertGif} />
+                )}
               </div>
             </div>
           )}

@@ -10,6 +10,7 @@ import CommentForm from "@/features/comment/ui/comment-form";
 import { formatDate2 } from "@/shared/lib/utils";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
 import { Avatar, Dot, Menu, type MenuItem } from "@/shared/ui";
+import { parseCommentBody } from "@/features/comment/lib/comment-gif";
 
 interface IProps {
   comment: CommentResponse;
@@ -70,6 +71,10 @@ const CommentView = ({ comment, postId }: IProps) => {
   };
 
   const handle = comment.user.userName ?? "";
+
+  // Split off a trailing whitelisted GIF (Giphy/Tenor only); untrusted markdown
+  // stays part of the text and renders literally.
+  const { text, gifUrl } = parseCommentBody(comment.body);
 
   const menuItems: MenuItem[] = [
     {
@@ -136,9 +141,25 @@ const CommentView = ({ comment, postId }: IProps) => {
           <span className="text-[14px] leading-[1.6] font-bold text-[var(--m-accent)]">
             &gt;
           </span>
-          <p className="text-[14px] leading-[1.6] whitespace-pre-line text-[var(--m-fg)]">
-            {withBigEmoji(comment.body)}
-          </p>
+          <div className="min-w-0">
+            {text && (
+              <p className="text-[14px] leading-[1.6] whitespace-pre-line text-[var(--m-fg)]">
+                {withBigEmoji(text)}
+              </p>
+            )}
+            {gifUrl && (
+              // Whitelisted Giphy/Tenor URL only (see comment-gif.ts). Plain
+              // <img> — these hosts aren't in next.config remotePatterns and the
+              // owner can't edit Vercel config; framed on-system, capped width.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={gifUrl}
+                alt="GIF"
+                loading="lazy"
+                className={`max-w-[280px] border-2 border-[var(--m-dim)] ${text ? "mt-3" : ""}`}
+              />
+            )}
+          </div>
         </div>
       )}
 
