@@ -26,10 +26,7 @@ export function Header() {
 
   const auth = useToggle();
 
-  // TODO(i18n): stub — no translation layer yet, this only flips the indicator.
-  // Wire it to a real i18n provider (+ persistence) when one lands.
-  const [lang, setLang] = useState<"en" | "ru">("en");
-  const toggleLang = () => setLang((prev) => (prev === "en" ? "ru" : "en"));
+  // Lang toggle is hidden for now (i18n is a backlog item) — no lang state here.
 
   const close = () => setOpen(false);
 
@@ -115,8 +112,6 @@ export function Header() {
                   open={open}
                   theme={theme}
                   onCycleTheme={cycleTheme}
-                  lang={lang}
-                  onToggleLang={toggleLang}
                 />
               </motion.div>
 

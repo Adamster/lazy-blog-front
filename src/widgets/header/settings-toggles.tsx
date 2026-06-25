@@ -26,14 +26,12 @@ interface SettingsTogglesProps {
   open: boolean;
   theme: Theme;
   onCycleTheme: () => void;
-  lang: "en" | "ru";
-  onToggleLang: () => void;
 }
 
 /**
- * Settings block — the lang + theme controls grouped under a `// settings`
- * console comment. Both keep the menu open so the user can flip them in place.
- * Order: theme → lang.
+ * Settings block — the theme control under a `// settings` console comment. Keeps
+ * the menu open so the user can flip it in place. (The lang toggle is HIDDEN for
+ * now — i18n is a backlog item; re-add the row here when wiring i18n.)
  *
  * `theme` is a single cycling control (light → dark → neo → light) — a theme is
  * mutually-exclusive by nature, so neo is just a third theme value here, not a
@@ -44,8 +42,6 @@ export function SettingsToggles({
   open,
   theme,
   onCycleTheme,
-  lang,
-  onToggleLang,
 }: SettingsTogglesProps) {
   return (
     <div>
@@ -64,15 +60,6 @@ export function SettingsToggles({
         }
       >
         theme
-      </CommandButton>
-
-      {/* lang — flips the indicator (i18n wiring pending) */}
-      <CommandButton
-        onClick={onToggleLang}
-        tabbable={open}
-        trailing={<ToggleIndicator active>[ {lang} ]</ToggleIndicator>}
-      >
-        lang
       </CommandButton>
     </div>
   );
