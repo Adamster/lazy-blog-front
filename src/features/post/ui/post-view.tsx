@@ -46,11 +46,6 @@ const nameOf = (u: AuthorPostResponse) =>
   u.userName ||
   "Unknown";
 
-const readTimeOf = (body: string) => {
-  const words = body.trim().split(/\s+/).filter(Boolean).length;
-  return Math.max(1, Math.round(words / 200));
-};
-
 /** Author tile + name/handle/date + view·like·comment metrics band. */
 function PostByline({
   post,
@@ -60,7 +55,6 @@ function PostByline({
   commentsCount: ReactNode;
 }) {
   const authorHandle = post.author.userName ?? "";
-  const readTime = readTimeOf(post.body);
 
   return (
     <section className="mx-[calc(50%-50vw)] mt-10 w-screen bg-[var(--m-card)]">
@@ -85,13 +79,11 @@ function PostByline({
             </Link>
             <Dot />
             <span>{formatDate2(post.createdAtUtc)}</span>
-            <Dot />
-            <span>{readTime} min read</span>
           </span>
         </div>
 
         {/* Right side: metrics cluster — between-metrics gap 16 (gap-4). */}
-        <div className="ml-auto flex items-center gap-4 text-[12px] text-[var(--m-muted)]">
+        <div className="flex items-center gap-4 text-[12px] text-[var(--m-muted)] sm:ml-auto">
           <Metric kind="views" value={post.views ?? 0} />
           {/* Comment count is a slotted client island (live query) — hand-rolled
               to match the Metric primitive (gap-1 icon→number, size-3.5 icon). */}
