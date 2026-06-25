@@ -53,7 +53,7 @@ export function Header() {
             <HeaderLockup />
             {theme === "neo" && isAuthenticated && (
               <Link
-                href="/arcade/snake"
+                href="/arcade/follow-the-rabbit"
                 aria-label="Follow the white rabbit"
                 className="mono-jiggle ml-3 hidden shrink-0 opacity-80 transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)] sm:inline-flex"
               >

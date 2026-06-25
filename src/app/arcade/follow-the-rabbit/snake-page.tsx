@@ -112,7 +112,7 @@ function NotTheOne() {
  */
 function SnakeArcade() {
   const rejected = useRejectedFromMatrix();
-  const { game, board } = useSnakeArcade();
+  const { game, board, statsLoading, boardLoading } = useSnakeArcade();
 
   return (
     <div
@@ -126,14 +126,18 @@ function SnakeArcade() {
 
         {/* Stats band — full-bleed, matches the profile/home stats band. */}
         <div className="mt-10">
-          <SnakeStatsBand state={game.state} history={game.history} />
+          <SnakeStatsBand
+            state={game.state}
+            history={game.history}
+            statsLoading={statsLoading}
+          />
         </div>
 
         {/* Stage — board (left, fills the column) + leaderboard (right), a clean
             40px gap (no trailing cap) between them. */}
         <div className="mt-10 grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
           <SnakeBoard api={game} />
-          <SnakeLeaderboard board={board} />
+          <SnakeLeaderboard board={board} loading={boardLoading} />
         </div>
       </main>
 
