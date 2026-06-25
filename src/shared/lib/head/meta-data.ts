@@ -7,6 +7,12 @@ interface Props {
   type?: string;
   card?: string;
   url?: string;
+  /**
+   * Hide the page from search engines (`robots: noindex, nofollow`). Used for
+   * internal / non-content routes that shouldn't be indexed — the `/brand`
+   * design-system reference and the `/arcade` game.
+   */
+  noindex?: boolean;
 }
 
 export const generateMeta = ({
@@ -16,6 +22,7 @@ export const generateMeta = ({
   type = "website",
   card = "summary_large_image",
   url,
+  noindex = false,
 }: Props) => {
   const fullTitle = title ? `${title} | !Lazy Blog` : "!Lazy Blog";
   const fullUrl = url ? `${SITE_URL}${url}` : SITE_URL;
@@ -36,6 +43,6 @@ export const generateMeta = ({
       images: [image],
       card: card,
     },
-    robots: "index, follow",
+    robots: noindex ? "noindex, nofollow" : "index, follow",
   };
 };

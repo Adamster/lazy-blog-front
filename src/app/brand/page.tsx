@@ -5,6 +5,7 @@ import BrandPage from "./brand-page";
 
 export const metadata: Metadata = generateMeta({
   title: "Brand Identity",
+  noindex: true,
 });
 
 // `BrandPage` reads `useSearchParams` (the `?tab=`) — give it its own Suspense
