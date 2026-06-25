@@ -1,13 +1,682 @@
+/* Crepe (Milkdown) editor — "Brutalist Mono" theme override.
+ *
+ * The WYSIWYG editor's editable area is `.ProseMirror`, wrapped here in
+ * `.mono-prose` (see `crepe.tsx`). `src/assets/styles/prose.css` is the single
+ * source of truth for prose styling and is shared with the server-rendered read
+ * view (`<PostBody>`), so what you type is 1:1 with the published page.
+ *
+ * Crepe ships its own theme (`@milkdown/crepe/theme/common/style.css`) whose
+ * rules are scoped `.milkdown .ProseMirror <tag>` (specificity 0-2-1) and beat
+ * the read view's `.mono-prose <tag>` (0-2-0). This file:
+ *   1. strips Crepe's editor padding / hides block handles (editor chrome only),
+ *   2. re-asserts the `prose.css` scale at `.mono-prose .ProseMirror …`
+ *      specificity so the editable content renders identically to the read view.
+ * Values here MUST mirror `prose.css` — keep the two in lockstep. */
+
 .milkdown {
   width: 100%;
   background: transparent;
 
+  /* Crepe's common theme ships only structure — the `--crepe-color-*` palette
+     lives in its (light/dark) color themes, which we don't import (they'd fight
+     our token system + dark mode). Without them every chrome surface — toolbar,
+     slash/block menu, link tooltip, code mirror — resolves to undefined colors
+     and renders "all black". Map the full Crepe palette onto our `--m-*` tokens
+     so the editor chrome inherits the Brutalist-Mono theme and tracks light/dark
+     automatically (the tokens already flip under `.dark .mono-scope`). */
+  --crepe-color-background: var(--m-bg);
+  --crepe-color-on-background: var(--m-fg);
+  --crepe-color-surface: var(--m-card);
+  --crepe-color-surface-low: var(--m-panel);
+  --crepe-color-on-surface: var(--m-fg);
+  --crepe-color-on-surface-variant: var(--m-muted);
+  --crepe-color-outline: var(--m-dim);
+  --crepe-color-primary: var(--m-accent);
+  --crepe-color-secondary: var(--m-panel);
+  --crepe-color-on-secondary: var(--m-fg);
+  --crepe-color-inverse: var(--m-fg);
+  --crepe-color-on-inverse: var(--m-bg);
+  --crepe-color-inline-code: var(--m-accent);
+  --crepe-color-error: var(--m-error);
+  --crepe-color-hover: var(--m-panel);
+  --crepe-color-selected: var(--m-dim);
+  --crepe-color-inline-area: var(--m-panel);
+
+  --crepe-font-title: var(--font-display);
+  --crepe-font-default: var(--font-mono);
+  --crepe-font-code: var(--font-mono);
+
+  --crepe-shadow-1: 0 1px 3px 1px rgba(0, 0, 0, 0.12);
+  --crepe-shadow-2: 0 2px 6px 2px rgba(0, 0, 0, 0.16);
+
   .ProseMirror {
     padding: 0;
-    min-height: 20rem;
+    /* AUTO height — no fixed minimum; the boxless editor grows with its content
+       instead of reserving a tall empty canvas (was `20rem`). */
+    min-height: 0;
+
+    /* Kill the browser's blue `:focus-visible` ring on the editable — the 2px
+       frame around the column is the focus affordance, not a UA outline. */
+    &:focus,
+    &:focus-visible {
+      outline: none;
+    }
   }
 
   .milkdown-block-handle {
     display: none;
+  }
+
+  /* ── Slash menu (`/` command palette) — brutalist frame ──
+     Square, 2px dim border + 2px accent top stripe, no shadow, no radius.
+     Capped width within the 780 column; capped height with the shared
+     `.mono-scrollbar` (never the OS chrome). */
+  .milkdown-slash-menu {
+    min-width: 240px;
+    max-width: 280px;
+    background: var(--m-bg);
+    border: 2px solid var(--m-dim);
+    border-top: 2px solid var(--m-accent);
+    border-radius: 0;
+    box-shadow: none;
+
+    /* Crepe rounds EVERY menu <li> (tabs + rows) at 8px — square them all, and
+       zero the default <ul> margins (browser 1em top/bottom) that leave dead
+       bands above/below the tabs and the item list. */
+    ul {
+      margin: 0;
+      padding-left: 0;
+
+      li {
+        border-radius: 0;
+      }
+    }
+
+    /* Tab header (Text / List / Advanced) — square brutalist tabs, mono,
+       selected = accent underline (not a rounded grey pill). */
+    .tab-group {
+      border-bottom: 2px solid var(--m-dim);
+      padding: 6px 0 0;
+
+      ul {
+        padding: 0;
+        gap: 0;
+
+        li {
+          padding: 8px 12px;
+          font-family: var(--font-mono);
+          font-size: 12px;
+          font-weight: 500;
+          font-style: normal;
+          letter-spacing: 0.06em;
+          line-height: 1.2;
+          color: var(--m-muted2);
+
+          &:hover {
+            background: var(--m-panel);
+            color: var(--m-fg);
+          }
+          &.selected {
+            background: transparent;
+            color: var(--m-accent);
+            border-bottom: 2px solid var(--m-accent);
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+
+    .menu-groups {
+      max-height: 320px;
+      padding: 0;
+      /* Inline the .mono-scrollbar utility (this menu portals outside the
+         element we'd add the class to). Keep in sync with tailwind.css. */
+      scrollbar-width: thin;
+      scrollbar-color: var(--m-dim) var(--m-bg);
+
+      &::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      &::-webkit-scrollbar-track {
+        background: var(--m-bg);
+      }
+      &::-webkit-scrollbar-thumb {
+        background: var(--m-dim);
+        border: 2px solid var(--m-bg);
+        border-radius: 0;
+      }
+      &::-webkit-scrollbar-thumb:hover {
+        background: var(--m-muted2);
+      }
+
+      .menu-group {
+        h6 {
+          font-family: var(--font-mono);
+          font-size: 11px;
+          font-weight: 500;
+          line-height: 1.2;
+          letter-spacing: 0.12em;
+          margin: 0;
+          padding: 12px 14px 6px;
+          color: var(--m-muted2);
+        }
+
+        li {
+          min-width: 0;
+          gap: 12px;
+          padding: 10px 14px;
+          border-radius: 0;
+          border-bottom: 2px solid var(--m-dim);
+
+          &:last-child {
+            border-bottom: 0;
+          }
+
+          &.hover,
+          &.active {
+            background: var(--m-panel);
+
+            svg {
+              color: var(--m-accent);
+              fill: var(--m-accent);
+            }
+          }
+
+          svg {
+            width: 16px;
+            height: 16px;
+            color: var(--m-muted);
+            fill: var(--m-muted);
+          }
+
+          > span {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1.2;
+          }
+        }
+
+        /* Drop Crepe's faint inter-group divider — every row already carries a
+           2px rule. */
+        + .menu-group::before {
+          display: none;
+        }
+      }
+    }
+  }
+
+  /* ── Selection bubble (inline format toolbar) — theme-matching chip ──
+     Surface bg + 2px line border (NOT inverted), fg icons; hover = panel +
+     accent icon, active/toggled = accent fill. Square, 32px buttons. */
+  .milkdown-toolbar {
+    background: var(--m-card);
+    border: 2px solid var(--m-line);
+    border-radius: 0;
+    box-shadow: none;
+
+    .divider {
+      background: var(--m-dim);
+      opacity: 1;
+    }
+
+    .toolbar-item {
+      width: 32px;
+      height: 32px;
+      border-radius: 0;
+
+      svg {
+        color: var(--m-fg);
+        fill: var(--m-fg);
+      }
+
+      &:hover {
+        background: var(--m-panel);
+
+        svg {
+          color: var(--m-accent);
+          fill: var(--m-accent);
+        }
+      }
+
+      &.active {
+        background: var(--m-accent);
+
+        svg {
+          color: var(--m-bg);
+          fill: var(--m-bg);
+        }
+      }
+    }
+  }
+
+  /* Link preview / edit popovers — same theme-matching chip; the edit input is
+     a mono underline on the surface. */
+  .milkdown-link-preview > .link-preview,
+  .milkdown-link-edit > .link-edit {
+    background: var(--m-card);
+    border: 2px solid var(--m-line);
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .milkdown-link-preview > .link-preview {
+    .link-display {
+      color: var(--m-fg);
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .link-icon,
+    .button {
+      border-radius: 0;
+
+      svg {
+        color: var(--m-fg);
+        fill: var(--m-fg);
+      }
+
+      &:hover {
+        background: var(--m-panel);
+
+        svg {
+          color: var(--m-accent);
+          fill: var(--m-accent);
+        }
+      }
+    }
+  }
+
+  .milkdown-link-edit > .link-edit {
+    .input-area {
+      color: var(--m-fg);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      border-bottom: 2px solid var(--m-line);
+      padding-bottom: 2px;
+    }
+
+    .button {
+      border-radius: 0;
+
+      svg {
+        color: var(--m-fg);
+        fill: var(--m-fg);
+      }
+
+      &:hover {
+        background: var(--m-panel);
+
+        svg {
+          color: var(--m-accent);
+          fill: var(--m-accent);
+        }
+      }
+    }
+  }
+
+  /* Placeholder ("Type something…") — our muted token; the size inherits the
+     14px prose body. */
+  .crepe-placeholder::before {
+    color: var(--m-muted2);
+  }
+
+  /* Image block — inline "add image" prompt + the URL-edit confirm button.
+     Crepe ships the prompt at 16px (off our scale) and rounds both; pin to 14px
+     and square them. */
+  .milkdown-image-block {
+    .empty-image-inline {
+      font-size: 14px;
+      border-radius: 0;
+    }
+
+    .image-edit .confirm {
+      font-size: 14px;
+      border-radius: 0;
+    }
+  }
+}
+
+/* Re-assert the shared prose scale at editor specificity. Mirrors prose.css. */
+.mono-prose .ProseMirror {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--m-fg);
+  caret-color: var(--m-accent);
+
+  /* The editable text carries its OWN fixed 700 measure, centered in the wider
+     (1240) boxless canvas — so the editing column matches the read view's 700
+     (780 − px-10 gutter) EXACTLY. Editing should read like reading. */
+  max-width: 700px;
+  margin-inline: auto;
+
+  p {
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--m-fg);
+    margin: 0 0 20px;
+    padding: 0;
+  }
+
+  // Space Grotesk headings, three distinct sizes (H1 32 · H2 24 · H3+ 18) —
+  // mirrors prose.css so the editor preview and the published page agree.
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-align: left;
+    margin: 36px 0 16px;
+    padding: 0;
+  }
+  h1 {
+    font-size: 32px;
+  }
+  h2 {
+    font-size: 24px;
+  }
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: 18px;
+  }
+
+  small {
+    font-size: 12px;
+  }
+
+  // Custom inline brand-effect marks (`:glitch[…]` / `:matrix[…]`). The animated
+  // effects (glitch jitter, matrix scramble) are READ-VIEW only (PostBody →
+  // GlitchText / MatrixText). In the editor the marked text keeps its NORMAL
+  // colour and is framed with a dashed box + a `title` hint, so the author can
+  // tell it carries an effect WITHOUT a colour/shake that could be mistaken for
+  // real styling. Both marks share `.mono-fx-mark`; `.mono-glitch` is kept only
+  // for paste round-trip, and its inherited shake is cancelled here. The hint is
+  // a fast CSS hover tooltip (`::after` from `data-fx-hint`) — the native
+  // `title` tooltip's ~1s delay was too slow.
+  .mono-fx-mark {
+    position: relative;
+    color: inherit;
+    letter-spacing: normal;
+    animation: none;
+    border: 1px dotted var(--m-dim);
+    padding: 0 3px;
+    cursor: help;
+    // Neutralise the read-view styling of the new inline marks (redact censor
+    // bar, spoiler blur, scan wash, keycap box) so the author always sees the
+    // legible text + the dotted hint frame — never the published effect.
+    background: none;
+    filter: none;
+
+    // The redact `::before`-style censor block is on `::after` in the read view;
+    // the framed-hint tooltip owns `::after` here, so the block can't show — but
+    // make the text legible regardless (the read view sets it to `--m-bg`).
+    &.mono-redact {
+      color: inherit;
+    }
+    // The strike's read-view line lives on `::after`; the hint tooltip owns
+    // `::after` here, so the line can't draw — but reset the muted colour the
+    // strike sets so the author reads the normal text + dotted frame.
+    &.mono-strike {
+      color: inherit;
+    }
+
+    &::after {
+      content: attr(data-fx-hint);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 0;
+      z-index: 30;
+      white-space: nowrap;
+      border: 1px solid var(--m-dim);
+      background: var(--m-bg);
+      padding: 3px 8px;
+      font-size: 11px;
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      color: var(--m-muted);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.08s ease;
+    }
+
+    &:hover::after {
+      opacity: 1;
+    }
+  }
+
+  // Custom inline text-colour marks (`:primary[…]` / `:muted[…]` / `:error[…]`)
+  // — the author sees the tint while editing. The colour comes from a fixed
+  // token (whitelisted directive name → class), mirrored in prose.css for the
+  // read view. "Default" carries no mark, so it inherits the `--m-fg` body.
+  .mono-color-primary {
+    color: var(--m-accent);
+  }
+  .mono-color-muted {
+    color: var(--m-muted);
+  }
+  .mono-color-error {
+    color: var(--m-error);
+  }
+
+  ul,
+  ol {
+    margin: 0 0 20px;
+    padding-left: 22px;
+  }
+  ul {
+    list-style: disc;
+  }
+  ol {
+    list-style: decimal;
+  }
+  li {
+    font-size: 14px;
+    line-height: 1.8;
+    margin: 0 0 8px;
+  }
+
+  a {
+    color: var(--m-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  strong {
+    font-weight: 700;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--m-fg);
+    background: var(--m-panel);
+    padding: 2px 6px;
+    border-radius: 0;
+  }
+
+  pre {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.6;
+    background: var(--m-panel);
+    border: 2px solid var(--m-dim);
+    padding: 16px 18px;
+    margin: 0 0 20px;
+    overflow-x: auto;
+
+    code {
+      background: transparent;
+      padding: 0;
+      font-size: 14px;
+    }
+  }
+
+  blockquote {
+    margin: 28px 0;
+    border-left: 2px solid var(--m-accent);
+    background: color-mix(in srgb, var(--m-accent) 6%, transparent);
+    padding: 18px 20px;
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--m-fg);
+    }
+
+    p + p {
+      margin: 10px 0 0;
+      font-size: 12px;
+      color: var(--m-muted);
+    }
+  }
+
+  hr {
+    height: 2px;
+    border: 0;
+    padding: 0;
+    background: var(--m-dim);
+    margin: 36px 0;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto 20px;
+    border: 2px solid var(--m-dim);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 20px;
+    font-size: 14px;
+  }
+  th,
+  td {
+    border: 2px solid var(--m-dim);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    font-family: var(--font-display);
+    font-weight: 700;
+    background: var(--m-panel);
+  }
+
+  del {
+    color: var(--m-muted);
+  }
+
+  // YouTube / Spotify embed — the author sees a compact, on-system placeholder
+  // CARD (not a live iframe) wherever a YT/Spotify link sits, so authoring stays
+  // smooth while still matching the published page's intent (the read view turns
+  // this same link into the real player). 2px-framed mono row: ▶ glyph + a
+  // `// KIND` label + the URL. Non-editable (atom node).
+  .mono-embed-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 28px 0;
+    padding: 16px 18px;
+    border: 2px solid var(--m-dim);
+    background: var(--m-card);
+    font-family: var(--font-mono);
+    cursor: default;
+    user-select: none;
+
+    &.ProseMirror-selectednode {
+      border-color: var(--m-accent);
+    }
+
+    &__glyph {
+      flex: none;
+      font-size: 14px;
+      line-height: 1;
+      color: var(--m-accent);
+    }
+
+    &__label {
+      flex: none;
+      font-size: 11px;
+      line-height: 1.2;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--m-fg);
+    }
+
+    &__url {
+      min-width: 0;
+      overflow: hidden;
+      font-size: 12px;
+      line-height: 1.2;
+      color: var(--m-muted);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+/* Crepe block-chrome that fights the shared prose styling — neutralize it so the
+   editable surface matches the read view 1:1. */
+.milkdown .ProseMirror {
+  /* Hide Crepe's rounded blockquote bar (::before) — prose.css already draws
+     the 2px accent border-left, so this is a duplicate. */
+  blockquote::before {
+    display: none;
+  }
+
+  /* First block carries no top margin (mirrors `.mono-prose > :first-child`). */
+  > :first-child {
+    margin-top: 0;
+  }
+
+  /* Crepe lays list items out as a flex row (24px marker column + 10px gap),
+     which over-indents vs the read view's native marker (~22px). Drop our list
+     padding (the marker column replaces it) and tighten the column + gap so the
+     content lands at ~22px like prose.css. */
+  ul,
+  ol {
+    padding-left: 0;
+  }
+  .milkdown-list-item-block li {
+    gap: 6px;
+  }
+  /* Crepe gives the marker a fixed 32px box (height + 4px padding) that makes
+     rows taller than the line and floats the marker below the first line. Size
+     the marker box to the text line (1.85em) and keep Crepe's flex-centering so
+     the marker sits ON the line; colour it fg (native disc/decimal is fg). */
+  .milkdown-list-item-block li .label-wrapper {
+    width: 20px;
+    height: 1.85em;
+    color: var(--m-fg);
+  }
+  .milkdown-list-item-block li .label-wrapper .label {
+    width: 20px;
+    height: auto;
+    padding: 0;
+  }
+  /* Bullet marker is an SVG dot — Crepe fills it with the dim outline colour and
+     it was over-shrunk. Colour it fg (the SVG uses `fill`, not `color`) and size
+     it ~the native disc. */
+  .milkdown-list-item-block li .label-wrapper .label svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--m-fg);
+  }
+  /* Crepe wraps each item's text in a <p> (margin 0 0 20px); zero it so tight
+     lists match the read view, where items aren't wrapped in a <p>. */
+  .milkdown-list-item-block li p {
+    margin: 0;
   }
 }

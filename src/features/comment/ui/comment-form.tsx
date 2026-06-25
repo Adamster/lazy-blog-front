@@ -1,19 +1,19 @@
-import { apiClient } from "@/shared/api/api-client";
-import { CommentResponse } from "@/shared/api/openapi";
-import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
-import { useTheme } from "@/shared/providers/theme-providers";
-import { useUser } from "@/shared/providers/user-provider";
-import { FaceSmileIcon, PaperAirplaneIcon } from "@heroicons/react/24/solid";
-import { Button, cn, Textarea } from "@heroui/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { EmojiStyle, Theme } from "emoji-picker-react";
-import dynamic from "next/dynamic";
-import { useRef, useState } from "react";
-import { useClickOutside } from "react-haiku";
+"use client";
 
-const Picker = dynamic(() => import("emoji-picker-react"), {
-  ssr: false,
-});
+import { CommentResponse } from "@/shared/api/openapi";
+import { useUser } from "@/entities/session";
+import { useAddComment } from "@/features/comment/model/use-add-comment";
+import { useUpdateComment } from "@/features/comment/model/use-update-comment";
+import { IconSubmitButton } from "@/shared/ui";
+import { useCallback, useState } from "react";
+import {
+  CommentEditor,
+  type CommentEditorApi,
+} from "@/features/comment/ui/comment-editor-wrapper";
+import { CommentToolbar } from "@/features/comment/ui/comment-toolbar";
+
+const focusRing =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
 
 interface IProps {
   postId?: string;
@@ -22,149 +22,105 @@ interface IProps {
 }
 
 function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
-  const queryClient = useQueryClient();
-  const [body, setBody] = useState(editComment?.body || "");
-  const [showEmoji, setShowEmoji] = useState(false);
-  const { isDarkTheme } = useTheme();
+  // `body` mirrors the editor's markdown (debounced) — it drives the empty
+  // guard + is the submit payload. The editor OWNS the document; we never push
+  // `body` back in (that would fight the cursor) — we remount to reset instead.
+  const [body, setBody] = useState(editComment?.body ?? "");
+  const [api, setApi] = useState<CommentEditorApi | null>(null);
+  // Bumped after a successful add to remount the editor empty (the editor is
+  // mount-once / owns its doc, so a remount is the clean reset).
+  const [editorKey, setEditorKey] = useState(0);
+  const [focused, setFocused] = useState(false);
   const { user } = useUser();
-  const pickerRef = useRef<HTMLDivElement>(null);
 
-  useClickOutside(pickerRef, () => {
-    setShowEmoji(false);
-  });
+  const addComment = useAddComment(postId ?? "", user);
+  const updateComment = useUpdateComment(postId ?? "", user?.id ?? "");
 
-  const postComment = useMutation({
-    mutationFn: () =>
-      apiClient.comments.addComment({
-        addCommentRequest: { postId: postId!, userId: user!.id!, body },
-      }),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["getCommentsByPostId", postId],
-      });
-
-      addToastSuccess("Comment has been posted");
-    },
-
-    onError: () => {
-      addToastError("Error posting comment");
-    },
-
-    onSettled: () => {
-      setBody("");
-      setShowEmoji(false);
-    },
-  });
-
-  const postEditedComment = useMutation({
-    mutationFn: () =>
-      apiClient.comments.updateComment({
-        updateCommentRequest: {
-          userId: user ? user.id! : "",
-          body: body,
-          commentId: editComment ? editComment.id : "",
-        },
-      }),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["getCommentsByPostId", postId],
-      });
-
-      addToastSuccess("Comment has been updated");
-    },
-
-    onError: () => {
-      addToastError("Error updating comment");
-    },
-
-    onSettled: () => {
-      setBody("");
-      setShowEmoji(false);
-    },
-  });
+  const onReady = useCallback((next: CommentEditorApi) => setApi(next), []);
 
   const handleSubmit = (e: React.FormEvent) => {
-    if (editComment) {
-      e.preventDefault();
-      postEditedComment.mutate();
+    e.preventDefault();
+    const trimmed = body.trim();
+    if (!trimmed) return;
 
-      if (setIsEditComment) setIsEditComment(false);
+    if (editComment) {
+      updateComment.mutate({ commentId: editComment.id, body: trimmed });
+      setIsEditComment?.(false);
     } else {
-      e.preventDefault();
-      postComment.mutate();
+      addComment.mutate(trimmed);
+      setBody("");
+      setApi(null);
+      setEditorKey((k) => k + 1); // remount empty
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div className="relative">
-        <Textarea
-          classNames={{ input: "text-base" }}
-          label="Too lazy to add a comment?"
-          required
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          className="input w-full"
-          size="md"
-        />
+  const handleCancel = () => {
+    if (editComment && setIsEditComment) {
+      setIsEditComment(false);
+    } else {
+      setBody("");
+      setApi(null);
+      setEditorKey((k) => k + 1);
+    }
+  };
 
-        <div
-          ref={pickerRef}
-          className={cn(
-            "absolute right-0 bottom-0 z-50",
-            showEmoji ? "" : "hidden"
-          )}
+  const isPending = updateComment.isPending || addComment.isPending;
+  const floated = focused || body.length > 0;
+  const labelText = editComment ? "Edit comment" : "Add a comment";
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* Material-style floating label — sits over the editor as a prompt, floats
+          up on focus/fill. Mirrors the auth/composer floating-label feel. */}
+      <div className="relative">
+        <span
+          className={`pointer-events-none absolute left-0 z-10 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-all duration-150 ${
+            floated ? "top-0" : "top-5"
+          }`}
         >
-          <Picker
-            theme={isDarkTheme ? Theme.DARK : Theme.LIGHT}
-            onEmojiClick={(e) => {
-              setBody((prevBody) => prevBody + e.emoji);
-              setShowEmoji(false);
-            }}
-            autoFocusSearch={false}
-            emojiStyle={EmojiStyle.NATIVE}
-            searchDisabled
-            height={300}
-            width={400}
-            skinTonesDisabled
-            previewConfig={{
-              showPreview: false,
-            }}
+          {labelText}
+        </span>
+
+        {/* The editor sits on a 2px bottom rule (the underline-field look),
+            turning accent on focus — same affordance as the old textarea. */}
+        <div
+          className={`border-b-2 pt-5 pb-2 transition-colors ${
+            focused ? "border-[var(--m-accent)]" : "border-[var(--m-dim)]"
+          }`}
+          // Milkdown's editable is the focus target; track focus on the wrapper
+          // so the label floats + the underline lights (capture phase = inside).
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+        >
+          <CommentEditor
+            key={editorKey}
+            markdown={editComment?.body ?? ""}
+            onChange={setBody}
+            onReady={onReady}
+            ariaLabel={labelText}
           />
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-4">
-        <Button
-          variant="flat"
-          size="sm"
-          isIconOnly
-          onPress={() => {
-            setShowEmoji((state) => !state);
-          }}
-        >
-          <FaceSmileIcon width="1rem" height="1.5rem" />
-        </Button>
+      <div className="mt-6 flex items-center gap-3">
+        <CommentToolbar api={api} />
 
-        <Button
-          type="submit"
-          variant="flat"
-          color="primary"
-          size="sm"
-          isIconOnly
-          disabled={postEditedComment.isPending || postComment.isPending}
-          isLoading={postEditedComment.isPending || postComment.isPending}
-        >
-          {!(postEditedComment.isPending || postComment.isPending) && (
-            <PaperAirplaneIcon
-              color="color-primary"
-              width="1rem"
-              height="1.5rem"
-            />
-          )}
-        </Button>
+        {editComment && (
+          <button
+            type="button"
+            onClick={handleCancel}
+            className={`mono-btn-outline ml-auto inline-flex h-9 items-center px-4 text-[14px] font-semibold tracking-[0.06em] ${focusRing}`}
+          >
+            Cancel
+          </button>
+        )}
+
+        <IconSubmitButton
+          label={editComment ? "Update" : "Send"}
+          pending={isPending}
+          disabled={!body.trim()}
+          className={editComment ? "" : "ml-auto"}
+        />
       </div>
     </form>
   );

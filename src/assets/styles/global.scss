@@ -1,12 +1,45 @@
-@use "./mark.scss";
-@use "./emoji.scss";
-@use "./milk.scss";
+/* `@reference` makes Tailwind's theme (variants like `md:`, utilities) available
+   to the `@apply` rules below without emitting duplicate CSS. Previously this was
+   pulled in transitively via the now-removed `mark.scss`. */
+@reference "tailwindcss";
 
 /* Layout */
+
+/* App canvas = the mono background (the redesign is now the default). Painted
+   on <html> so short pages and overscroll never reveal an uncovered (white)
+   strip behind the page wrapper. The theme (`.dark` + `data-theme`) lives on
+   <html> itself, set pre-paint by the layout's inline script. */
+html {
+  background-color: #f4f4f4; /* --m-bg, light */
+  /* Always reserve the vertical-scrollbar gutter. The fixed header centers its
+     1240 column in the full viewport while flow content centers in the
+     viewport-minus-scrollbar; `stable` makes both share the same containing
+     block so the header column aligns with the page column under it. */
+  scrollbar-gutter: stable;
+}
+/* Key on the `.dark` CLASS (set for BOTH dark and neo — neo extends the dark
+   canvas) so the html bg follows the theme. `data-theme` is "neo" for neo, so an
+   attribute selector would miss it and leave the page light. */
+html.dark {
+  background-color: #1a1a1a; /* --m-bg, dark */
+}
+
+/* Interactive elements always get the pointer cursor (browsers default
+   <button> to an arrow). Disabled controls keep the not-allowed cursor. */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
 
 body {
   font-size: 16px;
   font-family: var(--font-sans) !important;
+  /* Prevent the few-px horizontal scroll caused by full-bleed (100vw) sections
+     when a vertical scrollbar is present. `clip` doesn't break sticky. */
+  overflow-x: clip;
 
   h1,
   h2,

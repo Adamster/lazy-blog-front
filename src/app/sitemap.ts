@@ -18,7 +18,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const seenUsers = new Set<string>();
   const userEntries: MetadataRoute.Sitemap = [];
   const postEntries: MetadataRoute.Sitemap = [];
-  const tagSet = new Set<string>();
 
   for (const post of posts) {
     if (!post.isPublished) continue;
@@ -41,17 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
       });
     }
-
-    for (const tag of post.tags ?? []) {
-      if (tag?.tag) tagSet.add(tag.tag);
-    }
   }
 
-  const tagEntries: MetadataRoute.Sitemap = Array.from(tagSet).map((tag) => ({
-    url: `${SITE_URL}/tag/${tag}`,
-    changeFrequency: "weekly",
-    priority: 0.5,
-  }));
-
-  return [...staticEntries, ...userEntries, ...tagEntries, ...postEntries];
+  return [...staticEntries, ...userEntries, ...postEntries];
 }

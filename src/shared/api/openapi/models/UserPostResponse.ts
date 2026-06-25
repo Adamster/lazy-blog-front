@@ -20,6 +20,13 @@ import {
     UserResponseToJSON,
     UserResponseToJSONTyped,
 } from './UserResponse';
+import type { PostsPerMonth } from './PostsPerMonth';
+import {
+    PostsPerMonthFromJSON,
+    PostsPerMonthFromJSONTyped,
+    PostsPerMonthToJSON,
+    PostsPerMonthToJSONTyped,
+} from './PostsPerMonth';
 import type { UserPostItem } from './UserPostItem';
 import {
     UserPostItemFromJSON,
@@ -52,6 +59,30 @@ export interface UserPostResponse {
      * @memberof UserPostResponse
      */
     totalPostCount: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserPostResponse
+     */
+    totalUpVotes: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserPostResponse
+     */
+    totalDownVotes: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserPostResponse
+     */
+    totalViews: number;
+    /**
+     * 
+     * @type {Array<PostsPerMonth>}
+     * @memberof UserPostResponse
+     */
+    activity: Array<PostsPerMonth>;
 }
 
 /**
@@ -61,6 +92,10 @@ export function instanceOfUserPostResponse(value: object): value is UserPostResp
     if (!('user' in value) || value['user'] === undefined) return false;
     if (!('postItems' in value) || value['postItems'] === undefined) return false;
     if (!('totalPostCount' in value) || value['totalPostCount'] === undefined) return false;
+    if (!('totalUpVotes' in value) || value['totalUpVotes'] === undefined) return false;
+    if (!('totalDownVotes' in value) || value['totalDownVotes'] === undefined) return false;
+    if (!('totalViews' in value) || value['totalViews'] === undefined) return false;
+    if (!('activity' in value) || value['activity'] === undefined) return false;
     return true;
 }
 
@@ -77,6 +112,10 @@ export function UserPostResponseFromJSONTyped(json: any, ignoreDiscriminator: bo
         'user': UserResponseFromJSON(json['user']),
         'postItems': ((json['postItems'] as Array<any>).map(UserPostItemFromJSON)),
         'totalPostCount': json['totalPostCount'],
+        'totalUpVotes': json['totalUpVotes'],
+        'totalDownVotes': json['totalDownVotes'],
+        'totalViews': json['totalViews'],
+        'activity': ((json['activity'] as Array<any>).map(PostsPerMonthFromJSON)),
     };
 }
 
@@ -94,6 +133,10 @@ export function UserPostResponseToJSONTyped(value?: UserPostResponse | null, ign
         'user': UserResponseToJSON(value['user']),
         'postItems': ((value['postItems'] as Array<any>).map(UserPostItemToJSON)),
         'totalPostCount': value['totalPostCount'],
+        'totalUpVotes': value['totalUpVotes'],
+        'totalDownVotes': value['totalDownVotes'],
+        'totalViews': value['totalViews'],
+        'activity': ((value['activity'] as Array<any>).map(PostsPerMonthToJSON)),
     };
 }
 

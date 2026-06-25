@@ -1,10 +1,11 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { apiClient } from "@/shared/api/api-client";
 import { PAGE_SIZE } from "@/shared/types";
+import { postKeys } from "./post-keys";
 
 export const usePostsByTag = (tag: string) =>
   useInfiniteQuery({
-    queryKey: ["getPostsByTag", tag],
+    queryKey: postKeys.byTag(tag),
     queryFn: async ({ pageParam = 0 }) => {
       const response = await apiClient.posts.getPostsByTag({
         tag: tag?.replace(/_/g, " ") ?? "",

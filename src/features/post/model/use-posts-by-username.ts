@@ -1,10 +1,11 @@
 import { apiClient } from "@/shared/api/api-client";
 import { PAGE_SIZE } from "@/shared/types";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { postKeys } from "./post-keys";
 
 export const usePostsByUserName = (userName: string) =>
   useInfiniteQuery({
-    queryKey: ["getPostsByUserName", userName],
+    queryKey: postKeys.byUser(userName),
     queryFn: async ({ pageParam = 0 }) => {
       const response = await apiClient.posts.getPostsByUserName({
         userName,

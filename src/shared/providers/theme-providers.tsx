@@ -7,8 +7,19 @@ export interface ProvidersProps {
   children: React.ReactNode;
 }
 
+/** The three mutually-exclusive themes. neo extends dark (it boots `.dark` +
+ *  `.neo`); a theme is exclusive by nature, so neo is a third theme, not a
+ *  "mode that forces dark". */
+export type Theme = "light" | "dark" | "neo";
+
+const THEMES: readonly Theme[] = ["light", "dark", "neo"] as const;
+
 interface ThemeContextType {
-  changeTheme: () => void;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  /** light → dark → neo → light. */
+  cycleTheme: () => void;
+  /** Derived: dark OR neo (neo extends the dark canvas). */
   isDarkTheme: boolean;
 }
 
@@ -22,46 +33,59 @@ export const useTheme = () => {
   return context;
 };
 
+/**
+ * Apply the theme to `<html>` — the single source the CSS tokens key off:
+ * `data-theme` (completeness) + the `.dark` / `.neo` classes. light = neither;
+ * dark = `.dark`; neo = `.dark` + `.neo` (neo extends the dark tokens with the
+ * rain/translucency layer). The same is done pre-paint by the inline script in
+ * the root layout, so the first paint is already the right theme (no flash).
+ */
+function applyTheme(theme: Theme) {
+  const html = document.documentElement;
+  html.setAttribute("data-theme", theme);
+  html.classList.toggle("dark", theme === "dark" || theme === "neo");
+  html.classList.toggle("neo", theme === "neo");
+}
+
 export function ThemeProvider({ children }: ProvidersProps) {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setThemeState] = useState<Theme>("light");
 
+  // The inline script already resolved + applied the theme to <html> before
+  // paint; sync React state to it so consumers (the cycling control, the
+  // derived `isDarkTheme`) match without driving the visual theme (which
+  // <html> already carries).
   useEffect(() => {
-    const systemPrefersDark = window.matchMedia?.(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-
-    const storedTheme = localStorage.getItem("theme") as
-      | "light"
-      | "dark"
-      | null;
-
-    const finalTheme = storedTheme || (systemPrefersDark ? "dark" : "light");
-    setTheme(finalTheme);
+    const html = document.documentElement;
+    const applied: Theme = html.classList.contains("neo")
+      ? "neo"
+      : html.classList.contains("dark")
+        ? "dark"
+        : "light";
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setThemeState(applied);
   }, []);
 
-  const isDarkTheme = theme === "dark";
+  const setTheme = (next: Theme) => {
+    setThemeState(next);
+    localStorage.setItem("theme", next);
+    applyTheme(next);
+  };
 
-  const changeTheme = () => {
-    const newTheme = isDarkTheme ? "light" : "dark";
-    setTheme(newTheme);
-
-    localStorage.setItem("theme", newTheme);
+  const cycleTheme = () => {
+    const idx = THEMES.indexOf(theme);
+    setTheme(THEMES[(idx + 1) % THEMES.length]);
   };
 
   const value: ThemeContextType = {
-    isDarkTheme,
-    changeTheme,
+    theme,
+    setTheme,
+    cycleTheme,
+    isDarkTheme: theme !== "light",
   };
 
   return (
     <ThemeContext.Provider value={value}>
-      <div
-        className={"min-h-screen" + " " + theme}
-        data-theme={theme}
-        data-color-mode={theme}
-      >
-        {children}
-      </div>
+      <div className="min-h-screen">{children}</div>
     </ThemeContext.Provider>
   );
 }

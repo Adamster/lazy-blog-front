@@ -1,6 +1,7 @@
 import { apiClient } from "@/shared/api/api-client";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { userKeys } from "@/entities/session";
 
 export const useUploadAvatar = (userId: string) => {
   const queryClient = useQueryClient();
@@ -9,10 +10,10 @@ export const useUploadAvatar = (userId: string) => {
     mutationFn: (file: File) =>
       apiClient.users.uploadUserAvatar({ id: userId, file }),
     onSuccess: () => {
-      addToastSuccess("Avatar updated!");
+      addToastSuccess("New avatar. New you.");
 
       queryClient.invalidateQueries({
-        queryKey: ["getUserById", userId],
+        queryKey: userKeys.byId(userId),
       });
     },
     onError: (error) => {

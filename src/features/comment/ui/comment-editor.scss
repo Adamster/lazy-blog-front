@@ -1,0 +1,51 @@
+/* Comment WYSIWYG editor — Brutalist-Mono theme for the minimal Milkdown
+ * instance (`comment-editor.tsx`). The editable surface is `.ProseMirror`,
+ * scoped here under `.mono-comment-editor`. Unlike the POST editor (which mounts
+ * the article PROSE scale, 14/1.85), comments use the UI-COMMENT scale:
+ * 14px / line-height 1.6, mono — matching `comment-view.tsx`'s rendered body so
+ * what you type reads 1:1 with the published comment. */
+
+.mono-comment-editor {
+  .ProseMirror {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--m-fg);
+    caret-color: var(--m-accent);
+    outline: none;
+    /* Auto height; a small minimum so an empty composer isn't a single thin
+       line. Grows with content. */
+    min-height: 1.6em;
+
+    /* Paragraph rhythm — tight, comment-sized (no 20px article gap). */
+    p {
+      margin: 0;
+    }
+    p + p {
+      margin-top: 8px;
+    }
+
+    /* Inline GIF — the actual image shows in the editor (never a raw URL).
+       Framed on-system like the read view, capped width, square. Selectable as
+       an atom; the selected ring uses the accent border. */
+    img {
+      display: inline-block;
+      max-width: 280px;
+      height: auto;
+      margin: 4px 0;
+      border: 2px solid var(--m-dim);
+      vertical-align: bottom;
+    }
+    img.ProseMirror-selectednode {
+      border-color: var(--m-accent);
+    }
+
+    /* Emoji enlarged to ~1.5em to match the read view (`withBigEmoji`) — applied
+       by the `bigEmoji` inline decoration (comment-editor-big-emoji.ts). */
+    .mono-big-emoji {
+      font-size: 1.5em;
+      line-height: 1;
+      vertical-align: -0.1em;
+    }
+  }
+}

@@ -1,13 +1,9 @@
 import { notFound } from "next/navigation";
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query";
-import { PostDetailedResponse } from "@/shared/api/openapi";
 import { generateMeta } from "@/shared/lib/head/meta-data";
-import PostPage from "./post-page";
-import { getPostSSR } from "@/features/post/model/get-post.ssr";
+import { JsonLd } from "@/shared/lib/head/json-ld";
+import { getPostMeta } from "@/features/post/model/get-post-meta";
+import { buildPostJsonLd } from "@/features/post/lib/post-jsonld";
+import { PostPageBody } from "./post-page-body";
 
 type PageProps = {
   params: Promise<{ user: string; post: string }>;
@@ -15,7 +11,7 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps) {
   const { post: slug } = await params;
-  const postData: PostDetailedResponse | null = await getPostSSR(slug);
+  const postData = await getPostMeta(slug);
 
   if (postData) {
     return generateMeta({
@@ -33,17 +29,23 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function Page({ params }: PageProps) {
-  const { post: slug } = await params;
+  const { user, post: slug } = await params;
 
-  const postData = await getPostSSR(slug);
+  // META-ONLY server fetch (title / OG / JSON-LD), uncached — the page BODY
+  // loads client-side (authenticated), so vote state and view counts are live
+  // with no SSR/ISR staleness. A missing slug still returns a real 404.
+  const postData = await getPostMeta(slug);
   if (!postData) notFound();
 
-  const queryClient = new QueryClient();
-  queryClient.setQueryData(["getPostBySlug", slug], postData);
+  const url = `/${postData.author.userName ?? user}/${postData.slug}`;
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <PostPage slug={slug} />
-    </HydrationBoundary>
+    <div
+      className="mono-scope min-h-app mx-[calc(50%-50vw)] w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
+      style={{ fontFamily: "var(--font-mono)" }}
+    >
+      <JsonLd data={buildPostJsonLd(postData, url)} />
+      <PostPageBody slug={slug} />
+    </div>
   );
 }

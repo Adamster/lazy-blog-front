@@ -15,7 +15,7 @@
 
 import * as runtime from '../runtime';
 
-export interface AuthProviderLoginGetRequest {
+export interface ApiAuthProviderLoginGetRequest {
     provider: string;
     returnUrl?: string;
 }
@@ -33,11 +33,11 @@ export interface AuthApiInterface {
      * @throws {RequiredError}
      * @memberof AuthApiInterface
      */
-    authExternalCallbackGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    apiAuthExternalCallbackGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
 
     /**
      */
-    authExternalCallbackGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    apiAuthExternalCallbackGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
     /**
      * 
@@ -47,11 +47,11 @@ export interface AuthApiInterface {
      * @throws {RequiredError}
      * @memberof AuthApiInterface
      */
-    authProviderLoginGetRaw(requestParameters: AuthProviderLoginGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    apiAuthProviderLoginGetRaw(requestParameters: ApiAuthProviderLoginGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
 
     /**
      */
-    authProviderLoginGet(requestParameters: AuthProviderLoginGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    apiAuthProviderLoginGet(requestParameters: ApiAuthProviderLoginGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
 }
 
@@ -62,13 +62,13 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
 
     /**
      */
-    async authExternalCallbackGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiAuthExternalCallbackGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/auth/external-callback`,
+            path: `/api/auth/external-callback`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -79,17 +79,17 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
 
     /**
      */
-    async authExternalCallbackGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.authExternalCallbackGetRaw(initOverrides);
+    async apiAuthExternalCallbackGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiAuthExternalCallbackGetRaw(initOverrides);
     }
 
     /**
      */
-    async authProviderLoginGetRaw(requestParameters: AuthProviderLoginGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiAuthProviderLoginGetRaw(requestParameters: ApiAuthProviderLoginGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['provider'] == null) {
             throw new runtime.RequiredError(
                 'provider',
-                'Required parameter "provider" was null or undefined when calling authProviderLoginGet().'
+                'Required parameter "provider" was null or undefined when calling apiAuthProviderLoginGet().'
             );
         }
 
@@ -102,7 +102,7 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/auth/{provider}/login`.replace(`{${"provider"}}`, encodeURIComponent(String(requestParameters['provider']))),
+            path: `/api/auth/{provider}/login`.replace(`{${"provider"}}`, encodeURIComponent(String(requestParameters['provider']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -113,8 +113,8 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
 
     /**
      */
-    async authProviderLoginGet(requestParameters: AuthProviderLoginGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.authProviderLoginGetRaw(requestParameters, initOverrides);
+    async apiAuthProviderLoginGet(requestParameters: ApiAuthProviderLoginGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiAuthProviderLoginGetRaw(requestParameters, initOverrides);
     }
 
 }

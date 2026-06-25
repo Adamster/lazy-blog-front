@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   LoginRequest,
   LoginResponse,
+  LogoutRequest,
   ProblemDetails,
   RefreshTokenRequest,
   RefreshTokenResponse,
@@ -30,6 +31,8 @@ import {
     LoginRequestToJSON,
     LoginResponseFromJSON,
     LoginResponseToJSON,
+    LogoutRequestFromJSON,
+    LogoutRequestToJSON,
     ProblemDetailsFromJSON,
     ProblemDetailsToJSON,
     RefreshTokenRequestFromJSON,
@@ -65,6 +68,10 @@ export interface GetUserByIdRequest {
 
 export interface LoginOperationRequest {
     loginRequest: LoginRequest;
+}
+
+export interface LogoutOperationRequest {
+    logoutRequest: LogoutRequest;
 }
 
 export interface RefreshTokenOperationRequest {
@@ -157,6 +164,19 @@ export interface UsersApiInterface {
     /**
      */
     login(requestParameters: LoginOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginResponse>;
+
+    /**
+     * 
+     * @param {LogoutRequest} logoutRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApiInterface
+     */
+    logoutRaw(requestParameters: LogoutOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     */
+    logout(requestParameters: LogoutOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
     /**
      * 
@@ -382,6 +402,39 @@ export class UsersApi extends runtime.BaseAPI implements UsersApiInterface {
     async login(requestParameters: LoginOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginResponse> {
         const response = await this.loginRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async logoutRaw(requestParameters: LogoutOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['logoutRequest'] == null) {
+            throw new runtime.RequiredError(
+                'logoutRequest',
+                'Required parameter "logoutRequest" was null or undefined when calling logout().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/users/logout`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: LogoutRequestToJSON(requestParameters['logoutRequest']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async logout(requestParameters: LogoutOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.logoutRaw(requestParameters, initOverrides);
     }
 
     /**

@@ -10,7 +10,13 @@ export const getPostsByUserNameSSR = cache(
       const url = new URL(`${API_URL}/api/posts/${userName}/posts`);
       if (offset > 0) url.searchParams.set("offset", String(offset));
 
-      const response = await fetch(url.toString(), { cache: "no-store" });
+      // ISR: cache the profile feed and revalidate at most once every 5 min so
+      // the route is crawlable/cacheable (the SEO win), matching the home feed.
+      const response = await fetch(url.toString(), {
+        // Tagged per-user so publish/unpublish/delete can bust THIS author's
+        // profile feed on demand (not wait out the 5-min ISR window).
+        next: { revalidate: 300, tags: [`posts:user:${userName}`] },
+      });
       if (!response.ok) return null;
 
       return (await response.json()) as UserPostResponse;

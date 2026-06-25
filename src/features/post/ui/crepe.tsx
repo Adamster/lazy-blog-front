@@ -3,24 +3,27 @@
 import "@milkdown/crepe/theme/common/style.css";
 import "./crepe-overrides.scss";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Crepe } from "@milkdown/crepe";
+import { callCommand } from "@milkdown/kit/utils";
+import { insertImageCommand } from "@milkdown/kit/preset/commonmark";
 import { listener, listenerCtx } from "@milkdown/kit/plugin/listener";
-import { editorViewCtx, parserCtx } from "@milkdown/kit/core";
-import { Slice } from "@milkdown/kit/prose/model";
-import { useAuth } from "@/features/auth/model/use-auth";
-import { useUser } from "@/shared/providers/user-provider";
+import { useAuth, useUser } from "@/entities/session";
 import { API_URL } from "@/shared/types";
-import { observeEmbeds, toEmbedUrl } from "../lib/embed-url";
-
-const EMBED_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M10 16.5v-9l6 4.5-6 4.5zM20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12z"/></svg>`;
+import { getValidAccessToken } from "@/shared/lib/auth-refresh";
+import { EditorToolbar, type RunCommand } from "./editor-toolbar";
+import { smallMark } from "./editor-small-mark";
+import { effectMarks } from "./editor-effect-marks";
+import { colorMarks } from "./editor-color-marks";
+import { mediaEmbed } from "./editor-embed-node";
 
 type ImageUploadHandler = (file: File) => Promise<string>;
 
-interface CrepeComponentProps {
+interface CrepeEditorProps {
+  /** Initial markdown. Read once on mount (Crepe owns the document after). */
   markdown?: string;
   placeholder?: string;
-  readonly?: boolean;
+  /** Debounced markdown emitter for the form's `body` field. */
   onChange?: (markdown: string) => void;
 }
 
@@ -34,30 +37,65 @@ function debounce<T extends (...args: never[]) => void>(fn: T, ms: number) {
   };
 }
 
-export default function CrepeComponent({
+/**
+ * WYSIWYG markdown editor (Milkdown/Crepe). Edits styled rich text directly and
+ * emits markdown. The editable content is wrapped in `.mono-prose` so it renders
+ * with the SAME `prose.css` rules as the server-rendered read view (`<PostBody>`)
+ * — type a heading and it looks identical to the published page.
+ *
+ * Client-only by design (it's create/edit, behind auth) — loaded via
+ * `dynamic(ssr:false)` from `crepe-wrapper.tsx`. Not on the SEO read path.
+ */
+export default function CrepeEditor({
   markdown = "",
   placeholder,
-  readonly = false,
   onChange,
-}: CrepeComponentProps) {
+}: CrepeEditorProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const crepeRef = useRef<Crepe | null>(null);
+  // Gates the toolbar until the editor has finished mounting.
+  const [ready, setReady] = useState(false);
+
+  // Dispatch a Milkdown command from the persistent toolbar into the live
+  // editor. Mutations fire the `markdownUpdated` listener → debounced `onChange`,
+  // so the form's `body` stays in sync through the existing path (no new flow).
+  const runCommand = useCallback<RunCommand>((cmd, payload) => {
+    crepeRef.current?.editor.action(callCommand(cmd.key, payload));
+  }, []);
+
+  // Mount-once values, captured at first render so the init effect can run with
+  // empty deps without reading changing props from a stale closure.
+  const initialMarkdownRef = useRef(markdown);
+  const placeholderRef = useRef(placeholder);
+
   const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  });
 
   const { auth } = useAuth();
   const { user } = useUser();
+  const authRef = useRef({ auth, user });
+  useEffect(() => {
+    authRef.current = { auth, user };
+  });
 
   const imageUploadHandler: ImageUploadHandler = async (file) => {
-    if (!user || !auth?.accessToken) return "";
+    const { user: u } = authRef.current;
+    if (!u) return "";
+
+    // Proactively refresh an expired token (this upload bypasses the api-client
+    // middleware) so an in-post image upload after idle doesn't silently 401.
+    const accessToken = await getValidAccessToken();
+    if (!accessToken) return "";
 
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const response = await fetch(`${API_URL}/api/media/${user.id}/upload`, {
+      const response = await fetch(`${API_URL}/api/media/${u.id}/upload`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${auth.accessToken}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
         body: formData,
       });
 
@@ -65,7 +103,7 @@ export default function CrepeComponent({
 
       const contentType = response.headers.get("content-type");
       if (contentType?.includes("application/json")) {
-        const data = await response.json();
+        const data = (await response.json()) as { url?: string };
         return data.url ?? "";
       }
       return await response.text();
@@ -74,102 +112,111 @@ export default function CrepeComponent({
     }
   };
 
+  // Toolbar Image button → file picker hands the chosen file here. Reuse the
+  // same authed upload as Crepe's own ImageBlock, then dispatch
+  // `insertImageCommand` so the node lands at the selection — the mutation
+  // fires `markdownUpdated` and the body stays synced via the existing path.
+  const onInsertImage = async (file: File) => {
+    const src = await imageUploadHandler(file);
+    if (!src) return;
+    crepeRef.current?.editor.action(
+      callCommand(insertImageCommand.key, { src })
+    );
+  };
+
+  // Mount the editor once. Crepe owns the document lifecycle; the form value is
+  // synced out via the debounced `onChange`, never pushed back in (avoids cursor
+  // jumps / re-mount churn). `markdown`/`placeholder` are read on mount only.
   useEffect(() => {
-    if (!rootRef.current) return;
+    const root = rootRef.current;
+    if (!root) return;
 
     const crepe = new Crepe({
-      root: rootRef.current,
-      defaultValue: markdown,
+      root,
+      defaultValue: initialMarkdownRef.current,
       features: {
-        [Crepe.Feature.CodeMirror]: true,
-        [Crepe.Feature.Latex]: true,
-        [Crepe.Feature.Toolbar]: !readonly,
-        [Crepe.Feature.BlockEdit]: !readonly,
-        [Crepe.Feature.LinkTooltip]: !readonly,
-        [Crepe.Feature.Placeholder]: !readonly,
-        [Crepe.Feature.Cursor]: !readonly,
+        // CodeMirror OFF — its gutter/line-numbers/syntax theme diverged from
+        // the read view's plain `<pre>`. A plain code block styled by
+        // `.mono-prose .ProseMirror pre` matches the published page 1:1.
+        [Crepe.Feature.CodeMirror]: false,
+        // LaTeX depends on CodeMirror (and the blog doesn't need math), so it's
+        // off too — leaving it on throws "enable CodeMirror to use LaTeX".
+        [Crepe.Feature.Latex]: false,
+        // Floating selection bubble OFF — the persistent toolbar replaces it.
+        [Crepe.Feature.Toolbar]: false,
+        // Slash menu + block handles OFF — the persistent toolbar is now the
+        // single source of formatting (every block action lives there).
+        [Crepe.Feature.BlockEdit]: false,
+        [Crepe.Feature.LinkTooltip]: true,
+        [Crepe.Feature.Placeholder]: true,
+        // Virtual cursor OFF — it painted a grey caret over text that disagreed
+        // with the native one; the native accent caret is consistent.
+        [Crepe.Feature.Cursor]: false,
       },
       featureConfigs: {
-        [Crepe.Feature.Placeholder]: placeholder
-          ? { text: placeholder }
+        [Crepe.Feature.Placeholder]: placeholderRef.current
+          ? { text: placeholderRef.current }
           : undefined,
-        [Crepe.Feature.ImageBlock]: readonly
-          ? undefined
-          : { onUpload: imageUploadHandler },
-        [Crepe.Feature.BlockEdit]: {
-          buildMenu: (builder) => {
-            builder.getGroup("advanced").addItem("embed", {
-              label: "Embed",
-              icon: EMBED_ICON,
-              onRun: (ctx) => {
-                const raw = window.prompt("Paste embed URL:");
-                const url = raw?.trim();
-                if (!url) return;
-                if (!toEmbedUrl(url)) {
-                  window.alert(
-                    "This URL isn't recognized as a supported embed."
-                  );
-                  return;
-                }
-
-                const view = ctx.get(editorViewCtx);
-                const parser = ctx.get(parserCtx);
-                const doc = parser(`[Embed](${url})`);
-                const paragraph = doc?.firstChild;
-                if (!paragraph) return;
-
-                setTimeout(() => {
-                  const { state } = view;
-                  const { $from } = state.selection;
-                  const blockStart = $from.start();
-                  const blockEnd = $from.pos;
-
-                  let tr = state.tr;
-                  if (blockEnd > blockStart) {
-                    tr = tr.delete(blockStart, blockEnd);
-                  }
-                  tr = tr.replaceSelection(new Slice(paragraph.content, 0, 0));
-                  view.dispatch(tr);
-                  view.focus();
-                }, 0);
-              },
-            });
-          },
-        },
+        [Crepe.Feature.ImageBlock]: { onUpload: imageUploadHandler },
       },
     });
 
-    if (!readonly && onChangeRef.current) {
-      const emit = debounce((md: string) => {
-        onChangeRef.current?.(md);
-      }, DEBOUNCE_MS);
+    const emit = debounce(
+      (md: string) => onChangeRef.current?.(md),
+      DEBOUNCE_MS
+    );
+    crepe.editor
+      .config((ctx) => {
+        ctx.get(listenerCtx).markdownUpdated((_, md) => emit(md));
+      })
+      .use(listener)
+      // Custom inline "small" mark (`:small[…]`) — toolbar SM toggles it, it
+      // round-trips through markdown as a remark directive. See editor-small-mark.
+      .use(smallMark)
+      // Custom inline brand effects (`:glitch[…]` / `:matrix[…]`) — toolbar
+      // Effects ▾ toggles them; they round-trip as remark directives and reuse
+      // smallMark's single remark-directive registration. See editor-effect-marks.
+      .use(effectMarks)
+      // Custom inline text-colour marks (`:primary[…]` / `:muted[…]` /
+      // `:error[…]`) — toolbar Text-colour ▾ sets them (mutually exclusive;
+      // Default clears). Same remark-directive reuse. See editor-color-marks.
+      .use(colorMarks)
+      // YouTube / Spotify embed node — a paragraph that is ONLY a YT/Spotify
+      // link becomes an on-system placeholder CARD in the editor, round-tripping
+      // to the same bare-URL link the read view embeds. See editor-embed-node.
+      .use(mediaEmbed);
 
-      crepe.editor
-        .config((ctx) => {
-          ctx.get(listenerCtx).markdownUpdated((_, md) => emit(md));
-        })
-        .use(listener);
-    }
-
-    let disconnectEmbeds: (() => void) | null = null;
-
-    crepe.create().then(() => {
-      if (readonly) {
-        crepe.setReadonly(true);
-        if (rootRef.current) {
-          disconnectEmbeds = observeEmbeds(rootRef.current);
-        }
-      }
-      crepeRef.current = crepe;
+    crepeRef.current = crepe;
+    let alive = true;
+    void crepe.create().then(() => {
+      if (alive) setReady(true);
     });
 
     return () => {
-      disconnectEmbeds?.();
-      crepe.destroy();
+      alive = false;
       crepeRef.current = null;
+      void crepe.destroy();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [readonly]);
+    // Mount-once: every value the effect reads is a ref (stable identity), so
+    // the empty dep array is correct and complete.
+  }, []);
 
-  return <div className="milkdown" ref={rootRef} />;
+  return (
+    <div>
+      {/* Persistent toolbar = a self-closed 2px bar spanning the full canvas. */}
+      <EditorToolbar
+        onCommand={runCommand}
+        onInsertImage={onInsertImage}
+        disabled={!ready}
+      />
+      {/* Boxless writing area: no border / no fill, AUTO height (grows with the
+          content, no fixed minimum) — the text sits on the plain page like the
+          read view. `pt-10` gives the toolbar→text breathing room. The 700
+          measure isn't derived from this wrapper — it lives ON `.ProseMirror`
+          (centered), 1:1 with the read view (see crepe-overrides.scss). */}
+      <div className="pt-10">
+        <div className="milkdown mono-prose" ref={rootRef} />
+      </div>
+    </div>
+  );
 }

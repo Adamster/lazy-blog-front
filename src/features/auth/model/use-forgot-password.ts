@@ -11,7 +11,7 @@ export const useForgotPassword = () => {
       });
     },
     onSuccess: () => {
-      addToastSuccess("Password reset link sent to your email!");
+      addToastSuccess("Reset link sent. Go check your inbox (and spam).");
     },
     onError: (error) => {
       addToastError("Failed to send reset link.", error);

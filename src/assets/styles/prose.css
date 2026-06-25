@@ -1,0 +1,326 @@
+/* "Brutalist Mono" prose sub-scale.
+ *
+ * Targets the output of the shared <PostBody> renderer (react-markdown), which
+ * wraps content in `.mono-prose`. The SAME `.mono-prose` wraps both the
+ * server-rendered post read view AND the editor's live preview, so the two are
+ * guaranteed 1:1 identical.
+ *
+ * Scale (CLAUDE.md): body 14/1.85 (temporary — may revert to 16) · heading 24
+ * Space Grotesk · code 14 · blockquote · tokens via var(--m-*). */
+
+.mono-prose {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--m-fg);
+}
+
+.mono-prose > :first-child {
+  margin-top: 0;
+}
+.mono-prose > :last-child {
+  margin-bottom: 0;
+}
+
+.mono-prose p {
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--m-fg);
+  margin: 0 0 20px;
+}
+
+/* Markdown headings — Space Grotesk, three distinct sizes (H1 32 · H2 24 ·
+   H3+ 18). The doc title is the separate page <h1>. */
+.mono-prose h1,
+.mono-prose h2,
+.mono-prose h3,
+.mono-prose h4,
+.mono-prose h5,
+.mono-prose h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-align: left;
+  margin: 36px 0 16px;
+}
+.mono-prose h1 {
+  font-size: 32px;
+}
+.mono-prose h2 {
+  font-size: 24px;
+}
+.mono-prose h3,
+.mono-prose h4,
+.mono-prose h5,
+.mono-prose h6 {
+  font-size: 18px;
+}
+
+/* Small inline text (the `:small[…]` directive) — 12px, standard text colour. */
+.mono-prose small {
+  font-size: 12px;
+}
+
+.mono-prose ul,
+.mono-prose ol {
+  margin: 0 0 20px;
+  padding-left: 22px;
+}
+.mono-prose ul {
+  list-style: disc;
+}
+.mono-prose ol {
+  list-style: decimal;
+}
+.mono-prose li {
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0 0 8px;
+}
+/* GFM task lists — drop the marker, align the checkbox. */
+.mono-prose li:has(> input[type="checkbox"]) {
+  list-style: none;
+  margin-left: -22px;
+}
+.mono-prose li > input[type="checkbox"] {
+  margin-right: 8px;
+  accent-color: var(--m-accent);
+}
+
+.mono-prose a {
+  color: var(--m-accent);
+  text-underline-offset: 2px;
+}
+
+.mono-prose strong {
+  font-weight: 700;
+}
+
+/* Inline code. */
+.mono-prose code {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  background: var(--m-panel);
+  padding: 2px 6px;
+}
+
+/* Fenced code blocks — the <code> inside resets the inline chrome. */
+.mono-prose pre {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+  background: var(--m-panel);
+  border: 2px solid var(--m-dim);
+  padding: 16px 18px;
+  margin: 0 0 20px;
+  overflow-x: auto;
+}
+.mono-prose pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 14px;
+}
+
+.mono-prose blockquote {
+  margin: 28px 0;
+  border-left: 2px solid var(--m-accent);
+  background: color-mix(in srgb, var(--m-accent) 6%, transparent);
+  padding: 18px 20px;
+}
+.mono-prose blockquote p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--m-fg);
+}
+/* Attribution line (e.g. `— @handle`) — a trailing paragraph reads as source. */
+.mono-prose blockquote p + p {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--m-muted);
+}
+
+.mono-prose hr {
+  height: 2px;
+  border: 0;
+  background: var(--m-dim);
+  margin: 36px 0;
+}
+
+.mono-prose img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto 20px;
+  border: 2px solid var(--m-dim);
+}
+
+/* GFM tables. */
+.mono-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 20px;
+  font-size: 14px;
+}
+.mono-prose th,
+.mono-prose td {
+  border: 2px solid var(--m-dim);
+  padding: 8px 12px;
+  text-align: left;
+}
+.mono-prose th {
+  font-family: var(--font-display);
+  font-weight: 700;
+  background: var(--m-panel);
+}
+
+.mono-prose del {
+  color: var(--m-muted);
+}
+
+/* Custom inline text-colour marks — bridged from the `:primary[…]` /
+   `:muted[…]` / `:error[…]` directives to whitelisted classes by
+   `remarkColorDirectives` in post-body.tsx. The colour is a fixed token (never
+   a directive-supplied value), mirroring crepe-overrides.scss so the editor and
+   read view agree. "Default" carries no mark and inherits the `--m-fg` body. */
+.mono-prose .mono-color-primary {
+  color: var(--m-accent);
+}
+.mono-prose .mono-color-muted {
+  color: var(--m-muted);
+}
+.mono-prose .mono-color-error {
+  color: var(--m-error);
+}
+
+/* ───── Block effect directives (read view + editor preview share these) ───── */
+
+/* ASCII section break (`::divider`) — centered glyph run on the hr rhythm
+   (36px 0, matching `.mono-prose hr`), label scale 11px/0.12em dim. */
+.mono-prose .mono-divider,
+.mono-divider {
+  margin: 36px 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  color: var(--m-dim);
+}
+
+/* Terminal pull-quote (`:::quote`) — the blockquote chrome with the quote text
+   stepped up to H3 18px/600 (the one prose-legal step), a `// QUOTE` eyebrow and
+   a 12px muted `— @handle` attribution. */
+.mono-prose .mono-pullquote,
+.mono-pullquote {
+  margin: 28px 0;
+  border-left: 2px solid var(--m-accent);
+  background: color-mix(in srgb, var(--m-accent) 6%, transparent);
+  padding: 18px 20px;
+}
+.mono-pullquote-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  color: var(--m-accent);
+  margin-bottom: 24px;
+}
+.mono-pullquote-body,
+.mono-pullquote-body p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--m-fg);
+}
+.mono-pullquote-cite {
+  margin: 24px 0 0;
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--m-muted);
+}
+
+/* Console callout (`:::callout` type=note|warn) — the info-box recipe: a 2px
+   left edge (accent for note, error for warn), `--m-card` bg, 20px pad, a
+   `// NOTE` / `// WARN` eyebrow over body prose (14/1.85). */
+.mono-prose .mono-callout,
+.mono-callout {
+  margin: 28px 0;
+  border-left: 2px solid var(--m-accent);
+  background: var(--m-card);
+  padding: 20px;
+}
+.mono-callout--warn {
+  border-left-color: var(--m-error);
+}
+.mono-callout-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  color: var(--m-accent);
+  margin-bottom: 24px;
+}
+.mono-callout--warn .mono-callout-eyebrow {
+  color: var(--m-error);
+}
+.mono-callout-body {
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--m-fg);
+}
+.mono-callout-body > :first-child {
+  margin-top: 0;
+}
+.mono-callout-body > :last-child {
+  margin-bottom: 0;
+}
+
+/* ───── Batch 2 block directives in prose — sit on the 28px block rhythm ─────
+   The block bodies (diff / poll / ansi / fold / compare) carry their own visual
+   recipe from tailwind.css; here we only place them on the article block rhythm
+   so they read as part of the post, like the divider / callout / pullquote. */
+.mono-prose .mono-diff,
+.mono-prose .mono-poll,
+.mono-prose .mono-ansi,
+.mono-prose .mono-fold,
+.mono-prose .mono-compare {
+  margin: 28px 0;
+}
+
+/* ───── Media embeds (YouTube / Spotify) — read view + editor preview share ─────
+   On-system frame: full article measure, square corners, the same 2px `--m-dim`
+   border the prose <img> uses. Sits on the block rhythm. The iframe fills the
+   frame edge-to-edge (the border IS the chrome). YouTube keeps a responsive 16:9
+   box via `aspect-ratio`; Spotify uses its own fixed player height (set inline
+   from `spotifyHeight`), so its wrapper just lets the iframe size itself. */
+.mono-prose .mono-embed,
+.mono-embed {
+  margin: 28px 0;
+  border: 2px solid var(--m-dim);
+  background: var(--m-card);
+}
+.mono-embed--yt {
+  position: relative;
+  aspect-ratio: 16 / 9;
+}
+.mono-embed iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+}
+.mono-embed--yt iframe {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+}
+.mono-embed--spotify iframe {
+  /* Height comes from the `height` attribute (Spotify's per-type player size);
+     the wrapper border frames it. */
+  display: block;
+}

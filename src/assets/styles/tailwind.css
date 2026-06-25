@@ -1,2 +1,1148 @@
 @config "../../../tailwind.config.ts";
 @import "tailwindcss";
+
+/* Expose the Space Grotesk display font as a Tailwind utility (`font-display`). */
+@theme inline {
+  --font-display: var(--font-display);
+}
+
+/* Fixed header bar height — the SINGLE source for the bar (`h-[var(--m-header-h)]`),
+   its clearance (`pt-[var(--m-header-h)]` on the layout main) and the below-header
+   min-height utility below. */
+:root {
+  --m-header-h: 4rem;
+
+  /* Layering scale — ONE source for every fixed/portaled overlay so they stack
+     predictably: content < header < modal < fullscreen-rain < toast. The
+     fullscreen matrix rain is a full takeover above modals but under toasts so
+     the konami unlock toast still reads. */
+  --m-z-header: 50;
+  --m-z-modal: 60;
+  --m-z-rain: 65;
+  --m-z-toast: 70;
+}
+
+/* Min height = viewport MINUS the fixed header. Page roots / full-screen states
+   live inside the `pt-[--m-header-h]` content area, so a plain `min-h-screen`
+   (100vh) would overflow the viewport by the header height and create a stray
+   scroll. Use this instead. */
+@utility min-h-app {
+  min-height: calc(100vh - var(--m-header-h));
+}
+
+/* "Brutalist Mono" (variant B) palette — light by default, dark via the theme
+   provider's `.dark` class. Components reference these via var(--m-*).
+   `.mono-portal` mirrors the tokens for HeroUI overlays (Dropdown, etc.) that
+   render in a body-level portal outside `.mono-scope`. */
+.mono-scope,
+.mono-portal {
+  /* Design-system scope root is JetBrains Mono (data / labels / body); titles
+     opt into Space Grotesk via `font-display`. Mirrors the design file's root
+     and the per-page inline fallback, and — crucially — gives portaled overlays
+     (auth modal, dropdowns) the mono font so `// LABEL` tracking reads right
+     instead of inheriting the body `var(--font-sans)`. */
+  font-family: var(--font-mono);
+  --m-bg: #f4f4f4;
+  --m-fg: #161616;
+  --m-accent: #4d7c0f;
+  --m-line: #161616;
+  --m-panel: #e4e4e4;
+  --m-card: #eaeaea;
+  --m-muted: #6b6b6b;
+  --m-muted2: #8c8c8c;
+  --m-dim: #d6d6d6;
+  --m-error: #b91c1c;
+}
+/* `.dark` now lives on <html> (layout inline script + ThemeProvider), so this
+   reaches page scopes AND body-level portals (toasts, modals) alike. */
+.dark .mono-scope,
+.dark .mono-portal {
+  --m-bg: #1a1a1a;
+  --m-fg: #dcdcdc;
+  --m-accent: #cdff48;
+  --m-line: #e6e6e6;
+  --m-panel: #2a2a2a;
+  --m-card: #232323;
+  --m-muted: #9a9a9a;
+  --m-muted2: #7a7a7a;
+  --m-dim: #383838;
+  --m-error: #ff6b6b;
+}
+
+/* neo — the third theme ("Matrix"). It is the dark theme PLUS this layer: neo
+   always boots `.dark` + `.neo` (set pre-paint), so it inherits the `.dark`
+   tokens above and overrides on TOP:
+   1. Page roots (`.mono-scope`) drop their `bg-[var(--m-bg)]` to transparent so
+      the fixed Matrix-rain drape shows through the whole canvas. The header
+      wrapper is also a `.mono-scope` but carries no bg, so this is a no-op there.
+   2. The `--m-card` / `--m-panel` surface tokens go more translucent (the dark
+      #232323 / #2a2a2a at 0.70 alpha) so EVERY card/band surface (post byline
+      band, home/profile stat bands, hero, feed cards, menu hover) gets a strong,
+      cohesive rain bleed. `--m-bg` stays opaque, so the dropdown console + the
+      modals (`bg-[var(--m-bg)]`) stay fully solid and readable. Text (`--m-fg`
+      #dcdcdc) over a 0.70 #232323 card composited over the dim rain stays well
+      above AA on the dark canvas. */
+html.neo .mono-scope {
+  background-color: transparent;
+}
+html.neo .mono-scope,
+html.neo .mono-portal {
+  --m-card: rgba(35, 35, 35, 0.7);
+  --m-panel: rgba(42, 42, 42, 0.7);
+}
+/* …but OVERLAYS must stay OPAQUE — dropdowns/menus (`role="menu"`), selects
+   (`role="listbox"`) and the editor (`.milkdown` — toolbar + popovers read
+   `--m-card`/`--m-panel` directly or via `--crepe-color-surface`). Content
+   scrolls behind them, so the translucent rain bleed turns their text
+   unreadable. Reset the surface tokens to their SOLID dark values on them. */
+html.neo [role="menu"],
+html.neo [role="listbox"],
+html.neo .milkdown {
+  --m-card: #232323;
+  --m-panel: #2a2a2a;
+}
+
+/* Cover crop modal — tint react-advanced-cropper's chrome to the Brutalist-Mono
+   accent (it lives inside `.mono-portal`). Square handles, accent stencil lines
+   + grid, dimmed overlay on the cropped-out area. */
+.mono-portal .advanced-cropper-simple-handler {
+  background: var(--m-accent);
+  border-radius: 0;
+  width: 8px;
+  height: 8px;
+}
+.mono-portal .advanced-cropper-simple-line {
+  border-color: var(--m-accent);
+}
+.mono-portal .advanced-cropper-stencil-grid line {
+  stroke: var(--m-accent);
+  opacity: 0.45;
+}
+.mono-portal .advanced-cropper-stencil-overlay {
+  color: var(--m-bg);
+  opacity: 0.6;
+}
+
+/* Dropdown/menu separators — HeroUI's `showDivider` renders an <hr> with a
+   ~1px `bg-divider` token. Replace it with the brutalist 2px `--m-dim`
+   full-bleed rule used elsewhere. */
+.mono-portal hr,
+.mono-portal li[role="separator"] {
+  height: 2px;
+  margin: 0;
+  padding-inline: 0;
+  border: 0;
+  opacity: 1;
+  background-color: var(--m-dim);
+}
+
+/* Auth modal entrance — Brutalist Mono. Drives HeroUI's modal motion (which we
+   disable) with plain CSS so it matches spec exactly and respects reduced motion. */
+@keyframes mono-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes mono-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.mono-modal-enter {
+  animation: mono-modal-in 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.mono-backdrop-enter {
+  animation: mono-backdrop-in 120ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-modal-enter {
+    animation: mono-backdrop-in 120ms ease-out;
+  }
+  .mono-backdrop-enter {
+    animation: mono-backdrop-in 120ms ease-out;
+  }
+}
+
+/* Toast slide-in — Brutalist Mono. From the right, short + linear-ish. */
+@keyframes mono-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.mono-toast-enter {
+  animation: mono-toast-in 200ms ease forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-toast-enter {
+    animation: none;
+  }
+}
+
+/* Glitch headline — Brutalist Mono error pages. The main text jitters on the
+   "glitch beat"; two clipped ghost copies (accent top half, error bottom half)
+   flash on the same beat. Theme-aware via the `--m-*` tokens. */
+@keyframes mono-glitch-jit {
+  0%,
+  92%,
+  100% {
+    transform: none;
+  }
+  93% {
+    transform: translate(-2px, 1px);
+  }
+  95% {
+    transform: translate(2px, -1px);
+  }
+  97% {
+    transform: translate(-1px, 0);
+  }
+}
+@keyframes mono-glitch-flash {
+  0%,
+  92%,
+  100% {
+    opacity: 0;
+  }
+  93%,
+  96% {
+    opacity: 1;
+  }
+}
+.mono-glitch {
+  position: relative;
+  display: inline-block;
+}
+.mono-glitch-main {
+  display: inline-block;
+  animation: mono-glitch-jit 4.2s infinite;
+}
+.mono-glitch-ghost {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  animation: mono-glitch-flash 4.2s infinite;
+}
+.mono-glitch-g1 {
+  color: var(--m-accent);
+  transform: translate(-2px, 0);
+  clip-path: inset(0 0 55% 0);
+}
+.mono-glitch-g2 {
+  color: var(--m-error);
+  transform: translate(2px, 0);
+  clip-path: inset(55% 0 0 0);
+}
+/* Blinking block caret — terminal feel after a glitch headline. */
+.mono-caret {
+  display: inline-block;
+  width: 0.55ch;
+  height: 1em;
+  vertical-align: -0.1em;
+  margin-left: 4px;
+  background: var(--m-accent);
+  animation: lzblink 1.05s step-end infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-glitch-main {
+    animation: none;
+  }
+  .mono-glitch-ghost {
+    display: none;
+  }
+  .mono-caret {
+    animation: none;
+  }
+}
+
+/* Blinking terminal caret for the "Brutalist Mono" (variant B) home stats label. */
+@keyframes lzblink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ───────────────────────── LAB / FX effects ─────────────────────────
+   Toys + new primitives for the /brand LAB tab. EVERY animated rule below has
+   a `prefers-reduced-motion: reduce` fallback that drops the motion to a static
+   end-state (the visual stays legible, just stops moving). */
+
+/* Glitch-on-hover — RGB chromatic split datamosh, opt-in via the `hover` prop on
+   GlitchText / the `.mono-glitch--hover` class. Two ::before/::after ghosts
+   (accent + error) tear off the baseline ONLY while hovered/focused. Theme-aware
+   via the `--m-*` tokens; needs `data-text` mirroring the visible text. */
+@keyframes mono-glitch-hover-a {
+  0% {
+    clip-path: inset(0 0 65% 0);
+  }
+  50% {
+    clip-path: inset(25% 0 35% 0);
+  }
+  100% {
+    clip-path: inset(55% 0 5% 0);
+  }
+}
+@keyframes mono-glitch-hover-b {
+  0% {
+    clip-path: inset(60% 0 5% 0);
+  }
+  50% {
+    clip-path: inset(35% 0 40% 0);
+  }
+  100% {
+    clip-path: inset(5% 0 70% 0);
+  }
+}
+.mono-glitch--hover {
+  position: relative;
+  display: inline-block;
+}
+.mono-glitch--hover::before,
+.mono-glitch--hover::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+.mono-glitch--hover:hover::before,
+.mono-glitch--hover:focus-visible::before {
+  opacity: 0.9;
+  color: var(--m-accent);
+  transform: translate(-3px, -1px);
+  animation: mono-glitch-hover-a 0.25s steps(2) infinite;
+}
+.mono-glitch--hover:hover::after,
+.mono-glitch--hover:focus-visible::after {
+  opacity: 0.9;
+  color: var(--m-error);
+  transform: translate(3px, 1px);
+  animation: mono-glitch-hover-b 0.25s steps(2) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced motion: a single static split (no animation, no jitter) so the
+     effect is still expressed but stays still. */
+  .mono-glitch--hover:hover::before,
+  .mono-glitch--hover:focus-visible::before {
+    animation: none;
+    clip-path: inset(0 0 60% 0);
+  }
+  .mono-glitch--hover:hover::after,
+  .mono-glitch--hover:focus-visible::after {
+    animation: none;
+    clip-path: inset(55% 0 0 0);
+  }
+}
+
+/* Ambient Matrix-rain backdrop — NEO THEME ONLY. The rain (the global drape +
+   the error-page backdrop) is the headline visual of the `neo` theme; outside
+   neo it's hidden so the light/dark themes look exactly as before. neo always
+   carries `.dark` + `.neo` (set pre-paint), so the rain only ever paints on the
+   dark canvas. The `neo` class is set pre-paint, so no flash. */
+html:not(.neo) .mono-rain-bg {
+  display: none;
+}
+
+/* Redaction bar (`:redact[…]` / RevealMark variant="redact") — a solid `--m-fg`
+   censor block over the span; the text underneath is set to `--m-bg` so it's
+   invisible until revealed. On hover/focus the block wipes away L→R (clip-path)
+   and the text fades back to `--m-fg`. Inline, server-safe (pure CSS). */
+.mono-redact {
+  position: relative;
+  cursor: pointer;
+  color: var(--m-bg);
+  outline: none;
+  transition: color 0.16s ease;
+}
+.mono-redact::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--m-fg);
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 0.16s ease;
+}
+.mono-redact:hover,
+.mono-redact:focus-visible {
+  color: var(--m-fg);
+}
+.mono-redact:hover::after,
+.mono-redact:focus-visible::after {
+  clip-path: inset(0 0 0 100%);
+}
+
+/* Signal blur (`:spoiler[…]` / RevealMark variant="blur") — a `blur(5px)` span
+   in a 2px `--m-dim` box; sharpens to blur(0) on hover/focus and stays sharp
+   (focus is sticky via tabindex). Inline, server-safe. */
+.mono-spoiler {
+  cursor: pointer;
+  border: 2px solid var(--m-dim);
+  padding: 0 4px;
+  filter: blur(5px);
+  outline: none;
+  transition: filter 0.18s ease;
+}
+.mono-spoiler:hover,
+.mono-spoiler:focus,
+.mono-spoiler:focus-within,
+.mono-spoiler:focus-visible {
+  filter: blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced motion: drop the wipe/blur transitions; the reveal still works,
+     it just snaps instead of animating. */
+  .mono-redact,
+  .mono-redact::after,
+  .mono-spoiler {
+    transition: none;
+  }
+}
+
+/* Jiggle (`.mono-jiggle`) — a quick playful "laughing" wobble: a few-degree
+   side-to-side rotate looping while the trigger is hovered/focused
+   (transform-only, so no layout shift). The class sits on the TRIGGER (e.g. the
+   header link that owns the focus ring); the wobble is applied to its
+   `.mono-jiggle__mark` child, so the focus outline itself never moves. Used by
+   the NEO white-rabbit header easter-egg. */
+@keyframes mono-jiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-7deg);
+  }
+  40% {
+    transform: rotate(6deg);
+  }
+  60% {
+    transform: rotate(-4deg);
+  }
+  80% {
+    transform: rotate(3deg);
+  }
+}
+.mono-jiggle:hover .mono-jiggle__mark,
+.mono-jiggle:focus-visible .mono-jiggle__mark {
+  animation: mono-jiggle 0.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced motion: no wobble — the hover opacity/brightness reveal still
+     reads, the mark just stays still. */
+  .mono-jiggle:hover .mono-jiggle__mark,
+  .mono-jiggle:focus-visible .mono-jiggle__mark {
+    animation: none;
+  }
+}
+
+/* Keycap (`:kbd[…]` / Kbd) — JetBrains Mono 11px/0.12em/leading-none key cap,
+   square 2px `--m-line` border on `--m-panel`. Static. */
+.mono-kbd {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--m-fg);
+  background: var(--m-panel);
+  border: 2px solid var(--m-line);
+  padding: 4px 8px;
+  vertical-align: baseline;
+}
+
+/* Scanline highlight (`:scan[…]` / ScanText) — resting accent wash on the text
+   (text stays `--m-fg` for AA contrast), plus a one-shot accent light-bar sweep
+   on scroll-in (`.mono-scan--sweep`) and on hover (the server-safe path). */
+@keyframes mono-scan-sweep {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(110%);
+  }
+}
+.mono-scan {
+  position: relative;
+  background: color-mix(in srgb, var(--m-accent) 12%, transparent);
+  color: var(--m-fg);
+  padding: 0 2px;
+  overflow: hidden;
+}
+.mono-scan::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--m-accent) 45%, transparent),
+    transparent
+  );
+  transform: translateX(-110%);
+  pointer-events: none;
+}
+.mono-scan--sweep::after,
+.mono-scan:hover::after {
+  animation: mono-scan-sweep 0.22s ease-out 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced motion: the resting wash only — no sweep. */
+  .mono-scan::after {
+    display: none;
+  }
+}
+
+/* Transcript line stagger (Transcript / `:::terminal`) — each row fades+rises in
+   on scroll-in; the inline `animation-delay` staggers them. */
+@keyframes mono-transcript-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.mono-transcript-line {
+  opacity: 0;
+  animation: mono-transcript-in 0.24s ease-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-transcript-line {
+    opacity: 1;
+    animation: none;
+  }
+}
+
+/* Glyph cursor trail (GlyphCursorTrail) — each spawned glyph drifts up + fades
+   over ~200ms, then is reaped by the component. */
+@keyframes mono-trail-fade {
+  0% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -120%) scale(0.85);
+  }
+}
+.mono-trail-glyph {
+  animation: mono-trail-fade 0.22s linear forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* The component already disables spawning under reduced-motion; this is the
+     belt-and-braces fallback if any glyph slips through. */
+  .mono-trail-glyph {
+    display: none;
+  }
+}
+
+/* ═══════════════════════ Batch 2 — effects & toys (CSS) ═══════════════════════
+   Read-view inline marks, block directives and LAB-only toys. Same closed scale:
+   11px/0.12em labels, 14px/1.6 body, 2px square geometry, `--m-*` tokens. Every
+   animated effect drops its motion under `prefers-reduced-motion` to a legible
+   static end-state. */
+
+/* `:strike[…]` self-redacting edit (RevealMark variant="strike") — a 2px
+   `--m-accent` strike-through drawn L→R on scroll-in via a clipped ::after. */
+@keyframes mono-strike-draw {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.mono-strike {
+  position: relative;
+  color: var(--m-muted);
+}
+.mono-strike::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: var(--m-accent);
+  clip-path: inset(0 100% 0 0);
+}
+.mono-strike--draw::after {
+  animation: mono-strike-draw 0.5s ease-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-strike::after {
+    clip-path: inset(0 0 0 0);
+    animation: none;
+  }
+}
+
+/* `:cite[…]` footnote decode tooltip (CiteTooltip) — dotted-underline term with a
+   bounded popover that MatrixText-decodes once. Popover sits just under modals. */
+.mono-cite {
+  position: relative;
+  border-bottom: 2px dotted var(--m-dim);
+  cursor: help;
+  outline: none;
+}
+.mono-cite:focus-visible {
+  outline: 2px solid var(--m-accent);
+  outline-offset: 2px;
+}
+.mono-cite-pop {
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  margin-bottom: 8px;
+  z-index: calc(var(--m-z-modal) - 1);
+  display: block;
+  width: max-content;
+  max-width: 280px;
+  border: 2px solid var(--m-dim);
+  background: var(--m-card);
+  padding: 16px;
+  text-align: left;
+}
+.mono-cite-eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--m-accent);
+}
+.mono-cite-body {
+  display: block;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--m-fg);
+}
+
+/* `:ref[n]` margin ledger number (MarginRef) — superscript accent tag; on hover a
+   2px accent rule sweeps out toward the note. */
+.mono-ref {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  vertical-align: super;
+  color: var(--m-accent);
+  text-decoration: none;
+}
+.mono-ref::after {
+  content: "";
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--m-accent);
+  transition: width 0.22s ease-out;
+}
+.mono-ref:hover::after,
+.mono-ref:focus-visible::after {
+  width: 18px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-ref::after {
+    transition: none;
+  }
+}
+
+/* `:wave[…]` caret sweep highlight (WaveHighlight) — chars light accent as a
+   block-caret passes; the caret blinks while travelling. */
+.mono-wave--lit {
+  color: var(--m-accent);
+}
+.mono-wave-caret {
+  color: var(--m-accent);
+  animation: lzblink 0.6s steps(1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-wave-caret {
+    animation: none;
+  }
+}
+
+/* `:link[…]` scanline hover link (ScanLink) — rests muted; hover reveals accent +
+   a 2px underline that sweeps in L→R. */
+.mono-scanlink {
+  position: relative;
+  display: inline-block;
+  color: var(--m-muted);
+  text-decoration: none;
+  transition: color 0.16s ease;
+}
+.mono-scanlink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 2px;
+  width: 100%;
+  background: var(--m-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.22s ease-out;
+}
+.mono-scanlink:hover,
+.mono-scanlink:focus-visible {
+  color: var(--m-accent);
+}
+.mono-scanlink:hover::after,
+.mono-scanlink:focus-visible::after {
+  transform: scaleX(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-scanlink,
+  .mono-scanlink::after {
+    transition: none;
+  }
+}
+
+/* `:::poll` ASCII bar readout (PollBlock) — labelled bars that fill L→R on
+   scroll-in. */
+.mono-poll {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.mono-poll-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.mono-poll-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--m-muted2);
+}
+.mono-poll-pct {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--m-accent);
+}
+.mono-poll-track {
+  height: 12px;
+  border: 2px solid var(--m-dim);
+  background: transparent;
+}
+.mono-poll-fill {
+  height: 100%;
+  background: var(--m-accent);
+  transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-poll-fill {
+    transition: none;
+  }
+}
+
+/* `:::ansi` colour block (AnsiBlock) — whitelisted token swatches. */
+.mono-ansi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.mono-ansi-chip-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mono-ansi-chip {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--m-line);
+}
+.mono-ansi-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--m-muted);
+}
+
+/* Marquee ticker (Marquee) — seamless R→L scroll, pause on hover. */
+@keyframes mono-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.mono-marquee {
+  overflow: hidden;
+}
+.mono-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: mono-marquee 22s linear infinite;
+}
+.mono-marquee:hover .mono-marquee-track {
+  animation-play-state: paused;
+}
+.mono-marquee-run {
+  display: inline-flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 10px;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Static, horizontally-scrollable strip — no auto-translate. */
+  .mono-marquee {
+    overflow-x: auto;
+  }
+  .mono-marquee-track {
+    animation: none;
+  }
+}
+
+/* Datamosh scroll smear (DatamoshHeadline) — accent/error channel tear +
+   slice-offset while the `--smear` state is on (driven by scroll velocity). */
+.mono-datamosh {
+  position: relative;
+  display: inline-block;
+}
+.mono-datamosh-main {
+  position: relative;
+  z-index: 1;
+}
+.mono-datamosh-ghost {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.mono-datamosh--smear .mono-datamosh-g1 {
+  opacity: 0.85;
+  color: var(--m-accent);
+  transform: translate(-3px, -1px);
+  clip-path: inset(0 0 55% 0);
+}
+.mono-datamosh--smear .mono-datamosh-g2 {
+  opacity: 0.85;
+  color: var(--m-error);
+  transform: translate(3px, 1px);
+  clip-path: inset(55% 0 0 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-datamosh-ghost {
+    display: none;
+  }
+}
+
+/* CRT channel-surf (ChannelSurf) — scoped scanline drape + a roll bar / static
+   frame on a channel cut. The scanline recipe applied at panel scale. */
+.mono-tv-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.22) 0px,
+    rgba(0, 0, 0, 0.22) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+  mix-blend-mode: multiply;
+}
+@keyframes mono-tv-roll {
+  from {
+    top: -30%;
+  }
+  to {
+    top: 130%;
+  }
+}
+.mono-tv-roll {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background: repeating-linear-gradient(
+    0deg,
+    var(--m-muted2) 0px,
+    var(--m-muted2) 1px,
+    transparent 2px,
+    transparent 3px
+  );
+  opacity: 0.4;
+  animation: mono-tv-roll 0.16s linear 1;
+  pointer-events: none;
+}
+.mono-tv-rec {
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--m-error);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-tv-roll {
+    display: none;
+  }
+}
+
+/* Before/after compare slider (CompareSlider) — two stacked panels, the BEFORE
+   clipped over the AFTER by a draggable 2px accent handle. */
+.mono-compare {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid var(--m-dim);
+  min-height: 160px;
+  user-select: none;
+  touch-action: none;
+}
+.mono-compare-panel {
+  position: absolute;
+  inset: 0;
+  padding: 20px;
+  background: var(--m-card);
+}
+.mono-compare-after {
+  position: relative;
+}
+.mono-compare-tag {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--m-muted2);
+}
+.mono-compare-text {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--m-fg);
+  white-space: pre-wrap;
+}
+.mono-compare-before {
+  /* The visible divider is the draggable handle (2px accent); the before panel
+     is clipped at the same x, so no edge of its own. */
+  background: var(--m-card);
+}
+.mono-compare-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--m-accent);
+  transform: translateX(-1px);
+  cursor: ew-resize;
+  z-index: 2;
+  outline: none;
+}
+.mono-compare-handle:focus-visible {
+  outline: 2px solid var(--m-accent);
+  outline-offset: 2px;
+}
+.mono-compare-grip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--m-accent);
+  background: var(--m-bg);
+  font-size: 11px;
+  letter-spacing: 0;
+  color: var(--m-accent);
+}
+
+/* Terminal spoiler / details (FoldBlock) — native <details>; the body rests on a
+   left rail and the summary toggles `[ + ] / [ – ]`. */
+.mono-fold {
+  border-left: 2px solid var(--m-dim);
+  padding-left: 16px;
+}
+.mono-fold-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--m-accent);
+}
+.mono-fold-summary::-webkit-details-marker {
+  display: none;
+}
+.mono-fold-mark {
+  color: var(--m-accent);
+}
+.mono-fold-body {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--m-fg);
+}
+
+/* `:::diff` redline / patch block (DiffBlock) — added/removed/context lines with a
+   line-number gutter, on a left accent rail. */
+.mono-diff {
+  border-left: 2px solid var(--m-accent);
+  background: var(--m-card);
+  padding: 12px 0;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.mono-diff-line {
+  display: grid;
+  grid-template-columns: 2.5rem 1.25rem 1fr;
+  padding: 0 16px;
+}
+.mono-diff-num {
+  color: var(--m-muted2);
+  font-variant-numeric: tabular-nums;
+}
+.mono-diff-sign {
+  text-align: center;
+}
+.mono-diff-add {
+  background: color-mix(in srgb, var(--m-accent) 10%, transparent);
+}
+.mono-diff-add .mono-diff-sign,
+.mono-diff-add .mono-diff-text {
+  color: var(--m-accent);
+}
+.mono-diff-del .mono-diff-sign,
+.mono-diff-del .mono-diff-text {
+  color: var(--m-error);
+  text-decoration: line-through;
+}
+.mono-diff-ctx .mono-diff-text {
+  color: var(--m-muted);
+}
+
+/* ───────────────────────── Brutalist Mono primitives ─────────────────────────
+   Reusable atomic style batches so the same look is applied via ONE class name
+   everywhere (no copy-pasted long class strings, no drift). These encode the
+   unified label/category tracking standard (text-[11px] tracking-[0.12em]) and
+   the shared display/title/field/control treatments. Apply with `className`;
+   compose freely with extra utilities (color overrides, spacing, hover).
+   Used by the .tsx primitives in src/shared/ui/mono and directly where only
+   styling (not markup) repeats. */
+@layer components {
+  /* Eyebrow / section label — the accent `// LABEL` line. Add `uppercase` where
+     the source did. */
+  .mono-label {
+    @apply text-[11px] font-medium tracking-[0.12em] text-[var(--m-accent)];
+  }
+
+  /* `[ cat ]` category line — always uppercase, accent. */
+  .mono-cat {
+    @apply text-[11px] font-medium tracking-[0.12em] text-[var(--m-accent)] uppercase;
+  }
+
+  /* Card / content title (H3 size). Pair with `group-hover:text-[var(--m-accent)]`
+     (or the hover variant) where the source had a hover. */
+  .mono-title {
+    @apply font-display text-[18px] leading-[1.18] font-semibold;
+  }
+
+  /* Field label for the mono auth + reset forms. */
+  .mono-field-label {
+    @apply mb-2 block text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase;
+  }
+
+  /* Underline-style text input (auth + reset). Border color is applied per
+     state by the caller (error vs dim/focus). */
+  .mono-input {
+    @apply w-full border-0 border-b-2 bg-transparent text-[var(--m-fg)] caret-[var(--m-accent)] transition-colors outline-none placeholder:text-[var(--m-muted2)];
+  }
+
+  /* Inverted-accent primary button (filled accent → hollow on hover). */
+  .mono-cta {
+    @apply border-2 border-[var(--m-accent)] bg-[var(--m-accent)] text-[var(--m-bg)] uppercase transition-colors hover:bg-transparent hover:text-[var(--m-accent)] disabled:opacity-60;
+  }
+
+  /* Outline button — dim border, accent on hover. */
+  .mono-btn-outline {
+    @apply border-2 border-[var(--m-dim)] text-[var(--m-muted)] uppercase transition-colors hover:border-[var(--m-accent)] hover:text-[var(--m-accent)];
+  }
+
+  /* Square icon-only button — dim border, accent on hover (no uppercase). */
+  .mono-icon-btn {
+    /* Pure border, NO fill — consistent everywhere (the floating kebab/dropdown
+       no longer carries an ad-hoc `--m-card` bg either, so all icon buttons read
+       the same: a 2px box, transparent interior). */
+    @apply flex flex-none items-center justify-center border-2 border-[var(--m-dim)] text-[var(--m-muted)] transition-colors hover:border-[var(--m-accent)] hover:text-[var(--m-accent)];
+  }
+
+  /* Brutalist scrollbar — square, 2px-inset dim thumb on the page background.
+     Apply to any capped/overflowing list (Crepe slash menu, etc.) so it never
+     falls back to the OS chrome. */
+  .mono-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--m-dim) var(--m-bg);
+  }
+  .mono-scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  .mono-scrollbar::-webkit-scrollbar-track {
+    background: var(--m-bg);
+  }
+  .mono-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--m-dim);
+    border: 2px solid var(--m-bg);
+    border-radius: 0;
+  }
+  .mono-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--m-muted2);
+  }
+
+  /* Invisible scrollbar — the element still scrolls, but no bar is drawn (for
+     small capped fields where a visible bar would be ugly, e.g. the summary). */
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}

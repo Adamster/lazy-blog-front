@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { VoteDirection } from './VoteDirection';
+import {
+    VoteDirectionFromJSON,
+    VoteDirectionFromJSONTyped,
+    VoteDirectionToJSON,
+    VoteDirectionToJSONTyped,
+} from './VoteDirection';
 import type { TagPostResponse } from './TagPostResponse';
 import {
     TagPostResponseFromJSON,
@@ -20,13 +27,6 @@ import {
     TagPostResponseToJSON,
     TagPostResponseToJSONTyped,
 } from './TagPostResponse';
-import type { NullableOfVoteDirection } from './NullableOfVoteDirection';
-import {
-    NullableOfVoteDirectionFromJSON,
-    NullableOfVoteDirectionFromJSONTyped,
-    NullableOfVoteDirectionToJSON,
-    NullableOfVoteDirectionToJSONTyped,
-} from './NullableOfVoteDirection';
 
 /**
  * 
@@ -78,10 +78,10 @@ export interface UserPostItem {
     rating: number;
     /**
      * 
-     * @type {NullableOfVoteDirection}
+     * @type {VoteDirection}
      * @memberof UserPostItem
      */
-    voteDirection: NullableOfVoteDirection | null;
+    voteDirection: VoteDirection | null;
     /**
      * 
      * @type {string}
@@ -146,7 +146,7 @@ export function UserPostItemFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'views': json['views'],
         'comments': json['comments'],
         'rating': json['rating'],
-        'voteDirection': NullableOfVoteDirectionFromJSON(json['voteDirection']),
+        'voteDirection': VoteDirectionFromJSON(json['voteDirection']),
         'coverUrl': json['coverUrl'],
         'isPublished': json['isPublished'],
         'tags': ((json['tags'] as Array<any>).map(TagPostResponseFromJSON)),
@@ -172,7 +172,7 @@ export function UserPostItemToJSONTyped(value?: UserPostItem | null, ignoreDiscr
         'views': value['views'],
         'comments': value['comments'],
         'rating': value['rating'],
-        'voteDirection': NullableOfVoteDirectionToJSON(value['voteDirection']),
+        'voteDirection': VoteDirectionToJSON(value['voteDirection']),
         'coverUrl': value['coverUrl'],
         'isPublished': value['isPublished'],
         'tags': ((value['tags'] as Array<any>).map(TagPostResponseToJSON)),
