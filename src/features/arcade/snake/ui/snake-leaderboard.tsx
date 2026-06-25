@@ -1,5 +1,6 @@
 "use client";
 
+import { Spinner } from "@/shared/ui";
 import { BOARD_SIZE } from "../model/leaderboard";
 import type { RankedRow } from "../model/types";
 
@@ -39,13 +40,18 @@ function BoardRow({ row }: { row: RankedRow }) {
  * The high-score panel — a `// HIGH SCORES` header + `TOP N` count + the ranked
  * rows, borderless and flush to the rail edge. The board is the cross-user
  * backend leaderboard (`useSnakeLeaderboard` → padded to {@link BOARD_SIZE} by
- * `rankApiBoard`); the viewer's own row renders in accent as `YOU`.
+ * `rankApiBoard`); the viewer's own row renders in accent as `YOU`. While the
+ * query first loads (no data yet), the app's standard spinner shows instead of
+ * the 0/·· placeholders.
  */
 export function SnakeLeaderboard({
   board,
+  loading = false,
   className = "",
 }: {
   board: RankedRow[];
+  /** The board query is on its first load → skeleton rows, not 0/·· placeholders. */
+  loading?: boolean;
   className?: string;
 }) {
   return (
@@ -59,11 +65,17 @@ export function SnakeLeaderboard({
         </span>
       </div>
 
-      <div>
-        {board.map((row) => (
-          <BoardRow key={`${row.name}-${row.rank}`} row={row} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <Spinner className="text-[20px] text-[var(--m-accent)]" />
+        </div>
+      ) : (
+        <div>
+          {board.map((row) => (
+            <BoardRow key={`${row.name}-${row.rank}`} row={row} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

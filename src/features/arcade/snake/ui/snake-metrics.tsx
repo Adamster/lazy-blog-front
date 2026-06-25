@@ -1,6 +1,6 @@
 "use client";
 
-import { Label } from "@/shared/ui";
+import { Label, Spinner } from "@/shared/ui";
 import { Sparkline } from "@/shared/ui/sparkline";
 import { formatScore } from "../model/leaderboard";
 import { HISTORY_RECENT } from "../model/score-history";
@@ -16,6 +16,9 @@ interface StatDef {
   accent?: boolean;
   /** True for the live SCORE cell — hosts the floating "+N" juice. */
   live?: boolean;
+  /** True for a SERVER-backed number (BEST) — skeletoned while its query loads
+   *  so it never flashes a misleading 0. */
+  server?: boolean;
 }
 
 /** Columns 1–2: the big 46/700 numbers (Score, Best). */
@@ -28,7 +31,12 @@ function statsFor(state: SnakeGameState): StatDef[] {
       accent: true,
       live: true,
     },
-    { label: "BEST", value: formatScore(state.best), sub: "personal best" },
+    {
+      label: "BEST",
+      value: formatScore(state.best),
+      sub: "personal best",
+      server: true,
+    },
   ];
 }
 
@@ -73,9 +81,12 @@ function ScoreHistoryChart({ history }: { history: HistoryPoint[] }) {
 export function SnakeStatsBand({
   state,
   history,
+  statsLoading = false,
 }: {
   state: SnakeGameState;
   history: HistoryPoint[];
+  /** Server best/rank still on first load → skeleton the BEST number (not 0). */
+  statsLoading?: boolean;
 }) {
   return (
     <section className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
@@ -85,14 +96,37 @@ export function SnakeStatsBand({
           // to the number without shifting the grid.
           <div key={s.label} className="relative">
             <Label>{s.label}</Label>
-            {/* Anchored to the SCORE number's top so each "+10" rises off it. */}
-            {s.live && <ScorePops score={state.score} />}
-            <div
-              className="font-display mt-2 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums"
-              style={{ color: s.accent ? "var(--m-accent)" : "var(--m-fg)" }}
-            >
-              {s.value}
-            </div>
+            {s.server && statsLoading ? (
+              // The number's query hasn't returned its first value yet — show the
+              // app's standard spinner (never a misleading 0) in the number's
+              // footprint so the row doesn't jump.
+              <div className="mt-2 flex h-[46px] items-center">
+                <Spinner className="text-[26px] text-[var(--m-accent)]" />
+              </div>
+            ) : (
+              // `relative inline-block` so it hugs the digits' VARIABLE width and
+              // the live SCORE cell can anchor its "+N" pops to the number's RIGHT
+              // edge (via `left-full` inside ScorePops) regardless of digit count,
+              // with zero layout shift.
+              <div className="relative mt-2 inline-block">
+                <div
+                  className="font-display text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums"
+                  style={{
+                    color: s.accent ? "var(--m-accent)" : "var(--m-fg)",
+                  }}
+                >
+                  {s.value}
+                </div>
+                {/* Pops sit just RIGHT of the number, vertically centred on it.
+                    Mount ONLY while a run is live: leaving "playing" unmounts it,
+                    so a new run mounts a FRESH instance with `prevRef` re-seeded
+                    to 0 — the restart's N→0 score reset never spawns a spurious
+                    −N float, while in-play penalties (laugher/ears) still do. */}
+                {s.live && state.screen === "playing" && (
+                  <ScorePops score={state.score} />
+                )}
+              </div>
+            )}
             <div className="mt-2 text-[12px] leading-none text-[var(--m-muted2)]">
               {s.sub}
             </div>

@@ -18,6 +18,10 @@ export interface SnakeArcadeApi {
   game: SnakeGameApi;
   /** The ranked, padded leaderboard board (server entries + viewer highlight). */
   board: RankedRow[];
+  /** The viewer's best/rank query is on its FIRST load — show a skeleton, not 0. */
+  statsLoading: boolean;
+  /** The leaderboard query is on its FIRST load — show skeleton rows, not 0/··. */
+  boardLoading: boolean;
 }
 
 /**
@@ -78,5 +82,15 @@ export function useSnakeArcade(options?: UseSnakeGameOptions): SnakeArcadeApi {
     [leaderboard.data, viewerHandle]
   );
 
-  return { game: mergedGame, board };
+  return {
+    game: mergedGame,
+    board,
+    // Spinner until REAL data lands — gate on `data === undefined`, NOT
+    // `isLoading`. A query that's idle/disabled or has errored reports
+    // `isLoading === false` while still holding no data, which would flash a
+    // misleading 0. "No value yet" holds the loader; a refetch keeps the prior
+    // data, so it never re-flashes once loaded.
+    statsLoading: myStats.data === undefined,
+    boardLoading: leaderboard.data === undefined,
+  };
 }
