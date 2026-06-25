@@ -84,7 +84,7 @@ export const ErrorMessage = ({
   const headline = isNeo ? "The matrix has you…" : "A glitch in the Lazyverse";
   const lead = isNeo
     ? "Knock, knock, Neo."
-    : "Something broke on our side — not you. Try again; if it keeps happening, head back home.";
+    : "Something on our side worked too hard and gave out. Not your fault — ours.";
 
   return (
     <div
