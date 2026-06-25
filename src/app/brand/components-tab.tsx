@@ -4,10 +4,14 @@ import { useState } from "react";
 import {
   AdjustmentsHorizontalIcon,
   LinkIcon,
-  TrashIcon,
   PencilIcon,
 } from "@heroicons/react/24/solid";
-import { EyeSlashIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  EyeSlashIcon,
+  XMarkIcon,
+  PencilSquareIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 import {
   Label,
   Category,
@@ -20,6 +24,7 @@ import {
   Select,
   Switch,
   Avatar,
+  DraftOverlay,
   Modal,
   ModalHeader,
   SubmitButton,
@@ -235,12 +240,7 @@ export function ComponentsTab() {
                 </State>
                 <State caption="unpublished cover overlay">
                   <div className="relative aspect-[16/9] w-full overflow-hidden border-2 border-[var(--m-dim)] bg-[var(--m-panel)]">
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[var(--m-bg)]/70">
-                      <EyeSlashIcon className="size-7 text-[var(--m-fg)]" />
-                      <span className="text-[11px] font-semibold tracking-[0.12em] text-[var(--m-fg)] uppercase">
-                        Unpublished
-                      </span>
-                    </div>
+                    <DraftOverlay size="card" />
                   </div>
                 </State>
               </div>
@@ -516,7 +516,7 @@ export function ComponentsTab() {
                       {
                         id: "edit",
                         label: "Edit",
-                        icon: <PencilIcon />,
+                        icon: <PencilSquareIcon />,
                         onSelect: () => addToastSuccess("Edit clicked"),
                       },
                       {

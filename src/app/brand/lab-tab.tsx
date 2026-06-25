@@ -717,7 +717,7 @@ function ChannelSurfSection() {
     <Section
       index="19"
       title="CRT CHANNEL-SURF"
-      intro="A contained ‘TV’ panel with a scoped scanline drape; the button hard-cuts to the next channel with a one-frame static roll-bar. Mirrors the page CrtOverlay scanline recipe at panel scale. LAB-only. Reduced motion: an instant cut, no roll."
+      intro="A contained ‘TV’ panel with a scoped scanline drape; the button hard-cuts to the next channel with a one-frame static roll-bar. Uses the `.mono-tv-*` scanline recipe at panel scale. LAB-only. Reduced motion: an instant cut, no roll."
     >
       <Panel caption="// sloth tv">
         <ChannelSurf />

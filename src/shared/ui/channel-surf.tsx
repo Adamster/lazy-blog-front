@@ -29,7 +29,7 @@ const CHANNELS: Channel[] = [
 /**
  * CRT channel-surf — a contained "TV" panel; the button hard-cuts to the next
  * channel with a one-frame static + roll-bar over the scoped scanline screen
- * (`.mono-tv-*`, mirroring the CrtOverlay scanline recipe at a scoped scale). The
+ * (`.mono-tv-*`, the scanline recipe applied at a scoped panel scale). The
  * static bar is `--m-muted2`, the channel label 11px/0.12em accent. LAB-only.
  * Reduced motion: an instant cut — no roll, no static frame.
  */

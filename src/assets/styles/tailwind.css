@@ -867,7 +867,7 @@ html:not(.neo) .mono-rain-bg {
 }
 
 /* CRT channel-surf (ChannelSurf) — scoped scanline drape + a roll bar / static
-   frame on a channel cut. Mirrors the page CrtOverlay recipe at panel scale. */
+   frame on a channel cut. The scanline recipe applied at panel scale. */
 .mono-tv-scan {
   position: absolute;
   inset: 0;
