@@ -84,7 +84,7 @@ export const ErrorMessage = ({
   const headline = isNeo ? "The matrix has you…" : "A glitch in the Lazyverse";
   const lead = isNeo
     ? "Knock, knock, Neo."
-    : "A déjà vu is usually a glitch in the Matrix. It happens when they change something.";
+    : "Something broke on our side — not you. Try again; if it keeps happening, head back home.";
 
   return (
     <div
