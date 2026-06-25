@@ -1,4 +1,27 @@
+import { MATRIX_GLYPHS } from "@/shared/lib/glyphs";
 import type { Cell, Speed } from "./types";
+
+/**
+ * RENDER MODE for the snake + rabbits — the ONE switch the owner flips.
+ *
+ *  - `"glyph"` (DEFAULT): the snake is drawn as a MATRIX-RAIN STREAM of glyphs
+ *    bending along its body (bright near-white head → green {@link ACCENT} body
+ *    dimming to {@link ACCENT_DIM} at the tail) — the on-theme "Matrix code"
+ *    look, see {@link drawSnakeGlyphs}. The rabbits are ALWAYS the bunny-
+ *    silhouette pixel SPRITES (owner preference — they read better than glyph
+ *    rabbits), independent of this flag.
+ *  - `"sprite"`: the ORIGINAL pixel-art look — the grey sentinel head/body/tail
+ *    bitmaps (plus the same bunny rabbits). Flipping back to `"sprite"` restores
+ *    today's behaviour EXACTLY (every sprite const, {@link drawSprite}, {@link
+ *    rotateSprite} and the M/R colour maps are all still here, just gated by this
+ *    flag). Only the SNAKE body changes between modes; the rabbits do not.
+ *
+ * Mechanics / collisions / spawns / teardown are IDENTICAL in both modes — this
+ * is purely a render swap. To revert to the sprites, change this one line to
+ * `"sprite"`. (HMR won't re-instantiate the engine, so a HARD REFRESH is needed
+ * to see a flag flip.)
+ */
+const SNAKE_RENDER: "glyph" | "sprite" = "glyph";
 
 /**
  * Play-field grid, in cells. The board is a LANDSCAPE rectangle (wider than
@@ -117,8 +140,17 @@ const BOARD_BG = "#1a1a1a";
 const ACCENT = "#cdff48";
 /** Tail-end body tint — a dimmer accent so the body reads with subtle depth. */
 const ACCENT_DIM = "#5f7a23";
-/** White rabbit (the food) — `--m-fg` on the dark theme. "Follow the white rabbit." */
-const RABBIT_WHITE = "#e6e6e6";
+/**
+ * The SENTINEL creature is metallic GREY (the Matrix machine reads grey-black on
+ * screen, never lime): light at the head, dimming toward the tail. Light enough
+ * to read on {@link BOARD_BG} and distinctly greyer than the white rabbit so the
+ * two never blur.
+ */
+const SENTINEL = "#a8acb2";
+const SENTINEL_DIM = "#565a60";
+/** White rabbit (the food) — `--m-fg` on the dark theme. Exported so the hidden
+ *  header easter-egg ({@link RabbitMark}) paints the food its exact game colour. */
+export const RABBIT_WHITE = "#e6e6e6";
 /** Red HAZARD rabbit — `--m-error` (dark theme): a deadly trap, never a reward. */
 const RABBIT_RED = "#ff6b6b";
 /**
@@ -139,10 +171,40 @@ const TRICKSTER_EYE = RABBIT_RED;
  * grid itself can stay muted. The outer frame ({@link FRAME_LINE}) is a touch
  * stronger to delineate the board edge on every screen.
  */
-const GRID_LINE = "rgba(255,255,255,0.10)";
+const GRID_LINE = "rgba(255,255,255,0.01)";
 /** Outer board-edge frame — a stronger semi-transparent white than the inner
  *  grid so the board's rim always reads as a distinct field boundary. */
 const FRAME_LINE = "rgba(255,255,255,0.22)";
+
+// ---- glyph (matrix-rain) snake palette + cadence (SNAKE_RENDER === "glyph") ----
+
+/**
+ * GLYPH-MODE colours. The snake is a rain stream, so it goes GREEN — the
+ * authentic Matrix-rain palette (the same lime `--m-accent` family the on-page
+ * `MatrixRain` uses), NOT the sprite mode's grey sentinel. The HEAD is the
+ * bright leading glyph (near-white, like a rain column's head); the body fades
+ * head→tail from {@link ACCENT} (bright green) to {@link ACCENT_DIM} (deep
+ * green). (Owner note: if you'd rather the stream be GREY to match the sprite
+ * sentinel, swap {@link GLYPH_HEAD}/{@link GLYPH_BODY}/{@link GLYPH_TAIL} to
+ * `#f4f6f8` / {@link SENTINEL} / {@link SENTINEL_DIM} — a one-line trio swap.)
+ */
+const GLYPH_HEAD = "#eaffc0"; // near-white lime — the bright rain head
+const GLYPH_BODY = ACCENT; // bright green stream
+const GLYPH_TAIL = ACCENT_DIM; // deep-green tail end
+/**
+ * Glyph cell coverage (fraction of the cell the glyph FONT is sized to). Sized
+ * generously so the code reads, but under 1 so adjacent stream cells stay
+ * legible as separate characters.
+ */
+const GLYPH_FILL = 0.5;
+/**
+ * Churn cadence — how many render frames a stream POSITION holds its glyph
+ * before re-rolling (the rain flicker). The HEAD re-rolls faster (it's the live
+ * leading glyph). Bigger = calmer/more readable; smaller = busier shimmer. Kept
+ * slow enough to read, never a strobe. Frozen entirely under reduced motion.
+ */
+const GLYPH_CHURN_FRAMES = 16;
+const GLYPH_HEAD_CHURN_FRAMES = 7;
 
 // ---- explosion (red-hazard death) particle burst ----
 
@@ -178,7 +240,7 @@ interface Chip {
 // head, two eyes (the `0` gaps in row 4 `1011101`), a nose (the `0` in row 5
 // `1110111`), the body, and two feet (cols 1 & 5). The silhouette outline IS the
 // board background showing behind it.
-const RABBIT_SPRITE = [
+export const RABBIT_SPRITE = [
   "0100010",
   "0100010",
   "0100010",
@@ -230,92 +292,92 @@ function tricksterColor(ch: string): string | null {
 }
 
 /**
- * Snake HEAD sprite, decoded from the owner's snake-head SVG → a 7×8 bitmap,
- * AUTHORED FACING DOWN (tongue at the bottom). A WEDGE head: WIDE at the back
- * (top) and narrowing toward the tongue (bottom). `G` = head body pixel (the
- * bright lime accent — kept identical to the body so head + body read cohesive),
- * `R` = the red forked tongue (the hazard red, so the leading mouth reads
- * "live"), `.` = transparent (the board shows through). The two `.` in row 4
- * (`G.GGG.G`) are the EYES; the `R` pixels in rows 7–8 are the forked tongue
- * jutting out of the mouth in the heading direction. The head is WIDER (7) than
- * the body/tail (5) on purpose — that proportion is preserved by rendering all
- * snake parts off a common reference dimension (see {@link SNAKE_REF_DIM}). At
- * draw time the matrix is pre-rotated in 90° steps to face {@link dir} (see
- * {@link rotateSprite}) so the figure stays axis-aligned (no rotation smear) and
- * the tongue always points the way the snake moves.
+ * Sentinel HEAD sprite — the owner's hand-decoded 7×8 Matrix-"sentinel" bitmap,
+ * AUTHORED FACING UP (the spiky `.M.M.M.` antennae/sensor row is at the TOP =
+ * the creature's FRONT; the rounded `.MMMMM.` / `..MMM..` chin is at the BOTTOM
+ * = the back, where the body trails off). `M` = the creature's body pixel (the
+ * bright lime accent — kept identical to the body so head + body read as ONE
+ * creature, and so the sentinel stays VISIBLE on the dark `#1a1a1a` field; it is
+ * deliberately NOT black), `R` = a RED sensor/eye light (the hazard red — the
+ * sentinel's menacing red ocelli), `.` = transparent (the board shows through).
+ * The two `R` in row 3 (`MRMMMRM`) + the single `R` in row 4 (`MMMRMMM`) are the
+ * sentinel's red eye-cluster. The spiky antennae row makes the head instantly
+ * distinct from the smooth-rectangle body and the splaying-tentacle tail at a
+ * glance. All three snake parts are 7×8 and render off a common reference
+ * dimension ({@link SNAKE_REF_DIM}) so every pixel is one block size and the
+ * figure reads continuous. At draw time the matrix is pre-rotated in 90° steps
+ * to face {@link dir} (see {@link rotateSprite} / {@link headQuarters}) so the
+ * spikes + eyes always point the way the creature moves.
  */
 const HEAD_SPRITE = [
-  ".GGGGG.",
-  "GGGGGGG",
-  "GGGGGGG",
-  "G.GGG.G",
-  ".GGGGG.",
-  "..GGG..",
-  "...R...",
-  "..R.R..",
+  ".M.M.M.",
+  "MMMMMMM",
+  "MMMRMMM",
+  "MRMMMRM",
+  "MMMRMMM",
+  "MMMMMMM",
+  ".MMMMM.",
+  "..MMM..",
 ] as const;
-/** Head pixel → fill: `G` = lime accent, `R` = hazard red, `.` = transparent. */
+/** Head pixel → fill: `M` = grey body, `R` = red sensor/eye, `.` = transparent. */
 const HEAD_COLORS: Record<string, string | null> = {
-  G: ACCENT,
+  M: SENTINEL,
   R: RABBIT_RED,
   ".": null,
 };
 
 /**
  * Common reference dimension for the SNAKE parts (head + body + tail). All three
- * are rasterised off this single max-dimension (= the head/body height, 8) so
- * every snake pixel is the SAME device-pixel block size, regardless of each
- * sprite's own bounding box. This preserves the authored proportions: the head
- * is 7 blocks wide (the widest), the body 5 wide (narrower), the tail 5 wide × 6
- * tall (narrower AND shorter — it reads as a true taper, not a chunky stub). If
- * each part were fit to its OWN max dim (the rabbits' behaviour), the shorter
- * tail (max 6) would get a bigger block and render chunkier/taller than the body
- * — wrong. The rabbits keep fitting their own cell (they pass no `refDim`).
+ * are rasterised off this single max-dimension so every snake pixel is the SAME
+ * device-pixel block size, regardless of each sprite's own bounding box. With
+ * the sentinel art the three parts share ONE 7-wide × 8-tall bounding box (head,
+ * body and tail are each 7×8), so they ALL key off 8 and butt together into one
+ * continuous creature — the head's spiky front, the smooth body tube with its
+ * red seam, and the splaying tentacle tail all render at the same pixel pitch
+ * (the previous narrower 5-wide body/tail are gone). Keeping the shared `refDim`
+ * (rather than letting each part fit its own box, the rabbits' behaviour) is
+ * what guarantees the block size matches across segments — a per-part fit would
+ * desync the pixel size on parts whose bounding box differs. The rabbits keep
+ * fitting their own cell (they pass no `refDim`).
  */
 const SNAKE_REF_DIM = 8;
 
 /**
- * Snake BODY sprite (middle segments) — a NARROW vertical tube, authored
- * tube-DOWN: `G` = body pixel, `S` = the darker centre scale, `.` = transparent.
- * The bitmap is 8 rows (full ALONG the travel axis) × 8 cols but only the middle
- * 4 cols (2..5) are `G` — so the tube is **half a cell NARROW across** and FULL
- * along its flow.
+ * Sentinel BODY sprite (middle segments) — the owner's hand-decoded 7×8 bitmap,
+ * a smooth 5-wide tube (cols 1..5 filled, a 1px transparent gap each side) with
+ * a RED SEAM band across it. Authored as a vertical tube running top→bottom
+ * (`+y`). `M` = body pixel, `R` = the red seam, `.` = transparent.
  *
- * Why narrow-across + full-along (was a fat full-cell square; before that a
- * gappy 5×8 stick): the owner wants the THIN snake back — clearly thinner than
- * the cell — not the fat square. But a thin stick that's also SHORT along its
- * axis leaves end-to-end gaps and stair-steps on turns (the original
- * complaint). The fix is to keep it thin ACROSS while filling the WHOLE cell
- * pitch ALONG the direction of travel: at draw time the sprite is ROTATED so its
- * long (fill) axis aligns with the segment's flow (see `bodyQuarters`), and it
- * draws in `fillToCell` so the long axis slightly overflows the cell. Two
- * consecutive segments then butt end-to-end into ONE continuous thin tube on
- * straight runs; on a turn the two perpendicular tubes overlap at the shared
- * corner cell, minimising the inner-corner seam. Thin is the priority — a hair
- * of corner seam is accepted over going fat again.
- *
- * The centre scale `S` is a small 2×2 CENTRED block (symmetric), so it reads the
- * same whatever way the rotated segment flows. `G` takes the segment's gradient
- * color (the head→tail dim lerp); `S` is a notch dimmer. Rendered via
- * {@link drawSprite} off {@link SNAKE_REF_DIM} so the pixel block matches the
- * head/tail.
+ * The seam is authored at ROW 3 (4th of 8) — slightly above centre — exactly as
+ * in the source art. It runs PERPENDICULAR to the tube's flow, so on a straight
+ * run it reads as a recurring red rib banding the creature (a sentinel "spinal
+ * segment"), distinct from the head's red eye-cluster and the tail's bare
+ * tentacles. At draw time the sprite is ROTATED so its long (flow) axis aligns
+ * with the segment's direction of travel (see {@link bodyQuarters}) and it draws
+ * in `fillToCell` so the long axis slightly overflows the cell — two consecutive
+ * segments butt end-to-end into one continuous tube on straight runs; on a turn
+ * the two perpendicular tubes overlap at the shared corner cell, minimising the
+ * inner-corner seam. Rendered via {@link drawSprite} off {@link SNAKE_REF_DIM}
+ * so the pixel block matches the head/tail (the figure reads as one creature).
  */
 const BODY_SPRITE = [
-  ".GGG.",
-  "SGGGS",
-  "GSSSG",
-  "GSSSG",
-  "GSSSG",
-  "SGGGS",
-  ".GGG.",
+  ".......",
+  ".MMMMM.",
+  ".MMMMM.",
+  ".MMRMM.",
+  ".MMRMM.",
+  ".MMRMM.",
+  ".MMMMM.",
+  ".M...M.",
 ] as const;
 /**
  * Clockwise 90° turns to align the tube-DOWN {@link BODY_SPRITE} with the
  * segment's flow `dir` (the toroidal step between this segment and the next).
- * The tube is authored running vertically (`+y`), so `+y` = 0 turns; same
- * mapping as the head/tail. A horizontal flow rotates the narrow axis to run
- * across the page, keeping the tube thin in the perpendicular dimension while it
- * fills the cell along travel.
+ * The tube is authored running vertically (`+y`), so `+y` = 0 turns. A
+ * horizontal flow rotates the narrow axis to run across the page, keeping the
+ * tube thin in the perpendicular dimension while it fills the cell along travel.
+ * (The body is rotationally symmetric except for the red seam, which is fine —
+ * the seam just bands whichever way the segment flows.)
  */
 function bodyQuarters(dir: Cell): number {
   if (dir.x === 1) return 3; // tube runs right
@@ -325,26 +387,30 @@ function bodyQuarters(dir: Cell): number {
 }
 
 /**
- * Snake TAIL sprite (the last segment) — an 8-row × 4-col bitmap, AUTHORED
- * TIP-DOWN: the WIDE end is at the TOP (its 4-wide width MATCHES the narrow body
- * tube so the body→tail junction is seamless), tapering to a single-pixel column
- * at the BOTTOM (the tail tip). `G` = body pixel, `.` = transparent. It runs the
- * FULL 8-row long axis (like the body) so, drawn in `fillToCell`, its wide end
- * fills the cell pitch along travel and connects to the preceding body segment;
- * it's "shorter" only in that the lower rows narrow to a point (a true taper,
- * not a chunky stub). At draw time the matrix is pre-rotated in 90° steps (see
- * {@link rotateSprite}) so the point always trails AWAY from the body — aimed
- * along the tail's trailing direction (from `snake[len-2]` toward
- * `snake[len-1]`).
+ * Sentinel TAIL sprite (the last segment) — the owner's hand-decoded 7×8 bitmap,
+ * AUTHORED TIP-DOWN: a WIDE solid cap at the TOP (rows 0–1, 5–7 wide — matching
+ * the body tube so the body→tail junction is seamless) that SPLAYS into a bunch
+ * of metallic TENTACLES/tendrils dangling DOWN (rows 2–5, the alternating
+ * `M.M.M.M` columns + the two outer strands). The tentacle tips trail off into
+ * transparency at the bottom (rows 6–7 blank). `M` = body/tendril pixel, `.` =
+ * transparent. It runs the full 8-row long axis (like the body) so, drawn in
+ * `fillToCell`, its wide cap fills the cell pitch along travel and connects to
+ * the preceding body segment; the lower rows splay into the multi-strand
+ * tentacle bunch. The splaying tentacles make the tail instantly distinct from
+ * the smooth body tube and the spiky head. At draw time the matrix is
+ * pre-rotated in 90° steps (see {@link rotateSprite}) so the tentacles always
+ * trail AWAY from the body — aimed along the tail's trailing direction (from
+ * `snake[len-2]` toward `snake[len-1]`).
  */
 const TAIL_SPRITE = [
-  ".GGG.",
-  "GGGGG",
-  "GGGGG",
-  ".GGG.",
-  ".GGG.",
-  "..G..",
-  "..G..",
+  ".MMMMM.",
+  "MMMMMMM",
+  "M.M.M.M",
+  "M.M.M.M",
+  "M.M.M.M",
+  ".......",
+  ".......",
+  ".......",
 ] as const;
 /**
  * Bodyward nudge (fraction of a cell) applied to the tail when it draws in
@@ -357,28 +423,29 @@ const TAIL_CONNECT_SHIFT = 0;
 
 /**
  * Resolve a BODY sprite character to a fill, given the segment's gradient color
- * `g` (the head→tail dim lerp applied per segment). `G` = that lime, `S` = a
- * notch dimmer (lerped a bit further toward {@link ACCENT_DIM}) so the centre
- * scale reads as a subtle darker-lime detail, `.` = transparent.
+ * `g` (the head→tail dim lerp applied per segment). `M` = that grey body pixel,
+ * `R` = the sentinel's RED SEAM (a fixed hazard red, NOT lerped — the red rib
+ * must stay vividly red on every segment so it reads as the sentinel's seam,
+ * matching the head's red eyes and the red hazard rabbit), `.` = transparent.
  */
-const SCALE_DIM_T = 0.4; // how far `S` darkens past the segment's own `G`
 function bodyColors(g: string): (ch: string) => string | null {
-  const scale = lerpHex(g, ACCENT_DIM, SCALE_DIM_T);
-  return (ch) => (ch === "G" ? g : ch === "S" ? scale : null);
+  return (ch) => (ch === "M" ? g : ch === "R" ? RABBIT_RED : null);
 }
 
-/** Resolve a TAIL sprite character to a fill: `G` = the segment's lime, else
- *  transparent. (The tail has no scale; it's a flat tapering tip.) */
+/** Resolve a TAIL sprite character to a fill: `M` = the segment's grey tendril,
+ *  else transparent. (The tail's tentacles are flat body-grey; no red here.) */
 function tailColors(g: string): (ch: string) => string | null {
-  return (ch) => (ch === "G" ? g : null);
+  return (ch) => (ch === "M" ? g : null);
 }
 
 /**
  * Clockwise 90° turns to aim the TIP-DOWN tail sprite along a trailing
  * direction `dir` (pointing from the body toward the tail tip — i.e. AWAY from
- * the snake). Authored tip-DOWN = `{0,+1}` → 0 turns; same mapping as
- * {@link headQuarters} (the head is authored tongue-down, the tail tip-down,
- * both pointing `+y` at rest). Kept as its own function for intent clarity.
+ * the snake). The tentacle tips are authored dangling DOWN (`{0,+1}` → 0 turns),
+ * so this maps the trailing vector onto that rest pose. (The head is authored
+ * facing UP and the tail tentacles DOWN — opposite ends of the creature — so the
+ * two `*Quarters` mappings differ; see {@link headQuarters}.) Kept as its own
+ * function for intent clarity.
  */
 function tailQuarters(dir: Cell): number {
   if (dir.x === 1) return 3; // tip points right
@@ -389,12 +456,13 @@ function tailQuarters(dir: Cell): number {
 
 /**
  * Rotate a bitmap (rows of equal-length strings) by `quarters` × 90° clockwise.
- * Used to aim the DOWN-authored head sprite at the snake's heading. Rotating the
- * MATRIX (not the canvas) keeps every "on" bit on an integer device-pixel block,
- * so the head stays hard 8-bit crisp at any angle — a canvas `rotate()` would
- * resample and smear the pixels. Square/non-square bitmaps both handled; the
- * head is 7×8, so a 90°/270° turn yields an 8×7 matrix (the rasteriser fits the
- * larger dim into the cell, so it still centers cleanly).
+ * Used to aim the UP-authored sentinel head (and the tube-down body / tip-down
+ * tail) at the snake's heading. Rotating the MATRIX (not the canvas) keeps every
+ * "on" bit on an integer device-pixel block, so the sprite stays hard 8-bit
+ * crisp at any angle — a canvas `rotate()` would resample and smear the pixels.
+ * Square/non-square bitmaps both handled; the sentinel parts are 7×8, so a
+ * 90°/270° turn yields an 8×7 matrix (the rasteriser fits the larger dim into
+ * the cell, so it still centers cleanly).
  */
 function rotateSprite(
   sprite: readonly string[],
@@ -418,16 +486,18 @@ function rotateSprite(
 }
 
 /**
- * Clockwise 90° turns to map the DOWN-authored head sprite onto a heading.
- * Authored facing DOWN = `{0,+1}` → 0 turns. `{-1,0}` (left) → 1 turn,
- * `{0,-1}` (up) → 2 turns, `{1,0}` (right) → 3 turns. (One CW turn takes "down"
- * to "left", another to "up", another to "right".)
+ * Clockwise 90° turns to map the UP-authored sentinel head sprite onto a
+ * heading. The head bitmap's FRONT (the spiky `.M.M.M.` antennae row + the red
+ * eye-cluster just below it) is at the TOP, so it is authored facing UP
+ * (`{0,-1}`) → 0 turns. One CW turn takes "up" → "right", another → "down",
+ * another → "left": `{1,0}` (right) → 1, `{0,+1}` (down) → 2, `{-1,0}` (left)
+ * → 3. So the spikes + eyes always point the way the creature moves.
  */
 function headQuarters(dir: Cell): number {
-  if (dir.x === 1) return 3; // right
-  if (dir.x === -1) return 1; // left
-  if (dir.y === -1) return 2; // up
-  return 0; // down (and the default)
+  if (dir.x === 1) return 1; // right
+  if (dir.x === -1) return 3; // left
+  if (dir.y === 1) return 2; // down
+  return 0; // up (and the default)
 }
 
 /**
@@ -484,14 +554,30 @@ function lerpHex(a: string, b: string, t: number): string {
 }
 
 /**
+ * Deterministic glyph picker for the matrix-rain stream. Hashes the integer
+ * inputs (a stream POSITION + a churn epoch, or a rabbit's cell + epoch) into an
+ * index of {@link MATRIX_GLYPHS} — same inputs always yield the same glyph, so
+ * the shimmer is reproducible (no `Math.random()` strobe, honoring the engine's
+ * determinism intent). A cheap xorshift-style integer mix over a 2D-ish key;
+ * `>>> 0` keeps it an unsigned 32-bit int before the modulo.
+ */
+function glyphFor(a: number, b: number): string {
+  let h = (a * 73856093) ^ (b * 19349663);
+  h = Math.imul(h ^ (h >>> 13), 0x5bd1e995);
+  h ^= h >>> 15;
+  return MATRIX_GLYPHS[(h >>> 0) % MATRIX_GLYPHS.length];
+}
+
+/**
  * The headless Snake engine — all mutable game state + the step + the canvas
  * draw, with NO React. The `useSnakeGame` hook owns one instance and drives it;
  * `<SnakeBoard>` only hosts the canvas. Keeping the simulation out of React
  * avoids per-frame re-renders (the canvas is imperative; React state changes
  * only on discrete events: eat / die / pause).
  *
- * The look is a minimal brutalist snake: a continuous lime pixel tube (a proud
- * wedge HEAD over full-cell BODY squares dimming gently toward a tapering TAIL)
+ * The look is a minimal brutalist snake reskinned as a Matrix "sentinel": a
+ * continuous lime pixel creature (a spiky-antennaed red-eyed HEAD over a
+ * red-seamed BODY tube dimming gently toward a splaying multi-TENTACLE TAIL)
  * hunting small white rabbits — while a
  * red HAZARD rabbit appears as a deadly trap to route around (touching it
  * detonates the snake → game over), spawning fresh WITH every white capture
@@ -1045,6 +1131,97 @@ export class SnakeEngine {
     );
   }
 
+  // ---------- glyph (matrix-rain) renderer (SNAKE_RENDER === "glyph") ----------
+
+  /**
+   * Draw ONE matrix glyph centred in cell `at`, in `color`, with an optional
+   * vertical bob (`yOffsetCells`, fraction of a cell — used by the trickster
+   * laugh). The font is sized to {@link GLYPH_FILL} of the cell and the draw
+   * origin is snapped to the device-pixel grid (the ctx is `dpr`-scaled, so we
+   * snap in device px then divide back) — keeping the glyph from blurring across
+   * a half-pixel boundary even though text isn't a hard pixel grid. `textAlign`/
+   * `textBaseline` are centred so the glyph sits dead-centre regardless of font
+   * metrics.
+   */
+  private drawGlyph(
+    ctx: CanvasRenderingContext2D,
+    cell: number,
+    dpr: number,
+    at: Cell,
+    glyph: string,
+    color: string,
+    yOffsetCells = 0
+  ) {
+    const sizeCss = cell * GLYPH_FILL;
+    // Centre of the cell, in device px, snapped to a whole device pixel so the
+    // glyph baseline lands crisply.
+    const cellDev = cell * dpr;
+    const cxDev = Math.round((at.x + 0.5) * cellDev);
+    // `textBaseline:"middle"` centres on the em-box middle, which for these mono
+    // glyphs sits a hair ABOVE the optical centre — nudge down ~6% of a cell so
+    // the glyph reads centred in its square.
+    const cyDev =
+      Math.round((at.y + 0.5 + yOffsetCells) * cellDev) +
+      Math.round(cellDev * 0.06);
+    // The 2D context can't resolve CSS vars (same reason the palette is literal
+    // hex), so `var(--font-mono)` made the whole font string invalid → it was
+    // silently ignored and the weight never applied. Use a literal monospace
+    // stack so the weight actually lands.
+    ctx.font = `800 ${sizeCss}px ui-monospace, "JetBrains Mono", Menlo, monospace`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = color;
+    ctx.fillText(glyph, cxDev / dpr, cyDev / dpr);
+  }
+
+  /**
+   * Draw the snake as a MATRIX-RAIN STREAM that follows its body. Each cell is
+   * one glyph; the HEAD is the bright leading glyph ({@link GLYPH_HEAD}) and the
+   * body fades head→tail from {@link GLYPH_BODY} (bright green) to
+   * {@link GLYPH_TAIL} (deep green), so the whole figure reads like a rain
+   * column bent along the path — brightest where the creature is "now", dimming
+   * into its wake.
+   *
+   * Glyph CHURN (the rain flicker): each STREAM POSITION (index from the head,
+   * NOT the moving cell) re-rolls its glyph every {@link GLYPH_CHURN_FRAMES}
+   * render frames; the head re-rolls faster ({@link GLYPH_HEAD_CHURN_FRAMES}).
+   * The glyph is chosen by {@link glyphFor} from `(position, churnEpoch)` — fully
+   * deterministic, so the shimmer is reproducible and never a random strobe.
+   * Seeding by position-from-head (not by board cell) means the pattern reads as
+   * a STABLE stream that flickers in place, the way a rain column does, rather
+   * than scrambling on every move.
+   *
+   * Painted TAIL→HEAD so the brighter near-head glyphs land on top at any
+   * overlap. `animate=false` (reduced motion) freezes the churn to epoch 0 — a
+   * legible STATIC stream, no flicker.
+   */
+  private drawSnakeGlyphs(
+    ctx: CanvasRenderingContext2D,
+    cell: number,
+    dpr: number,
+    animate: boolean
+  ) {
+    const len = this.snake.length;
+    const headEpoch = animate
+      ? Math.floor(this.frame / GLYPH_HEAD_CHURN_FRAMES)
+      : 0;
+    const bodyEpoch = animate ? Math.floor(this.frame / GLYPH_CHURN_FRAMES) : 0;
+    for (let i = len - 1; i >= 0; i--) {
+      const seg = this.snake[i];
+      if (i === 0) {
+        // HEAD — bright leading glyph, fast flicker.
+        this.drawGlyph(ctx, cell, dpr, seg, glyphFor(0, headEpoch), GLYPH_HEAD);
+      } else {
+        // Body fades from bright green just behind the head to deep green at the
+        // tail (eased so most of the stream stays clearly green and only the
+        // last cells go dim).
+        const t = len <= 1 ? 0 : i / (len - 1);
+        const color = lerpHex(GLYPH_BODY, GLYPH_TAIL, t * 0.9);
+        this.drawGlyph(ctx, cell, dpr, seg, glyphFor(i, bodyEpoch), color);
+      }
+    }
+  }
+
   /**
    * Advance + paint the explosion chip burst (square brutalist chips), centred
    * on {@link explosionCell}, in CSS-px space. Chips spray out, fall under
@@ -1106,56 +1283,68 @@ export class SnakeEngine {
     ctx.fillRect(0, 0, cssW, cssH);
     this.drawGrid(ctx, cssW, cssH);
 
-    // Rabbits — the white staple FOOD + (when present) the red HAZARD rabbit.
-    // The red gets a slightly stronger breathing pulse (frozen under reduced
-    // motion) so the DANGER reads as alive/throbbing and draws the eye to avoid
-    // it — the red fill + pulse together mark it as a trap, never as food.
-    if (this.pellet) this.drawRabbit(ctx, cell, dpr, this.pellet, RABBIT_WHITE);
+    // Rabbits — the white staple FOOD + (when present) the red HAZARD rabbit +
+    // the white-bodied red-eyed TRICKSTER decoy. ALWAYS the bunny-silhouette
+    // SPRITES, in BOTH render modes (owner preference — the pixel bunnies read
+    // better than the glyph rabbits, even when the snake itself is the green
+    // matrix-rain glyph stream). The red hazard breathes (a size/flicker pulse,
+    // frozen under reduced motion) so the DANGER reads as alive and the trickster
+    // laughs (a vertical bob), keeping all three apart at a glance — readability
+    // is non-negotiable.
+    if (this.pellet) {
+      this.drawRabbit(ctx, cell, dpr, this.pellet, RABBIT_WHITE);
+    }
     if (this.redPellet) {
       const pulse = animate ? 1 + 0.12 * Math.sin(this.frame * 0.16) : 1;
       this.drawRabbit(ctx, cell, dpr, this.redPellet, RABBIT_RED, pulse);
     }
-    // The TRICKSTER (white body, red eyes) — a tempting "white rabbit" that's
-    // actually a troll (+length, 0 score). It bobs vertically like it's laughing
-    // (frozen static under reduced motion). Red eyes + bob keep it distinct from
-    // the plain white food and the all-red hazard at a glance.
     if (this.trickster) {
       this.drawTrickster(ctx, cell, dpr, this.trickster, animate);
     }
 
-    // Body + tail — pixel sprites, dimming from head toward the tail (the same
-    // lime gradient the old inset squares used). Indices 1..len-2 use the BODY
-    // sprite; the LAST segment uses the TAIL sprite. Both share the head's
-    // reference block ({@link SNAKE_REF_DIM}) so every snake pixel is one size.
+    // Snake — the matrix-rain GLYPH stream (glyph mode) follows the body in one
+    // call (head/body fade + churn handled inside); skip the entire sprite path
+    // below. Returns early after the head + explosion so the sprite head doesn't
+    // double-draw.
+    if (SNAKE_RENDER === "glyph") {
+      this.drawSnakeGlyphs(ctx, cell, dpr, animate);
+      this.drawExplosion(ctx, cell);
+      return;
+    }
+
+    // Body + tail — sentinel pixel sprites, dimming from head toward the tail
+    // (the lime gradient). Indices 1..len-2 use the BODY sprite; the LAST segment
+    // uses the TAIL sprite. Both share the head's reference block
+    // ({@link SNAKE_REF_DIM}) so every snake pixel is one size and the creature
+    // reads continuous (head, body and tail are all 7×8).
     //
-    // The body is a NARROW tube (thin across, full along its flow axis) drawn in
+    // The body is the sentinel tube (5-wide of 7, a red seam banding it) drawn in
     // `fillToCell` mode and ROTATED to align its long/fill axis with the
     // segment's direction of travel. So consecutive segments butt end-to-end into
-    // one continuous THIN tube on straight runs (no gap), while staying clearly
-    // thinner than the cell — the thin look the owner asked back, NOT the fat
-    // full-cell square. On a turn the two perpendicular tubes overlap at the
-    // shared corner cell (a tiny inner seam is accepted; thin is the priority).
+    // one continuous tube on straight runs (no gap); on a turn the two
+    // perpendicular tubes overlap at the shared corner cell (a tiny inner seam is
+    // accepted). The red seam recurs down the body like a spine.
     //
-    // The TAIL keeps the inset-taper look: it is still rotated so its tapering
-    // tip trails AWAY from the body, and (so it actually connects to the
-    // last full-cell body segment) it ALSO draws in `fillToCell` — its wide end
-    // fills the cell while the authored taper narrows the tip. Painted tail→neck
-    // so the segments nearer the head overlap on top.
+    // The TAIL is the splaying multi-tentacle end: it is rotated so its tentacles
+    // trail AWAY from the body, and (so it connects to the last body segment) it
+    // ALSO draws in `fillToCell` — its wide cap fills the cell while the authored
+    // tentacles dangle off the trailing edge. Painted tail→neck so the segments
+    // nearer the head overlap on top.
     const bodyLen = this.snake.length - 1;
     for (let j = bodyLen; j >= 1; j--) {
       const seg = this.snake[j];
       const t = bodyLen <= 1 ? 0 : (j - 1) / (bodyLen - 1);
-      const g = lerpHex(ACCENT, ACCENT_DIM, t * 0.85);
+      const g = lerpHex(SENTINEL, SENTINEL_DIM, t * 0.85);
       if (j === bodyLen) {
         // Trailing direction: from the previous segment toward the tail tip
         // (wrap-corrected so a seam-crossing pair doesn't read as a huge jump).
         const trail = wrapStep(this.snake[j - 1], seg);
         const tailSprite = rotateSprite(TAIL_SPRITE, tailQuarters(trail));
-        // The tail draws in `fillToCell` (its wide end fills the cell, the taper
-        // narrows the tip within it) and is nudged BODYWARD by TAIL_CONNECT_SHIFT
-        // (in the −trail direction) so its wide edge sits flush at the body's cell
-        // border — the last full-cell body segment's overflow then overlaps it, so
-        // body→tail connects with no gap and the tube still tapers to a point.
+        // The tail draws in `fillToCell` (its wide cap fills the cell, the
+        // tentacles splay off the trailing edge) and is nudged BODYWARD by
+        // TAIL_CONNECT_SHIFT (in the −trail direction) so its wide cap sits flush
+        // at the body's cell border — the last body segment's overflow then
+        // overlaps it, so body→tail connects with no gap and the tentacles trail.
         this.drawSprite(
           ctx,
           cell,
@@ -1170,13 +1359,13 @@ export class SnakeEngine {
           -trail.x * TAIL_CONNECT_SHIFT
         );
       } else {
-        // Middle segment: a NARROW tube (thin across, full along) ROTATED to run
-        // along the segment's FLOW — the toroidal step from this segment toward
-        // the next one nearer the HEAD (`snake[j-1]`). In `fillToCell` the long
-        // (flow) axis overflows the cell so consecutive segments butt end-to-end
-        // into one continuous THIN tube; the narrow axis stays half-cell thin.
+        // Middle segment: the sentinel tube (5-wide of 7, red-seamed) ROTATED to
+        // run along the segment's FLOW — the toroidal step from this segment
+        // toward the next one nearer the HEAD (`snake[j-1]`). In `fillToCell` the
+        // long (flow) axis overflows the cell so consecutive segments butt
+        // end-to-end into one continuous tube; the seam bands across the flow.
         // On a turn the perpendicular neighbour overlaps at the corner cell,
-        // minimising the inner seam (thin is the priority over a perfect corner).
+        // minimising the inner seam.
         const flow = wrapStep(seg, this.snake[j - 1]);
         const bodySprite = rotateSprite(BODY_SPRITE, bodyQuarters(flow));
         this.drawSprite(
@@ -1194,12 +1383,12 @@ export class SnakeEngine {
       }
     }
 
-    // Head — the pixel-art snake-head sprite (lime body + red forked tongue,
-    // transparent eyes), pre-rotated in 90° steps to face the current heading so
-    // the tongue/eyes always point the way the snake moves. Pre-rotating the
+    // Head — the pixel-art sentinel head sprite (lime body + red eye-cluster +
+    // spiky antennae), pre-rotated in 90° steps to face the current heading so
+    // the spikes/eyes always point the way the creature moves. Pre-rotating the
     // BITMAP (not the canvas) keeps the pixels axis-aligned and crisp. Same
     // device-pixel-block rasteriser + ~0.85 cell fill as the rabbits, so the head
-    // reads as the bright leading segment, cohesive with the inset body squares.
+    // reads as the bright leading segment, cohesive with the body tube.
     const h = this.snake[0];
     const headSprite = rotateSprite(HEAD_SPRITE, headQuarters(this.dir));
     this.drawSprite(

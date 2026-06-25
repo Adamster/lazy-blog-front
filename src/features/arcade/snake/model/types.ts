@@ -55,23 +55,28 @@ export interface SnakeGameState {
   rank: number;
 }
 
-/** Everything the hook returns — state + canvas ref + the control surface. */
+/** Everything the engine hook returns — live run state + canvas ref + controls. */
 export interface SnakeGameApi {
   state: SnakeGameState;
   /** Wire onto the `<canvas>`. */
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
-  board: RankedRow[];
   /** Recent-runs sparkline series (last N final scores, newest on the right). */
   history: HistoryPoint[];
   start: () => void;
   togglePause: () => void;
   /** Steer; ignored if it would reverse into the neck. */
   steer: (x: number, y: number) => void;
-  resetBoard: () => void;
 }
 
 export interface UseSnakeGameOptions {
   speed?: Speed;
   /** When true (the DEFAULT), edges wrap (pass-through) instead of killing. */
   wrapWalls?: boolean;
+  /**
+   * The viewer's server-truth personal best — used for the optimistic
+   * new-best test on game over. Fed by the data layer (`useMyArcadeStats`).
+   */
+  best?: number;
+  /** Fired ONCE per finished run with its final score (the data layer submits). */
+  onGameOver?: (score: number) => void;
 }

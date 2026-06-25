@@ -5,4 +5,5 @@ export { SnakeBoard } from "./ui/snake-board";
 export { SnakeStatsBand } from "./ui/snake-metrics";
 export { SnakeLeaderboard } from "./ui/snake-leaderboard";
 export { ArcadeHeader } from "./ui/arcade-header";
+export { RabbitMark } from "./ui/rabbit-mark";
 export type { Speed } from "./model/types";

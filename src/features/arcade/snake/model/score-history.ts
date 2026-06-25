@@ -1,9 +1,11 @@
 /**
  * Snake score history — a localStorage log of every finished run's final score
  * (per browser), the data behind the stats band's `// RECENT RUNS` sparkline.
- * Mirrors the leaderboard's shape: a versioned key, a buffer cap, and every
- * access wrapped in try/catch so a disabled / full localStorage never crashes
- * the game (it just falls back to an in-memory empty log for the session).
+ * This is the ONE arcade store still on localStorage: the backend exposes the
+ * viewer's best / games-played / rank but NO per-run history SERIES, so the
+ * recent-runs sparkline has no endpoint to read. A versioned key, a buffer cap,
+ * and every access wrapped in try/catch so a disabled / full localStorage never
+ * crashes the game (it just falls back to an in-memory empty log for the session).
  */
 
 import type { HistoryPoint } from "./types";
@@ -19,8 +21,8 @@ export const HISTORY_RECENT = 20;
 /**
  * Seed series — plausible recent-run scores (oldest → newest) with some shape
  * and variance so the band's `// SCORES · LAST 20` sparkline renders populated
- * and good-looking on a fresh browser. Mirrors `leaderboard.ts`'s `SEED_BOARD`:
- * it's the fallback when NOTHING is stored yet; the moment a real run is
+ * and good-looking on a fresh browser. It's the fallback when NOTHING is stored
+ * yet; the moment a real run is
  * recorded the seed is appended-to and persisted, so real scores show up and
  * the seed is never permanently masking history.
  */
@@ -73,15 +75,6 @@ export function recordScore(prev: number[], score: number): number[] {
     // ignore — log stays in memory for this session
   }
   return next;
-}
-
-/** Wipe the persisted score log (paired with the board reset). */
-export function clearHistory(): void {
-  try {
-    localStorage.removeItem(KEY_HISTORY);
-  } catch {
-    // ignore
-  }
 }
 
 /**

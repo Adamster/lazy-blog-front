@@ -22,7 +22,7 @@ import { Confetti } from "./confetti";
  * The game-over override (`overlayScrimOver`) is a notch heavier — death is a
  * harder stop — still light enough to keep the frame visible behind the score.
  */
-const overlayScrim = "bg-[rgba(8,8,8,0.5)]";
+const overlayScrim = "bg-[rgba(8,8,8,0.10)]";
 const overlayScrimOver = "bg-[rgba(8,8,8,0.62)]";
 // Layout-only base (no background) — each overlay appends its own scrim class so
 // there's never a duplicate `bg-*` whose Tailwind ordering would be ambiguous.
@@ -112,7 +112,7 @@ export function SnakeBoard({ api }: { api: SnakeGameApi }) {
           <div className={overlayBase}>
             <OverlayRail>
               <div className="text-[11px] tracking-[0.12em] text-[var(--m-accent)] uppercase">
-                {"// FOLLOW THE WHITE RABBIT"}
+                {"// FREE YOUR MIND"}
               </div>
               <ArcadeButton onClick={start}>Start game</ArcadeButton>
               <div className="text-[12px] tracking-[0.06em] text-[var(--m-muted)]">
@@ -152,7 +152,7 @@ export function SnakeBoard({ api }: { api: SnakeGameApi }) {
                   New record
                 </div>
               ) : (
-                <Eyebrow color="var(--m-error)">{"// CONNECTION LOST"}</Eyebrow>
+                <Eyebrow color="var(--m-error)">{"// GAME OVER, NEO"}</Eyebrow>
               )}
               <div className="font-display text-[46px] leading-none font-bold text-[var(--m-accent)] tabular-nums">
                 {formatScore(state.score)}

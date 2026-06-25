@@ -5,13 +5,17 @@ import { Sparkline } from "@/shared/ui/sparkline";
 import { formatScore } from "../model/leaderboard";
 import { HISTORY_RECENT } from "../model/score-history";
 import type { HistoryPoint, SnakeGameState } from "../model/types";
+import { ScorePops } from "./score-pops";
 
 interface StatDef {
+  /** Stable key + display label. */
   label: string;
   value: string;
   /** Small muted sub-label under the big number. */
   sub: string;
   accent?: boolean;
+  /** True for the live SCORE cell — hosts the floating "+N" juice. */
+  live?: boolean;
 }
 
 /** Columns 1–2: the big 46/700 numbers (Score, Best). */
@@ -22,6 +26,7 @@ function statsFor(state: SnakeGameState): StatDef[] {
       value: formatScore(state.score),
       sub: "current run",
       accent: true,
+      live: true,
     },
     { label: "BEST", value: formatScore(state.best), sub: "personal best" },
   ];
@@ -76,8 +81,12 @@ export function SnakeStatsBand({
     <section className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
       <div className="mx-auto grid max-w-[1240px] gap-10 px-10 py-10 sm:grid-cols-3">
         {statsFor(state).map((s) => (
-          <div key={s.label}>
+          // `relative` so the live SCORE cell can anchor its floating "+N" pops
+          // to the number without shifting the grid.
+          <div key={s.label} className="relative">
             <Label>{s.label}</Label>
+            {/* Anchored to the SCORE number's top so each "+10" rises off it. */}
+            {s.live && <ScorePops score={state.score} />}
             <div
               className="font-display mt-2 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums"
               style={{ color: s.accent ? "var(--m-accent)" : "var(--m-fg)" }}

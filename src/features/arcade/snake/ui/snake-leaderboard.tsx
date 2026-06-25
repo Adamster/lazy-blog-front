@@ -37,8 +37,9 @@ function BoardRow({ row }: { row: RankedRow }) {
 
 /**
  * The high-score panel — a `// HIGH SCORES` header + `TOP N` count + the ranked
- * rows, borderless and flush to the rail edge. Scores are local for now; a
- * cross-user backend board is a follow-up.
+ * rows, borderless and flush to the rail edge. The board is the cross-user
+ * backend leaderboard (`useSnakeLeaderboard` → padded to {@link BOARD_SIZE} by
+ * `rankApiBoard`); the viewer's own row renders in accent as `YOU`.
  */
 export function SnakeLeaderboard({
   board,
