@@ -163,7 +163,7 @@ function LoginView({
         eyebrow="// ACCESS"
         title="Welcome back"
         titleId={titleId}
-        subtitle="Same handle, same opinions. Log in and pick up where you left off."
+        subtitle="The feed's been napping. Log in and wake it up."
         onClose={onClose}
       />
 

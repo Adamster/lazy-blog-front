@@ -86,7 +86,7 @@ export const usePublishPost = (
     true,
     () => apiClient.posts.publishPost({ id: postId }),
     {
-      success: "Published. It's live — no take-backs.",
+      success: "Live. Now go do nothing — you earned it.",
       error: "Error publishing post",
     }
   );

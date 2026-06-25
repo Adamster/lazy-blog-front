@@ -74,7 +74,7 @@ export default function ResetPassword() {
             eyebrow="// RESET PASSWORD"
             title="Set a new password"
             titleId={titleId}
-            subtitle="One you'll remember this time — or at least until the next reset link."
+            subtitle="Brain too lazy to hold the old password? Fair enough — fresh one below."
             onClose={onClose}
           />
 
