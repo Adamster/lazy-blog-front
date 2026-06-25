@@ -39,17 +39,19 @@ export function Menu({ items, triggerLabel }: MenuProps) {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="mono-icon-btn size-9 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
+        className="flex size-9 items-center justify-center text-[var(--m-accent)] transition-[filter] hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
       >
         <EllipsisVerticalIcon className="size-[18px]" />
       </button>
 
-      {/* Minimal popout: bordered icon buttons (like the emoji button) in a
-          row, to the LEFT of the dots. */}
+      {/* Minimal popout: BORDERED icon buttons (size-8, smaller than the
+          trigger) in a row, to the LEFT of the dots — the 3-dot TRIGGER itself is
+          borderless (plain accent dots). Centered to the trigger via `inset-y-0`
+          + `items-center`. */}
       {open && (
         <div
           role="menu"
-          className="absolute top-0 right-full z-30 mr-3 flex items-center gap-2"
+          className="absolute inset-y-0 right-full z-30 mr-1 flex items-center gap-2"
         >
           {items.map((item) => {
             const label = typeof item.label === "string" ? item.label : item.id;
@@ -65,7 +67,7 @@ export function Menu({ items, triggerLabel }: MenuProps) {
                   item.onSelect();
                 }}
                 className={
-                  "mono-icon-btn size-9 [&>svg]:size-[18px] " +
+                  "mono-icon-btn size-8 [&>svg]:size-4 " +
                   (item.danger
                     ? "text-[var(--m-error)] hover:border-[var(--m-error)] hover:text-[var(--m-error)]"
                     : "")
