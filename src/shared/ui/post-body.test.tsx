@@ -50,4 +50,48 @@ describe("PostBody", () => {
     );
     expect(container.querySelector("img")).toBeNull();
   });
+
+  it("renders a bare YouTube link as an embed iframe (nocookie, validated id)", () => {
+    const { container } = render(
+      <PostBody markdown={"https://youtu.be/dQw4w9WgXcQ"} />
+    );
+    const iframe = container.querySelector("iframe");
+    expect(iframe).toBeInTheDocument();
+    expect(iframe).toHaveAttribute(
+      "src",
+      "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"
+    );
+    expect(iframe).toHaveAttribute("loading", "lazy");
+    // No plain link is left behind.
+    expect(container.querySelector("a")).toBeNull();
+  });
+
+  it("renders a bare Spotify track link as an embed iframe", () => {
+    const { container } = render(
+      <PostBody
+        markdown={"https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT"}
+      />
+    );
+    const iframe = container.querySelector("iframe");
+    expect(iframe).toHaveAttribute(
+      "src",
+      "https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT"
+    );
+    expect(iframe).toHaveAttribute("height", "152");
+  });
+
+  it("leaves a malformed/unknown media URL as a plain link (no iframe)", () => {
+    const { container } = render(
+      <PostBody markdown={"https://youtu.be/tooShort"} />
+    );
+    expect(container.querySelector("iframe")).toBeNull();
+    expect(container.querySelector("a")).toBeInTheDocument();
+  });
+
+  it("does not embed a YT link mixed with other prose in the paragraph", () => {
+    const { container } = render(
+      <PostBody markdown={"watch this https://youtu.be/dQw4w9WgXcQ now"} />
+    );
+    expect(container.querySelector("iframe")).toBeNull();
+  });
 });

@@ -19,6 +19,9 @@ import { PollBlock, type PollRow } from "./poll-block";
 import { AnsiBlock } from "./ansi-block";
 import { FoldBlock } from "./fold-block";
 import { CompareSlider } from "./compare-slider";
+import { MediaEmbed } from "./media-embed";
+import { remarkMediaEmbeds } from "./remark-media-embeds";
+import type { SpotifyType } from "@/shared/lib/media-embed";
 
 type MdNode = {
   type: string;
@@ -483,6 +486,32 @@ const components = {
       />
     );
   },
+  // YouTube / Spotify embed — `remarkMediaEmbeds` rewrites a paragraph that is
+  // ONLY a YT/Spotify link into this node, forwarding the VALIDATED kind/id/type
+  // as plain string props (never the raw URL). Reconstruct the discriminated
+  // descriptor here and hand it to `<MediaEmbed>`, which rebuilds the iframe src.
+  "media-embed": (props: {
+    kind?: string;
+    videoId?: string;
+    spotifyType?: string;
+    spotifyId?: string;
+  }) => {
+    if (props.kind === "youtube" && props.videoId) {
+      return <MediaEmbed embed={{ kind: "youtube", id: props.videoId }} />;
+    }
+    if (props.kind === "spotify" && props.spotifyType && props.spotifyId) {
+      return (
+        <MediaEmbed
+          embed={{
+            kind: "spotify",
+            type: props.spotifyType as SpotifyType,
+            id: props.spotifyId,
+          }}
+        />
+      );
+    }
+    return null;
+  },
 } as Components;
 
 interface PostBodyProps {
@@ -501,6 +530,9 @@ export function PostBody({ markdown }: PostBodyProps) {
           remarkEffectDirectives,
           remarkBlockDirectives,
           remarkColorDirectives,
+          // Turn a paragraph that is ONLY a YouTube/Spotify link into an embed
+          // node (existing posts carry plain links — no migration needed).
+          remarkMediaEmbeds,
           remarkLiteralizeUnknownDirectives,
           remarkDropEmptyLines,
         ]}

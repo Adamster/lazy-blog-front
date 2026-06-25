@@ -15,6 +15,7 @@ import { EditorToolbar, type RunCommand } from "./editor-toolbar";
 import { smallMark } from "./editor-small-mark";
 import { effectMarks } from "./editor-effect-marks";
 import { colorMarks } from "./editor-color-marks";
+import { mediaEmbed } from "./editor-embed-node";
 
 type ImageUploadHandler = (file: File) => Promise<string>;
 
@@ -179,7 +180,11 @@ export default function CrepeEditor({
       // Custom inline text-colour marks (`:primary[…]` / `:muted[…]` /
       // `:error[…]`) — toolbar Text-colour ▾ sets them (mutually exclusive;
       // Default clears). Same remark-directive reuse. See editor-color-marks.
-      .use(colorMarks);
+      .use(colorMarks)
+      // YouTube / Spotify embed node — a paragraph that is ONLY a YT/Spotify
+      // link becomes an on-system placeholder CARD in the editor, round-tripping
+      // to the same bare-URL link the read view embeds. See editor-embed-node.
+      .use(mediaEmbed);
 
     crepeRef.current = crepe;
     let alive = true;

@@ -577,6 +577,54 @@
   del {
     color: var(--m-muted);
   }
+
+  // YouTube / Spotify embed — the author sees a compact, on-system placeholder
+  // CARD (not a live iframe) wherever a YT/Spotify link sits, so authoring stays
+  // smooth while still matching the published page's intent (the read view turns
+  // this same link into the real player). 2px-framed mono row: ▶ glyph + a
+  // `// KIND` label + the URL. Non-editable (atom node).
+  .mono-embed-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 28px 0;
+    padding: 16px 18px;
+    border: 2px solid var(--m-dim);
+    background: var(--m-card);
+    font-family: var(--font-mono);
+    cursor: default;
+    user-select: none;
+
+    &.ProseMirror-selectednode {
+      border-color: var(--m-accent);
+    }
+
+    &__glyph {
+      flex: none;
+      font-size: 14px;
+      line-height: 1;
+      color: var(--m-accent);
+    }
+
+    &__label {
+      flex: none;
+      font-size: 11px;
+      line-height: 1.2;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--m-fg);
+    }
+
+    &__url {
+      min-width: 0;
+      overflow: hidden;
+      font-size: 12px;
+      line-height: 1.2;
+      color: var(--m-muted);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
 }
 
 /* Crepe block-chrome that fights the shared prose styling — neutralize it so the
