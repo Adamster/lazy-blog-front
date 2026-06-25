@@ -78,9 +78,13 @@ export const ErrorMessage = ({
     status === 404 ? "NOT FOUND · 404" : `RUNTIME EXCEPTION · ${status ?? 500}`;
 
   // NEO theme swaps the generic error chrome for a Matrix line (ties into the
-  // neo matrix-rain). Same layout/scale — only the eyebrow + headline change.
+  // neo matrix-rain). Same layout/scale — eyebrow + headline + lead all stay in
+  // the ONE opening-transmission scene so it reads cohesive, not stitched.
   const eyebrowText = isNeo ? "FOLLOW THE WHITE RABBIT" : statusLine;
   const headline = isNeo ? "The matrix has you…" : "A glitch in the Lazyverse";
+  const lead = isNeo
+    ? "Knock, knock, Neo."
+    : "A déjà vu is usually a glitch in the Matrix. It happens when they change something.";
 
   return (
     <div
@@ -101,8 +105,7 @@ export const ErrorMessage = ({
         </h1>
 
         <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
-          A déjà vu is usually a glitch in the Matrix. It happens when they
-          change something.
+          {lead}
         </p>
 
         {errorMessage ? (
