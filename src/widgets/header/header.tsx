@@ -9,6 +9,7 @@ import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 import { useTheme } from "@/shared/providers/theme-providers";
 import { useUser, useAuth } from "@/entities/session";
 import { AuthModal } from "@/features/auth/ui/auth-modal";
+import { RabbitMark } from "@/features/arcade/snake";
 import { AccountCommands } from "./account-commands";
 import { HeaderLockup } from "./header-lockup";
 import { PromptHeader } from "./prompt-header";
@@ -39,7 +40,27 @@ export function Header() {
           the 1240 content column). */}
       <header className="fixed inset-x-0 top-0 z-[var(--m-z-header)] h-[var(--m-header-h)] border-b-2 border-[var(--m-card)] bg-[var(--m-bg)]/70 backdrop-blur-md">
         <div className="flex h-full items-center justify-between px-5">
-          <HeaderLockup />
+          {/* Lockup + the hidden NEO easter-egg: the game's white rabbit sits
+              right AFTER the lockup's blinking cursor (a `ml-3` = 12px gap, one
+              step up the scale from the cursor), ONLY in the neo theme AND only
+              when signed in — "follow the white rabbit" to the arcade (which is
+              login-only, so there's no point dangling it to logged-out visitors).
+              On hover/focus it `mono-jiggle`s (a playful "laughing" wobble;
+              transform-only, no layout shift, dropped under reduced-motion).
+              Hidden under `sm` so it never crowds / wraps the wordmark on a
+              narrow phone bar. Not on light/dark. */}
+          <div className="flex items-center">
+            <HeaderLockup />
+            {theme === "neo" && isAuthenticated && (
+              <Link
+                href="/arcade/snake"
+                aria-label="Follow the white rabbit"
+                className="mono-jiggle ml-3 hidden shrink-0 opacity-80 transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)] sm:inline-flex"
+              >
+                <RabbitMark size={16} className="mono-jiggle__mark" />
+              </Link>
+            )}
+          </div>
 
           {/* Right cap — the authed `@handle` profile link sits to the LEFT of
               the burger; both ride the bar's far-right edge. The `@handle` lives

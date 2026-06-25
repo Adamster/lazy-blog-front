@@ -5,38 +5,8 @@ import {
   PencilSquareIcon,
   ArrowRightStartOnRectangleIcon,
   ArrowRightEndOnRectangleIcon,
-  CommandLineIcon,
 } from "@heroicons/react/24/outline";
 import { BracketIcon, CommandButton, CommandLink } from "./command-row";
-
-/**
- * `// play` group — the arcade link, pinned to the BOTTOM of the menu. The game
- * is login-only now (the route is protected + scores persist per user), so this
- * renders ONLY in the signed-in menu.
- */
-function PlayCommands({
-  open,
-  onNavigate,
-}: {
-  open: boolean;
-  onNavigate: () => void;
-}) {
-  return (
-    <>
-      <div className="px-4 pt-3 pb-1 text-[11px] tracking-[0.12em] text-[var(--m-muted2)]">
-        {"// play"}
-      </div>
-      <CommandLink
-        href="/arcade/snake"
-        onClick={onNavigate}
-        tabbable={open}
-        trailing={<BracketIcon Icon={CommandLineIcon} />}
-      >
-        play_snake
-      </CommandLink>
-    </>
-  );
-}
 
 interface AccountCommandsProps {
   isAuthenticated: boolean;
@@ -111,9 +81,6 @@ export function AccountCommands({
       >
         logout
       </CommandButton>
-
-      {/* arcade link — pinned to the bottom of the menu (login-only). */}
-      <PlayCommands open={open} onNavigate={onNavigate} />
     </>
   );
 }

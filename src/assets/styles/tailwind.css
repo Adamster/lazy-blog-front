@@ -419,6 +419,43 @@ html:not(.neo) .mono-rain-bg {
   }
 }
 
+/* Jiggle (`.mono-jiggle`) — a quick playful "laughing" wobble: a few-degree
+   side-to-side rotate looping while the trigger is hovered/focused
+   (transform-only, so no layout shift). The class sits on the TRIGGER (e.g. the
+   header link that owns the focus ring); the wobble is applied to its
+   `.mono-jiggle__mark` child, so the focus outline itself never moves. Used by
+   the NEO white-rabbit header easter-egg. */
+@keyframes mono-jiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-7deg);
+  }
+  40% {
+    transform: rotate(6deg);
+  }
+  60% {
+    transform: rotate(-4deg);
+  }
+  80% {
+    transform: rotate(3deg);
+  }
+}
+.mono-jiggle:hover .mono-jiggle__mark,
+.mono-jiggle:focus-visible .mono-jiggle__mark {
+  animation: mono-jiggle 0.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced motion: no wobble — the hover opacity/brightness reveal still
+     reads, the mark just stays still. */
+  .mono-jiggle:hover .mono-jiggle__mark,
+  .mono-jiggle:focus-visible .mono-jiggle__mark {
+    animation: none;
+  }
+}
+
 /* Keycap (`:kbd[…]` / Kbd) — JetBrains Mono 11px/0.12em/leading-none key cap,
    square 2px `--m-line` border on `--m-panel`. Static. */
 .mono-kbd {
