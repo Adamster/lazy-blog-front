@@ -21,17 +21,20 @@ const focusRing =
 export function IconSubmitButton({
   label,
   pending = false,
+  disabled = false,
   className = "",
 }: {
   /** Accessible name + hover tooltip (the icon has no visible text). */
   label: string;
   pending?: boolean;
+  /** Disable the action independent of `pending` (e.g. an empty form). */
+  disabled?: boolean;
   className?: string;
 }) {
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={pending || disabled}
       aria-label={label}
       aria-busy={pending}
       title={label}

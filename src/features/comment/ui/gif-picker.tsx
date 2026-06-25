@@ -5,7 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Spinner } from "@/shared/ui";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
-import { fetchTrendingGifs, searchGifs, type GifResult } from "../lib/giphy";
+import {
+  fetchTrending,
+  searchMedia,
+  type GifResult,
+  type MediaKind,
+} from "../lib/klipy";
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
@@ -13,29 +18,32 @@ const focusRing =
 /** A bare status line in the brutalist label scale (loading / empty / error). */
 function StatusLine({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-40 items-center justify-center px-4 text-center text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase">
+    <div className="flex h-40 items-center justify-center text-center text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase">
       {children}
     </div>
   );
 }
 
 interface GifPickerProps {
-  /** Fired with the validated GIF when a result is chosen. */
+  /** Fired with the validated GIF/sticker when a result is chosen. */
   onPick: (gif: GifResult) => void;
+  /** Which KLIPY media to browse — `gif` or `sticker`. */
+  kind: MediaKind;
 }
 
 /**
- * GIF tab — a labelled debounced search input over the Giphy CDN with a results
+ * GIF tab — a labelled debounced search input over the KLIPY CDN with a results
  * grid. Trending GIFs show by default; typing searches (300ms debounce). All
  * three async states are designed: a spinner while loading, an empty line when a
- * search returns nothing, and an error line on failure (incl. the beta-key 429
- * rate limit). Thumbnails lazy-load; under reduced-motion the static first frame
- * is shown instead of the animated thumbnail.
+ * search returns nothing, and an error line on failure. Thumbnails lazy-load;
+ * under reduced-motion the static first frame is shown instead of the animated
+ * thumbnail.
  */
-export function GifPicker({ onPick }: GifPickerProps) {
+export function GifPicker({ onPick, kind }: GifPickerProps) {
   const [query, setQuery] = useState("");
   const [debounced, setDebounced] = useState("");
   const reduced = useReducedMotion();
+  const noun = kind === "sticker" ? "stickers" : "GIFs";
 
   // Debounce the query → only the settled value drives the request.
   useEffect(() => {
@@ -44,34 +52,45 @@ export function GifPicker({ onPick }: GifPickerProps) {
   }, [query]);
 
   const { data, isPending, isError, refetch } = useQuery({
-    queryKey: ["giphy", debounced || "trending"],
+    queryKey: ["klipy", kind, debounced || "trending"],
     queryFn: ({ signal }) =>
-      debounced ? searchGifs(debounced, signal) : fetchTrendingGifs(signal),
+      debounced
+        ? searchMedia(kind, debounced, signal)
+        : fetchTrending(kind, signal),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     retry: 1,
   });
 
   return (
-    <div>
-      <div className="flex items-center gap-2.5 border-b-2 border-[var(--m-dim)] bg-[var(--m-card)] px-3">
-        <MagnifyingGlassIcon
-          className="size-3.5 shrink-0 text-[var(--m-muted2)]"
-          aria-hidden="true"
-        />
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          aria-label="Search GIFs"
-          placeholder="Search GIFs"
-          autoComplete="off"
-          className={`w-full border-0 bg-transparent py-2.5 text-[14px] leading-[1.6] text-[var(--m-fg)] caret-[var(--m-accent)] outline-none placeholder:text-[var(--m-muted2)] ${focusRing}`}
-          style={{ fontFamily: "var(--font-mono)" }}
-        />
+    // pb-4 frames the bottom. The horizontal inset (px-4 — matching the tabs) is
+    // applied PER-ELEMENT (search wrapper + grid), NOT on this root, so the
+    // scroll area runs full-width and the brutalist scrollbar sits in its own
+    // right gutter OUTSIDE the GIF grid (no scrollbar-over-GIF overlap); the
+    // search + GIFs still align with the tab text at 16px.
+    <div className="pb-4">
+      {/* Search — a 36px underline field (no fill), inset px-4 to align with the
+          tabs + the GIF grid. */}
+      <div className="px-4">
+        <div className="flex h-9 items-center gap-2.5 border-b-2 border-[var(--m-dim)] transition-colors focus-within:border-[var(--m-accent)]">
+          <MagnifyingGlassIcon
+            className="size-3.5 shrink-0 text-[var(--m-muted2)]"
+            aria-hidden="true"
+          />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            aria-label={`Search ${noun}`}
+            placeholder={`Search ${noun}`}
+            autoComplete="off"
+            className="h-full w-full border-0 bg-transparent text-[14px] leading-none text-[var(--m-fg)] caret-[var(--m-accent)] outline-none placeholder:text-[var(--m-muted2)]"
+            style={{ fontFamily: "var(--font-mono)" }}
+          />
+        </div>
       </div>
 
-      <div className="mono-scrollbar h-56 overflow-y-auto bg-[var(--m-dim)]">
+      <div className="mono-scrollbar mt-3 h-48 overflow-y-auto">
         {isPending ? (
           <StatusLine>
             <Spinner className="text-[14px] text-[var(--m-accent)]" />
@@ -83,13 +102,13 @@ export function GifPicker({ onPick }: GifPickerProps) {
               onClick={() => refetch()}
               className={`tracking-[0.12em] text-[var(--m-error)] uppercase transition-colors hover:text-[var(--m-fg)] ${focusRing}`}
             >
-              Couldn&apos;t load GIFs · Retry
+              {`Couldn't load ${noun} · Retry`}
             </button>
           </StatusLine>
         ) : data.length === 0 ? (
-          <StatusLine>No GIFs found</StatusLine>
+          <StatusLine>{`No ${noun} found`}</StatusLine>
         ) : (
-          <div className="grid grid-cols-2 gap-[2px]">
+          <div className="grid grid-cols-3 gap-[2px] pr-[5px] pl-4">
             {data.map((gif) => (
               <button
                 key={gif.id}
@@ -98,14 +117,14 @@ export function GifPicker({ onPick }: GifPickerProps) {
                 onClick={() => onPick(gif)}
                 className={`group relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-[var(--m-card)] transition-opacity hover:opacity-80 ${focusRing}`}
               >
-                {/* Plain <img>: Giphy hosts aren't in next.config remotePatterns
+                {/* Plain <img>: KLIPY hosts aren't in next.config remotePatterns
                     (owner can't edit Vercel config), and the GIF must animate. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={reduced ? gif.stillUrl : gif.thumbUrl}
                   alt=""
                   loading="lazy"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain"
                 />
               </button>
             ))}

@@ -4,13 +4,13 @@ import { CommentResponse } from "@/shared/api/openapi";
 import { IsAuthor } from "@/entities/session";
 import { useDeleteComment } from "@/features/comment/model/use-delete-comment";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { useState, type ReactNode } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import CommentForm from "@/features/comment/ui/comment-form";
 import { formatDate2 } from "@/shared/lib/utils";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
 import { Avatar, Dot, Menu, type MenuItem } from "@/shared/ui";
-import { parseCommentBody } from "@/features/comment/lib/comment-gif";
+import { renderCommentMarkdown } from "@/features/comment/lib/comment-markdown";
 
 interface IProps {
   comment: CommentResponse;
@@ -21,43 +21,6 @@ const nameOf = (u: CommentResponse["user"]) =>
   [u.firstName, u.lastName].filter(Boolean).join(" ") ||
   u.userName ||
   "Unknown";
-
-const graphemeSegmenter =
-  typeof Intl !== "undefined" && "Segmenter" in Intl
-    ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
-    : null;
-const EMOJI_RE = /\p{Extended_Pictographic}/u;
-
-/**
- * Render comment text with emoji enlarged (~1.35em). Native emoji otherwise
- * inherit the 14px body size and read tiny; we segment into graphemes (so ZWJ
- * sequences / variation selectors stay intact) and wrap emoji ones in a larger
- * span, leaving the surrounding text at body size. Falls back to plain text
- * where `Intl.Segmenter` is unavailable.
- */
-function withBigEmoji(text: string): ReactNode {
-  if (!graphemeSegmenter) return text;
-  const out: ReactNode[] = [];
-  let buf = "";
-  let key = 0;
-  for (const { segment } of graphemeSegmenter.segment(text)) {
-    if (EMOJI_RE.test(segment)) {
-      if (buf) {
-        out.push(buf);
-        buf = "";
-      }
-      out.push(
-        <span key={key++} className="align-[-0.1em] text-[1.5em] leading-none">
-          {segment}
-        </span>
-      );
-    } else {
-      buf += segment;
-    }
-  }
-  if (buf) out.push(buf);
-  return out;
-}
 
 const CommentView = ({ comment, postId }: IProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -72,9 +35,15 @@ const CommentView = ({ comment, postId }: IProps) => {
 
   const handle = comment.user.userName ?? "";
 
-  // Split off a trailing whitelisted GIF (Giphy/Tenor only); untrusted markdown
-  // stays part of the text and renders literally.
-  const { text, gifUrl } = parseCommentBody(comment.body);
+  // Render the whole body through the minimal inline-markdown subset — which now
+  // also renders inline GIF images (whitelisted KLIPY/Tenor only). This covers
+  // both NEW comments (GIFs are `![gif](url)` images anywhere) and OLD ones
+  // (trailing `![gif](url)` lines are just images at the end). Memoized on the
+  // raw body so re-renders (menu open, edit toggle) don't re-parse.
+  const renderedBody = useMemo(
+    () => (comment.body.trim() ? renderCommentMarkdown(comment.body) : null),
+    [comment.body]
+  );
 
   const menuItems: MenuItem[] = [
     {
@@ -142,22 +111,10 @@ const CommentView = ({ comment, postId }: IProps) => {
             &gt;
           </span>
           <div className="min-w-0">
-            {text && (
+            {renderedBody && (
               <p className="text-[14px] leading-[1.6] whitespace-pre-line text-[var(--m-fg)]">
-                {withBigEmoji(text)}
+                {renderedBody}
               </p>
-            )}
-            {gifUrl && (
-              // Whitelisted Giphy/Tenor URL only (see comment-gif.ts). Plain
-              // <img> — these hosts aren't in next.config remotePatterns and the
-              // owner can't edit Vercel config; framed on-system, capped width.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={gifUrl}
-                alt="GIF"
-                loading="lazy"
-                className={`max-w-[280px] border-2 border-[var(--m-dim)] ${text ? "mt-3" : ""}`}
-              />
             )}
           </div>
         </div>
