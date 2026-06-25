@@ -79,8 +79,8 @@ export const ErrorMessage = ({
 
   // NEO theme swaps the generic error chrome for a Matrix line (ties into the
   // neo matrix-rain). Same layout/scale — only the eyebrow + headline change.
-  const eyebrowText = isNeo ? "// FOLLOW THE WHITE RABBIT" : statusLine;
-  const headline = isNeo ? "The matrix has you" : "A glitch in the Lazyverse";
+  const eyebrowText = isNeo ? "FOLLOW THE WHITE RABBIT" : statusLine;
+  const headline = isNeo ? "The matrix has you…" : "A glitch in the Lazyverse";
 
   return (
     <div
@@ -88,7 +88,7 @@ export const ErrorMessage = ({
       style={{ fontFamily: "var(--font-mono)" }}
     >
       <div className="mx-auto w-full max-w-[640px]">
-        <div className="mb-6 flex items-center gap-2.5 text-[11px] tracking-[0.12em] text-[var(--m-error)]">
+        <div className="mb-6 flex items-center gap-2.5 text-[11px] leading-none tracking-[0.12em] text-[var(--m-error)]">
           <span
             aria-hidden="true"
             className="inline-block size-2 bg-[var(--m-error)]"
