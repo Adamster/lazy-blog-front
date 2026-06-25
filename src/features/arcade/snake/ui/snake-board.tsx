@@ -38,7 +38,7 @@ const overlayBase = `${overlayLayout} ${overlayScrim}`;
 function OverlayRail({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-stretch">
-      <div className="w-2 shrink-0 bg-[var(--m-accent)]" aria-hidden />
+      <div className="w-0.5 shrink-0 bg-[var(--m-accent)]" aria-hidden />
       <div className="flex flex-col items-start gap-6 pl-10 text-left">
         {children}
       </div>
