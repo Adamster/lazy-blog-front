@@ -101,8 +101,8 @@ export const ErrorMessage = ({
         </h1>
 
         <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
-          Something broke on our side — not you. Try again; if it keeps
-          happening, head back home.
+          A déjà vu is usually a glitch in the Matrix. It happens when they
+          change something.
         </p>
 
         {errorMessage ? (
