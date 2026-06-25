@@ -4,6 +4,7 @@ import type { Node as ProseNode } from "@milkdown/kit/prose/model";
 import {
   parseEmbedUrl,
   embedLabel,
+  embedSrc,
   type MediaEmbed,
 } from "@/shared/lib/media-embed";
 import { remarkDirective } from "./editor-small-mark";
@@ -79,6 +80,20 @@ export const mediaEmbedSchema = $nodeSchema("mediaEmbed", () => ({
         const embed = parseEmbedUrl(url);
         if (!embed) return false;
         return embedToAttrs(embed, url);
+      },
+    },
+    {
+      // PASTE: an author pastes Spotify/YouTube "Copy embed code" — a raw
+      // `<iframe src="…/embed/…">`. Validate the src through the SAME whitelist
+      // (host + type + id) and store the canonical embed `src` as the node's url
+      // so it serialises to a bare link the read view re-detects. A non-whitelisted
+      // iframe returns false → ProseMirror drops it (we never keep a raw iframe).
+      tag: "iframe[src]",
+      getAttrs: (dom) => {
+        if (!(dom instanceof HTMLElement)) return false;
+        const embed = parseEmbedUrl(dom.getAttribute("src") ?? "");
+        if (!embed) return false;
+        return embedToAttrs(embed, embedSrc(embed));
       },
     },
   ],

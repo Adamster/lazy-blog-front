@@ -94,4 +94,47 @@ describe("PostBody", () => {
     );
     expect(container.querySelector("iframe")).toBeNull();
   });
+
+  it("renders a pasted Spotify <iframe> embed block as a player (no re-save)", () => {
+    const { container } = render(
+      <PostBody
+        markdown={
+          '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/6obTxej2mmfp6HqZvTWZGF?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay" loading="lazy" />'
+        }
+      />
+    );
+    const iframe = container.querySelector("iframe");
+    expect(iframe).toHaveAttribute(
+      "src",
+      "https://open.spotify.com/embed/track/6obTxej2mmfp6HqZvTWZGF"
+    );
+    // The raw iframe markup is gone — not literalised as text.
+    expect(container.textContent).not.toContain("<iframe");
+  });
+
+  it("renders several pasted iframes in one block as separate players", () => {
+    const { container } = render(
+      <PostBody
+        markdown={
+          '<iframe src="https://open.spotify.com/embed/track/6obTxej2mmfp6HqZvTWZGF" /> <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" />'
+        }
+      />
+    );
+    const srcs = [...container.querySelectorAll("iframe")].map((f) =>
+      f.getAttribute("src")
+    );
+    expect(srcs).toEqual([
+      "https://open.spotify.com/embed/track/6obTxej2mmfp6HqZvTWZGF",
+      "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
+    ]);
+  });
+
+  it("does not render a non-whitelisted pasted iframe (security)", () => {
+    const { container } = render(
+      <PostBody
+        markdown={'<iframe src="https://evil.com/embed/track/aaa"></iframe>'}
+      />
+    );
+    expect(container.querySelector("iframe")).toBeNull();
+  });
 });

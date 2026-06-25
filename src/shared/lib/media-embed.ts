@@ -157,3 +157,72 @@ export function spotifyHeight(type: SpotifyType): number {
 export function embedLabel(embed: MediaEmbed): string {
   return embed.kind === "youtube" ? "YouTube video" : `Spotify ${embed.type}`;
 }
+
+/**
+ * Pull the `src="…"` (or `src='…'`) value out of a single `<iframe …>` tag. The
+ * `src` may sit anywhere among the other attributes, in single or double quotes;
+ * we don't trust the rest of the tag at all — only this one URL, which still has
+ * to clear `parseEmbedUrl`'s host + type + id whitelist downstream.
+ *
+ * Returns the raw src string (caller validates), or `null` if the tag has none.
+ */
+function iframeSrc(tag: string): string | null {
+  const m = /\bsrc\s*=\s*(?:"([^"]*)"|'([^']*)')/i.exec(tag);
+  const src = m?.[1] ?? m?.[2];
+  return src ? src : null;
+}
+
+/** Matches each `<iframe …>…</iframe>` (or self-closing `<iframe … />`) in a
+ *  blob — the global flag walks several per string, and the optional body +
+ *  closing tag are consumed so a non-self-closing tag leaves no dangling
+ *  `</iframe>` remnant. We only ever read the opening tag's `src`. */
+const IFRAME_TAG =
+  /<iframe\b[^>]*?>(?:(?:(?!<iframe\b)[\s\S])*?<\/iframe\s*>)?/gi;
+
+/**
+ * A piece of a raw-HTML blob after splitting on its `<iframe>` tags: either a
+ * validated embed descriptor (whitelisted host + type + id) or a run of leftover
+ * text/markup that sat between iframes (kept so nothing is silently dropped).
+ */
+export type IframeBlobPart =
+  | { kind: "embed"; embed: MediaEmbed }
+  | { kind: "text"; value: string };
+
+/**
+ * Split a raw HTML blob (one mdast `html` node may carry SEVERAL `<iframe>` tags,
+ * possibly interleaved with other text/markup) into ordered parts: every iframe
+ * whose `src` clears the whitelist becomes an `embed` part; everything else —
+ * including a non-whitelisted / unparseable iframe and any surrounding text —
+ * stays as a `text` part. A blob with no embeddable iframe yields a single `text`
+ * part equal to the original (callers can then leave it exactly as-is).
+ *
+ * SECURITY: a non-whitelisted iframe is reduced to INERT text (its source string,
+ * which the read view escapes — it is never rendered as live HTML). The only
+ * thing that ever reaches a player is the validated descriptor; the original
+ * `src` is discarded and rebuilt by `embedSrc`.
+ */
+export function splitIframeBlob(html: string): IframeBlobPart[] {
+  const parts: IframeBlobPart[] = [];
+  let lastIndex = 0;
+  let hasEmbed = false;
+
+  IFRAME_TAG.lastIndex = 0;
+  for (let m = IFRAME_TAG.exec(html); m; m = IFRAME_TAG.exec(html)) {
+    const tag = m[0];
+    const src = iframeSrc(tag);
+    const embed = src ? parseEmbedUrl(src) : null;
+    if (!embed) continue; // leave non-whitelisted iframes inside the text run.
+
+    const before = html.slice(lastIndex, m.index);
+    if (before) parts.push({ kind: "text", value: before });
+    parts.push({ kind: "embed", embed });
+    lastIndex = m.index + tag.length;
+    hasEmbed = true;
+  }
+
+  if (!hasEmbed) return [{ kind: "text", value: html }];
+
+  const tail = html.slice(lastIndex);
+  if (tail) parts.push({ kind: "text", value: tail });
+  return parts;
+}

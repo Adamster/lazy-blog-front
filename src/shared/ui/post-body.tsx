@@ -20,7 +20,7 @@ import { AnsiBlock } from "./ansi-block";
 import { FoldBlock } from "./fold-block";
 import { CompareSlider } from "./compare-slider";
 import { MediaEmbed } from "./media-embed";
-import { remarkMediaEmbeds } from "./remark-media-embeds";
+import { remarkMediaEmbeds, remarkIframeEmbeds } from "./remark-media-embeds";
 import type { SpotifyType } from "@/shared/lib/media-embed";
 
 type MdNode = {
@@ -533,6 +533,10 @@ export function PostBody({ markdown }: PostBodyProps) {
           // Turn a paragraph that is ONLY a YouTube/Spotify link into an embed
           // node (existing posts carry plain links — no migration needed).
           remarkMediaEmbeds,
+          // Turn pasted raw `<iframe>` embed HTML (Spotify/YouTube "Copy embed
+          // code") into the same embed node — lights up existing posts at render
+          // time, no re-save (the read view literalises raw HTML otherwise).
+          remarkIframeEmbeds,
           remarkLiteralizeUnknownDirectives,
           remarkDropEmptyLines,
         ]}
