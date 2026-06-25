@@ -5,6 +5,7 @@ import {
 } from "@/shared/lib/auth-refresh";
 import { API_URL } from "@/shared/types";
 import {
+  ArcadeApi,
   ChangePasswordApi,
   CommentsApi,
   ForgotPasswordApi,
@@ -99,6 +100,7 @@ const configuration = new Configuration({
 });
 
 export const apiClient = {
+  arcade: new ArcadeApi(configuration),
   users: new UsersApi(configuration),
   posts: new PostsApi(configuration),
   comments: new CommentsApi(configuration),

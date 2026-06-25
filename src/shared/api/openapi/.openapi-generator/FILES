@@ -1,4 +1,5 @@
 .openapi-generator-ignore
+apis/ArcadeApi.ts
 apis/AuthApi.ts
 apis/ChangePasswordApi.ts
 apis/CommentsApi.ts
@@ -13,6 +14,7 @@ apis/UsersApi.ts
 apis/index.ts
 index.ts
 models/AddCommentRequest.ts
+models/ArcadeStatsResponse.ts
 models/AuthorPostResponse.ts
 models/ChangePasswordRequest.ts
 models/CommentResponse.ts
@@ -20,8 +22,11 @@ models/CreatePostRequest.ts
 models/DisplayPostResponse.ts
 models/ForgotPasswordRequest.ts
 models/HomeStatsResponse.ts
+models/LeaderboardEntryResponse.ts
+models/LeaderboardResponse.ts
 models/LoginRequest.ts
 models/LoginResponse.ts
+models/LogoutRequest.ts
 models/MediaItemResponse.ts
 models/MostActiveUserResponse.ts
 models/NoContent.ts
@@ -36,6 +41,7 @@ models/RefreshTokenRequest.ts
 models/RefreshTokenResponse.ts
 models/RegisterUserRequest.ts
 models/ResetPasswordRequest.ts
+models/SubmitScoreRequest.ts
 models/TagPostResponse.ts
 models/TagResponse.ts
 models/TopPostResponse.ts

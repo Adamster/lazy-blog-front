@@ -1,5 +1,6 @@
 /* tslint:disable */
  
+export * from './ArcadeApi';
 export * from './AuthApi';
 export * from './ChangePasswordApi';
 export * from './CommentsApi';
