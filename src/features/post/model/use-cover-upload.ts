@@ -19,7 +19,7 @@ export function useCoverUpload(onUploaded: (url: string) => void) {
     mutationFn: (file: File) =>
       apiClient.media.uploadMedia({ id: user?.id ?? "", file }),
     onSuccess: (url) => {
-      addToastSuccess("Image uploaded successfully!");
+      addToastSuccess("Cover uploaded. Looking good.");
       onUploaded(url);
     },
     onError: (error) => {

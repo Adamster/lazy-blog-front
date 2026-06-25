@@ -11,7 +11,7 @@ export const useResetPassword = (email: string, token: string) => {
       });
     },
     onSuccess: () => {
-      addToastSuccess("Your password has been reset successfully!");
+      addToastSuccess("Password reset. You're back in.");
     },
     onError: (error) => {
       addToastError("Password reset failed.", error);

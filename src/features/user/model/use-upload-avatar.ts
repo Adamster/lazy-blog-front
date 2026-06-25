@@ -10,7 +10,7 @@ export const useUploadAvatar = (userId: string) => {
     mutationFn: (file: File) =>
       apiClient.users.uploadUserAvatar({ id: userId, file }),
     onSuccess: () => {
-      addToastSuccess("Avatar updated!");
+      addToastSuccess("New avatar. New you.");
 
       queryClient.invalidateQueries({
         queryKey: userKeys.byId(userId),

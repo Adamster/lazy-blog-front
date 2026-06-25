@@ -85,7 +85,10 @@ export const usePublishPost = (
     authorHandle,
     true,
     () => apiClient.posts.publishPost({ id: postId }),
-    { success: "Post has been published", error: "Error publishing post" }
+    {
+      success: "Published. It's live — no take-backs.",
+      error: "Error publishing post",
+    }
   );
 
 export const useHidePost = (
@@ -99,5 +102,8 @@ export const useHidePost = (
     authorHandle,
     false,
     () => apiClient.posts.hidePost({ id: postId }),
-    { success: "Post has been unpublished", error: "Error unpublishing post" }
+    {
+      success: "Unpublished. Back to draft, nobody saw a thing.",
+      error: "Error unpublishing post",
+    }
   );

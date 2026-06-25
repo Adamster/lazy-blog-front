@@ -163,7 +163,7 @@ function LoginView({
         eyebrow="// ACCESS"
         title="Welcome back"
         titleId={titleId}
-        subtitle="Log in to break the silence — like, comment, join the noise."
+        subtitle="Same handle, same opinions. Log in and pick up where you left off."
         onClose={onClose}
       />
 
@@ -255,9 +255,9 @@ function ForgotView({
     <>
       <ModalHeader
         eyebrow="// RECOVERY"
-        title="Reset password"
+        title="Forgot password"
         titleId={titleId}
-        subtitle="Drop your email — we'll beam over a reset link. Check spam if it ghosts you."
+        subtitle="Happens to everyone. Drop your email and we'll send a reset link — check spam if it ghosts you."
         onClose={onClose}
       />
 
@@ -343,6 +343,7 @@ function RegisterView({
         eyebrow="// NEW USER"
         title="Create an account"
         titleId={titleId}
+        subtitle="Six fields between you and a comment section. We've seen longer commit messages."
         onClose={onClose}
       />
 

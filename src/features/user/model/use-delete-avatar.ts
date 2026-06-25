@@ -9,7 +9,7 @@ export const useDeleteAvatar = (userId: string) => {
   return useMutation({
     mutationFn: () => apiClient.users.deleteUserAvatar({ id: userId }),
     onSuccess: () => {
-      addToastSuccess("Avatar deleted!");
+      addToastSuccess("Avatar gone. Back to initials.");
 
       queryClient.invalidateQueries({
         queryKey: userKeys.byId(userId),

@@ -108,7 +108,7 @@ export default function HomePage() {
               {"// EMPTY FEED"}
             </p>
             <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
-              No posts in the Lazyverse yet.
+              {"Nobody's posted yet. The feed is yours for the taking."}
             </p>
           </div>
         ) : (

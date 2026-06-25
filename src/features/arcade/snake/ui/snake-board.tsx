@@ -13,7 +13,7 @@ import { Confetti } from "./confetti";
  * dark `#1a1a1a` on EVERY theme (the game palette is dark-tuned), but
  * `bg-[var(--m-bg)]/60` followed the THEME bg — so on the LIGHT theme it laid a
  * 60%-white film over a dark board and read as a flat washed-out gray (the
- * owner's "немного не очень"). A theme-independent low-alpha BLACK instead
+ * owner's "a bit off"). A theme-independent low-alpha BLACK instead
  * DARKENS the busy field by the same amount on light, dark and neo, so the lime
  * eyebrow + button and the muted hints keep identical contrast on every theme.
  * Kept light enough that the gridded field + outer frame still read through. (A

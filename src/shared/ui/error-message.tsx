@@ -3,6 +3,7 @@
 import { ResponseError } from "@/shared/api/openapi";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTheme } from "@/shared/providers/theme-providers";
 import { GlitchText } from "./glitch-text";
 import { Console } from "./console";
 
@@ -43,6 +44,8 @@ export const ErrorMessage = ({
   status?: number;
 }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { theme } = useTheme();
+  const isNeo = theme === "neo";
 
   useEffect(() => {
     const fetchErrorMessage = async () => {
@@ -74,6 +77,11 @@ export const ErrorMessage = ({
   const statusLine =
     status === 404 ? "NOT FOUND · 404" : `RUNTIME EXCEPTION · ${status ?? 500}`;
 
+  // NEO theme swaps the generic error chrome for a Matrix line (ties into the
+  // neo matrix-rain). Same layout/scale — only the eyebrow + headline change.
+  const eyebrowText = isNeo ? "// FOLLOW THE WHITE RABBIT" : statusLine;
+  const headline = isNeo ? "The matrix has you" : "A glitch in the Lazyverse";
+
   return (
     <div
       className="mono-scope min-h-app flex w-full flex-col justify-center bg-[var(--m-bg)] px-10 py-14 text-[var(--m-fg)]"
@@ -85,11 +93,11 @@ export const ErrorMessage = ({
             aria-hidden="true"
             className="inline-block size-2 bg-[var(--m-error)]"
           />
-          {statusLine}
+          {eyebrowText}
         </div>
 
         <h1 className="font-display text-[32px] leading-[1.04] font-bold tracking-[-0.02em] text-[var(--m-fg)] md:text-[40px]">
-          <GlitchText caret>A glitch in the Lazyverse</GlitchText>
+          <GlitchText caret>{headline}</GlitchText>
         </h1>
 
         <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">

@@ -15,7 +15,7 @@ export const useUpdatePassword = () => {
         changePasswordRequest: { oldPassword, newPassword },
       }),
     onSuccess: () => {
-      addToastSuccess("Password successfully changed!");
+      addToastSuccess("Password changed. Don't forget this one too.");
       router.push("/");
 
       setTimeout(() => {
