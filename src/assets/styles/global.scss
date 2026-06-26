@@ -21,7 +21,7 @@ html {
    canvas) so the html bg follows the theme. `data-theme` is "neo" for neo, so an
    attribute selector would miss it and leave the page light. */
 html.dark {
-  background-color: #1a1a1a; /* --m-bg, dark */
+  background-color: #141414; /* --m-bg, dark */
 }
 
 /* Interactive elements always get the pointer cursor (browsers default

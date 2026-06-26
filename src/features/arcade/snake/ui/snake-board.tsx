@@ -10,7 +10,7 @@ import { Confetti } from "./confetti";
  * Overlay scrim — a fixed NEUTRAL-BLACK wash, NOT the theme bg.
  *
  * Why a raw rgba black (not `--m-bg/60`): the canvas field is always the same
- * dark `#1a1a1a` on EVERY theme (the game palette is dark-tuned), but
+ * dark `#141414` on EVERY theme (the game palette is dark-tuned), but
  * `bg-[var(--m-bg)]/60` followed the THEME bg — so on the LIGHT theme it laid a
  * 60%-white film over a dark board and read as a flat washed-out gray (the
  * owner's "a bit off"). A theme-independent low-alpha BLACK instead
@@ -92,7 +92,7 @@ export function SnakeBoard({ api }: { api: SnakeGameApi }) {
       : "Off the board — eat more, grow longer";
 
   // Force the DARK palette on the board + overlays: the canvas field is always the
-  // dark `#1a1a1a` on every theme, so the overlay text/accent must read the
+  // dark `#141414` on every theme, so the overlay text/accent must read the
   // dark-theme `--m-*` (light fg + lime), not the light theme's dark fg (invisible
   // on the dark board). The dark vars are scoped `.dark .mono-scope` — `.dark` on
   // an ANCESTOR — so we wrap the board in a `.dark` div with the board itself the

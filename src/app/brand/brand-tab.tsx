@@ -23,7 +23,7 @@ const LIGHT: Pal = {
   border: "#161616",
 };
 const DARK: Pal = {
-  bg: "#1a1a1a",
+  bg: "#141414",
   fg: "#dcdcdc",
   accent: "#cdff48",
   panel: "#2a2a2a",
@@ -56,7 +56,7 @@ const LIGHT_HEX: Record<string, string> = {
   error: "#b91c1c",
 };
 const DARK_HEX: Record<string, string> = {
-  bg: "#1a1a1a",
+  bg: "#141414",
   fg: "#dcdcdc",
   accent: "#cdff48",
   line: "#e6e6e6",
