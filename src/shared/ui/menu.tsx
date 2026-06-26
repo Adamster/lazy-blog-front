@@ -2,7 +2,7 @@
 
 import { useRef, useState, type ReactNode } from "react";
 import { useClickOutside } from "react-haiku";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/solid";
+import { EllipsisHorizontalCircleIcon } from "@heroicons/react/24/outline";
 
 export interface MenuItem {
   /** Stable id for the row (React key + onSelect dispatch). */
@@ -39,14 +39,15 @@ export function Menu({ items, triggerLabel }: MenuProps) {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex size-9 items-center justify-center text-[var(--m-accent)] transition-[filter] hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
+        className="flex size-9 items-center justify-center text-[var(--m-muted2)] transition-colors hover:text-[var(--m-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
       >
-        <EllipsisVerticalIcon className="size-[18px]" />
+        <EllipsisHorizontalCircleIcon className="size-[18px]" />
       </button>
 
       {/* Minimal popout: BORDERED icon buttons (size-8, smaller than the
           trigger) in a row, to the LEFT of the dots — the 3-dot TRIGGER itself is
-          borderless (plain accent dots). Centered to the trigger via `inset-y-0`
+          borderless (plain MUTED dots → accent on hover, so the kebab stays
+          quiet until reached). Centered to the trigger via `inset-y-0`
           + `items-center`. */}
       {open && (
         <div
