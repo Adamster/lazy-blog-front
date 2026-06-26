@@ -3,7 +3,7 @@
 import { ResponseError } from "@/shared/api/openapi";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useTheme } from "@/shared/providers/theme-providers";
+import { useThemeSafe } from "@/shared/providers/theme-providers";
 import { GlitchText } from "./glitch-text";
 import { Console } from "./console";
 
@@ -41,7 +41,9 @@ export const ErrorMessage = ({
   status?: number;
 }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { theme } = useTheme();
+  // The root ErrorBoundary fallback renders ABOVE ThemeProvider, so read the
+  // theme defensively (off <html>) instead of throwing when there's no provider.
+  const { theme } = useThemeSafe();
   const isNeo = theme === "neo";
 
   useEffect(() => {
