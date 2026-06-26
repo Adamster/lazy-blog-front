@@ -1,5 +1,6 @@
 "use client";
 
+import type { ComponentType } from "react";
 import { RocketLaunchIcon } from "@heroicons/react/24/solid";
 import { Spinner } from "./loading";
 
@@ -8,9 +9,10 @@ const focusRing =
 
 /**
  * Icon-only primary submit — the composer-Publish pattern, generalised. A 36px
- * (`size-9`) accent `.mono-cta` square with the `RocketLaunchIcon` (`size-3.5`),
- * `type=submit`. Used for every "submit / send / save" primary (comment Send,
- * profile Save, auth Log in, …) so the action reads identically everywhere.
+ * (`size-9`) accent `.mono-cta` square, `type=submit`. The glyph DEFAULTS to the
+ * `RocketLaunchIcon` (publish/send) but is overridable via `icon` (e.g. a save
+ * icon when the action is "save draft", not publish). Used for every
+ * "submit / send / save" primary (comment Send, profile Save, auth Log in, …).
  *
  * The icon carries NO visible text, so `label` is REQUIRED and drives BOTH the
  * accessible name (`aria-label`) AND the hover tooltip (`title`) — an icon
@@ -20,12 +22,16 @@ const focusRing =
  */
 export function IconSubmitButton({
   label,
+  icon: Icon = RocketLaunchIcon,
   pending = false,
   disabled = false,
   className = "",
 }: {
   /** Accessible name + hover tooltip (the icon has no visible text). */
   label: string;
+  /** The glyph — defaults to `RocketLaunchIcon` (publish/send). Pass another
+   *  (e.g. a save icon) when the submit means something else. */
+  icon?: ComponentType<{ className?: string }>;
   pending?: boolean;
   /** Disable the action independent of `pending` (e.g. an empty form). */
   disabled?: boolean;
@@ -43,7 +49,7 @@ export function IconSubmitButton({
       {pending ? (
         <Spinner className="text-[14px]" />
       ) : (
-        <RocketLaunchIcon className="size-3.5" />
+        <Icon className="size-3.5" />
       )}
     </button>
   );

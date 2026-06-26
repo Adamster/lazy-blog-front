@@ -8,6 +8,7 @@ import {
   PencilIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
+import { CheckIcon, RocketLaunchIcon } from "@heroicons/react/24/solid";
 import { IconSubmitButton, Stepper } from "@/shared/ui";
 import type { ComposerStep } from "./composer-step";
 
@@ -113,7 +114,15 @@ export function ComposerTopBar({
               flush against the primary. */}
           <span aria-hidden="true" className="h-5 w-0.5 bg-[var(--m-dim)]" />
 
-          <IconSubmitButton label="Publish" pending={isPending} />
+          {/* Rocket = publish (eye visible); the check = save a DRAFT (eye
+              hidden) — the glyph matches the intent the eye toggle set, so a
+              draft-save doesn't read as "launching". Same submit either way;
+              only the icon + label change. */}
+          <IconSubmitButton
+            icon={published ? RocketLaunchIcon : CheckIcon}
+            label={published ? "Publish" : "Save draft"}
+            pending={isPending}
+          />
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { useUser } from "@/entities/session";
 import { useAddComment } from "@/features/comment/model/use-add-comment";
 import { useUpdateComment } from "@/features/comment/model/use-update-comment";
 import { IconSubmitButton } from "@/shared/ui";
+import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import { useCallback, useState } from "react";
 import {
   CommentEditor,
@@ -116,6 +117,7 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
         )}
 
         <IconSubmitButton
+          icon={PaperAirplaneIcon}
           label={editComment ? "Update" : "Send"}
           pending={isPending}
           disabled={!body.trim()}
