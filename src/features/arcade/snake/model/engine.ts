@@ -863,7 +863,12 @@ export class SnakeEngine {
   private snake: Cell[] = [];
 
   private dir: Cell = { x: 1, y: 0 };
-  private nextDir: Cell = { x: 1, y: 0 };
+  /** Buffered direction changes (FIFO). step() consumes one per tick, so two
+   *  quick turns within a single tick (e.g. up→left around a corner) BOTH
+   *  register instead of the second being dropped or mis-rejected as a reverse. */
+  private dirQueue: Cell[] = [];
+  /** Max buffered turns; extra inputs within one tick are ignored. */
+  private readonly dirQueueMax = 2;
   /**
    * The FOUR live rabbits — always exactly one POSITIVE, two NEGATIVE, and one
    * KILLER (see {@link Rabbit}). The whole array is replaced on EVERY eat by
@@ -915,7 +920,7 @@ export class SnakeEngine {
       { x: cx - 2, y: cy },
     ];
     this.dir = { x: 1, y: 0 };
-    this.nextDir = { x: 1, y: 0 };
+    this.dirQueue = [];
     this.stepMs = SPEED_MS[this.speed];
     this.score = 0;
     this.chips = [];
@@ -975,10 +980,18 @@ export class SnakeEngine {
     });
   }
 
-  /** Queue a direction change; no-op on a direct reverse. */
+  /** Queue a direction change. Validates against the LAST queued turn (or the
+   *  live direction when the queue is empty), so a 180° reverse is rejected and
+   *  an identical repeat is a no-op; buffers up to {@link dirQueueMax} turns so
+   *  fast successive presses aren't lost. */
   steer(x: number, y: number) {
-    if (x === -this.dir.x && y === -this.dir.y) return;
-    this.nextDir = { x, y };
+    const ref = this.dirQueue.length
+      ? this.dirQueue[this.dirQueue.length - 1]
+      : this.dir;
+    if (x === ref.x && y === ref.y) return;
+    if (x === -ref.x && y === -ref.y) return;
+    if (this.dirQueue.length >= this.dirQueueMax) return;
+    this.dirQueue.push({ x, y });
   }
 
   /**
@@ -1050,7 +1063,7 @@ export class SnakeEngine {
    * is always silent; the KILLER rabbit is the one lethal-on-eat hazard.
    */
   step(animate = true): StepResult {
-    this.dir = this.nextDir;
+    if (this.dirQueue.length) this.dir = this.dirQueue.shift()!;
     const head = this.snake[0];
     let nx = head.x + this.dir.x;
     let ny = head.y + this.dir.y;
