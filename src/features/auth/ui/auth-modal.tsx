@@ -344,20 +344,22 @@ function RegisterView({
       />
 
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
-        {/* Email + Username */}
-        <div className="grid grid-cols-2 gap-4">
-          <Field
-            id="reg-email"
-            label="Email"
-            type="email"
-            autoComplete="email"
-            required
-            error={errors.email?.message}
-            {...register("email", {
-              required: "Email is required",
-              pattern: EMAIL_PATTERN,
-            })}
-          />
+        {/* Email — full width */}
+        <Field
+          id="reg-email"
+          label="Email"
+          type="email"
+          autoComplete="email"
+          required
+          error={errors.email?.message}
+          {...register("email", {
+            required: "Email is required",
+            pattern: EMAIL_PATTERN,
+          })}
+        />
+
+        {/* Username + Display name */}
+        <div className="mt-4 grid grid-cols-2 gap-4">
           <Field
             id="reg-username"
             label="Username"
@@ -373,11 +375,6 @@ function RegisterView({
               },
             })}
           />
-        </div>
-
-        {/* Display name — one full-width field spanning the two natural pairs
-            (email/username above, password/confirm below). */}
-        <div className="mt-4">
           <Field
             id="reg-displayname"
             label="Display name"
