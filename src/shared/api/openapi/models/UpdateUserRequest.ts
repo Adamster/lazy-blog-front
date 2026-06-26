@@ -20,17 +20,11 @@ import { mapValues } from '../runtime';
  */
 export interface UpdateUserRequest {
     /**
-     * 
+     *
      * @type {string}
      * @memberof UpdateUserRequest
      */
-    firstName: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdateUserRequest
-     */
-    lastName: string;
+    displayName: string;
     /**
      * 
      * @type {string}
@@ -49,8 +43,7 @@ export interface UpdateUserRequest {
  * Check if a given object implements the UpdateUserRequest interface.
  */
 export function instanceOfUpdateUserRequest(value: object): value is UpdateUserRequest {
-    if (!('firstName' in value) || value['firstName'] === undefined) return false;
-    if (!('lastName' in value) || value['lastName'] === undefined) return false;
+    if (!('displayName' in value) || value['displayName'] === undefined) return false;
     if (!('userName' in value) || value['userName'] === undefined) return false;
     if (!('biography' in value) || value['biography'] === undefined) return false;
     return true;
@@ -66,8 +59,7 @@ export function UpdateUserRequestFromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         
-        'firstName': json['firstName'],
-        'lastName': json['lastName'],
+        'displayName': json['displayName'],
         'userName': json['userName'],
         'biography': json['biography'],
     };
@@ -84,8 +76,7 @@ export function UpdateUserRequestToJSONTyped(value?: UpdateUserRequest | null, i
 
     return {
         
-        'firstName': value['firstName'],
-        'lastName': value['lastName'],
+        'displayName': value['displayName'],
         'userName': value['userName'],
         'biography': value['biography'],
     };

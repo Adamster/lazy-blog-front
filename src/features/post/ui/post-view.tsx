@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/solid";
-import { AuthorPostResponse, PostDetailedResponse } from "@/shared/api/openapi";
-import { formatDate2 } from "@/shared/lib/utils";
+import { PostDetailedResponse } from "@/shared/api/openapi";
+import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
 import {
   Avatar,
   Category,
@@ -41,11 +41,6 @@ interface IProps {
   commentsCount?: ReactNode;
 }
 
-const nameOf = (u: AuthorPostResponse) =>
-  [u.firstName, u.lastName].filter(Boolean).join(" ") ||
-  u.userName ||
-  "Unknown";
-
 /** Author tile + name/handle/date + view·like·comment metrics band. */
 function PostByline({
   post,
@@ -61,14 +56,17 @@ function PostByline({
       <div className="mx-auto flex max-w-[780px] flex-wrap items-end gap-x-4 gap-y-4 px-10 py-10">
         <Link
           href={`/${authorHandle}`}
-          aria-label={`${nameOf(post.author)} profile`}
+          aria-label={`${displayNameOf(post.author)} profile`}
           className="self-center"
         >
-          <Avatar src={post.author.avatarUrl} name={nameOf(post.author)} />
+          <Avatar
+            src={post.author.avatarUrl}
+            name={displayNameOf(post.author)}
+          />
         </Link>
         <div className="min-w-0">
           <span className="font-display block truncate text-[14px] font-semibold">
-            {nameOf(post.author)}
+            {displayNameOf(post.author)}
           </span>
           <span className="flex flex-wrap items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
             <Link

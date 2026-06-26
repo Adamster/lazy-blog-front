@@ -32,17 +32,11 @@ export interface UserResponse {
      */
     email?: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof UserResponse
      */
-    firstName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserResponse
-     */
-    lastName?: string;
+    displayName?: string;
     /**
      * 
      * @type {string}
@@ -88,8 +82,7 @@ export function UserResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
         
         'id': json['id'] == null ? undefined : json['id'],
         'email': json['email'] == null ? undefined : json['email'],
-        'firstName': json['firstName'] == null ? undefined : json['firstName'],
-        'lastName': json['lastName'] == null ? undefined : json['lastName'],
+        'displayName': json['displayName'] == null ? undefined : json['displayName'],
         'userName': json['userName'] == null ? undefined : json['userName'],
         'biography': json['biography'] == null ? undefined : json['biography'],
         'avatarUrl': json['avatarUrl'] == null ? undefined : json['avatarUrl'],
@@ -110,8 +103,7 @@ export function UserResponseToJSONTyped(value?: UserResponse | null, ignoreDiscr
         
         'id': value['id'],
         'email': value['email'],
-        'firstName': value['firstName'],
-        'lastName': value['lastName'],
+        'displayName': value['displayName'],
         'userName': value['userName'],
         'biography': value['biography'],
         'avatarUrl': value['avatarUrl'],

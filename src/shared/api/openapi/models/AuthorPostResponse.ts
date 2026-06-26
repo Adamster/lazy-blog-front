@@ -26,17 +26,11 @@ export interface AuthorPostResponse {
      */
     id?: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof AuthorPostResponse
      */
-    firstName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof AuthorPostResponse
-     */
-    lastName?: string;
+    displayName?: string;
     /**
      * 
      * @type {string}
@@ -81,8 +75,7 @@ export function AuthorPostResponseFromJSONTyped(json: any, ignoreDiscriminator: 
     return {
         
         'id': json['id'] == null ? undefined : json['id'],
-        'firstName': json['firstName'] == null ? undefined : json['firstName'],
-        'lastName': json['lastName'] == null ? undefined : json['lastName'],
+        'displayName': json['displayName'] == null ? undefined : json['displayName'],
         'userName': json['userName'] == null ? undefined : json['userName'],
         'biography': json['biography'] == null ? undefined : json['biography'],
         'avatarUrl': json['avatarUrl'] == null ? undefined : json['avatarUrl'],
@@ -102,8 +95,7 @@ export function AuthorPostResponseToJSONTyped(value?: AuthorPostResponse | null,
     return {
         
         'id': value['id'],
-        'firstName': value['firstName'],
-        'lastName': value['lastName'],
+        'displayName': value['displayName'],
         'userName': value['userName'],
         'biography': value['biography'],
         'avatarUrl': value['avatarUrl'],

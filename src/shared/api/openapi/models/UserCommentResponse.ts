@@ -26,17 +26,11 @@ export interface UserCommentResponse {
      */
     id: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof UserCommentResponse
      */
-    firstName: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserCommentResponse
-     */
-    lastName: string;
+    displayName: string;
     /**
      * 
      * @type {string}
@@ -56,8 +50,7 @@ export interface UserCommentResponse {
  */
 export function instanceOfUserCommentResponse(value: object): value is UserCommentResponse {
     if (!('id' in value) || value['id'] === undefined) return false;
-    if (!('firstName' in value) || value['firstName'] === undefined) return false;
-    if (!('lastName' in value) || value['lastName'] === undefined) return false;
+    if (!('displayName' in value) || value['displayName'] === undefined) return false;
     if (!('userName' in value) || value['userName'] === undefined) return false;
     if (!('avatarUrl' in value) || value['avatarUrl'] === undefined) return false;
     return true;
@@ -74,8 +67,7 @@ export function UserCommentResponseFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'id': json['id'],
-        'firstName': json['firstName'],
-        'lastName': json['lastName'],
+        'displayName': json['displayName'],
         'userName': json['userName'],
         'avatarUrl': json['avatarUrl'],
     };
@@ -93,8 +85,7 @@ export function UserCommentResponseToJSONTyped(value?: UserCommentResponse | nul
     return {
         
         'id': value['id'],
-        'firstName': value['firstName'],
-        'lastName': value['lastName'],
+        'displayName': value['displayName'],
         'userName': value['userName'],
         'avatarUrl': value['avatarUrl'],
     };

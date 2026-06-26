@@ -316,8 +316,7 @@ function RegisterView({
     try {
       await registerUser({
         email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
+        displayName: data.displayName,
         userName: data.userName,
         password: data.password,
         biography: null,
@@ -340,7 +339,7 @@ function RegisterView({
         eyebrow="// NEW USER"
         title="Create an account"
         titleId={titleId}
-        subtitle="Six fields between you and a comment section. We've seen longer commit messages."
+        subtitle="Five fields between you and a comment section. We've seen longer commit messages."
         onClose={onClose}
       />
 
@@ -376,30 +375,19 @@ function RegisterView({
           />
         </div>
 
-        {/* First + Last name */}
-        <div className="mt-4 grid grid-cols-2 gap-4">
+        {/* Display name — one full-width field spanning the two natural pairs
+            (email/username above, password/confirm below). */}
+        <div className="mt-4">
           <Field
-            id="reg-firstname"
-            label="First name"
+            id="reg-displayname"
+            label="Display name"
             type="text"
-            autoComplete="given-name"
+            autoComplete="name"
             required
-            error={errors.firstName?.message}
-            {...register("firstName", {
-              required: "First Name is required",
-              minLength: { value: 2, message: "At least 2 characters" },
-            })}
-          />
-          <Field
-            id="reg-lastname"
-            label="Last name"
-            type="text"
-            autoComplete="family-name"
-            required
-            error={errors.lastName?.message}
-            {...register("lastName", {
-              required: "Last Name is required",
-              minLength: { value: 2, message: "At least 2 characters" },
+            error={errors.displayName?.message}
+            {...register("displayName", {
+              required: "Display name is required",
+              maxLength: { value: 100, message: "Maximum 100 characters" },
             })}
           />
         </div>

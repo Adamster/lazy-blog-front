@@ -12,8 +12,7 @@ export const useUpdateUser = (userId: string) => {
       apiClient.users.updateUser({
         id: userId,
         updateUserRequest: {
-          firstName: data.firstName,
-          lastName: data.lastName,
+          displayName: data.displayName,
           userName: data.userName,
           biography: data.biography,
         },
