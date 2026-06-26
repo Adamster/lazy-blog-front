@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { Controller, type UseFormReturn } from "react-hook-form";
 import type { UpdatePostRequest } from "@/shared/api/openapi";
-import { Field, type SelectOption } from "@/shared/ui";
+import { Field, FieldError, type SelectOption } from "@/shared/ui";
 import ConfirmModal from "@/shared/ui/confirmation-modal";
 import { useTags } from "@/entities/tag";
 import { ComposerTopBar } from "./composer-top-bar";
@@ -199,7 +199,7 @@ export const PostForm = ({
           {/* Form — right panel, on the card background, content vertically
               centered (matches the cover). Tag on top; no slug field (it's
               auto-generated server-side). */}
-          <div className="flex flex-col justify-center border-2 border-t-0 border-[var(--m-dim)] bg-[var(--m-card)] p-7 md:border-t-2 md:border-l-0 md:p-10">
+          <div className="flex flex-col justify-center border-2 border-t-0 border-[var(--m-dim)] bg-[var(--m-card)] p-10 md:border-t-2 md:border-l-0">
             <Controller
               name="tags"
               control={control}
@@ -212,7 +212,7 @@ export const PostForm = ({
               )}
             />
 
-            <div className="mt-5">
+            <div className="mt-4">
               <Field
                 id="post-title"
                 label="Title"
@@ -230,7 +230,7 @@ export const PostForm = ({
                 (`max-h`), scrolling with an INVISIBLE scrollbar past that, so it
                 can never stretch the card (newlines allowed). The static label
                 (vs the floating one) avoids the label/text overlap. */}
-            <div className="mt-5">
+            <div className="mt-4">
               <label htmlFor="post-summary" className="mono-field-label">
                 Summary
                 <span className="ml-1 text-[var(--m-accent)]">*</span>
@@ -257,12 +257,7 @@ export const PostForm = ({
                 })}
               />
               {errors.summary ? (
-                <p
-                  role="alert"
-                  className="mt-1.5 text-[11px] tracking-[0.02em] text-[var(--m-error)]"
-                >
-                  {`! ${errors.summary.message}`}
-                </p>
+                <FieldError error={errors.summary.message ?? ""} />
               ) : null}
             </div>
           </div>

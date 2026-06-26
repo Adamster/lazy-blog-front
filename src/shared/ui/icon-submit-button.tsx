@@ -4,9 +4,6 @@ import type { ComponentType } from "react";
 import { RocketLaunchIcon } from "@heroicons/react/24/solid";
 import { Spinner } from "./loading";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 /**
  * Icon-only primary submit — the composer-Publish pattern, generalised. A 36px
  * (`size-9`) accent `.mono-cta` square, `type=submit`. The glyph DEFAULTS to the
@@ -44,7 +41,7 @@ export function IconSubmitButton({
       aria-label={label}
       aria-busy={pending}
       title={label}
-      className={`mono-cta inline-flex size-9 shrink-0 items-center justify-center ${focusRing} ${className}`}
+      className={`mono-cta mono-focus inline-flex size-9 shrink-0 items-center justify-center ${className}`}
     >
       {pending ? (
         <Spinner className="text-[14px]" />

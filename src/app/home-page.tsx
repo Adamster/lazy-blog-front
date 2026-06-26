@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -50,9 +51,21 @@ function HeroCover({ post }: { post: DisplayPostResponse }) {
   }
   return (
     <div className="flex h-full w-full items-center justify-center bg-[var(--m-panel)]">
-      <span className="font-display text-5xl font-bold text-[var(--m-accent)] select-none">
+      <span className="font-display text-[46px] font-bold text-[var(--m-accent)] select-none">
         {firstLetter(post.title)}
       </span>
+    </div>
+  );
+}
+
+/** Fixed 32px headline slot in the home stats band — pins a single-line
+ *  `mono-title` (centered via `leading-8`) so the filled title-link and the
+ *  empty MatrixText placeholder hold the same row height and the column never
+ *  jumps between loading / empty / filled. */
+function StatTitle({ children }: { children: ReactNode }) {
+  return (
+    <div className="mono-title block h-8 truncate leading-8 transition-colors group-hover:text-[var(--m-accent)]">
+      {children}
     </div>
   );
 }
@@ -127,9 +140,7 @@ export default function HomePage() {
                           href={`/${topUser.user.userName}`}
                           className="group block"
                         >
-                          <div className="mono-title block h-[30px] truncate !leading-[30px] transition-colors group-hover:text-[var(--m-accent)]">
-                            {nameOf(topUser.user)}
-                          </div>
+                          <StatTitle>{nameOf(topUser.user)}</StatTitle>
                         </Link>
                         <div className="mt-4 flex items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
                           <Link
@@ -146,7 +157,7 @@ export default function HomePage() {
                         </div>
                       </div>
                     ) : (
-                      <Label className="mono-label flex h-[30px] items-center text-[var(--m-muted2)]">
+                      <Label className="mono-label flex h-8 items-center text-[var(--m-muted2)]">
                         <MatrixText text="NO LEADER YET" />
                       </Label>
                     ))}
@@ -163,9 +174,7 @@ export default function HomePage() {
                           href={`/${topPost.userName}/${topPost.slug}`}
                           className="group block"
                         >
-                          <div className="mono-title h-[30px] truncate !leading-[30px] transition-colors group-hover:text-[var(--m-accent)]">
-                            {topPost.title}
-                          </div>
+                          <StatTitle>{topPost.title}</StatTitle>
                         </Link>
                         <div className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px] text-[var(--m-muted)]">
                           <Link
@@ -182,7 +191,7 @@ export default function HomePage() {
                         </div>
                       </div>
                     ) : (
-                      <Label className="mono-label flex h-[30px] items-center text-[var(--m-muted2)]">
+                      <Label className="mono-label flex h-8 items-center text-[var(--m-muted2)]">
                         <MatrixText text="WARMING UP ..." />
                       </Label>
                     ))}
@@ -215,19 +224,19 @@ export default function HomePage() {
                 {/* Status badge — pinned top-right (LATEST DROP / future PINNED) */}
                 <StatusBadge
                   status="LATEST DROP"
-                  className="absolute top-5 right-5 z-10"
+                  className="absolute top-5 right-5 z-[var(--m-z-content)]"
                 />
                 <Link
                   href={hrefOf(hero)}
-                  className="relative z-10 block aspect-[16/10] overflow-hidden bg-[var(--m-panel)]"
+                  className="relative z-[var(--m-z-content)] block aspect-[16/10] overflow-hidden bg-[var(--m-panel)]"
                 >
                   <HeroCover post={hero} />
                 </Link>
-                <div className="flex flex-col justify-center p-8 lg:p-[34px]">
+                <div className="flex flex-col justify-center p-[34px]">
                   <div className="mb-2">
                     <Category>{catOf(hero)}</Category>
                   </div>
-                  <h1 className="font-display text-[clamp(2rem,4vw,2.5rem)] leading-[1.04] font-bold tracking-[-0.02em] text-balance transition-colors group-hover:text-[var(--m-accent)]">
+                  <h1 className="font-display text-[32px] leading-[1.04] font-bold tracking-[-0.02em] text-balance transition-colors group-hover:text-[var(--m-accent)] md:text-[40px]">
                     <Link
                       href={hrefOf(hero)}
                       className="after:absolute after:inset-0"
@@ -243,7 +252,7 @@ export default function HomePage() {
                   <div className="mt-6 flex flex-wrap items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
                     <Link
                       href={`/${hero.author.userName}`}
-                      className="relative z-10 text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
+                      className="relative z-[var(--m-z-content)] text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
                     >
                       @{hero.author.userName}
                     </Link>
@@ -262,7 +271,7 @@ export default function HomePage() {
 
             {/* Grid feed — shared PostCard (bg-fill cards, no borders) */}
             {visibleGrid.length > 0 && (
-              <section className="mt-7 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+              <section className="mt-10 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
                 {visibleGrid.map((p, index) => (
                   <motion.div
                     key={p.id}

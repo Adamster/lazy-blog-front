@@ -7,9 +7,6 @@ import { useTheme } from "@/shared/providers/theme-providers";
 import { GlitchText } from "./glitch-text";
 import { Console } from "./console";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 /** Narrows the `{ response: { status } }` shape some fetch errors carry. */
 const statusOf = (error: unknown): number | undefined => {
   if (
@@ -119,7 +116,7 @@ export const ErrorMessage = ({
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href="/"
-            className={`mono-cta inline-flex h-9 items-center justify-center px-4 text-[14px] font-bold tracking-[0.06em] ${focusRing}`}
+            className={`mono-cta mono-focus inline-flex h-9 items-center justify-center px-4 text-[14px] font-bold tracking-[0.06em]`}
           >
             Go home
           </Link>

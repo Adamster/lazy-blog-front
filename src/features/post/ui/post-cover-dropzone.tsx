@@ -4,9 +4,6 @@ import { useRef } from "react";
 import Image from "next/image";
 import { TrashIcon } from "@heroicons/react/24/outline";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 /** Diagonal film-hatch fill — the empty drop-zone + the letterbox behind a
  *  centered 16:9 cover when the column is taller than the image. */
 const FILM_BG =
@@ -75,7 +72,7 @@ export function PostCoverDropzone({
         type="button"
         onClick={openPicker}
         aria-label={hasCover ? "Replace cover image" : "Add cover image"}
-        className={`relative flex size-full items-center justify-center overflow-hidden ${focusRing}`}
+        className={`mono-focus relative flex size-full items-center justify-center overflow-hidden`}
       >
         {hasCover ? (
           <>
@@ -116,7 +113,7 @@ export function PostCoverDropzone({
           type="button"
           onClick={onRemove}
           aria-label="Remove cover image"
-          className={`absolute top-3 right-3 z-10 flex size-9 items-center justify-center border-2 border-[var(--m-dim)] bg-[var(--m-bg)] text-[var(--m-error)] opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 hover:border-[var(--m-error)] ${focusRing}`}
+          className={`mono-focus absolute top-3 right-3 z-[var(--m-z-content)] flex size-9 items-center justify-center border-2 border-[var(--m-dim)] bg-[var(--m-bg)] text-[var(--m-error)] opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 hover:border-[var(--m-error)]`}
         >
           <TrashIcon className="size-3.5" />
         </button>

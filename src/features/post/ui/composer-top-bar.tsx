@@ -12,9 +12,6 @@ import { CheckIcon, RocketLaunchIcon } from "@heroicons/react/24/solid";
 import { IconSubmitButton, Stepper } from "@/shared/ui";
 import type { ComposerStep } from "./composer-step";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 interface ComposerTopBarProps {
   step: ComposerStep;
   /** Jump to a step (unconditional — switching is free, no validation gate). */
@@ -71,7 +68,7 @@ export function ComposerTopBar({
               href={viewHref}
               aria-label="View post"
               title="View the live post"
-              className={`mono-icon-btn size-9 ${focusRing}`}
+              className={`mono-icon-btn mono-focus size-9`}
             >
               <ArrowTopRightOnSquareIcon className="size-3.5" />
             </a>
@@ -88,7 +85,7 @@ export function ComposerTopBar({
             title={published ? "Visible (live)" : "Hidden (draft)"}
             className={`mono-icon-btn size-9 ${
               published ? "border-[var(--m-accent)] text-[var(--m-accent)]" : ""
-            } ${focusRing}`}
+            } mono-focus`}
           >
             {published ? (
               <EyeIcon className="size-3.5" />
@@ -102,7 +99,7 @@ export function ComposerTopBar({
               type="button"
               onClick={onDelete}
               aria-label="Delete post"
-              className={`mono-icon-btn size-9 text-[var(--m-error)] hover:border-[var(--m-error)] hover:text-[var(--m-error)] ${focusRing}`}
+              className={`mono-icon-btn mono-focus size-9 text-[var(--m-error)] hover:border-[var(--m-error)] hover:text-[var(--m-error)]`}
             >
               <TrashIcon className="size-3.5" />
             </button>

@@ -40,7 +40,7 @@ function ToastCard({ toast }: { toast: Toast }) {
     >
       {/* Content */}
       <div className="min-w-0 flex-1">
-        <p className="text-[14px] leading-[1.2] font-semibold text-[var(--m-fg)]">
+        <p className="text-[14px] leading-none font-semibold text-[var(--m-fg)]">
           {toast.title}
         </p>
         {toast.description ? (

@@ -5,9 +5,6 @@ import { Modal, ModalHeader, useModalTitleId } from "@/shared/ui";
 import { ImageCropper } from "@/shared/ui/image-cropper-dynamic";
 import { useUploadAvatar } from "../model/use-upload-avatar";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 interface AvatarCropModalProps {
   /** Object URL of the picked file; empty when the modal is closed. */
   src: string;
@@ -83,11 +80,11 @@ export function AvatarCropModal({
             />
           </div>
 
-          <div className="mt-7 flex justify-end gap-3">
+          <div className="mt-6 flex justify-end gap-3">
             <button
               type="button"
               onClick={close}
-              className={`mono-btn-outline inline-flex h-9 items-center px-4 text-[14px] font-semibold tracking-[0.06em] ${focusRing}`}
+              className={`mono-btn-outline mono-focus inline-flex h-9 items-center px-4 text-[14px] font-semibold tracking-[0.06em]`}
             >
               Cancel
             </button>
@@ -95,7 +92,7 @@ export function AvatarCropModal({
               type="button"
               onClick={() => setCropSignal((n) => n + 1)}
               disabled={uploadAvatar.isPending}
-              className={`mono-cta inline-flex h-9 items-center px-4 text-[14px] font-bold tracking-[0.06em] ${focusRing}`}
+              className={`mono-cta mono-focus inline-flex h-9 items-center px-4 text-[14px] font-bold tracking-[0.06em]`}
             >
               {uploadAvatar.isPending ? "Uploading…" : "Upload"}
             </button>

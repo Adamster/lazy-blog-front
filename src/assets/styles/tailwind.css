@@ -13,9 +13,20 @@
   --m-header-h: 4rem;
 
   /* Layering scale — ONE source for every fixed/portaled overlay so they stack
-     predictably: content < header < modal < fullscreen-rain < toast. The
-     fullscreen matrix rain is a full takeover above modals but under toasts so
-     the konami unlock toast still reads. */
+     predictably: content < dropdown < header < modal < fullscreen-rain < toast.
+     The fullscreen matrix rain is a full takeover above modals but under toasts
+     so the konami unlock toast still reads.
+     - content  = in-flow lift over sibling content within a card/section
+       (cover/draft overlay, an avatar's delete affordance, a floating label).
+     - dropdown = page-level popovers/menus that must clear sibling content but
+       stay UNDER the fixed header (Select listbox, Menu row, the comment
+       emoji/GIF picker, the editor FX hint).
+     EXEMPT (intentionally NOT tokenized): purely component-internal stacking
+     contexts that order siblings WITHIN a single component and never compete
+     with the global overlays — e.g. `.mono-datamosh-main` (z 1) and
+     `.mono-compare-handle` (z 2). Those stay raw low integers. */
+  --m-z-content: 10;
+  --m-z-dropdown: 40;
   --m-z-header: 50;
   --m-z-modal: 60;
   --m-z-rain: 65;
@@ -1104,6 +1115,22 @@ html:not(.neo) .mono-rain-bg {
   /* Outline button — dim border, accent on hover. */
   .mono-btn-outline {
     @apply border-2 border-[var(--m-dim)] text-[var(--m-muted)] uppercase transition-colors hover:border-[var(--m-accent)] hover:text-[var(--m-accent)];
+  }
+
+  /* Shared focus-visible ring — accent 2px outline at 2px offset. The ONE
+     source for the keyboard-focus ring (replaces the `focusRing` string that
+     used to be copy-pasted across ~28 call sites). Add `mono-focus` to any
+     interactive element. */
+  .mono-focus {
+    @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)];
+  }
+
+  /* Field validation message — 11px terminal label scale, accent-error, hugs
+     the control at 8px. ONE source for every form error (Field / Textarea /
+     Select / hand-rolled composer fields) so tracking + spacing never drift.
+     Rendered by the `FieldError` primitive. */
+  .mono-error {
+    @apply mt-2 text-[11px] tracking-[0.12em] text-[var(--m-error)];
   }
 
   /* Square icon-only button — dim border, accent on hover (no uppercase). */

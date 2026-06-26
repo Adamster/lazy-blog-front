@@ -9,6 +9,7 @@ export { MatrixText } from "./matrix-text";
 export { Menu } from "./menu";
 export type { MenuItem } from "./menu";
 export { Field } from "./field";
+export { FieldError } from "./field-error";
 export { Textarea } from "./textarea";
 export { Select } from "./select";
 export type { SelectOption } from "./select";

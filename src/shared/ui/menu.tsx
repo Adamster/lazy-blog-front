@@ -39,7 +39,7 @@ export function Menu({ items, triggerLabel }: MenuProps) {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex size-9 items-center justify-center text-[var(--m-muted2)] transition-colors hover:text-[var(--m-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
+        className="mono-focus flex size-9 items-center justify-center text-[var(--m-muted2)] transition-colors hover:text-[var(--m-accent)]"
       >
         <EllipsisHorizontalCircleIcon className="size-[18px]" />
       </button>
@@ -52,7 +52,7 @@ export function Menu({ items, triggerLabel }: MenuProps) {
       {open && (
         <div
           role="menu"
-          className="absolute inset-y-0 right-full z-30 mr-1 flex items-center gap-2"
+          className="absolute inset-y-0 right-full z-[var(--m-z-dropdown)] mr-1 flex items-center gap-2"
         >
           {items.map((item) => {
             const label = typeof item.label === "string" ? item.label : item.id;

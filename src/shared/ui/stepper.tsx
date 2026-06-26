@@ -1,9 +1,6 @@
 import { Fragment, type ComponentType } from "react";
 import { STEP_BOX, stepBoxClass } from "./step-box";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 type StepIcon = ComponentType<{ className?: string }>;
 
 interface StepperProps {
@@ -100,7 +97,7 @@ export function Stepper({
                   ? `Go to step ${step}: ${label} (has errors)`
                   : `Go to step ${step}: ${label}`
               }
-              className={`group flex size-10 items-center justify-center ${focusRing}`}
+              className={`group mono-focus flex size-10 items-center justify-center`}
             >
               <span aria-hidden="true" className={`${STEP_BOX} ${boxClass}`}>
                 <Icon className="size-4" />

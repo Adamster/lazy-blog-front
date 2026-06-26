@@ -2,9 +2,6 @@
 
 import { useRef } from "react";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 export interface UnderlineTabItem {
   /** Stable id — reported by `onSelect` and matched against `current`. */
   id: string;
@@ -82,7 +79,7 @@ export function UnderlineTabs({
             tabIndex={active ? 0 : -1}
             onClick={() => onSelect(tab.id)}
             onKeyDown={(e) => onKeyDown(e, index)}
-            className={`-mb-0.5 border-b-2 pb-3 text-[11px] leading-none font-medium tracking-[0.12em] uppercase transition-colors ${focusRing} ${
+            className={`mono-focus -mb-0.5 border-b-2 pb-3 text-[11px] leading-none font-medium tracking-[0.12em] uppercase transition-colors ${
               active
                 ? "border-[var(--m-accent)] text-[var(--m-fg)]"
                 : "border-transparent text-[var(--m-muted2)] hover:text-[var(--m-fg)]"

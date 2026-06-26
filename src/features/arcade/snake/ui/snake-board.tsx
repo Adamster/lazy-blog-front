@@ -58,7 +58,7 @@ function ArcadeButton({
     <button
       type="button"
       onClick={onClick}
-      className="font-display flex h-9 items-center justify-center bg-[var(--m-accent)] px-4 text-[14px] leading-none font-bold tracking-[0.06em] text-[#050505] uppercase transition-[filter] hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
+      className="font-display mono-focus flex h-9 items-center justify-center bg-[var(--m-accent)] px-4 text-[14px] leading-none font-bold tracking-[0.06em] text-[var(--m-bg)] uppercase transition-[filter] hover:brightness-110"
     >
       {children}
     </button>

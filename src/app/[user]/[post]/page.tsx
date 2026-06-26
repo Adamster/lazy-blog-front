@@ -13,7 +13,9 @@ export async function generateMetadata({ params }: PageProps) {
   const { post: slug } = await params;
   const postData = await getPostMeta(slug);
 
-  if (postData) {
+  // Never surface a draft's title/summary/body in public OG/meta — defence in
+  // depth even if the (unauthenticated) backend ever returns an unpublished post.
+  if (postData && postData.isPublished) {
     return generateMeta({
       title: postData.title,
       description: postData?.summary || postData?.body?.substring(0, 100) || "",
@@ -35,7 +37,9 @@ export default async function Page({ params }: PageProps) {
   // loads client-side (authenticated), so vote state and view counts are live
   // with no SSR/ISR staleness. A missing slug still returns a real 404.
   const postData = await getPostMeta(slug);
-  if (!postData) notFound();
+  // Treat a draft exactly like a missing post for anonymous SSR: no 404-able
+  // route to a draft, and the public JSON-LD `articleBody` below never leaks.
+  if (!postData || !postData.isPublished) notFound();
 
   const url = `/${postData.author.userName ?? user}/${postData.slug}`;
 

@@ -104,7 +104,7 @@ export function ComponentsTab() {
       <h1 className="font-display mt-7 text-[40px] leading-none font-bold tracking-[-0.02em]">
         Components
       </h1>
-      <p className="mt-5 text-[14px] leading-[1.7] text-[var(--m-muted)]">
+      <p className="mt-5 text-[14px] leading-[1.6] text-[var(--m-muted)]">
         Every Brutalist-Mono primitive from{" "}
         <code className="text-[var(--m-fg)]">src/shared/ui</code> and every
         state, side by side. A living reference — these are the real components,

@@ -49,9 +49,6 @@ import {
 /** Dispatch a Milkdown command into the live editor (owned by `crepe.tsx`). */
 export type RunCommand = <T>(cmd: $Command<T>, payload?: T) => void;
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 function ToolBtn({
   label,
   glyph,
@@ -78,7 +75,7 @@ function ToolBtn({
       // Keep the editor selection — clicking the button must not blur it.
       onMouseDown={(e) => e.preventDefault()}
       onClick={onPress}
-      className={`flex size-9 flex-none items-center justify-center text-[14px] leading-none text-[var(--m-muted)] transition-colors hover:bg-[var(--m-panel)] hover:text-[var(--m-accent)] disabled:opacity-50 ${focusRing}`}
+      className={`mono-focus flex size-9 flex-none items-center justify-center text-[14px] leading-none text-[var(--m-muted)] transition-colors hover:bg-[var(--m-panel)] hover:text-[var(--m-accent)] disabled:opacity-50`}
       style={{ fontFamily: "var(--font-mono)" }}
     >
       {Icon ? (
@@ -151,7 +148,7 @@ function ToolbarMenu({
         onKeyDown={(e) => {
           if (e.key === "Escape") setOpen(false);
         }}
-        className={`flex h-9 flex-none items-center gap-0.5 px-2 text-[var(--m-muted)] transition-colors hover:bg-[var(--m-panel)] hover:text-[var(--m-accent)] disabled:opacity-50 ${focusRing}`}
+        className={`mono-focus flex h-9 flex-none items-center gap-0.5 px-2 text-[var(--m-muted)] transition-colors hover:bg-[var(--m-panel)] hover:text-[var(--m-accent)] disabled:opacity-50`}
       >
         <Icon className="size-[18px]" />
         <svg
@@ -171,7 +168,7 @@ function ToolbarMenu({
       {open ? (
         <div
           role="menu"
-          className="mono-scrollbar absolute top-full right-0 z-30 mt-1 max-h-72 min-w-44 overflow-auto border-2 border-[var(--m-dim)] bg-[var(--m-card)] py-1"
+          className="mono-scrollbar absolute top-full right-0 z-[var(--m-z-dropdown)] mt-1 max-h-72 min-w-44 overflow-auto border-2 border-[var(--m-dim)] bg-[var(--m-card)] py-1"
         >
           {items.map((item) => (
             <button
@@ -325,7 +322,7 @@ export function EditorToolbar({
   ];
 
   return (
-    <div className="sticky top-0 z-10 flex items-center gap-1 border-2 border-[var(--m-dim)] bg-[var(--m-card)] px-4 py-2">
+    <div className="sticky top-0 z-[var(--m-z-content)] flex items-center gap-1 border-2 border-[var(--m-dim)] bg-[var(--m-card)] px-4 py-2">
       {/* Scrollable format buttons. The horizontal scroll lives on THIS inner
           row (not the bar) so the Insert popover — a sibling in the non-overflow
           outer — isn't clipped by `overflow-x-auto`. */}

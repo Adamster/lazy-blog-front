@@ -83,7 +83,7 @@ export default function ImageCropper({
           <button
             type="button"
             onClick={handleSave}
-            className="mono-cta inline-flex h-9 items-center gap-2 px-4 text-[14px] font-bold tracking-[0.06em] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
+            className="mono-cta mono-focus inline-flex h-9 items-center gap-2 px-4 text-[14px] font-bold tracking-[0.06em]"
           >
             <RocketLaunchIcon className="size-3.5" />
             {saveLabel}
@@ -92,7 +92,7 @@ export default function ImageCropper({
             type="button"
             onClick={onCancel}
             aria-label="Cancel"
-            className="mono-icon-btn size-9 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
+            className="mono-icon-btn mono-focus size-9"
           >
             <NoSymbolIcon className="size-[18px]" />
           </button>

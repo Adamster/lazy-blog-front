@@ -2,9 +2,7 @@
 
 import { useCallback, useId, useMemo, useRef, useState } from "react";
 import { useClickOutside } from "react-haiku";
-
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
+import { FieldError } from "./field-error";
 
 export interface SelectOption {
   /** Stable value stored in form state + used as the option key. */
@@ -182,11 +180,11 @@ export function Select(props: SelectProps) {
           else openListbox();
         }}
         onKeyDown={onTriggerKeyDown}
-        className={`flex w-full items-center justify-between gap-2 border-0 border-b-2 bg-transparent px-0 pt-1 pb-2 text-left text-[14px] leading-[1.5] transition-colors outline-none disabled:opacity-60 ${
+        className={`flex w-full items-center justify-between gap-2 border-0 border-b-2 bg-transparent px-0 pt-1 pb-2 text-left text-[14px] leading-[1.6] transition-colors outline-none disabled:opacity-60 ${
           hasError
             ? "border-[var(--m-error)]"
             : "border-[var(--m-dim)] focus-visible:border-[var(--m-accent)]"
-        } ${focusRing}`}
+        } mono-focus`}
         style={{ fontFamily: "var(--font-mono)" }}
       >
         <span
@@ -222,7 +220,7 @@ export function Select(props: SelectProps) {
               : undefined
           }
           onKeyDown={onListKeyDown}
-          className="mono-scrollbar absolute z-30 mt-1 max-h-60 w-full overflow-auto border-2 border-[var(--m-dim)] bg-[var(--m-card)] py-1 shadow-none outline-none"
+          className="mono-scrollbar absolute z-[var(--m-z-dropdown)] mt-1 max-h-60 w-full overflow-auto border-2 border-[var(--m-dim)] bg-[var(--m-card)] py-1 shadow-none outline-none"
         >
           {options.length === 0 ? (
             <li className="px-3 py-2 text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase">
@@ -259,15 +257,7 @@ export function Select(props: SelectProps) {
         </ul>
       ) : null}
 
-      {hasError ? (
-        <p
-          id={errorId}
-          role="alert"
-          className="mt-1.5 text-[11px] tracking-[0.02em] text-[var(--m-error)]"
-        >
-          {`! ${error}`}
-        </p>
-      ) : null}
+      {hasError ? <FieldError id={errorId} error={error!} /> : null}
     </div>
   );
 }

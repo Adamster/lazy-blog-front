@@ -34,24 +34,13 @@
 
 import { type ReactNode } from "react";
 
+/** Single source of truth for the http/https href whitelist (shared with `:link`). */
+import { safeHref } from "@/shared/lib/safe-url";
+
 /** Reuse the project's emoji-enlarging pass on each plain-text leaf. */
 import { withBigEmoji } from "./comment-emoji";
 /** Whitelist gate — only KLIPY/Tenor https URLs become an `<img src>`. */
 import { parseGifUrl } from "./comment-gif";
-
-/** A safe http/https href, or `null` when the URL must fall back to plain text. */
-function safeHref(raw: string): string | null {
-  const trimmed = raw.trim();
-  if (!trimmed) return null;
-  let url: URL;
-  try {
-    url = new URL(trimmed);
-  } catch {
-    return null;
-  }
-  if (url.protocol !== "http:" && url.protocol !== "https:") return null;
-  return url.toString();
-}
 
 function Link({ href, children }: { href: string; children: ReactNode }) {
   return (

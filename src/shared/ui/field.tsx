@@ -1,9 +1,7 @@
 "use client";
 
 import { forwardRef, useId, useState, type ComponentPropsWithRef } from "react";
-
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
+import { FieldError } from "./field-error";
 
 /** Eye / eye-off toggle glyph for password fields. */
 function EyeIcon({ off }: { off: boolean }) {
@@ -92,7 +90,7 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
           placeholder=" "
           aria-invalid={hasError}
           aria-describedby={hasError ? errorId : undefined}
-          className={`block w-full border-0 border-b-2 bg-transparent px-0 pt-5 pb-2 text-[14px] leading-[1.5] text-[var(--m-fg)] caret-[var(--m-accent)] transition-all outline-none placeholder:text-transparent ${
+          className={`block w-full border-0 border-b-2 bg-transparent px-0 pt-5 pb-2 text-[14px] leading-[1.6] text-[var(--m-fg)] caret-[var(--m-accent)] transition-all outline-none placeholder:text-transparent ${
             isPassword ? "pr-8" : ""
           } ${
             hasError
@@ -110,22 +108,14 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
             aria-label={showPassword ? "Hide password" : "Show password"}
             aria-pressed={showPassword}
             tabIndex={-1}
-            className={`absolute right-0 bottom-2 flex p-1 text-[var(--m-muted2)] transition-colors hover:text-[var(--m-accent)] ${focusRing}`}
+            className="mono-focus absolute right-0 bottom-2 flex p-1 text-[var(--m-muted2)] transition-colors hover:text-[var(--m-accent)]"
           >
             <EyeIcon off={showPassword} />
           </button>
         ) : null}
       </div>
 
-      {hasError ? (
-        <p
-          id={errorId}
-          role="alert"
-          className="mt-1.5 text-[11px] tracking-[0.02em] text-[var(--m-error)]"
-        >
-          {`! ${error}`}
-        </p>
-      ) : null}
+      {hasError ? <FieldError id={errorId} error={error!} /> : null}
     </div>
   );
 });
