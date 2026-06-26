@@ -10,26 +10,17 @@
 
 import type { HistoryPoint } from "./types";
 
-const KEY_HISTORY = "notlazy_snake_history_v1";
+// Bumped v1 → v2 to drop the old seed-polluted logs. v1 seeded every browser's
+// log with a fake SEED_HISTORY and real runs appended onto it, so the sparkline
+// showed games (up to 940) that never happened and never made the leaderboard.
+// v2 starts clean: real runs only, no fabricated data.
+const KEY_HISTORY = "notlazy_snake_history_v2";
 
 /** How many runs we persist (a healthy buffer; the band shows the last N). */
 export const HISTORY_CAP = 50;
 
 /** How many recent runs the stats-band sparkline plots (newest on the right). */
 export const HISTORY_RECENT = 20;
-
-/**
- * Seed series — plausible recent-run scores (oldest → newest) with some shape
- * and variance so the band's `// SCORES · LAST 20` sparkline renders populated
- * and good-looking on a fresh browser. It's the fallback when NOTHING is stored
- * yet; the moment a real run is
- * recorded the seed is appended-to and persisted, so real scores show up and
- * the seed is never permanently masking history.
- */
-export const SEED_HISTORY: number[] = [
-  120, 90, 210, 180, 340, 260, 420, 380, 510, 470, 360, 540, 620, 580, 700, 660,
-  480, 760, 820, 940,
-];
 
 function parseHistory(raw: string | null): number[] {
   if (!raw) return [];
@@ -47,17 +38,15 @@ function parseHistory(raw: string | null): number[] {
 }
 
 /**
- * Read the full persisted score log (oldest → newest). Falls back to
- * {@link SEED_HISTORY} when nothing is stored yet (same pattern as the board
- * seed) so the chart renders populated by default; a real run then appends to
- * and overrides it.
+ * Read the full persisted score log (oldest → newest). Returns an EMPTY log when
+ * nothing is stored — the chart renders a flat zero point until the first real
+ * run lands, never fabricated data (the leaderboard and the sparkline now agree).
  */
 export function loadHistory(): number[] {
   try {
-    const stored = parseHistory(localStorage.getItem(KEY_HISTORY));
-    return stored.length ? stored : [...SEED_HISTORY];
+    return parseHistory(localStorage.getItem(KEY_HISTORY));
   } catch {
-    return [...SEED_HISTORY];
+    return [];
   }
 }
 
