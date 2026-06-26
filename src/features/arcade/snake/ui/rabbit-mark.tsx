@@ -1,16 +1,17 @@
-import { RABBIT_SPRITE, RABBIT_WHITE } from "../model/engine";
+import { RABBIT_PLAIN, RABBIT_WHITE } from "../model/engine";
 
 /**
- * The game's white-rabbit food, rendered 1:1 as a crisp SVG pixel grid for use
- * OUTSIDE the canvas (the hidden header easter-egg entry to the arcade). It reads
- * the exact same {@link RABBIT_SPRITE} bitmap + {@link RABBIT_WHITE} fill the
- * engine paints on the board, so the mark stays identical to the in-game sprite
- * automatically — never copy-paste the matrix.
+ * The game's white-rabbit (the +10 prize), rendered 1:1 as a crisp SVG pixel grid
+ * for use OUTSIDE the canvas (the hidden header easter-egg entry to the arcade). It
+ * reads the exact same {@link RABBIT_PLAIN} bitmap + {@link RABBIT_WHITE} fill the
+ * engine paints on the board for the plain-white positive rabbit, so the mark stays
+ * identical to the in-game sprite automatically — never copy-paste the matrix.
  *
- * Each `"1"` body pixel → one 1×1 `<rect>` on the bitmap's `cols × rows`
- * viewBox; `"0"` cells are left transparent (the silhouette is the gap, exactly
- * like the board bg showing through in-game). Square pixels, no anti-aliasing on
- * the grid edges — crisp at any DPR. Color defaults to the game's white.
+ * Each `"1"` body pixel → one 1×1 `<rect>` on the bitmap's `cols × rows` viewBox;
+ * `"0"` and `"."` cells are left transparent — the silhouette gaps + the eye sockets,
+ * exactly like the board bg showing through in-game (the positive rabbit's eyes are
+ * transparent sockets, same as the game). Square pixels, no anti-aliasing on the grid
+ * edges — crisp at any DPR. Colour defaults to the game's white.
  */
 export function RabbitMark({
   size = 16,
@@ -22,8 +23,8 @@ export function RabbitMark({
   className?: string;
   fill?: string;
 }) {
-  const rows = RABBIT_SPRITE.length;
-  const cols = RABBIT_SPRITE[0].length;
+  const rows = RABBIT_PLAIN.length;
+  const cols = RABBIT_PLAIN[0].length;
   const width = (size * cols) / rows;
 
   return (
@@ -36,7 +37,7 @@ export function RabbitMark({
       className={className}
       style={{ display: "block" }}
     >
-      {RABBIT_SPRITE.flatMap((row, y) =>
+      {RABBIT_PLAIN.flatMap((row, y) =>
         row
           .split("")
           .map((ch, x) =>
