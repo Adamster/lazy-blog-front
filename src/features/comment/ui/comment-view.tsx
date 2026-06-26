@@ -7,7 +7,7 @@ import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import CommentForm from "@/features/comment/ui/comment-form";
-import { formatDate2 } from "@/shared/lib/utils";
+import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
 import { Avatar, Dot, Menu, type MenuItem } from "@/shared/ui";
 import { renderCommentMarkdown } from "@/features/comment/lib/comment-markdown";
@@ -20,11 +20,6 @@ interface IProps {
   comment: CommentResponse;
   postId: string;
 }
-
-const nameOf = (u: CommentResponse["user"]) =>
-  [u.firstName, u.lastName].filter(Boolean).join(" ") ||
-  u.userName ||
-  "Unknown";
 
 const CommentView = ({ comment, postId }: IProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -89,15 +84,18 @@ const CommentView = ({ comment, postId }: IProps) => {
       <div className="flex items-center gap-4">
         <Link
           href={`/${handle}`}
-          aria-label={`${nameOf(comment.user)} profile`}
+          aria-label={`${displayNameOf(comment.user)} profile`}
           className="flex-none"
         >
-          <Avatar src={comment.user.avatarUrl} name={nameOf(comment.user)} />
+          <Avatar
+            src={comment.user.avatarUrl}
+            name={displayNameOf(comment.user)}
+          />
         </Link>
 
         <div className="min-w-0">
           <span className="font-display block text-[14px] font-semibold">
-            {nameOf(comment.user)}
+            {displayNameOf(comment.user)}
           </span>
           <div className="mt-1 flex items-center gap-2.5 text-[12px] whitespace-nowrap">
             <Link

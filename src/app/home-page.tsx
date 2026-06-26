@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { DisplayPostResponse, UserResponse } from "@/shared/api/openapi";
+import { DisplayPostResponse } from "@/shared/api/openapi";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
 import { useAllPosts } from "@/features/post/model/use-all-posts";
@@ -19,11 +19,9 @@ import {
   MatrixText,
 } from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
-import { formatDate2 } from "@/shared/lib/utils";
+import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
 import { PostCard } from "@/features/post/ui/post-card";
 
-const nameOf = (u: UserResponse) =>
-  [u.firstName, u.lastName].filter(Boolean).join(" ") || u.userName;
 const catOf = (p: DisplayPostResponse) => p.tags?.[0]?.tag ?? "post";
 const hrefOf = (p: DisplayPostResponse) => `/${p.author.userName}/${p.slug}`;
 // First letter/digit of a title (skips punctuation like "(" so a placeholder
@@ -140,7 +138,7 @@ export default function HomePage() {
                           href={`/${topUser.user.userName}`}
                           className="group block"
                         >
-                          <StatTitle>{nameOf(topUser.user)}</StatTitle>
+                          <StatTitle>{displayNameOf(topUser.user)}</StatTitle>
                         </Link>
                         <div className="mt-4 flex items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
                           <Link

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { EyeIcon, StarIcon } from "@heroicons/react/24/solid";
-import { UserResponse } from "@/shared/api/openapi";
 import { useUser } from "@/entities/session";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Loading } from "@/shared/ui/loading";
@@ -15,11 +14,8 @@ import {
 import { Sparkline, seriesFromMonths } from "@/shared/ui/sparkline";
 import { Label, MatrixText, Avatar, Dot, fmt } from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
-import { formatDate2 } from "@/shared/lib/utils";
+import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
 import { PostCard } from "@/features/post/ui/post-card";
-
-const nameOf = (u?: UserResponse) =>
-  [u?.firstName, u?.lastName].filter(Boolean).join(" ") || u?.userName || "—";
 
 export default function UserPage({ userName }: { userName: string }) {
   const query = usePostsByUserName(userName);
@@ -87,11 +83,15 @@ export default function UserPage({ userName }: { userName: string }) {
       <main className="mx-auto max-w-[1240px] px-10 pb-10">
         {/* Profile header */}
         <section className="flex flex-col gap-10 pt-10 pb-10 sm:flex-row sm:items-center">
-          <Avatar src={user?.avatarUrl} name={nameOf(user)} size="lg" />
+          <Avatar
+            src={user?.avatarUrl}
+            name={displayNameOf(user, "—")}
+            size="lg"
+          />
 
           <div className="min-w-0 flex-1">
             <h1 className="font-display text-[40px] leading-none font-bold tracking-[-0.02em]">
-              {nameOf(user)}
+              {displayNameOf(user, "—")}
             </h1>
             <div className="mt-4 flex flex-wrap items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
               <span className="font-medium text-[var(--m-accent)]">

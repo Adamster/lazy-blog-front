@@ -1,5 +1,6 @@
 import { getPostsByUserNameSSR } from "@/features/post/model/get-posts-by-username.ssr";
 import { generateMeta } from "@/shared/lib/head/meta-data";
+import { displayNameOf } from "@/shared/lib/utils";
 import UserPage from "./user-page";
 
 type PageProps = {
@@ -13,7 +14,7 @@ export async function generateMetadata({ params }: PageProps) {
 
   if (userData) {
     return generateMeta({
-      title: `${userData.firstName} ${userData.lastName}`,
+      title: displayNameOf(userData, user),
       description: `Explore articles and stories shared by ${user}. ${
         userData.biography ? userData.biography : ""
       }`,

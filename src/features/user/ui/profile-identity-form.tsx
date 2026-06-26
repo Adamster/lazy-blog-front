@@ -31,8 +31,7 @@ export function ProfileIdentityForm({ userData }: ProfileIdentityFormProps) {
     values: userData
       ? {
           userName: userData.userName ?? "",
-          firstName: userData.firstName ?? "",
-          lastName: userData.lastName ?? "",
+          displayName: userData.displayName ?? "",
           biography: userData.biography ?? null,
         }
       : undefined,
@@ -60,25 +59,15 @@ export function ProfileIdentityForm({ userData }: ProfileIdentityFormProps) {
         })}
       />
 
-      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="mt-4">
         <Field
-          id="profile-firstname"
-          label="First name"
+          id="profile-displayname"
+          label="Display name"
           required
-          error={errors.firstName?.message}
-          {...register("firstName", {
-            required: "First Name is required",
-            minLength: { value: 2, message: "At least 2 characters" },
-          })}
-        />
-        <Field
-          id="profile-lastname"
-          label="Last name"
-          required
-          error={errors.lastName?.message}
-          {...register("lastName", {
-            required: "Last Name is required",
-            minLength: { value: 2, message: "At least 2 characters" },
+          error={errors.displayName?.message}
+          {...register("displayName", {
+            required: "Display name is required",
+            maxLength: { value: 100, message: "Maximum 100 characters" },
           })}
         />
       </div>

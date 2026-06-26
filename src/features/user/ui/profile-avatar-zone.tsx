@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import type { UserResponse } from "@/shared/api/openapi";
 import { Avatar } from "@/shared/ui";
+import { displayNameOf } from "@/shared/lib/utils";
 import { AvatarCropModal } from "./avatar-crop-modal";
 import { useDeleteAvatar } from "../model/use-delete-avatar";
 
@@ -14,9 +15,6 @@ const FILM_BG =
 interface ProfileAvatarZoneProps {
   userData: UserResponse | undefined;
 }
-
-const nameOf = (u?: UserResponse) =>
-  [u?.firstName, u?.lastName].filter(Boolean).join(" ") || u?.userName || "—";
 
 /**
  * Step-1 LEFT panel of the edit-profile card — the avatar equivalent of
@@ -71,7 +69,7 @@ export function ProfileAvatarZone({ userData }: ProfileAvatarZoneProps) {
           >
             <Avatar
               src={userData?.avatarUrl}
-              name={nameOf(userData)}
+              name={displayNameOf(userData, "—")}
               size="lg"
             />
             <span className="absolute inset-0 flex items-center justify-center bg-[var(--m-bg)]/70 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">

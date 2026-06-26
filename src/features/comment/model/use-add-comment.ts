@@ -21,8 +21,7 @@ function optimisticComment(
     createdAtUtc: new Date(),
     user: {
       id: user.id ?? "",
-      firstName: user.firstName ?? "",
-      lastName: user.lastName ?? "",
+      displayName: user.displayName ?? "",
       userName: user.userName ?? "",
       avatarUrl: user.avatarUrl ?? null,
     },
