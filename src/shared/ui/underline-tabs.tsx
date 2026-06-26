@@ -22,6 +22,10 @@ interface UnderlineTabsProps {
   ariaLabel: string;
   /** Wires `aria-controls`/`id` on each tab to its panel (`${idPrefix}${id}`). */
   panelIdPrefix?: string;
+  /** The 2px `--m-dim` baseline under the row. Set `false` to show ONLY the
+   *  active-tab accent underline (e.g. under a header that already has a
+   *  divider), so the row doesn't carry a second full line. */
+  baseline?: boolean;
   className?: string;
 }
 
@@ -38,6 +42,7 @@ export function UnderlineTabs({
   onSelect,
   ariaLabel,
   panelIdPrefix,
+  baseline = true,
   className = "",
 }: UnderlineTabsProps) {
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -55,7 +60,9 @@ export function UnderlineTabs({
     <div
       role="tablist"
       aria-label={ariaLabel}
-      className={`flex items-stretch gap-7 border-b-2 border-[var(--m-dim)] ${className}`}
+      className={`flex items-stretch gap-7 ${
+        baseline ? "border-b-2 border-[var(--m-dim)]" : ""
+      } ${className}`}
     >
       {tabs.map((tab, index) => {
         const active = tab.id === current;
