@@ -73,10 +73,10 @@ const CommentView = ({ comment, postId }: IProps) => {
         </Link>
 
         <div className="min-w-0">
-          <span className="font-display block text-[14px] font-semibold text-[var(--m-muted)]">
+          <span className="font-display block text-[14px] font-semibold">
             {nameOf(comment.user)}
           </span>
-          <div className="mt-0.5 flex items-center gap-2.5 text-[12px] whitespace-nowrap">
+          <div className="mt-1 flex items-center gap-2.5 text-[12px] whitespace-nowrap">
             <Link
               href={`/${handle}`}
               className="text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
@@ -106,7 +106,7 @@ const CommentView = ({ comment, postId }: IProps) => {
           />
         </div>
       ) : (
-        <div className="mt-3 grid grid-cols-[auto_1fr] gap-3">
+        <div className="mt-4 grid grid-cols-[auto_1fr] gap-3">
           <span className="text-[14px] leading-[1.6] font-bold text-[var(--m-accent)]">
             &gt;
           </span>

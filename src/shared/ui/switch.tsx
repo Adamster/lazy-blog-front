@@ -2,9 +2,6 @@
 
 import { useId } from "react";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 interface SwitchProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
@@ -37,7 +34,7 @@ export function Switch({
       aria-checked={checked}
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className={`group flex w-full items-center gap-3 disabled:opacity-60 ${focusRing}`}
+      className={`group mono-focus flex w-full items-center gap-3 disabled:opacity-60`}
     >
       <span
         aria-hidden="true"

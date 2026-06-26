@@ -16,7 +16,7 @@ function BoardRow({ row }: { row: RankedRow }) {
       ? "var(--m-muted2)"
       : "var(--m-fg)";
   return (
-    <div className="grid grid-cols-[28px_1fr_auto] items-center gap-3 py-[11px]">
+    <div className="grid grid-cols-[28px_1fr_auto] items-center gap-3 py-3">
       <span className="text-[12px] tabular-nums" style={{ color: rankColor }}>
         {row.rank}
       </span>

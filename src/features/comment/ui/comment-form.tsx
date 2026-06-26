@@ -13,9 +13,6 @@ import {
 } from "@/features/comment/ui/comment-editor-wrapper";
 import { CommentToolbar } from "@/features/comment/ui/comment-toolbar";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 interface IProps {
   postId?: string;
   editComment?: CommentResponse;
@@ -75,7 +72,7 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
           up on focus/fill. Mirrors the auth/composer floating-label feel. */}
       <div className="relative">
         <span
-          className={`pointer-events-none absolute left-0 z-10 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-all duration-150 ${
+          className={`pointer-events-none absolute left-0 z-[var(--m-z-content)] text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-all duration-150 ${
             floated ? "top-0" : "top-5"
           }`}
         >
@@ -110,7 +107,7 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
           <button
             type="button"
             onClick={handleCancel}
-            className={`mono-btn-outline ml-auto inline-flex h-9 items-center px-4 text-[14px] font-semibold tracking-[0.06em] ${focusRing}`}
+            className={`mono-btn-outline mono-focus ml-auto inline-flex h-9 items-center px-4 text-[14px] font-semibold tracking-[0.06em]`}
           >
             Cancel
           </button>

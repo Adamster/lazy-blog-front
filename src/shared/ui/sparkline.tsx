@@ -179,7 +179,7 @@ export function Sparkline({
           <span
             key={i}
             aria-hidden
-            className="absolute size-[5px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--m-accent)]"
+            className="absolute size-[5px] -translate-x-1/2 -translate-y-1/2 bg-[var(--m-accent)]"
             style={{ left: `${p.x}%`, top: `${(p.y / VB_H) * 100}%` }}
           />
         ))}

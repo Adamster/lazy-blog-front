@@ -86,7 +86,7 @@ export default function UserPage({ userName }: { userName: string }) {
     >
       <main className="mx-auto max-w-[1240px] px-10 pb-10">
         {/* Profile header */}
-        <section className="flex flex-col gap-8 pt-10 pb-10 sm:flex-row sm:items-center">
+        <section className="flex flex-col gap-10 pt-10 pb-10 sm:flex-row sm:items-center">
           <Avatar src={user?.avatarUrl} name={nameOf(user)} size="lg" />
 
           <div className="min-w-0 flex-1">
@@ -134,7 +134,7 @@ export default function UserPage({ userName }: { userName: string }) {
               >
                 {fmt(totalKarma)}
               </div>
-              <div className="mt-2 flex items-center gap-1.5 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)]">
+              <div className="mt-2 flex items-center gap-2.5 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)]">
                 <StarIcon aria-hidden className="size-3.5" />
                 net rating
               </div>
@@ -145,7 +145,7 @@ export default function UserPage({ userName }: { userName: string }) {
               <div className="font-display mt-2 text-[46px] leading-none font-bold tracking-[-0.02em] text-[var(--m-accent)] tabular-nums">
                 {fmt(totalViews)}
               </div>
-              <div className="mt-2 flex items-center gap-1.5 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)]">
+              <div className="mt-2 flex items-center gap-2.5 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)]">
                 <EyeIcon className="size-3.5" />
                 views total
               </div>

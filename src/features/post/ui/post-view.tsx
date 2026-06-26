@@ -133,7 +133,7 @@ export const PostView = ({
         </div>
 
         {/* Title */}
-        <h1 className="font-display text-[clamp(2rem,5vw,2.75rem)] leading-[1.04] font-bold tracking-[-0.02em] text-balance">
+        <h1 className="font-display text-[32px] leading-[1.04] font-bold tracking-[-0.02em] text-balance md:text-[40px]">
           {post.title}
         </h1>
 

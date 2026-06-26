@@ -96,7 +96,7 @@ export function ProfileIdentityForm({ userData }: ProfileIdentityFormProps) {
             },
           })}
         />
-        <div className="mt-1.5 text-right text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)] tabular-nums">
+        <div className="mt-2 text-right text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)] tabular-nums">
           {aboutLength} / {ABOUT_MAX}
         </div>
       </div>

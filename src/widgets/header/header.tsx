@@ -55,7 +55,7 @@ export function Header() {
               <Link
                 href="/arcade/follow-the-rabbit"
                 aria-label="Follow the white rabbit"
-                className="mono-jiggle ml-3 hidden shrink-0 opacity-80 transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)] sm:inline-flex"
+                className="mono-jiggle mono-focus ml-3 hidden shrink-0 opacity-80 transition-opacity hover:opacity-100 focus-visible:opacity-100 sm:inline-flex"
               >
                 <RabbitMark size={16} className="mono-jiggle__mark" />
               </Link>
@@ -71,7 +71,7 @@ export function Header() {
               <Link
                 href={`/${user.userName}`}
                 style={{ fontFamily: "var(--font-mono)" }}
-                className="max-w-[160px] truncate text-[12px] leading-none text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]"
+                className="mono-focus max-w-[160px] truncate text-[12px] leading-none text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
               >
                 @{user.userName}
               </Link>

@@ -26,9 +26,6 @@ export default function SnakePage() {
   );
 }
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 /**
  * Easter egg: the white rabbit lives in the matrix — the ONLY proper way into
  * the arcade is the neo theme (that's the only theme the header rabbit shows in).
@@ -93,7 +90,7 @@ function NotTheOne() {
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <Link
             href="/"
-            className={`mono-cta inline-flex h-9 items-center justify-center px-4 text-[14px] font-bold tracking-[0.06em] ${focusRing}`}
+            className={`mono-cta mono-focus inline-flex h-9 items-center justify-center px-4 text-[14px] font-bold tracking-[0.06em]`}
           >
             Go home
           </Link>

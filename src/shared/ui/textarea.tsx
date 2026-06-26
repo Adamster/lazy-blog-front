@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef, useId, type ComponentPropsWithRef } from "react";
+import { FieldError } from "./field-error";
 
 type NativeTextareaProps = Omit<
   ComponentPropsWithRef<"textarea">,
@@ -70,15 +71,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           />
         </div>
 
-        {hasError ? (
-          <p
-            id={errorId}
-            role="alert"
-            className="mt-1.5 text-[11px] tracking-[0.02em] text-[var(--m-error)]"
-          >
-            {`! ${error}`}
-          </p>
-        ) : null}
+        {hasError ? <FieldError id={errorId} error={error!} /> : null}
       </div>
     );
   }

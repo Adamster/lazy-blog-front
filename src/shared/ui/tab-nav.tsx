@@ -1,9 +1,6 @@
 import { Fragment, type ComponentType } from "react";
 import { STEP_BOX, stepBoxClass } from "./step-box";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 type TabIcon = ComponentType<{ className?: string }>;
 
 export interface TabItem {
@@ -71,7 +68,7 @@ export function TabNav({
               }
               tabIndex={active ? 0 : -1}
               onClick={() => onSelect(tab.id)}
-              className={`group flex size-10 items-center justify-center ${focusRing}`}
+              className={`group mono-focus flex size-10 items-center justify-center`}
             >
               <span
                 aria-hidden="true"

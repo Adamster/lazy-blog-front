@@ -4,9 +4,6 @@ import { useRef, useState } from "react";
 import { useClickOutside } from "react-haiku";
 import type { SelectOption } from "@/shared/ui";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 interface PostTagPickerProps {
   options: SelectOption[];
   /** Selected tag ids (API accepts multiple tags). */
@@ -112,7 +109,7 @@ export function PostTagPicker({
           selectedLabels.length > 0
             ? "text-[var(--m-accent)]"
             : "text-[var(--m-muted2)]"
-        } ${focusRing}`}
+        } mono-focus`}
         style={{ fontFamily: "var(--font-mono)" }}
       >
         <span>{`[ ${triggerLabel} ]`}</span>
@@ -146,7 +143,7 @@ export function PostTagPicker({
               : undefined
           }
           onKeyDown={onListKeyDown}
-          className="mono-scrollbar absolute top-7 left-0 z-30 mt-1 max-h-60 min-w-[240px] overflow-auto border-2 border-[var(--m-dim)] bg-[var(--m-card)] py-1 outline-none"
+          className="mono-scrollbar absolute top-7 left-0 z-[var(--m-z-dropdown)] mt-1 max-h-60 min-w-[240px] overflow-auto border-2 border-[var(--m-dim)] bg-[var(--m-card)] py-1 outline-none"
         >
           {options.length === 0 ? (
             <li className="px-3 py-2 text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase">

@@ -23,7 +23,7 @@ export function DraftOverlay({
 }: DraftOverlayProps) {
   return (
     <div
-      className={`absolute inset-0 z-10 flex flex-col items-center justify-center gap-2.5 bg-[var(--m-bg)]/70 ${
+      className={`absolute inset-0 z-[var(--m-z-content)] flex flex-col items-center justify-center gap-2.5 bg-[var(--m-bg)]/70 ${
         pointerThrough ? "pointer-events-none" : ""
       }`}
     >

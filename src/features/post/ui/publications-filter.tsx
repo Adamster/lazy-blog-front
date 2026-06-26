@@ -6,9 +6,6 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
  *  `all` = no filter (the default — published + drafts mixed). */
 export type PublicationsView = "all" | "published" | "drafts";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 interface PublicationsFilterProps {
   view: PublicationsView;
   onChange: (view: PublicationsView) => void;
@@ -44,7 +41,7 @@ export function PublicationsFilter({
           view === "published"
             ? "border-[var(--m-accent)] text-[var(--m-accent)]"
             : ""
-        } ${focusRing}`}
+        } mono-focus`}
       >
         <EyeIcon className="size-3.5" />
       </button>
@@ -58,7 +55,7 @@ export function PublicationsFilter({
           view === "drafts"
             ? "border-[var(--m-accent)] text-[var(--m-accent)]"
             : ""
-        } ${focusRing}`}
+        } mono-focus`}
       >
         <EyeSlashIcon className="size-3.5" />
       </button>

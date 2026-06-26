@@ -89,7 +89,7 @@ export function ChannelSurf({ className = "" }: { className?: string }) {
       <button
         type="button"
         onClick={surf}
-        className="mt-4 inline-flex h-9 items-center justify-center border-2 border-[var(--m-dim)] px-4 text-[11px] font-semibold tracking-[0.12em] text-[var(--m-muted)] uppercase transition-colors hover:border-[var(--m-accent)] hover:text-[var(--m-accent)]"
+        className="mono-btn-outline mono-focus mt-4 inline-flex h-9 items-center justify-center px-4 text-[14px] leading-none font-semibold tracking-[0.06em]"
       >
         Surf channel
       </button>

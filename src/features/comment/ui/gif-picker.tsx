@@ -12,9 +12,6 @@ import {
   type MediaKind,
 } from "../lib/klipy";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 /** A bare status line in the brutalist label scale (loading / empty / error). */
 function StatusLine({ children }: { children: React.ReactNode }) {
   return (
@@ -101,7 +98,7 @@ export function GifPicker({ onPick, kind }: GifPickerProps) {
             <button
               type="button"
               onClick={() => refetch()}
-              className={`tracking-[0.12em] text-[var(--m-error)] uppercase transition-colors hover:text-[var(--m-fg)] ${focusRing}`}
+              className={`mono-focus tracking-[0.12em] text-[var(--m-error)] uppercase transition-colors hover:text-[var(--m-fg)]`}
             >
               {`Couldn't load ${noun} · Retry`}
             </button>
@@ -109,14 +106,14 @@ export function GifPicker({ onPick, kind }: GifPickerProps) {
         ) : data.length === 0 ? (
           <StatusLine>{`No ${noun} found`}</StatusLine>
         ) : (
-          <div className="grid grid-cols-3 gap-[2px] pr-[5px] pl-4">
+          <div className="grid grid-cols-3 gap-[2px] pr-1.5 pl-4">
             {data.map((gif) => (
               <button
                 key={gif.id}
                 type="button"
                 aria-label={`Insert ${gif.title}`}
                 onClick={() => onPick(gif)}
-                className={`group relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-[var(--m-card)] transition-opacity hover:opacity-80 ${focusRing}`}
+                className={`group mono-focus relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-[var(--m-card)] transition-opacity hover:opacity-80`}
               >
                 {/* Plain <img>: KLIPY hosts aren't in next.config remotePatterns
                     (owner can't edit Vercel config), and the GIF must animate. */}

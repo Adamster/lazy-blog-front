@@ -29,10 +29,7 @@ const PASSWORD_PATTERN = {
     "At least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character",
 } as const;
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
-const accentLink = `text-[var(--m-fg)] font-semibold transition-colors hover:text-[var(--m-accent)] ${focusRing}`;
+const accentLink = `text-[var(--m-fg)] font-semibold transition-colors hover:text-[var(--m-accent)] mono-focus`;
 
 /* ----------------------------- shared bits ----------------------------- */
 
@@ -72,7 +69,7 @@ function GoogleButton({
       type="button"
       onClick={onClick}
       // Full-width outline button → matches the submit height (36px / h-9).
-      className={`mono-btn-outline flex h-9 w-full items-center justify-center gap-2.5 bg-transparent px-4 text-[14px] font-semibold tracking-[0.06em] text-[var(--m-fg)] hover:bg-[var(--m-panel)] hover:text-[var(--m-fg)] ${focusRing}`}
+      className={`mono-btn-outline mono-focus flex h-9 w-full items-center justify-center gap-2.5 bg-transparent px-4 text-[14px] font-semibold tracking-[0.06em] text-[var(--m-fg)] hover:bg-[var(--m-panel)] hover:text-[var(--m-fg)]`}
     >
       <GoogleGlyph />
       {label}
@@ -117,7 +114,7 @@ function BackLink({
       <button
         type="button"
         onClick={onClick}
-        className={`inline-flex items-center gap-2 text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)] ${focusRing}`}
+        className={`mono-focus inline-flex items-center gap-2 text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)]`}
       >
         <span aria-hidden="true">←</span>
         {children}

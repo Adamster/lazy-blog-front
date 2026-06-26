@@ -7,9 +7,6 @@ import { Avatar } from "@/shared/ui";
 import { AvatarCropModal } from "./avatar-crop-modal";
 import { useDeleteAvatar } from "../model/use-delete-avatar";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 /** Diagonal film-hatch fill — the same letterbox texture as the cover dropzone. */
 const FILM_BG =
   "repeating-linear-gradient(135deg,var(--m-panel) 0 1px,transparent 1px 10px)";
@@ -70,7 +67,7 @@ export function ProfileAvatarZone({ userData }: ProfileAvatarZoneProps) {
             type="button"
             onClick={() => inputRef.current?.click()}
             aria-label={hasAvatar ? "Replace avatar" : "Add avatar"}
-            className={`relative block overflow-hidden ${focusRing}`}
+            className={`mono-focus relative block overflow-hidden`}
           >
             <Avatar
               src={userData?.avatarUrl}
@@ -89,7 +86,7 @@ export function ProfileAvatarZone({ userData }: ProfileAvatarZoneProps) {
               type="button"
               onClick={() => deleteAvatar.mutate()}
               aria-label="Remove avatar"
-              className={`absolute -top-3 -right-3 z-10 flex size-9 items-center justify-center border-2 border-[var(--m-dim)] bg-[var(--m-bg)] text-[var(--m-error)] opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 hover:border-[var(--m-error)] ${focusRing}`}
+              className={`mono-focus absolute -top-3 -right-3 z-[var(--m-z-content)] flex size-9 items-center justify-center border-2 border-[var(--m-dim)] bg-[var(--m-bg)] text-[var(--m-error)] opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 hover:border-[var(--m-error)]`}
             >
               <TrashIcon className="size-3.5" />
             </button>

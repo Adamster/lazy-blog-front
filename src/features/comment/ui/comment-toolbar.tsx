@@ -10,9 +10,6 @@ import { parseGifUrl } from "@/features/comment/lib/comment-gif";
 import type { GifResult } from "@/features/comment/lib/klipy";
 import type { CommentEditorApi } from "./comment-editor";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 // Curated native-unicode emoji set — rendered by the OS (crisp, zero deps/CDN).
 // Sorted FACES → HANDS → everything else; 84 = a full 7×12 grid.
 const EMOJIS = [
@@ -181,7 +178,7 @@ export function CommentToolbar({ api }: CommentToolbarProps) {
           disabled={disabled}
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => setOpen((cur) => !cur)}
-          className={`mono-icon-btn size-9 ${focusRing}`}
+          className={`mono-icon-btn mono-focus size-9`}
         >
           <FaceSmileIcon className="size-[18px] shrink-0" />
         </button>
@@ -190,7 +187,7 @@ export function CommentToolbar({ api }: CommentToolbarProps) {
           <div
             role="dialog"
             aria-label="Emoji, GIF and sticker picker"
-            className="absolute bottom-full left-0 z-50 mb-3 w-[420px] max-w-[calc(100vw-5rem)] border-2 border-[var(--m-dim)] bg-[var(--m-bg)]"
+            className="absolute bottom-full left-0 z-[var(--m-z-dropdown)] mb-3 w-[420px] max-w-[calc(100vw-5rem)] border-2 border-[var(--m-dim)] bg-[var(--m-bg)]"
           >
             {/* Terminal-chrome header (a short funny line) → shared underline
                 tab bar → active panel. The HEADER keeps its `--m-dim` divider;
@@ -219,7 +216,7 @@ export function CommentToolbar({ api }: CommentToolbarProps) {
                     aria-label={`Insert ${emoji}`}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => insertEmoji(emoji)}
-                    className={`flex aspect-square items-center justify-center bg-[var(--m-card)] text-[20px] leading-none transition-colors hover:bg-[var(--m-panel)] ${focusRing}`}
+                    className={`mono-focus flex aspect-square items-center justify-center bg-[var(--m-card)] text-[18px] leading-none transition-colors hover:bg-[var(--m-panel)]`}
                   >
                     {emoji}
                   </button>

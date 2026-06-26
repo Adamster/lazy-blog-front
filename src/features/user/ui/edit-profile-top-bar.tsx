@@ -8,9 +8,6 @@ import {
 import { TabNav, type TabItem } from "@/shared/ui";
 import type { ProfileTab } from "./profile-tabs";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 /** The two profile sections, rendered as the composer-style tab boxes. */
 const TABS: TabItem[] = [
   { id: "profile", icon: UserIcon, label: "Profile" },
@@ -53,7 +50,7 @@ export function EditProfileTopBar({
           href={profileHref}
           aria-label="View profile"
           title="View your profile"
-          className={`mono-icon-btn ml-auto size-9 ${focusRing}`}
+          className={`mono-icon-btn mono-focus ml-auto size-9`}
         >
           <ArrowTopRightOnSquareIcon className="size-3.5" />
         </a>

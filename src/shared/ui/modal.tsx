@@ -11,9 +11,6 @@ import { createPortal } from "react-dom";
 import { useIsMounted } from "@/shared/lib/use-is-mounted";
 import { Spinner } from "./loading";
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 const FOCUSABLE =
   'a[href],area[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"]),[contenteditable="true"]';
 
@@ -222,7 +219,7 @@ export function ModalHeader({
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className={`-mt-1.5 -mr-2 flex size-9 shrink-0 items-center justify-center text-[20px] text-[var(--m-muted2)] transition-colors hover:bg-[var(--m-panel)] hover:text-[var(--m-fg)] ${focusRing}`}
+          className={`mono-focus -mt-1.5 -mr-2 flex size-9 shrink-0 items-center justify-center text-[20px] text-[var(--m-muted2)] transition-colors hover:bg-[var(--m-panel)] hover:text-[var(--m-fg)]`}
         >
           <span aria-hidden="true">✕</span>
         </button>
@@ -254,7 +251,7 @@ export function SubmitButton({
       disabled={pending}
       className={`font-display flex h-9 items-center justify-center gap-2 ${
         fullWidth ? "w-full" : "px-4"
-      } bg-[var(--m-accent)] text-[14px] leading-none font-bold tracking-[0.06em] text-[var(--m-bg)] uppercase transition-[filter] hover:brightness-110 disabled:pointer-events-none disabled:opacity-80 ${focusRing}`}
+      } mono-focus bg-[var(--m-accent)] text-[14px] leading-none font-bold tracking-[0.06em] text-[var(--m-bg)] uppercase transition-[filter] hover:brightness-110 disabled:pointer-events-none disabled:opacity-80`}
     >
       {pending ? (
         <>

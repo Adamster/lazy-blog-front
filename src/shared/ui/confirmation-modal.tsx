@@ -22,9 +22,6 @@ interface ConfirmModalProps {
   onConfirm: () => void;
 }
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)]";
-
 /**
  * Confirm modal — Brutalist-Mono. Two tones: destructive (`danger`, the default)
  * with the error stripe + filled-error action, and a neutral `default` (accent
@@ -81,7 +78,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className={`-mt-1.5 -mr-2 flex size-9 shrink-0 items-center justify-center text-[20px] text-[var(--m-muted2)] transition-colors hover:bg-[var(--m-panel)] hover:text-[var(--m-fg)] ${focusRing}`}
+              className={`mono-focus -mt-1.5 -mr-2 flex size-9 shrink-0 items-center justify-center text-[20px] text-[var(--m-muted2)] transition-colors hover:bg-[var(--m-panel)] hover:text-[var(--m-fg)]`}
             >
               <span aria-hidden="true">✕</span>
             </button>
@@ -91,7 +88,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className={`mono-btn-outline inline-flex h-9 flex-1 items-center justify-center text-[14px] font-semibold tracking-[0.06em] ${focusRing}`}
+              className={`mono-btn-outline mono-focus inline-flex h-9 flex-1 items-center justify-center text-[14px] font-semibold tracking-[0.06em]`}
             >
               Cancel
             </button>
@@ -103,8 +100,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
               }}
               className={
                 isDanger
-                  ? `inline-flex h-9 flex-1 items-center justify-center border-2 border-[var(--m-error)] bg-[var(--m-error)] text-[14px] font-bold tracking-[0.06em] text-[var(--m-bg)] uppercase transition-colors hover:bg-transparent hover:text-[var(--m-error)] ${focusRing}`
-                  : `mono-cta inline-flex h-9 flex-1 items-center justify-center text-[14px] font-bold tracking-[0.06em] ${focusRing}`
+                  ? `mono-focus inline-flex h-9 flex-1 items-center justify-center border-2 border-[var(--m-error)] bg-[var(--m-error)] text-[14px] font-bold tracking-[0.06em] text-[var(--m-bg)] uppercase transition-colors hover:bg-transparent hover:text-[var(--m-error)]`
+                  : `mono-cta mono-focus inline-flex h-9 flex-1 items-center justify-center text-[14px] font-bold tracking-[0.06em]`
               }
             >
               {confirmLabel}

@@ -39,7 +39,7 @@ function Cover({ post }: { post: FeedPost }) {
   }
   return (
     <div className="flex h-full w-full items-center justify-center bg-[var(--m-panel)]">
-      <span className="font-display text-5xl font-bold text-[var(--m-accent)] select-none">
+      <span className="font-display text-[46px] font-bold text-[var(--m-accent)] select-none">
         {firstLetter(post.title)}
       </span>
     </div>
@@ -59,7 +59,7 @@ function CardMeta({
       {authorHandle ? (
         <Link
           href={`/${authorHandle}`}
-          className="relative z-10 truncate text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
+          className="relative z-[var(--m-z-content)] truncate text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
         >
           @{authorHandle}
         </Link>

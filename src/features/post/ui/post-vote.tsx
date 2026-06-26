@@ -91,10 +91,10 @@ export const PostVote = ({
   const labelCls =
     "text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)] uppercase";
   const subRowCls =
-    "mt-2 flex items-center gap-1.5 text-[11px] leading-none tracking-[0.12em] whitespace-nowrap text-[var(--m-muted2)]";
+    "mt-2 flex items-center gap-2.5 text-[11px] leading-none tracking-[0.12em] whitespace-nowrap text-[var(--m-muted2)]";
 
   return (
-    <section className="mx-[calc(50%-50vw)] mt-12 w-screen bg-[var(--m-card)]">
+    <section className="mx-[calc(50%-50vw)] mt-10 w-screen bg-[var(--m-card)]">
       <div className="mx-auto grid max-w-[780px] items-start gap-10 px-10 py-10 sm:grid-cols-3">
         {/* // LOVE IT — upvote toggle + total likes (left) */}
         <div className="min-w-0">
