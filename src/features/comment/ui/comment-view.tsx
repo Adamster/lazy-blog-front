@@ -4,13 +4,17 @@ import { CommentResponse } from "@/shared/api/openapi";
 import { IsAuthor } from "@/entities/session";
 import { useDeleteComment } from "@/features/comment/model/use-delete-comment";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import CommentForm from "@/features/comment/ui/comment-form";
 import { formatDate2 } from "@/shared/lib/utils";
 import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
 import { Avatar, Dot, Menu, type MenuItem } from "@/shared/ui";
 import { renderCommentMarkdown } from "@/features/comment/lib/comment-markdown";
+import {
+  canEditComment,
+  editWindowRemainingMs,
+} from "@/features/comment/lib/comment-edit-window";
 
 interface IProps {
   comment: CommentResponse;
@@ -35,6 +39,21 @@ const CommentView = ({ comment, postId }: IProps) => {
 
   const handle = comment.user.userName ?? "";
 
+  // The author may edit only within the 1-hour window after posting; once it
+  // closes the Edit affordance drops. Seed from the helper (no sync setState in
+  // an effect) and schedule the exact flip-off so it disappears live, not just
+  // on the next refresh. The backend is the authoritative gate.
+  const createdAt = comment.createdAtUtc;
+  const [canEdit, setCanEdit] = useState(() => canEditComment(createdAt));
+  useEffect(() => {
+    if (!canEdit) return;
+    const timer = setTimeout(
+      () => setCanEdit(false),
+      editWindowRemainingMs(createdAt)
+    );
+    return () => clearTimeout(timer);
+  }, [canEdit, createdAt]);
+
   // Render the whole body through the minimal inline-markdown subset — which now
   // also renders inline GIF images (whitelisted KLIPY/Tenor only). This covers
   // both NEW comments (GIFs are `![gif](url)` images anywhere) and OLD ones
@@ -46,12 +65,16 @@ const CommentView = ({ comment, postId }: IProps) => {
   );
 
   const menuItems: MenuItem[] = [
-    {
-      id: "edit",
-      label: "Edit",
-      icon: <PencilSquareIcon className="size-3.5" />,
-      onSelect: () => setIsEditComment(true),
-    },
+    ...(canEdit
+      ? [
+          {
+            id: "edit",
+            label: "Edit",
+            icon: <PencilSquareIcon className="size-3.5" />,
+            onSelect: () => setIsEditComment(true),
+          },
+        ]
+      : []),
     {
       id: "delete",
       label: "Delete",
