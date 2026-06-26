@@ -238,7 +238,7 @@ function sampleTwitch(p: number): number {
  * is dark-tuned, so the board just stays this gray everywhere.) The head's
  * direction notch is punched back to this same gray.
  */
-const BOARD_BG = "#1a1a1a";
+const BOARD_BG = "#141414";
 /** Snake head / fresh body — the lime accent (`--m-accent`, dark theme). */
 const ACCENT = "#cdff48";
 /** Tail-end body tint — a dimmer accent so the body reads with subtle depth. */
@@ -261,7 +261,7 @@ export const RABBIT_WHITE = "#e6e6e6";
 const RABBIT_RED = "#ff6b6b";
 /**
  * Faint cell grid — a SEMI-TRANSPARENT white so it adapts to whatever theme bg
- * shows through the transparent canvas (dark `--m-bg #1a1a1a`, neo's slightly
+ * shows through the transparent canvas (dark `--m-bg #141414`, neo's slightly
  * different shade + rain bleed, light) instead of a fixed `#333` that only
  * suited one field. The low alpha keeps it quiet during active play (it must
  * not compete with the snake); the overlay-wash reduction (see `<SnakeBoard>`)
@@ -546,7 +546,7 @@ function killerColor(ch: string): string | null {
  * the creature's FRONT; the rounded `.MMMMM.` / `..MMM..` chin is at the BOTTOM
  * = the back, where the body trails off). `M` = the creature's body pixel (the
  * bright lime accent — kept identical to the body so head + body read as ONE
- * creature, and so the sentinel stays VISIBLE on the dark `#1a1a1a` field; it is
+ * creature, and so the sentinel stays VISIBLE on the dark `#141414` field; it is
  * deliberately NOT black), `R` = a RED sensor/eye light (the hazard red — the
  * sentinel's menacing red ocelli), `.` = transparent (the board shows through).
  * The two `R` in row 3 (`MRMMMRM`) + the single `R` in row 4 (`MMMRMMM`) are the
