@@ -69,20 +69,19 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
 
           <p
             style={{
-              marginTop: 20,
+              marginTop: 16,
               maxWidth: "42ch",
               fontSize: 14,
               lineHeight: 1.6,
               color: "#9a9a9a",
             }}
           >
-            {error?.message ||
-              "Something broke on our side. Try again, or head back home."}
+            {error?.message || "Error detected. Motivation to fix it: pending."}
           </p>
 
           <div
             style={{
-              marginTop: 28,
+              marginTop: 24,
               display: "flex",
               gap: 12,
               flexWrap: "wrap",
