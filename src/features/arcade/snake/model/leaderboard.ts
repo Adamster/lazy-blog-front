@@ -38,6 +38,7 @@ export function rankApiBoard(
 ): RankedRow[] {
   const rows: RankedRow[] = entries.slice(0, BOARD_SIZE).map((entry) => ({
     name: `@${entry.userName}`,
+    userName: entry.userName,
     score: entry.bestScore,
     you: !!viewerHandle && entry.userName === viewerHandle,
     rank: String(entry.rank).padStart(2, "0"),

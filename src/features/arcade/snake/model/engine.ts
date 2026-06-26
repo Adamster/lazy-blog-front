@@ -42,206 +42,193 @@ const STEP_ACCEL = 1.5;
 const STEP_FLOOR = 60;
 
 /**
- * ============================ RABBIT TYPE SYSTEM ============================
+ * ============================ RABBIT VALUE SYSTEM ============================
  *
- * Six rabbit kinds drive scoring + growth. TWO are ALWAYS-PRESENT BASE rabbits — the
- * WHITE staple food and the red-eyed LAUGHER (a −10 penalty) — each respawns the
- * instant it's eaten, so the board always carries both (the owner's "effectively two
- * base rabbits"). The other FOUR are transient SPECIALS that appear/leave on a
- * CAPTURE cadence (NOT a move/time/frame timer — see {@link SnakeEngine.captures}):
- * a special is spawned ON the capture whose running count hits its cadence, and
- * lingers exactly until the next bite (a one-capture lifetime). At most ONE of each
- * type on the board at a time. Driving spawns off captures (the owner's "a move = when you ATE
- * a rabbit") means rabbits ONLY ever change in response to the player eating — they
- * never flicker on a clock independent of play.
+ * "Follow the Rabbit" core loop (owner spec): the board ALWAYS carries EXACTLY FOUR
+ * rabbits — ONE POSITIVE (a bonus that ADDS points), TWO NEGATIVE penalties, and ONE
+ * KILLER (always present, its own dedicated slot — NOT a rare escalation). Eating ANY
+ * of the four RE-GENERATES the WHOLE field: fresh cells for all four (the killer
+ * relocates too) AND freshly-rolled ranks for the positive + the two negatives.
+ * Nothing is on a clock — the field only ever changes the instant the player eats.
  *
- * BALANCE GUARDS baked into this table + the engine (the level-design verdict):
- *  - SCORE is CLAMPED at >= 0 (see {@link SCORE_FLOOR}) — penalties cost you
- *    progress, never a meaningless negative trophy / negative leaderboard.
- *  - LENGTH: every eat grows the snake by EXACTLY +1 cell (kinds differ ONLY in
- *    score) — nothing ever shrinks. Death = walls/self, PLUS the fully-RED body
- *    (eating it is INSTANT DEATH, resolved before any length change); the old
- *    touch-to-die hazard is GONE.
- *  - At most one of each kind = max 6 rabbits on the board (2 always-present base —
- *    white + laugher — plus the 4 transient one-bite specials), so the field stays
- *    readable, never a swarm.
- *  - Each type is distinguished by COLOR ZONE *and* MOTION (two channels) so the
- *    near-identical white variants are still instantly separable (see the render
- *    section + {@link RabbitKind}).
+ * THE THREE "AVOID" RABBITS are the two negatives + the killer (eating the killer is
+ * death; eating a negative costs score). Only the positive is safe to chase.
+ *
+ * VISUAL MODEL (the final scheme — NO stripes on the bonus):
+ *  - POSITIVE = a PLAIN WHITE bunny, no stripes, no rank — and a FIXED +10 (it is NOT
+ *    rolled by magnitude). It's the prize the player chases; white = good.
+ *  - NEGATIVE = a white bunny with `rank + 1` RED ear stripes ({@link stripeColor} +
+ *    {@link RABBIT_RED}) → 1 / 2 / 3 stripes for −10 / −20 / −30, PLUS RED eyes. So the
+ *    count of RED stripes reads the size of the penalty at a glance.
+ *  - KILLER = the SAME white bunny silhouette filled SOLID RED, no stripes, with BLACK
+ *    eyes (red eyes would vanish on the red body) in the SAME cells as the negatives'
+ *    eyes — solid red = death. So the read is dead simple: white = good, red stripes
+ *    (1–3) = penalty, all-red = death; and the "dangerous" rabbits (negatives + killer)
+ *    share visible eyes in one spot (red on white, black on red).
+ * Body silhouette + size are IDENTICAL across all four (the killer shares the exact
+ * {@link RABBIT_PLAIN} geometry). The MOTION is the subtler second tell: the white +10
+ * TWITCHES about its axis (the nav-bar `.mono-jiggle`), the negatives BOB + laugh-
+ * SHAKE, the killer slowly MENACE-pulses.
+ *
+ * NEGATIVE MAGNITUDES are {@link RABBIT_VALUES} (10/20/30 — a 3-tier penalty ladder,
+ * the old −50 is GONE), rolled by {@link RABBIT_VALUE_WEIGHTS} where bigger = rarer.
+ * The two negative slots roll INDEPENDENTLY and MAY COINCIDE (two −10 at once is fine;
+ * there is no de-dup between them). The positive is a fixed +10 (no roll); the killer
+ * has no magnitude (lethal, not scored) and no roll — it's simply always there.
+ *
+ * BALANCE GUARDS:
+ *  - SCORE is CLAMPED at >= 0 ({@link SCORE_FLOOR}) — a penalty costs progress, never
+ *    a meaningless negative trophy / negative leaderboard.
+ *  - LENGTH: every NON-lethal eat (the +10 or a negative) grows the snake by EXACTLY
+ *    +1 cell — nothing shrinks. The KILLER never grows it (eating it ends the run).
+ *  - LETHALITY: exactly ONE kind is lethal — the KILLER. Eating it is INSTANT game
+ *    over, like a wall/self hit. The walls (when not wrapping) and the snake's own
+ *    body are still the other death causes; the +10 and the negatives are never lethal.
+ *  - AVOIDABILITY: all THREE avoid rabbits (the two negatives AND the killer) honour
+ *    the head-path spawn exclusion ({@link headExclusion}) so a −score grab — or an
+ *    instant DEATH — can never materialise on the head's unavoidable next cells. The
+ *    +10 is a free target (no exclusion) — it may appear anywhere, even in your lap.
  */
-type RabbitKind =
-  | "white" // staple food
-  | "laugher" // white + RED EYES — the old trickster, now a SCORE penalty
-  | "greenEars" // white + GREEN ears — a calm bonus
-  | "redEars" // white + RED ears — a jiggling penalty
-  | "green" // fully GREEN body — the high-value prize (+30)
-  | "red"; // fully RED body — INSTANT DEATH (lethal, like a self-hit; see step())
 
-/** Per-type payload: the SCORE delta (the only thing that differs by kind). Score
- *  is clamped >=0 after applying it (so a penalty never underflows). LENGTH is NOT
- *  per-kind — every eat grows the snake by exactly +1 cell (see {@link step}). */
-interface RabbitSpec {
-  score: number;
-}
-const RABBIT_SPEC: Record<RabbitKind, RabbitSpec> = {
-  white: { score: 10 },
-  laugher: { score: -10 },
-  greenEars: { score: 20 },
-  redEars: { score: -20 },
-  green: { score: 30 }, // fully-green body — the high-value lime prize
-  red: { score: -50 }, // fully-red body — INSTANT DEATH (see step())
-};
+/** The FIXED score of the positive rabbit — always +10 (no per-magnitude roll). */
+const POSITIVE_VALUE = 10;
+
+/**
+ * The NEGATIVE penalty MAGNITUDES — a 3-tier ladder (10/20/30; the old −50 is gone).
+ * The array index is the negative's RANK (0..2), which maps to its RED EAR-STRIPE
+ * COUNT (`rank + 1` → 1 / 2 / 3 stripes). Only the negatives use this; the positive is
+ * a fixed {@link POSITIVE_VALUE}.
+ */
+const RABBIT_VALUES = [10, 20, 30] as const;
+
+/**
+ * WEIGHTED magnitude roll for a NEGATIVE — index-aligned with {@link RABBIT_VALUES},
+ * monotonically DECREASING so the bigger the penalty the RARER it appears (the level-
+ * design call). Read as ~percentages (they sum to 100): −10 lands ~60% of negative
+ * rolls, −20 ~30%, and the worst −30 only ~10%. The two negative slots each draw from
+ * this table INDEPENDENTLY (they may land the same rank — no de-dup). The positive +
+ * killer are not rolled.
+ */
+const RABBIT_VALUE_WEIGHTS = [60, 30, 10] as const;
+
+/** Exactly one positive (fixed +10) + two negative rabbits (rolled) each field; the
+ *  killer is the always-present, un-rolled 4th slot (see {@link SnakeEngine.spawnField}). */
+const POSITIVE_COUNT = 1;
+const NEGATIVE_COUNT = 2;
 
 /**
  * SCORE FLOOR — the running score can never read below this. A penalty that would
  * push it negative just pins it here. Rationale: a negative score is a
  * demoralizing, meaningless trophy and breaks the leaderboard / sparkline (which
- * assume non-negative). The penalty's real teeth are the LENGTH loss + lost
- * speed-accel progress, not a sub-zero number.
+ * assume non-negative). The penalty's real teeth are the lost points + the extra
+ * (unwanted) length + the speed-accel progress a +10 grab would have given.
  */
 const SCORE_FLOOR = 0;
 
 /**
- * SPECIAL SPAWN CADENCE (in CAPTURES) + LIFETIME (in CAPTURES), per type. The
- * cadence is the owner's original intent: a "move" = a CAPTURE (eating ANY rabbit),
- * so a special spawns ON the capture whose running count is a multiple of its
- * `every` (e.g. `every: 3` → the 3rd, 6th, 9th… rabbit eaten brings the laugher),
- * AND that type isn't already on the board AND there's a free cell. This is the
- * old trickster's capture-keyed model generalised to all five — NOT a move/step/
- * frame/wall-clock timer, so the rabbits only ever change when the player eats and
- * never "flicker on a clock".
- *
- * LIFETIME is ALSO in captures. For the EARS + BODY specials it is ONE capture-
- * window: an uneaten special despawns on the VERY NEXT capture after it spawned. A
- * special spawned on capture N gets `despawnAtCapture = N + 1`, and
- * `despawnExpiredSpecials` (run on each eat, after `captures++`) clears it once
- * `captures >= N + 1` — i.e. the next rabbit you eat. So those specials are a single
- * "until your next bite" window: grab it now or it's gone — it goes stale by play,
- * not by a clock, and never lingers across multiple grabs. (The spawn that sets it
- * runs AFTER the despawn check on the same capture, so it is never cleared on the
- * capture it appeared.)
- *
- *  - laugher (−10): the SECOND BASE rabbit — ALWAYS on the board alongside the
- *    white staple (owner's "effectively two base rabbits"). It is NOT on a sparse
- *    cadence and NOT on a one-bite lifetime: its `every` is 1 (so it re-spawns on
- *    the very next capture after it's eaten, the way the white respawns) and its
- *    lifetime is {@link NEVER_DESPAWN} (a sentinel = "never auto-despawn"), so the
- *    despawn pass NEVER clears it. It is ALWAYS-PRESENT (it only ever leaves the
- *    board by being eaten, then respawns at a fresh free cell on that capture) — but
- *    its CELL now RE-RANDOMIZES on EVERY capture via {@link
- *    SnakeEngine.reshuffleRabbits} (the owner's "any eat reshuffles the whole
- *    field"), so it relocates on each bite rather than staying put. So the board
- *    always carries white + laugher, both jumping to fresh cells on every eat.
- *  - greenEars (+20) / redEars (−20): a matched bonus/penalty PAIR, same cadence
- *    (every 7th) — risk/reward symmetry. Distinguished by ear color + (decisively)
- *    motion: green-ears STATIC (safe), red-ears JIGGLES (danger).
- *  - green (+30) / red (LETHAL): the high-stakes pair, rarer (every 12th) — a
- *    one-window "chase it / dodge it" event, gone if you don't act on the next bite.
- *    The green (+30) is the prize; the fully-red body is INSTANT DEATH (eating it
- *    ends the run, like a self-hit — see {@link SnakeEngine.step}), so the "dodge
- *    it" is now literal: brush past the red or the run is over.
+ * Pick a NEGATIVE's RANK (an index into {@link RABBIT_VALUES}) by the weighted table —
+ * a standard cumulative-weight roll. Bigger magnitudes have smaller weights, so the
+ * draw is biased toward −10 (the −30 is rare). Called once per negative slot, each an
+ * INDEPENDENT draw (the two may coincide). The positive is fixed +10, never rolled.
  */
-/**
- * Sentinel lifetime = "this special NEVER auto-despawns". A special stamped with
- * this `despawnAtCapture` is skipped by {@link SnakeEngine.despawnExpiredSpecials}
- * (the comparison `captures >= Infinity` is never true), so the despawn pass leaves
- * it on the board forever — it only ever leaves by being eaten. Used by the laugher
- * so it behaves like a SECOND BASE rabbit (a stable fixture, like the white), not a
- * transient special. Reads cleaner than a magic huge number.
- */
-const NEVER_DESPAWN = Infinity;
-// The laugher is a BASE rabbit now: `every: 1` = it re-spawns on the very next
-// capture whenever it's off the board (the way the white respawns the instant it's
-// eaten), and its lifetime is NEVER_DESPAWN so the despawn pass never clears it —
-// it persists in place until eaten, then respawns at a fresh cell. Always present.
-const LAUGHER_EVERY = 1;
-const LAUGHER_LIFE = NEVER_DESPAWN;
-const GREEN_EARS_EVERY = 7;
-const GREEN_EARS_LIFE = 1;
-const RED_EARS_EVERY = 7;
-const RED_EARS_LIFE = 1;
-const GREEN_EVERY = 12;
-const GREEN_LIFE = 1;
-const RED_EVERY = 12;
-const RED_LIFE = 1;
-
-/** The five non-white kinds + their CAPTURE cadence/lifetime, in spawn-resolution
- *  order (penalties first so a bonus can't crowd a penalty off a tight board —
- *  though the cap is per-type so order rarely matters). `every`/`life` are both in
- *  CAPTURES. Drives the generic capture-keyed spawn loop — including the LAUGHER's
- *  always-present respawn (`every: 1` / `life: NEVER_DESPAWN`): it's listed here so
- *  the one spawn pass also re-places it the capture after it's eaten. */
-const SPECIAL_SCHEDULE: {
-  kind: RabbitKind;
-  every: number;
-  life: number;
-}[] = [
-  { kind: "laugher", every: LAUGHER_EVERY, life: LAUGHER_LIFE },
-  { kind: "redEars", every: RED_EARS_EVERY, life: RED_EARS_LIFE },
-  { kind: "greenEars", every: GREEN_EARS_EVERY, life: GREEN_EARS_LIFE },
-  { kind: "red", every: RED_EVERY, life: RED_LIFE },
-  { kind: "green", every: GREEN_EVERY, life: GREEN_LIFE },
-];
+function pickRank(): number {
+  const total = RABBIT_VALUE_WEIGHTS.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < RABBIT_VALUE_WEIGHTS.length; i++) {
+    r -= RABBIT_VALUE_WEIGHTS[i];
+    if (r < 0) return i;
+  }
+  return RABBIT_VALUE_WEIGHTS.length - 1;
+}
 
 /**
- * Fairness: cells a PENALTY rabbit may NEVER spawn into, measured from the snake
- * head. `HEAD_AHEAD` blocks the next N cells the head will step through on its
- * current heading (zero-reaction-time grabs) and `HEAD_RADIUS` blocks a small
- * Chebyshev ring around the head (a penalty materialising right beside the head
- * is just as unfair). Applied to the penalty specials (laugher / redEars / red)
- * so a −score/−length grab is always AVOIDABLE — never an unavoidable −50. Bonus
- * specials + white skip the exclusion (a free reward on your path is fine).
+ * Fairness: cells an "AVOID" rabbit (a negative OR the lethal killer) may NEVER spawn
+ * into, measured from the snake head. `HEAD_AHEAD` blocks the next N cells the head
+ * will step through on its current heading (zero-reaction-time grabs) and
+ * `HEAD_RADIUS` blocks a small Chebyshev ring around the head (a hazard materialising
+ * right beside the head is just as unfair). Applied to all THREE avoid rabbits so a
+ * −score grab — or an instant DEATH on the killer — is always AVOIDABLE. The single
+ * +10 positive skips the exclusion (a free target — it may appear in your lap).
  */
 const HEAD_AHEAD = 3;
 const HEAD_RADIUS = 2;
 
-/** Which kinds are penalties → get the head-path spawn exclusion (never land on
- *  the player's unavoidable next cells). */
-const PENALTY_KINDS = new Set<RabbitKind>(["laugher", "redEars", "red"]);
+/**
+ * POSITIVE rabbit "twitch around its own axis" — the SAME wobble the nav-bar
+ * white-rabbit easter-egg plays on hover (`@keyframes mono-jiggle` in
+ * `tailwind.css`), ported to the canvas so the prize jerks on its axis with the
+ * exact same character. The CSS keyframes (phase → degrees) ARE reproduced verbatim
+ * in {@link NAVBAR_TWITCH_KEYS}; {@link sampleTwitch} eases between the stops the way
+ * the CSS `ease-in-out` does. The CSS loop is 0.4s (~{@link TWITCH_DUR_FRAMES} frames
+ * at ~60fps); we play that wobble, then HOLD STILL for the rest of a
+ * {@link TWITCH_PERIOD_FRAMES} cycle, so it reads as a periodic TWITCH (a jerk, then
+ * a beat of stillness) rather than a constant spin. Frozen under reduced motion
+ * (deg → 0 → a static plain-white bunny; the white body alone then says "chase me").
+ */
+const NAVBAR_TWITCH_KEYS: { t: number; deg: number }[] = [
+  { t: 0, deg: 0 },
+  { t: 0.2, deg: -7 },
+  { t: 0.4, deg: 6 },
+  { t: 0.6, deg: -4 },
+  { t: 0.8, deg: 3 },
+  { t: 1, deg: 0 },
+];
+const TWITCH_DUR_FRAMES = 24; // the 0.4s mono-jiggle loop at ~60fps
+const TWITCH_PERIOD_FRAMES = 78; // wobble (24) + ~0.9s still beat between jerks
 
 /**
- * LAUGHER "laughing" bob — INTERMITTENT, not a constant wobble: the sprite bobs in
- * BURSTS separated by a still pause, looping, like laughter. Driven off the shared
- * render-frame counter so it free-runs the whole time the rabbit is on the board.
- * Every {@link SPECIAL_ANIM_CYCLE} frames the first {@link SPECIAL_ANIM_BURST}
- * frames animate (a sine off the IN-BURST phase so it starts AND ends near zero —
- * no snap when it stops), then hold still. Frozen entirely under reduced motion
- * (static legible frame — the color zone alone still distinguishes the type).
- *  - BOB: vertical offset, amplitude {@link LAUGH_BOB_AMP} of a cell.
+ * NEGATIVE rabbit motion — the penalties "laugh": a CONTINUOUS gentle vertical BOB
+ * (up/down, never a rotation — owner spec) PLUS an INTERMITTENT horizontal SHAKE in
+ * "ha-ha-ha" bursts so the silhouette visibly trembles with laughter. The bob runs
+ * the whole time (so a negative never sits perfectly still and is always told from
+ * the twitching positive); the laugh-shake fires in bursts via {@link burstWave}.
+ * Both freeze under reduced motion (a static striped bunny; the RED ear stripes then
+ * carry the "dodge me"). The two negatives are de-phased by their cell so they don't
+ * bob in lockstep (see {@link drawNegative}).
+ *  - BOB:   vertical offset, amplitude {@link NEG_BOB_AMP} of a cell, continuous.
+ *  - SHAKE: horizontal jitter, amplitude {@link LAUGH_SHAKE_AMP} of a cell, bursty.
  */
-const LAUGH_BOB_AMP = 0.12;
-const LAUGH_BOB_FREQ = 0.45;
+const NEG_BOB_AMP = 0.1;
+const NEG_BOB_FREQ = 0.18;
+const LAUGH_SHAKE_AMP = 0.06;
+const LAUGH_SHAKE_FREQ = 0.9;
+/** The "ha-ha-ha" laugh-burst envelope: animate the first {@link SPECIAL_ANIM_BURST}
+ *  frames of each {@link SPECIAL_ANIM_CYCLE}-frame cycle, hold still the rest (see
+ *  {@link burstWave}) — rhythmic shaking bursts with still pauses, like laughter. */
 const SPECIAL_ANIM_CYCLE = 100;
 const SPECIAL_ANIM_BURST = 35;
 
 /**
- * RED-EARS "danger" jiggle — the agitated shake tell on the −20 penalty. Unlike
- * the laugher's INTERMITTENT bob, this is a CONTINUOUS shake that runs the WHOLE
- * time the rabbit is on the board (owner: it must "unmistakably jiggle the whole
- * time", never sit still mid-pause) — a still red-ears bunny would be
- * indistinguishable from the static SAFE green-ears, defeating the safe-vs-danger
- * motion channel. A {@link AXIS_JIGGLE_DEG}° rotate-wobble about the sprite's OWN
- * centre (the nav-bar `mono-jiggle` feel), at a wide enough amplitude (14°, up
- * from the old ±9° burst-gated version that read as "not moving") that the crisp
- * pixel bunny visibly SHAKES at any cell size. Runs at {@link AXIS_JIGGLE_FREQ}
- * (a brisk, agitated shake). Frozen under reduced motion (deg → 0 → the static
- * legible red-eared frame; the red ears alone then carry the "penalty" read).
+ * KILLER "menace" pulse — the lethal red bunny slowly BREATHES (a size throb) so it
+ * reads as alive + dangerous, NOT a joke (it never "laughs"). A slow, ominous swell
+ * rather than the negatives' jittery bob. Frozen to scale 1 under reduced motion (a
+ * static solid-red silhouette — the colour alone then carries the "death").
  */
-const AXIS_JIGGLE_DEG = 14;
-const AXIS_JIGGLE_FREQ = 0.7;
+const KILLER_PULSE_AMP = 0.1;
+const KILLER_PULSE_FREQ = 0.12;
+
+/** Cubic smoothstep — a cheap stand-in for CSS `ease-in-out` between twitch stops. */
+function easeInOut(t: number): number {
+  return t * t * (3 - 2 * t);
+}
 
 /**
- * Dangerous PULSE (the fully-RED body only) — a fast agitated size-breathing throb
- * so the LETHAL red reads as "alive / dangerous" (eating it is INSTANT DEATH, so the
- * agitated throb is an earned warning, not bluff). MOTION encodes safe-vs-danger:
- * the SAFE rabbits (white, green-ears, AND the +30 GREEN body) are all STATIC, only
- * the threats move — so ONLY the red body pulses (the green prize had a calm
- * pulse, now removed: it's a still, solid-lime bunny, told apart from the green
- * snake glyph stream by SHAPE — a solid silhouette vs the churning stream — not by
- * motion). Frozen to scale 1 under reduced motion (then the shape carries it).
+ * Sample the nav-bar twitch curve at phase `p` in [0,1] → degrees. Walks
+ * {@link NAVBAR_TWITCH_KEYS} (the verbatim `mono-jiggle` keyframes) and eases
+ * between the bracketing stops, so the canvas twitch traces the exact same
+ * wobble path as the header rabbit.
  */
-const RED_PULSE_AMP = 0.14;
-const RED_PULSE_FREQ = 0.22;
+function sampleTwitch(p: number): number {
+  for (let i = 1; i < NAVBAR_TWITCH_KEYS.length; i++) {
+    const a = NAVBAR_TWITCH_KEYS[i - 1];
+    const b = NAVBAR_TWITCH_KEYS[i];
+    if (p <= b.t) {
+      const local = (p - a.t) / (b.t - a.t);
+      return a.deg + (b.deg - a.deg) * easeInOut(local);
+    }
+  }
+  return 0;
+}
 
 // ---- canvas palette (literal hex — the 2D context can't resolve CSS vars) ----
 
@@ -267,23 +254,11 @@ const SENTINEL_DIM = "#565a60";
 /** White rabbit (the food) — `--m-fg` on the dark theme. Exported so the hidden
  *  header easter-egg ({@link RabbitMark}) paints the food its exact game colour. */
 export const RABBIT_WHITE = "#e6e6e6";
-/** Red rabbit / red tint — `--m-error` (dark theme): the penalty color, never a
- *  reward. Used for the fully-red body, the red ears, and the laugher's red eyes. */
+/** Red rabbit / red tint — `--m-error` (dark theme): the penalty/danger colour.
+ *  Used for the negatives' RED ear stripes (1–3, the only stripe colour now), the
+ *  solid-RED killer body, and the red explosion chips. (The positive has NO stripes —
+ *  it's a plain white bunny — so there is no longer a bonus-stripe colour at all.) */
 const RABBIT_RED = "#ff6b6b";
-/**
- * GREEN rabbit / green tint — the site's lime accent (`--m-accent`, dark theme),
- * mirrored here as a literal because the canvas can't read CSS vars. Owner request:
- * the bonus rabbits use the SITE green so they match the colour scheme. NOTE this
- * is the SAME lime as the snake ({@link ACCENT}) — bonuses were originally gold
- * specifically to stay distinct from the creature; on the owner's call they're now
- * green, so the player separates bonus-rabbit from snake purely by SHAPE (a solid
- * bunny silhouette vs the snake's glyph-rain stream), NOT by colour and NOT by
- * motion (the green prize is STATIC now — all safe rabbits are still). Used for the
- * fully-green body and the green ears.
- */
-const RABBIT_GREEN = ACCENT;
-/** Laugher's eye color (the old trickster) — the penalty red, on a white body. */
-const LAUGHER_EYE = RABBIT_RED;
 /**
  * Faint cell grid — a SEMI-TRANSPARENT white so it adapts to whatever theme bg
  * shows through the transparent canvas (dark `--m-bg #1a1a1a`, neo's slightly
@@ -354,39 +329,53 @@ const GLYPH_BG_INSET = 0.08;
 const GLYPH_CHURN_FRAMES = 16;
 const GLYPH_HEAD_CHURN_FRAMES = 7;
 
-// ---- explosion ("ouch" punch / death) particle burst ----
-// Fires on a SURVIVABLE PENALTY-rabbit GRAB (the laugher −10, red-ears −20) as a
-// punchy "ouch", AND — the original use — as the big DEATH burst when the snake
-// eats the LETHAL fully-red body (−50 worth of spray, the most chips). The spray
-// INTENSITY scales with the magnitude: the bigger the minus, the more chips fly, so
-// the red death is the fullest burst. Death from a WALL/SELF hit stays silent (no
-// burst — only the red body explodes on death). Purely cosmetic; frozen under
-// reduced motion (the hook passes `animate = false`), where the static game-over /
-// score overlay carries the end-state instead.
+// ---- RED-SPARK ("ouch" / death) particle burst ----
+// Fires on EVERY NEGATIVE grab AND on the KILLER death (nothing else explodes —
+// the +10 never does; a wall/self death stays silent). The chips are ALWAYS pure RED
+// ({@link RABBIT_RED} / `--m-error`) — never any accent/white mix (owner rule: a
+// penalty sparks red, full stop). The MAGNITUDE maps to one thing only: the COUNT of
+// red chips — bigger minus → MORE red sparks (−10 = few, −30 = more, the KILLER = the
+// maximal blast at {@link KILLER_SPARK_MAGNITUDE}). Size/spread keep a light scale so
+// a big hit reads bigger, but the COLOUR is 100% red at every magnitude. Purely
+// cosmetic; frozen under reduced motion (the hook passes `animate = false`, so the
+// engine never seeds a burst — no info is motion-only).
 
-/** Explosion chip palette — the penalty red + the lime accent + white. */
-const EXPLOSION_COLORS = [RABBIT_RED, ACCENT, "#ffffff"] as const;
-/** Chips for the BIGGEST penalty (the −50 red) — the full punchy spray, unchanged
- *  from the original red burst. Smaller penalties scale DOWN from this anchor. */
+/** Chips for the MAXIMAL blast (the killer) — the full punchy spray. Penalties scale
+ *  DOWN from this anchor. */
 const EXPLOSION_COUNT_MAX = 26;
-/** The −50 red is the reference penalty; chip count scales `abs(delta) / 50`. */
+/** The spark-intensity reference (count = `magnitude / PENALTY_REF`). Held at 50 —
+ *  ABOVE the worst penalty (−30) on purpose, so the negative ladder (−10/−20/−30)
+ *  scales BELOW the cap and the KILLER (passing {@link KILLER_SPARK_MAGNITUDE}) is the
+ *  strictly biggest burst, not tied with −30. */
 const PENALTY_REF = 50;
+/** The KILLER death-burst magnitude — the reference (50), so it yields the maximal
+ *  red blast (full count + widest spread); the killer is the biggest "ouch" there is. */
+const KILLER_SPARK_MAGNITUDE = PENALTY_REF;
 /** Floor so even the smallest penalty (−10) still reads as a real little burst,
  *  not one or two stray chips. −10 → ~max(6, 26·10/50 = ~5) = 6 chips. */
 const EXPLOSION_COUNT_MIN = 6;
 /** Burst lifetime (ms): ~0.7s of gravity + fade, then it self-clears. */
 const EXPLOSION_MS = 700;
+/** Extra spray spread + chip size at the killer vs the −10 (a bigger blast throws
+ *  chips a touch wider/larger — colour is unaffected, always red). */
+const SPARK_SPEED_BOOST = 0.6;
+
+/** Normalised penalty intensity in [0,1]: 0 at the smallest magnitude (10), 1 at
+ *  the reference (50 = the killer). Drives the light size/spread scale (NOT colour). */
+function penaltyIntensity(magnitude: number): number {
+  const lo = RABBIT_VALUES[0];
+  return Math.min(1, Math.max(0, (magnitude - lo) / (PENALTY_REF - lo)));
+}
 
 /**
- * Map a penalty magnitude (`abs(score delta)`) → chip count, scaled linearly off
- * the −50 anchor and floored so a small penalty still reads as a burst:
- *   −10 → 6 (fewest) · −20 → ~10 (medium) · −50 → 26 (most, the full red spray).
- * Bonuses / white never call this (only negative deltas explode).
+ * Map a magnitude (`abs(score delta)`) → red-chip COUNT, scaled linearly off the
+ * PENALTY_REF anchor and floored so a small penalty still reads as a burst:
+ *   −10 → 6 (fewest) · −20 → ~10 · −30 → ~16 · killer (50) → 26 (most). Every chip is
+ * red; only the count grows. The +10 never calls this (only negatives + the killer
+ * explode).
  */
-function explosionCountFor(penaltyMagnitude: number): number {
-  const scaled = Math.round(
-    (EXPLOSION_COUNT_MAX * penaltyMagnitude) / PENALTY_REF
-  );
+function explosionCountFor(magnitude: number): number {
+  const scaled = Math.round((EXPLOSION_COUNT_MAX * magnitude) / PENALTY_REF);
   return Math.max(EXPLOSION_COUNT_MIN, Math.min(EXPLOSION_COUNT_MAX, scaled));
 }
 
@@ -408,70 +397,51 @@ interface Chip {
   color: string;
 }
 
-// Big-eared front-facing bunny, decoded from the owner's bunny SVG → a 7×9
-// bitmap (tall ears = 3 rows). `1` = a body pixel (rendered in the fill color),
-// `0` = NOT drawn = the transparent canvas (so the theme-correct board bg shows
-// through). Reading top→bottom: two tall ears (cols 1 & 5, rows 0–2), a wide
-// head, two eyes (the `0` gaps in row 4 `1011101`), a nose (the `0` in row 5
-// `1110111`), the body, and two feet (cols 1 & 5). The silhouette outline IS the
-// board background showing behind it.
-export const RABBIT_SPRITE = [
-  "0100010",
-  "0100010",
-  "0100010",
-  "1111111",
-  "1011101",
-  "1110111",
-  "1111111",
-  "0111110",
-  "0100010",
-] as const;
 /** Sprite occupies this fraction of the cell (a touch smaller, centered). */
 const SPRITE_FILL = 0.85;
 /** Body + tail render a touch larger — `scale` lifts their effective fill to ~0.9
- *  of the cell (owner request); the head + rabbits stay at the 0.85 default. */
+ *  of the cell (owner request); the snake HEAD stays at the 0.85 default. */
 const BODY_TAIL_SCALE = 0.9 / SPRITE_FILL;
-
-// The white/red rabbit is a single-fill bitmap: `1` = the fill color, `0` =
-// transparent. A shared resolver lets the generic sprite rasteriser treat it the
-// same way as the multi-color head below.
-const RABBIT_COLORS: Record<string, string | null> = {
-  "1": "_FILL_",
-  "0": null,
-};
+/** Every rabbit renders at this effective cell-fill — a hair larger than the base so
+ *  the thin EAR STRIPES stay legible at game cell size. IDENTICAL for ALL four (owner:
+ *  same body size — the plain-white +10 and the red-striped negatives are the same
+ *  bunny, and the KILLER stands out ONLY by its solid-red fill + menace pulse, NEVER by
+ *  size). `scale` is relative to {@link SPRITE_FILL}. */
+const RABBIT_BODY_SCALE = 0.96 / SPRITE_FILL;
 
 /**
- * EYE-MARKED bunny bitmap — the same big-eared 7×9 silhouette as
- * {@link RABBIT_SPRITE}, but the eye row's two body `1` pixels (cols 1 & 5 of the
- * `1011101` row) are marked `E` = an EYE pixel (tinted by the resolver). `1` →
- * body fill, `E` → eye tint, `0` → transparent. Used by the LAUGHER (white body,
- * RED eyes) — only the eyes differ from the plain food, so the body still reads
- * "white rabbit" while the red eyes + laughing bob flag the penalty.
+ * IN-GAME rabbit bitmap — ALL four rabbits share ONE WHITE-bodied bunny silhouette of
+ * identical geometry/size; only the colouring differs. A 7-wide × 13-tall bunny: two
+ * long ears (rows 0–6) over a white head/body (rows 7–12; the eyes are the transparent
+ * `0` gaps, neutral). {@link stripedRabbit} builds the NEGATIVE variant per RANK,
+ * colouring `rank + 1` RED stripe bands across BOTH ears, bottom-anchored on
+ * alternating rows so 1..3 stay countable. The POSITIVE (+10) and the KILLER use the
+ * un-striped {@link RABBIT_PLAIN} (the same bitmap with NO `C` bands), filled white and
+ * solid-red respectively.
+ *
+ *  - `1` = white body ({@link RABBIT_WHITE}).
+ *  - `C` = a STRIPE pixel — RED ({@link RABBIT_RED}), the penalty colour, supplied at
+ *    draw time by {@link stripeColor}. (Only negatives have stripes now.)
+ *  - `.` = transparent (board shows through).
+ *
+ * The ear columns (1–2 and 4–5) are filled every row so each ear reads as a solid
+ * white blade; a stripe row just recolours those ear pixels. Because stripes live IN
+ * the bitmap, the existing sprite transforms (bob / shake / twitch) carry them along
+ * automatically — no separate overlay to keep in sync.
  */
-const EYES_SPRITE = [
-  "0100010",
-  "0100010",
-  "0100010",
-  "1111111",
-  "1E111E1", // eyes (cols 1 & 5) → tinted
-  "1110111",
-  "1111111",
-  "0111110",
-  "0100010",
-] as const;
-
-/**
- * EAR-MARKED bunny bitmap — the same silhouette, but the two tall EAR pixels
- * (cols 1 & 5, rows 0–2 — the `0R00R0` rows) are marked `R` = an EAR pixel
- * (tinted by the resolver). `1` → body fill (white), `R` → ear tint, `0` →
- * transparent. Used by GREEN-EARS (+20, green ears, static) and RED-EARS (−20, red
- * ears, axis-jiggle) — same bitmap, the resolver supplies the ear color and the
- * motion tell decides the rest.
- */
-const EARS_SPRITE = [
-  "0R000R0",
-  "0R000R0",
-  "0R000R0",
+const RABBIT_EAR_WHITE = ".11.11.";
+const RABBIT_EAR_STRIPE = ".CC.CC.";
+/** Stripe SLOT rows on the 7-row ear region, bottom → top — THREE slots now (the
+ *  ladder tops out at 3 stripes / −30). A rank lights the first `rank + 1` of these,
+ *  so rank 0 shows the single lowest band and rank 2 all three; the alternating gap
+ *  rows (5/3) keep the bands visually separate at cell size, and the top ear rows
+ *  (0/1) stay white tips. */
+const RABBIT_STRIPE_SLOTS = [6, 4, 2] as const;
+const RABBIT_EAR_ROWS = 7;
+/** The white head/body/feet beneath the ears, eye row PLAIN — the eyes are the `0`
+ *  gaps (transparent sockets), nose = the `0`. Used by {@link RABBIT_PLAIN} (the
+ *  POSITIVE +10 and the KILLER), so neither gets coloured eyes. */
+const RABBIT_FACE = [
   "1111111",
   "1011101",
   "1110111",
@@ -480,16 +450,94 @@ const EARS_SPRITE = [
   "0100010",
 ] as const;
 
-/** Resolve an EYE-marked cell: `1` = white body, `E` = the eye tint, else
- *  transparent. */
-function eyesColor(eye: string): (ch: string) => string | null {
-  return (ch) => (ch === "1" ? RABBIT_WHITE : ch === "E" ? eye : null);
+/** The SAME face but with RED-marked eyes. Each eye is **2px wide** (`EE` at cols
+ *  1–2 and 4–5 of the eye row — a touch bigger than a 1px dot so the red eyes read,
+ *  but still restrained, the silhouette unchanged) and sits directly UNDER the red ear
+ *  stripes (same cols 1–2 / 4–5), so the red eyes line up with the red ears. Used by
+ *  {@link stripedRabbit} — the NEGATIVE rabbits get RED eyes bundled with their red
+ *  stripes (owner). The positive/killer keep the plain {@link RABBIT_FACE} (transparent
+ *  sockets). Footprint is identical to {@link RABBIT_FACE} (same 7×6 grid). */
+const RABBIT_FACE_EYES = [
+  "1111111",
+  "1EE1EE1", // eyes (cols 1–2 & 4–5, 2px wide) → red on the negative variant
+  "1110111",
+  "1111111",
+  "0111110",
+  "0100010",
+] as const;
+
+/** Build the striped (NEGATIVE) bunny bitmap for `rank` (0..2): `rank + 1` RED-`C`
+ *  stripe bands across both ears (bottom-anchored), then the RED-EYED white face. */
+function stripedRabbit(rank: number): string[] {
+  const lit = new Set<number>(RABBIT_STRIPE_SLOTS.slice(0, rank + 1));
+  const rows: string[] = [];
+  for (let r = 0; r < RABBIT_EAR_ROWS; r++) {
+    rows.push(lit.has(r) ? RABBIT_EAR_STRIPE : RABBIT_EAR_WHITE);
+  }
+  for (const f of RABBIT_FACE_EYES) rows.push(f);
+  return rows;
 }
 
-/** Resolve an EAR-marked cell: `1` = white body, `R` = the ear tint, else
+/**
+ * The POSITIVE (+10) bunny silhouette — the EXACT same geometry/size as
+ * {@link stripedRabbit} (the same 7-row white ears + the plain {@link RABBIT_FACE})
+ * but with NO stripe bands. Filled white ({@link RABBIT_WHITE}) via {@link solidColor}
+ * it's the plain white prize, its eyes left as transparent sockets (same as in-game).
+ * All four rabbits are PIXEL-FOR-PIXEL the same silhouette + size — only the colouring
+ * differs (plain white / white + red stripes + red eyes / solid red + black eyes). The
+ * killer reuses the same ears + an eye-face ({@link RABBIT_KILLER}); there is no second
+ * geometry. Exported so the header easter-egg ({@link RabbitMark}) renders this EXACT
+ * silhouette as its SVG icon, 1:1 with the in-game white (+10) rabbit (`1` = a body
+ * pixel; `0`/`.` = transparent — the eye sockets + outline gaps).
+ */
+export const RABBIT_PLAIN: readonly string[] = [
+  ...Array.from({ length: RABBIT_EAR_ROWS }, () => RABBIT_EAR_WHITE),
+  ...RABBIT_FACE,
+];
+
+/** Resolve a striped (NEGATIVE) rabbit cell: `1` = white body, `C` = the RED stripe
+ *  colour, `E` = a RED eye (always {@link RABBIT_RED} — the red eyes ride along with
+ *  the red stripes), else transparent. */
+function stripeColor(stripe: string): (ch: string) => string | null {
+  return (ch) =>
+    ch === "1"
+      ? RABBIT_WHITE
+      : ch === "C"
+        ? stripe
+        : ch === "E"
+          ? RABBIT_RED
+          : null;
+}
+
+/** Resolve a single-fill silhouette ({@link RABBIT_PLAIN}): `1` = the fill, else
+ *  transparent. Used by the POSITIVE (filled white, transparent eye sockets). */
+function solidColor(fill: string): (ch: string) => string | null {
+  return (ch) => (ch === "1" ? fill : null);
+}
+
+/** KILLER eye colour — pure BLACK. The killer body is solid {@link RABBIT_RED}, so a
+ *  red eye would vanish on it; black reads with hard contrast (~6:1+ on the red) and
+ *  gives the lethal bunny a menacing stare. */
+const KILLER_EYE = "#000000";
+
+/**
+ * The KILLER bitmap — the EXACT same geometry/size as {@link RABBIT_PLAIN} (same white
+ * ears + the {@link RABBIT_FACE_EYES} face), so its silhouette/footprint is identical
+ * to every other rabbit. The difference is purely colour, via {@link killerColor}: the
+ * whole body (`1`) fills solid red and the eye cells (`E`, the SAME 2px cols 1–2 / 4–5
+ * as the negatives' red eyes) fill BLACK. So the "dangerous" rabbits — the negatives
+ * and the killer — all carry visible eyes in the same spot (red on white, black on
+ * red), reading as one family. No extra geometry: it reuses the shared ear + eye-face.
+ */
+const RABBIT_KILLER: readonly string[] = [
+  ...Array.from({ length: RABBIT_EAR_ROWS }, () => RABBIT_EAR_WHITE),
+  ...RABBIT_FACE_EYES,
+];
+
+/** Resolve a KILLER cell: `1` = the solid-red body, `E` = a BLACK eye, else
  *  transparent. */
-function earsColor(ear: string): (ch: string) => string | null {
-  return (ch) => (ch === "1" ? RABBIT_WHITE : ch === "R" ? ear : null);
+function killerColor(ch: string): string | null {
+  return ch === "1" ? RABBIT_RED : ch === "E" ? KILLER_EYE : null;
 }
 
 /**
@@ -729,6 +777,24 @@ export interface StepResult {
   length: number;
 }
 
+/** What a rabbit IS: the plain-white bonus (+10), a red-striped penalty, or the
+ *  lethal (solid-red) killer. */
+type RabbitKind = "positive" | "negative" | "killer";
+
+/**
+ * One of the four live rabbits. `kind` drives behaviour + render; `value` is the
+ * SIGNED score delta (`+10` for the positive, `−10/−20/−30` for a negative; 0 and
+ * unused for the killer — eating it ends the run before any scoring); `rank` (0..2,
+ * index into {@link RABBIT_VALUES}) drives the RED ear-stripe COUNT for a NEGATIVE
+ * (unused for the positive, which has no stripes, and the killer, which has none).
+ */
+interface Rabbit {
+  cell: Cell;
+  kind: RabbitKind;
+  value: number;
+  rank: number;
+}
+
 /**
  * Parse a color string to `[r,g,b]`. Accepts BOTH `#rrggbb` and the
  * `rgb(r,g,b)` form that {@link lerpHex} itself emits — so a lerp result can be
@@ -779,58 +845,40 @@ function glyphFor(a: number, b: number): string {
  * The look is a minimal brutalist snake reskinned as a Matrix "sentinel": a
  * continuous lime pixel creature (a spiky-antennaed red-eyed HEAD over a
  * red-seamed BODY tube dimming gently toward a splaying multi-TENTACLE TAIL)
- * hunting rabbits. TWO BASE rabbits are ALWAYS on the board: the staple WHITE
- * rabbit (+10/+1) and the red-eyed LAUGHER (−10/+1, a penalty that laughs) — each
- * respawns the instant it's eaten, so the field always carries both. FOUR more
- * SPECIAL rabbits appear/leave on a CAPTURE cadence (a "move" = eating any rabbit;
- * at most one of each, one-bite capture lifetimes): GREEN-EARS (+20) / RED-EARS
- * (−20) every 7th, and a fully-GREEN prize (+30) / fully-RED body every 12th. They
- * change ONLY when the player eats — never on a clock. MOTION encodes
- * safe-vs-danger: every SAFE (positive) rabbit is STATIC (white, green-ears, the
- * green prize), only the threats move (the laugher bobs, red-ears jiggles, the
- * red body throbs). Score is clamped ≥0; every eat grows the snake by exactly +1.
- * LETHAL = the walls (off when wrapping), the snake's own body, AND the fully-RED
- * body rabbit (eating it is INSTANT DEATH — the high-stakes "dodge it"). The
- * red-EARS (−20) and the LAUGHER (−10) are SURVIVABLE penalties, never lethal.
- * ("Follow the white rabbit.")
+ * hunting rabbits. The board ALWAYS carries EXACTLY FOUR rabbits: ONE POSITIVE (a
+ * PLAIN WHITE bunny, fixed +10, NO stripes) + TWO NEGATIVE penalties (white bunnies
+ * with 1–3 RED ear stripes + RED eyes = −10/−20/−30; the two roll independently and may
+ * match) + ONE always-present KILLER (the same bunny filled SOLID RED with BLACK eyes,
+ * no stripes — INSTANT DEATH to eat). All four are the same silhouette + size; only the
+ * colouring differs (white = good · red stripes 1–3 = penalty · solid red = death).
+ * Eating ANY of the
+ * four RE-GENERATES the WHOLE field (fresh cells for all four — the killer relocates
+ * too — and fresh ranks for the two negatives; the +10 needs no roll). MOTION is the
+ * subtler tell: the +10 TWITCHES about its axis (the nav-bar rabbit wobble), the
+ * negatives BOB + laugh-SHAKE, the killer slowly MENACE-pulses. Score is clamped ≥0;
+ * every non-lethal eat grows the snake by exactly +1. Death is a wall hit (when not
+ * wrapping), a self-hit, OR the killer. ("Follow the white rabbit.")
  */
 export class SnakeEngine {
   private snake: Cell[] = [];
 
   private dir: Cell = { x: 1, y: 0 };
   private nextDir: Cell = { x: 1, y: 0 };
-  /** The white rabbit (the always-present staple food). */
-  private pellet: Cell | null = null;
   /**
-   * The five SPECIAL rabbits currently on the board, keyed by kind — at most ONE
-   * of each. Each entry carries its grid cell + the CAPTURE count at which it
-   * despawns if not eaten (its lifetime ceiling, in captures). A missing key =
-   * that special is not on the board; it'll re-appear on its next qualifying
-   * capture (when {@link captures} next hits a multiple of its cadence).
+   * The FOUR live rabbits — always exactly one POSITIVE, two NEGATIVE, and one
+   * KILLER (see {@link Rabbit}). The whole array is replaced on EVERY eat by
+   * {@link spawnField} (every rabbit, the killer included, relocates).
    */
-  private specials = new Map<
-    RabbitKind,
-    { cell: Cell; despawnAtCapture: number }
-  >();
-  /**
-   * CAPTURE COUNTER — the running number of rabbits eaten this run (a "move" in the
-   * owner's sense: a move = when you ATE a rabbit). This is the MASTER cadence for
-   * every special's SPAWN (a special appears on the capture whose count is a
-   * multiple of its `every`) AND its capture-based lifetime. There is NO step/time/
-   * frame timer for spawning anymore — rabbits only ever change in response to the
-   * player eating, so they never flicker on a clock. Distinct from {@link frame}
-   * (render frames, ~60fps), which drives the draw pulses/bobs only.
-   */
-  private captures = 0;
+  private rabbits: Rabbit[] = [];
 
   private stepMs = SPEED_MS.classic;
   private frame = 0;
 
   private score = 0;
 
-  /** Live explosion chips. Empty unless a penalty GRAB (laugher / red-ears) or the
-   *  lethal red-body DEATH just fired the burst; they animate out + down and fade,
-   *  then clear (the death burst plays out on the game-over screen). */
+  /** Live red-spark chips. Empty unless a NEGATIVE grab or the KILLER death just
+   *  fired the burst; they animate out + down and fade, then clear. The positive
+   *  never seeds chips. */
   private chips: Chip[] = [];
   /** Grid cell the explosion is centred on (chip offsets are relative to it). */
   private explosionCell: Cell | null = null;
@@ -840,8 +888,9 @@ export class SnakeEngine {
   constructor(
     private speed: Speed = "classic",
     // Wrap-walls is the ACTIVE behavior: edges are pass-through (exit one edge,
-    // re-enter the opposite). The run ends ONLY from a self-hit or the red
-    // hazard — never from a wall. The outer frame stays as the visual board edge.
+    // re-enter the opposite). With wrapping the run ends from a self-hit OR eating
+    // the lethal KILLER rabbit — never from a wall. The outer frame stays as the
+    // visual board edge.
     private wrapWalls = true
   ) {}
 
@@ -856,7 +905,7 @@ export class SnakeEngine {
     this.wrapWalls = wrap;
   }
 
-  /** Reset to a fresh run (centre snake + a pellet). */
+  /** Reset to a fresh run (centre snake + a fresh trio of rabbits). */
   reset() {
     const cx = Math.floor(GRID_W / 2);
     const cy = Math.floor(GRID_H / 2);
@@ -869,34 +918,61 @@ export class SnakeEngine {
     this.nextDir = { x: 1, y: 0 };
     this.stepMs = SPEED_MS[this.speed];
     this.score = 0;
-    // The initial board carries the TWO BASE rabbits — the white staple + the
-    // always-present laugher (the owner's "effectively two base rabbits"). The
-    // EARS/BODY specials still start OFF the board; each first appears on the
-    // capture whose count hits its cadence (greenEars/redEars on the 7th, green/red
-    // on the 12th) — so the opening is calm and those specials fade in as the
-    // player actually plays, never on a clock.
-    this.specials.clear();
-    this.captures = 0;
     this.chips = [];
     this.explosionCell = null;
     this.explosionStart = 0;
-    this.spawnPellet();
-    this.spawnLaugher();
+    // The board ALWAYS opens with the full field — 1 positive + 2 negative + the
+    // always-present killer, the +10 fixed + the two negatives' ranks freshly rolled.
+    this.spawnField();
   }
 
   /**
-   * Place the always-present LAUGHER (the second base rabbit) on a fresh free cell
-   * with the {@link NEVER_DESPAWN} sentinel lifetime, so the despawn pass never
-   * clears it — it only ever leaves the board by being eaten (then its cell is
-   * re-randomized every capture by {@link reshuffleRabbits}). Called on {@link
-   * reset} (so the board opens with both base rabbits) and again whenever it's been
-   * eaten (via the `every: 1` spawn in {@link resolveSpecialSpawns}). It's a PENALTY
-   * (−10), so it honours the head-path exclusion — a base penalty must still be
-   * avoidable, never materialising on the head's unavoidable next cells.
+   * RE-GENERATE the whole rabbit field: place a brand-new FOUR — ONE positive (fixed
+   * +10) + TWO negative (freshly-rolled ranks) + the always-present KILLER — on fresh
+   * free cells. Called on {@link reset} and on EVERY eat (the owner's "any eaten rabbit
+   * regenerates everything", killer included — it relocates on every bite).
+   *
+   * The single POSITIVE is placed FIRST with no head-path exclusion (a free target on
+   * your path is fair) and is a FIXED {@link POSITIVE_VALUE} (no roll). The three AVOID
+   * rabbits — both NEGATIVES (INDEPENDENT weighted ranks; they may land the SAME rank,
+   * no de-dup) and the KILLER — are then placed avoiding the snake, the already-placed
+   * rabbits, AND the {@link headExclusion}, so neither a −score grab nor an instant
+   * DEATH can land on the head's unavoidable next cells. Each placement re-reads the
+   * live {@link rabbitCells} so the four never overlap (nor sit on the snake); the
+   * head-path block is computed ONCE (the head is fixed during a respawn).
    */
-  private spawnLaugher() {
-    const cell = this.freeCell(this.rabbitCells(), this.headExclusion());
-    this.specials.set("laugher", { cell, despawnAtCapture: NEVER_DESPAWN });
+  private spawnField() {
+    this.rabbits = [];
+    const headBlock = this.headExclusion();
+    for (let i = 0; i < POSITIVE_COUNT; i++) {
+      const cell = this.freeCell(this.rabbitCells());
+      this.rabbits.push({
+        cell,
+        kind: "positive",
+        value: POSITIVE_VALUE,
+        rank: 0, // unused — the +10 has no stripes
+      });
+    }
+    for (let i = 0; i < NEGATIVE_COUNT; i++) {
+      // Each negative rolls its rank INDEPENDENTLY (the two may coincide — no de-dup).
+      const rank = pickRank();
+      const cell = this.freeCell(this.rabbitCells(), headBlock);
+      this.rabbits.push({
+        cell,
+        kind: "negative",
+        value: -RABBIT_VALUES[rank],
+        rank,
+      });
+    }
+    // The KILLER — the always-present 4th slot. An "avoid" rabbit, so it honours the
+    // same head-path exclusion (an instant death must never be unavoidable) and the
+    // no-overlap placement; it relocates here on every eat like the rest.
+    this.rabbits.push({
+      cell: this.freeCell(this.rabbitCells(), headBlock),
+      kind: "killer",
+      value: 0,
+      rank: 0,
+    });
   }
 
   /** Queue a direction change; no-op on a direct reverse. */
@@ -929,118 +1005,20 @@ export class SnakeEngine {
     return { x, y };
   }
 
-  /** All currently-occupied rabbit cells (white + every live special) — passed as
-   *  `extra` exclusions so no two rabbits ever overlap. */
+  /** All currently-occupied rabbit cells — passed as `extra` exclusions so no two
+   *  of the four rabbits ever overlap. */
   private rabbitCells(): Cell[] {
-    const cells: Cell[] = [];
-    if (this.pellet) cells.push(this.pellet);
-    for (const s of this.specials.values()) cells.push(s.cell);
-    return cells;
-  }
-
-  /** Spawn a fresh white staple on a free cell, avoiding the snake + every live
-   *  special. (Specials avoid the white the same way — no two rabbits overlap.)
-   *  The OLD white cell is being replaced, so only the specials are excluded. */
-  private spawnPellet() {
-    const specialCells = [...this.specials.values()].map((s) => s.cell);
-    this.pellet = this.freeCell(specialCells);
+    return this.rabbits.map((r) => r.cell);
   }
 
   /**
-   * Resolve the SPECIAL spawns triggered BY this capture. Called once per capture
-   * (after {@link captures} is incremented), NOT per step/frame — so a special can
-   * only ever appear ON a rabbit-eaten event. For each scheduled kind whose `every`
-   * divides the new capture count, if it isn't already on the board, place ONE on a
-   * free cell (PENALTY kinds also avoid the {@link headExclusion} so a −score grab
-   * is always avoidable; bonuses skip it). This is the path that RESPAWNS the always-
-   * present LAUGHER: its `every` is 1, so on the very next capture after it's eaten
-   * it's off the board and gets re-placed (and stamped {@link NEVER_DESPAWN} via
-   * `captures + Infinity`), exactly mirroring how the white staple respawns; while
-   * it's still on the board the `has(kind)` guard skips RE-SPAWNING it here. (Its
-   * CELL is still re-randomized every capture by {@link reshuffleRabbits}, which runs
-   * AFTER this pass — the owner's "any eat reshuffles the whole field"; the
-   * always-present laugher no longer stays put.) The 7th/12th specials get a finite
-   * `captures + life` ceiling and despawn on the next bite. At most one of each kind
-   * → max 6 rabbits.
-   */
-  private resolveSpecialSpawns() {
-    for (const { kind, every, life } of SPECIAL_SCHEDULE) {
-      // Cadence is in CAPTURES: spawn only on the capture whose running count is a
-      // multiple of `every`. (`captures` is > 0 here — this runs post-eat.)
-      if (this.captures % every !== 0) continue;
-      if (this.specials.has(kind)) continue; // already on the board → skip
-      const blocked = PENALTY_KINDS.has(kind)
-        ? this.headExclusion()
-        : undefined;
-      const cell = this.freeCell(this.rabbitCells(), blocked);
-      this.specials.set(kind, {
-        cell,
-        despawnAtCapture: this.captures + life,
-      });
-    }
-  }
-
-  /**
-   * RESHUFFLE the WHOLE rabbit field — relocate every rabbit still on the board
-   * (the white staple + every live special, incl. the always-present laugher) to a
-   * fresh free cell. Called ONCE per capture in {@link step}, AFTER the eaten rabbit
-   * is resolved and the capture-keyed despawn/spawn has run — so it moves whatever
-   * remains: the freshly-respawned white, the persistent laugher, and any cadence
-   * special still on the board. The owner's rule: ANY eat of ANY rabbit regenerates
-   * EVERY rabbit's position — the white moves on every eat (not only when white is
-   * eaten), and the laugher now RELOCATES on every eat too (reversing its old
-   * stay-put behaviour; it stays always-present, only its CELL is re-randomized).
-   *
-   * Each rabbit is relocated in sequence off the LIVE board state: every placement
-   * reuses {@link freeCell}, excluding the snake + every OTHER rabbit's current cell
-   * (so no two rabbits ever overlap, and a rabbit isn't blocked by its OWN old cell
-   * it's vacating). PENALTY kinds (laugher / redEars / red) keep honouring the
-   * {@link headExclusion} exactly as on spawn — the now-LETHAL red and the −score
-   * penalties can never land on the head's unavoidable next cells. The penalty
-   * exclusion is computed ONCE up front (the head doesn't move during a reshuffle).
-   */
-  private reshuffleRabbits() {
-    const headBlock = this.headExclusion();
-    // Relocate a rabbit's cell to a fresh free spot, excluding every OTHER live
-    // rabbit cell (`others`) so the field never overlaps, plus the head-path block
-    // for penalty kinds. `others` reads the CURRENT cells (mutated in place as we
-    // go), and skips the cell being replaced so it isn't blocked by itself.
-    const relocate = (current: Cell, isPenalty: boolean): Cell => {
-      const others = this.rabbitCells().filter(
-        (c) => !(c.x === current.x && c.y === current.y)
-      );
-      return this.freeCell(others, isPenalty ? headBlock : undefined);
-    };
-
-    // White staple (a safe kind — no head exclusion).
-    if (this.pellet) this.pellet = relocate(this.pellet, false);
-
-    // Every live special, incl. the laugher — re-randomize each cell in place.
-    for (const [kind, s] of this.specials) {
-      s.cell = relocate(s.cell, PENALTY_KINDS.has(kind));
-    }
-  }
-
-  /** Despawn any special whose CAPTURE-based lifetime ceiling has been reached
-   *  (uneaten — `life` captures have passed since it spawned). Run once per
-   *  capture so the board self-cleans on play cadence, never on a clock. The
-   *  always-present LAUGHER is stamped {@link NEVER_DESPAWN} (= Infinity), so
-   *  `captures >= Infinity` is never true and it is NEVER cleared here — it only
-   *  ever leaves the board by being eaten (then respawns via the spawn pass). */
-  private despawnExpiredSpecials() {
-    for (const [kind, s] of this.specials) {
-      if (this.captures >= s.despawnAtCapture) this.specials.delete(kind);
-    }
-  }
-
-  /**
-   * The set of cells a PENALTY rabbit is forbidden to spawn into, keyed `"x,y"`:
-   * the next {@link HEAD_AHEAD} cells straight ahead of the head on its current
-   * heading (the unavoidable path) PLUS a {@link HEAD_RADIUS} Chebyshev ring
-   * around the head. Both are wrap-corrected (cells that fall off an edge re-enter
-   * the opposite side) because walls are pass-through, so the "path ahead"
-   * genuinely continues across the seam. This is what guarantees no unavoidable
-   * −50 / −20 / −10.
+   * The set of cells an "AVOID" rabbit (a negative OR the lethal killer) is forbidden
+   * to spawn into, keyed `"x,y"`: the next {@link HEAD_AHEAD} cells straight ahead of
+   * the head on its current heading (the unavoidable path) PLUS a {@link HEAD_RADIUS}
+   * Chebyshev ring around the head. Both are wrap-corrected (cells that fall off an
+   * edge re-enter the opposite side) because walls are pass-through, so the "path
+   * ahead" genuinely continues across the seam. This is what guarantees no unavoidable
+   * −score grab — and, crucially, no unavoidable instant DEATH on the killer.
    */
   private headExclusion(): Set<string> {
     const head = this.snake[0];
@@ -1065,12 +1043,11 @@ export class SnakeEngine {
 
   /**
    * Advance one tick. Returns the outcome for the hook to project to state.
-   * `animate` (default true) gates EVERY EXPLOSION burst — the survivable
-   * penalty-grab "ouch" (laugher / red-ears) AND the big DEATH burst on eating the
-   * lethal fully-red body — under reduced motion the hook passes `false`, so the
-   * grab/death is silent (no particles) and the static overlay carries it, matching
-   * the project's reduced-motion contract. Death from a WALL/SELF hit is silent
-   * regardless (only the red body explodes on death).
+   * `animate` (default true) gates EVERY red-spark burst — the survivable NEGATIVE
+   * grab "ouch" AND the KILLER death-burst — so under reduced motion the hook passes
+   * `false` and both are silent (the static overlay carries it), matching the
+   * project's reduced-motion contract. Death from a WALL (not wrapping) or a SELF hit
+   * is always silent; the KILLER rabbit is the one lethal-on-eat hazard.
    */
   step(animate = true): StepResult {
     this.dir = this.nextDir;
@@ -1089,18 +1066,17 @@ export class SnakeEngine {
     }
 
     // Which rabbit (if any) is on the cell the head is stepping into? At most one
-    // rabbit per cell (spawn exclusions guarantee no overlap), so this resolves
-    // to a single kind. Specials are checked first, then the white staple.
-    let eaten: RabbitKind | null = null;
-    for (const [kind, s] of this.specials) {
-      if (s.cell.x === nx && s.cell.y === ny) {
-        eaten = kind;
+    // rabbit per cell (spawn exclusions guarantee no overlap), so this resolves to
+    // a single rabbit. `-1` = an empty cell (a plain move).
+    let eatenIndex = -1;
+    for (let i = 0; i < this.rabbits.length; i++) {
+      const c = this.rabbits[i].cell;
+      if (c.x === nx && c.y === ny) {
+        eatenIndex = i;
         break;
       }
     }
-    if (!eaten && this.pellet && nx === this.pellet.x && ny === this.pellet.y) {
-      eaten = "white";
-    }
+    const ate = eatenIndex >= 0;
 
     // Self-collision. The new head must miss the body that will REMAIN this step.
     // The tail FREES UP only when the snake does NOT grow: on an eat the snake
@@ -1108,7 +1084,7 @@ export class SnakeEngine {
     // collision); on a normal move the tail pops one cell — that freed cell is a
     // legal landing. So we exclude the trailing cell from the check on a plain move,
     // and check the whole body on an eat.
-    const bodyToCheck = eaten
+    const bodyToCheck = ate
       ? this.snake
       : this.snake.slice(0, this.snake.length - 1);
     if (bodyToCheck.some((s) => s.x === nx && s.y === ny)) {
@@ -1117,112 +1093,77 @@ export class SnakeEngine {
 
     this.snake.unshift({ x: nx, y: ny });
 
-    // LETHAL RED BODY — the fully-RED (−50) rabbit is INSTANT DEATH, exactly like
-    // hitting yourself (owner: "death on the red rabbit, like before"). It is
-    // routed to the game-over path HERE — BEFORE any score/capture/growth
-    // bookkeeping — so its −50 / +1 are moot (the run ends). The new head was just
-    // unshifted onto the red cell, so we fire the BIG death EXPLOSION burst right
-    // at that cell (the full red spray; this is what the explosion originally
-    // marked — death, not a survivable grab) and return {@link dead}. The burst is
-    // gated by `animate` like every other burst, so under reduced motion the grab
-    // is silent and the static game-over overlay carries the end-state (the
-    // project's reduced-motion contract). The hook sees `dead: true`, flips the
-    // screen to "over" (the `onGameOver` score-submit fires once with the final
-    // score), and the over-screen draw still plays the seeded burst out.
-    //
-    // ONLY the full red BODY is lethal — the red-EARS (−20) and the LAUGHER (−10)
-    // stay SURVIVABLE penalties (they fall through to the score/shrink path below).
-    // Lethal = walls (off when wrapping), self, and the red body. The head-path
-    // spawn EXCLUSION ({@link headExclusion} / {@link PENALTY_KINDS}) still covers
-    // `red`, so a now-LETHAL red can never materialise on the head's unavoidable
-    // next cells — an unavoidable instant death is the cardinal sin.
-    if (eaten === "red") {
-      if (animate) {
-        this.explodeAt(
-          { x: nx, y: ny },
-          explosionCountFor(-RABBIT_SPEC.red.score)
-        );
-      }
-      return this.dead();
-    }
+    if (ate) {
+      const r = this.rabbits[eatenIndex];
 
-    // Apply the eaten rabbit's payload (score clamped ≥0, length floored). The
-    // surviving penalties (laugher / red-ears) fire the "ouch" burst; the white
-    // still accelerates the step timer (the staple cadence reward). All surviving
-    // specials are removed on eat. EATING IS THE ONE EVENT that advances the
-    // special cadence: each eat (any kind, white included) is one CAPTURE — the
-    // owner's "a move = when you ATE a rabbit". So we bump {@link captures} here and
-    // (below) run the capture-keyed spawn/despawn. Nothing about the specials
-    // changes on a non-eating step, so they never flicker on a clock.
-    if (eaten) {
-      const spec = RABBIT_SPEC[eaten];
-      this.score = Math.max(SCORE_FLOOR, this.score + spec.score);
-      this.captures++;
-      if (eaten === "white") {
-        // White staple: accelerate + respawn a fresh staple immediately so there
-        // is always exactly one white on the board to hunt.
+      // KILLER — eating the lethal red bunny is INSTANT game over, exactly like a
+      // wall/self hit. Resolved HERE, BEFORE any scoring/growth/respawn (its `value`
+      // is moot — the run ends). Fire the BIG red death-burst at the head cell (the
+      // maximal spray, gated by `animate` like every burst → reduced motion = silent,
+      // the static game-over overlay carries it) and return dead. The head was just
+      // unshifted onto the killer cell, so the burst centres there. The hook flips to
+      // "over" and fires `onGameOver` once with the final score (leaderboard intact).
+      if (r.kind === "killer") {
+        if (animate) this.explodeAt({ x: nx, y: ny }, KILLER_SPARK_MAGNITUDE);
+        return this.dead();
+      }
+
+      // Apply the signed payload, clamped ≥0 (a penalty never underflows the floor).
+      this.score = Math.max(SCORE_FLOOR, this.score + r.value);
+      if (r.value > 0) {
+        // The POSITIVE is the reward → it ramps the step timer (the classic
+        // per-pellet accel). Negatives give no speed reward (eating one is a mistake).
         this.stepMs = Math.max(STEP_FLOOR, this.stepMs - STEP_ACCEL);
-        this.spawnPellet();
-      } else {
-        // A special was eaten → clear it (its slot frees up; it can re-appear on a
-        // later qualifying capture). EVERY penalty special (negative score delta)
-        // fires the "ouch" burst, with the chip count scaled to the penalty size —
-        // −10 small, −20 medium, −50 the full spray. Bonuses don't explode.
-        this.specials.delete(eaten);
-        if (spec.score < 0 && animate) {
-          this.explodeAt({ x: nx, y: ny }, explosionCountFor(-spec.score));
-        }
+      } else if (animate) {
+        // A NEGATIVE grab sparks a pure-red "ouch" whose chip COUNT scales with the
+        // magnitude (the lone non-lethal thing that explodes).
+        this.explodeAt({ x: nx, y: ny }, -r.value);
       }
-    }
-
-    // Resolve length. The new head was already unshifted above, so we only manage
-    // the TAIL: on an eat the snake grows +1 (keep the tail), on a normal move the
-    // length holds (pop one tail cell). Every eat grows by exactly +1 — there is no
-    // shrink path (the lethal red body returned `dead` above before reaching here).
-    if (!eaten) this.snake.pop();
-
-    // Capture-keyed special housekeeping — runs ONLY on an eat (the `captures` bump
-    // above), NEVER on a plain step/frame/clock, so rabbits change only in response
-    // to the player eating. Despawn the stale ones first (free their slots — and
-    // the just-eaten special was already deleted above), then resolve the spawns
-    // this capture triggers (reads the just-advanced head for the penalty
-    // head-exclusion, so a fresh penalty never lands on the player's next cells).
-    // FINALLY reshuffle the WHOLE remaining rabbit field to fresh cells — the
-    // owner's rule that ANY eat regenerates EVERY rabbit's position (white moves on
-    // every eat, the laugher relocates on every eat too). Run LAST so it moves
-    // whatever the despawn/spawn left on the board, honouring the same overlap +
-    // penalty head exclusions as spawning.
-    if (eaten) {
-      this.despawnExpiredSpecials();
-      this.resolveSpecialSpawns();
-      this.reshuffleRabbits();
+      // ANY non-lethal eat RE-GENERATES the whole field — fresh cells for all four
+      // (the killer relocates too) + fresh weighted ranks (the owner's "any eaten
+      // rabbit regenerates everything"). Runs AFTER the head advanced, so the avoid
+      // rabbits' head-path exclusion reads the new head.
+      this.spawnField();
+    } else {
+      // Plain move: pop the tail (length holds). Every non-lethal EAT keeps the tail
+      // (+1 growth) — positive AND negative; nothing ever shrinks the snake.
+      this.snake.pop();
     }
 
     return {
       dead: false,
-      ate: eaten !== null,
+      ate,
       score: this.score,
       length: this.snake.length,
     };
   }
 
-  /** Seed an explosion burst centred on `cell` (chips spray out + fall). `count`
-   *  is the chip count for this burst, scaled to the penalty magnitude by the
-   *  caller ({@link explosionCountFor}) — the bigger the minus, the more chips. The
-   *  draw loop animates and clears it; under reduced motion it never seeds. */
-  private explodeAt(cell: Cell, count: number) {
+  /**
+   * Seed a RED-SPARK burst centred on `cell` for a NEGATIVE grab (or the KILLER
+   * death) of magnitude `magnitude`. Every chip is pure {@link RABBIT_RED} — the
+   * magnitude maps ONLY to the chip COUNT ({@link explosionCountFor}): bigger →
+   * more red sparks (the killer passes {@link KILLER_SPARK_MAGNITUDE} for the
+   * maximal blast). A light size/spread scale ({@link SPARK_SPEED_BOOST}) lets a
+   * bigger hit read bigger, but the colour is 100% red at every magnitude. The draw
+   * loop animates + clears it; under reduced motion it never seeds (caller gates).
+   */
+  private explodeAt(cell: Cell, magnitude: number) {
+    const count = explosionCountFor(magnitude);
+    const intensity = penaltyIntensity(magnitude);
+    const speedScale = 1 + SPARK_SPEED_BOOST * intensity;
     this.explosionCell = cell;
     this.explosionStart = 0; // stamped on the first draw frame
     this.chips = Array.from({ length: count }, () => {
       const ang = Math.random() * Math.PI * 2;
-      const spd = 0.04 + Math.random() * 0.1; // cell-units / frame
+      const spd = (0.04 + Math.random() * 0.1) * speedScale; // cell-units / frame
       return {
         ox: 0,
         oy: 0,
         vx: Math.cos(ang) * spd,
         vy: Math.sin(ang) * spd - 0.05, // a touch of initial lift
-        size: 0.12 + Math.random() * 0.16, // fraction of a cell
-        color: EXPLOSION_COLORS[(Math.random() * EXPLOSION_COLORS.length) | 0],
+        // Bigger blasts throw slightly bigger chips too (colour stays red).
+        size: (0.12 + Math.random() * 0.16) * (0.9 + 0.3 * intensity),
+        color: RABBIT_RED, // ALWAYS red — no accent/white mix (owner rule)
       };
     });
   }
@@ -1268,13 +1209,13 @@ export class SnakeEngine {
    * paints it crisp at any cell size. `sprite` is rows of equal-length strings;
    * `resolve(ch)` maps each character to a fill color (or `null` = transparent,
    * board shows through). Serves the rabbits (single-fill) AND the multi-color
-   * snake head; `scale` (default 1) lets the green/red rabbits pulse.
+   * snake head; `scale` (default 1) lets the killer pulse + sizes the rabbits.
    *
    * `yOffsetCells` (default 0) shifts the WHOLE figure vertically by a fraction
-   * of a cell — used ONLY by the laugher's laughing bob, so food / specials /
-   * head / body / tail stay dead-centred. The offset is converted to device px
-   * and snapped to the device-pixel grid (alongside the centring round) so the
-   * sprite stays crisp even mid-bob.
+   * of a cell — used by the negatives' laughing BOB, so the other sprites (head /
+   * body / tail) stay dead-centred. The offset is converted to device px and snapped
+   * to the device-pixel grid (alongside the centring round) so the sprite stays crisp
+   * even mid-bob.
    *
    * `refDim` (default 0 = "fit this sprite's own larger dim") overrides the
    * dimension the per-bit block is sized against. The SNAKE parts pass
@@ -1315,11 +1256,11 @@ export class SnakeEngine {
     // TAIL to nudge its WIDE end flush against the body cell border (so the body
     // overflow overlaps it and the tube connects); 0 for everything else.
     xOffsetCells = 0,
-    // AXIS-JIGGLE: a small rotation (degrees) about the sprite's own centre — the
-    // nav-bar `mono-jiggle` feel on the canvas, used ONLY by the red-ears penalty
-    // rabbit (its "danger" motion tell). Rotating the canvas resamples slightly,
-    // but `imageSmoothingEnabled=false` keeps the pixel edges hard, and the wobble
-    // is small + intermittent, so it reads as a crisp shaking bunny, not a blur.
+    // AXIS-TWITCH: a small rotation (degrees) about the sprite's own centre — the
+    // nav-bar `mono-jiggle` feel on the canvas, used ONLY by the POSITIVE rabbit (its
+    // "chase me" twitch). Rotating the canvas resamples slightly, but
+    // `imageSmoothingEnabled=false` keeps the pixel edges hard, and the wobble is
+    // small + intermittent, so it reads as a crisp twitching bunny, not a blur.
     // 0 = no rotation (every other sprite stays axis-aligned + pixel-exact).
     rotateDeg = 0
   ) {
@@ -1392,39 +1333,12 @@ export class SnakeEngine {
   }
 
   /**
-   * Plain single-fill rabbit (white staple / fully-green / fully-red body) — the
-   * base {@link RABBIT_SPRITE} silhouette painted in one `color`; `scale` lets the
-   * green/red bodies breathe their value/danger pulse. Thin wrapper over the
-   * generic {@link drawSprite}.
-   */
-  private drawRabbit(
-    ctx: CanvasRenderingContext2D,
-    cell: number,
-    dpr: number,
-    at: Cell,
-    color: string,
-    scale = 1
-  ) {
-    this.drawSprite(
-      ctx,
-      cell,
-      dpr,
-      at,
-      RABBIT_SPRITE,
-      (ch) => (RABBIT_COLORS[ch] === "_FILL_" ? color : null),
-      scale
-    );
-  }
-
-  /**
-   * Intermittent "burst" animation envelope shared by the laughing bob + the
-   * axis-jiggle: returns a sine value that runs for the first
-   * {@link SPECIAL_ANIM_BURST} frames of each {@link SPECIAL_ANIM_CYCLE}-frame
-   * cycle and is 0 (held still) the rest of the time — so the motion reads as
-   * rhythmic bursts (a "ha-ha-ha" / a shimmy) with still pauses between, like
-   * laughter. Driven off the shared render-frame counter so it free-runs the whole
-   * time the rabbit is on the board. Returns 0 when `animate` is false (reduced
-   * motion → a static legible frame; the color zone alone still tells the type).
+   * Intermittent "ha-ha-ha" laugh-burst envelope (the negatives' shake): returns a
+   * sine that runs for the first {@link SPECIAL_ANIM_BURST} frames of each
+   * {@link SPECIAL_ANIM_CYCLE}-frame cycle and is 0 (held still) the rest of the time
+   * — so the shake reads as rhythmic bursts with still pauses, like laughter. Driven
+   * off the shared render-frame counter so it free-runs the whole time the rabbit is
+   * on the board. Returns 0 when `animate` is false (reduced motion → no shake).
    */
   private burstWave(animate: boolean, freq: number): number {
     if (!animate) return 0;
@@ -1434,95 +1348,122 @@ export class SnakeEngine {
   }
 
   /**
-   * Draw ONE special rabbit by kind, applying its color zone + motion tell. MOTION
-   * encodes SAFE-vs-DANGER: every SAFE (positive-score) rabbit is STATIC, only the
-   * PENALTIES animate —
-   *  - laugher (−10, PENALTY): white body + RED eyes, laughing vertical BOB.
-   *  - greenEars (+20, SAFE): white body + GREEN ears, STATIC.
-   *  - redEars (−20, PENALTY): white body + RED ears, AXIS-JIGGLE (danger wobble).
-   *  - green (+30, SAFE): fully GREEN body, STATIC — a still solid-lime prize.
-   *  - red (LETHAL): fully RED body, fast AGITATED pulse — eating it is INSTANT
-   *    DEATH, so the dangerous throb is an earned warning (it draws the same; the
-   *    lethality is enforced in {@link step}, not here).
-   * All motion degrades to a static frame under reduced motion (see
-   * {@link burstWave}); the white staple isn't routed here (it's a plain
-   * {@link drawRabbit}). Sprites stay pixel-crisp; only the red-ears jiggle uses
-   * a canvas rotation (small, intermittent — see {@link drawSprite}'s `rotateDeg`).
+   * Draw the single POSITIVE rabbit: a PLAIN WHITE bunny — the un-striped
+   * {@link RABBIT_PLAIN} silhouette filled {@link RABBIT_WHITE}, no stripes, no rank
+   * (it's the fixed +10 prize) — that TWITCHES about its own axis (the nav-bar
+   * `.mono-jiggle` wobble ported to canvas, {@link sampleTwitch}, fired in periodic
+   * jerks by {@link twitchDeg}). Same silhouette + size as every other rabbit; it's
+   * the ONLY all-white one, so white = the thing to chase. Told apart from the snake by
+   * SHAPE (a solid bunny vs a churning glyph stream). Frozen to a static white bunny
+   * under reduced motion (deg → 0; the plain white body alone then says "chase me").
    */
-  private drawSpecial(
+  private drawPositive(
     ctx: CanvasRenderingContext2D,
     cell: number,
     dpr: number,
     at: Cell,
-    kind: RabbitKind,
     animate: boolean
   ) {
-    switch (kind) {
-      case "laugher": {
-        const bob = LAUGH_BOB_AMP * this.burstWave(animate, LAUGH_BOB_FREQ);
-        this.drawSprite(
-          ctx,
-          cell,
-          dpr,
-          at,
-          EYES_SPRITE,
-          eyesColor(LAUGHER_EYE),
-          1,
-          bob
-        );
-        return;
-      }
-      case "greenEars": {
-        // STATIC — a SAFE (+20) bonus; all safe rabbits are still (safe = static).
-        this.drawSprite(
-          ctx,
-          cell,
-          dpr,
-          at,
-          EARS_SPRITE,
-          earsColor(RABBIT_GREEN)
-        );
-        return;
-      }
-      case "redEars": {
-        // Axis-jiggle (the `mono-jiggle` feel) — the "danger" motion tell.
-        const deg = AXIS_JIGGLE_DEG * this.burstWave(animate, AXIS_JIGGLE_FREQ);
-        this.drawSprite(
-          ctx,
-          cell,
-          dpr,
-          at,
-          EARS_SPRITE,
-          earsColor(RABBIT_RED),
-          1,
-          0,
-          0,
-          false,
-          0,
-          deg
-        );
-        return;
-      }
-      case "green": {
-        // STATIC — the +30 prize is a SAFE rabbit, and "all safe ones are static"
-        // (owner). Motion now encodes safe-vs-danger: a still bunny = safe, a moving
-        // one = threat. So the green prize sits perfectly still (its solid lime fill
-        // + the bunny silhouette carry it, telling it apart from the green snake
-        // glyph stream by SHAPE, not by a pulse). No GREEN_PULSE_* anymore.
-        this.drawRabbit(ctx, cell, dpr, at, RABBIT_GREEN);
-        return;
-      }
-      case "red": {
-        // Fast agitated throb — "dangerous".
-        const pulse = animate
-          ? 1 + RED_PULSE_AMP * Math.sin(this.frame * RED_PULSE_FREQ)
-          : 1;
-        this.drawRabbit(ctx, cell, dpr, at, RABBIT_RED, pulse);
-        return;
-      }
-      default:
-        return;
-    }
+    const deg = this.twitchDeg(animate);
+    this.drawSprite(
+      ctx,
+      cell,
+      dpr,
+      at,
+      RABBIT_PLAIN,
+      solidColor(RABBIT_WHITE),
+      RABBIT_BODY_SCALE,
+      0,
+      0,
+      false,
+      0,
+      deg
+    );
+  }
+
+  /**
+   * Draw ONE of the two NEGATIVE rabbits: a WHITE bunny with `rank+1` RED ear stripes
+   * (1–3 for −10/−20/−30) — the SAME silhouette + size as the plain-white +10, so the
+   * ONLY difference is the RED stripes and their COUNT. It "laughs": a continuous
+   * vertical BOB (never a rotation) plus an intermittent horizontal laugh-SHAKE (the
+   * {@link burstWave} "ha-ha-ha"). The two negatives are DE-PHASED by their cell so they
+   * never bob/shake in lockstep. Frozen to a static striped bunny under reduced motion
+   * (the red stripes then carry the "dodge me").
+   */
+  private drawNegative(
+    ctx: CanvasRenderingContext2D,
+    cell: number,
+    dpr: number,
+    at: Cell,
+    rank: number,
+    animate: boolean
+  ) {
+    // De-phase per cell so the two negatives aren't synchronised.
+    const phase = (at.x * 1.3 + at.y * 0.7) % (Math.PI * 2);
+    const bob = animate
+      ? NEG_BOB_AMP * Math.sin(this.frame * NEG_BOB_FREQ + phase)
+      : 0;
+    const shake = LAUGH_SHAKE_AMP * this.burstWave(animate, LAUGH_SHAKE_FREQ);
+    this.drawSprite(
+      ctx,
+      cell,
+      dpr,
+      at,
+      stripedRabbit(rank),
+      stripeColor(RABBIT_RED),
+      RABBIT_BODY_SCALE,
+      bob,
+      0,
+      false,
+      shake
+    );
+  }
+
+  /**
+   * Draw the KILLER: literally the white rabbit's OWN bunny — the SAME {@link
+   * RABBIT_KILLER} geometry (identical to {@link RABBIT_PLAIN} / {@link stripedRabbit})
+   * at the SAME {@link RABBIT_BODY_SCALE} — but the WHOLE body fills solid {@link
+   * RABBIT_RED} with a pair of BLACK eyes ({@link killerColor}) in the SAME 2px cells
+   * (cols 1–2 / 4–5) where the negatives carry their red eyes. So it is pixel-for-pixel
+   * the same silhouette + size; the ONLY difference is the colour (solid red body +
+   * black eyes). The black eyes make it read as one "dangerous" family with the
+   * red-eyed negatives, while the solid red still screams death. Its standout is purely
+   * that colour + a slow MENACE-pulse (a size throb about its own scale, NOT the
+   * negatives' jittery laugh — a threat, not a joke), never a different shape or
+   * footprint. Frozen to a static frame under reduced motion (the colour carries it).
+   */
+  private drawKiller(
+    ctx: CanvasRenderingContext2D,
+    cell: number,
+    dpr: number,
+    at: Cell,
+    animate: boolean
+  ) {
+    const pulse = animate
+      ? 1 + KILLER_PULSE_AMP * Math.sin(this.frame * KILLER_PULSE_FREQ)
+      : 1;
+    this.drawSprite(
+      ctx,
+      cell,
+      dpr,
+      at,
+      RABBIT_KILLER,
+      killerColor,
+      RABBIT_BODY_SCALE * pulse
+    );
+  }
+
+  /**
+   * The positive's axis-TWITCH angle (degrees) this frame: play the nav-bar wobble
+   * curve over the first {@link TWITCH_DUR_FRAMES} of each {@link TWITCH_PERIOD_FRAMES}
+   * cycle, then HOLD at 0 — a periodic jerk, not a constant spin. 0 under reduced
+   * motion (a static bunny).
+   */
+  private twitchDeg(animate: boolean): number {
+    if (!animate) return 0;
+    const phase = this.frame % TWITCH_PERIOD_FRAMES;
+    if (phase >= TWITCH_DUR_FRAMES) return 0;
+    return sampleTwitch(phase / TWITCH_DUR_FRAMES);
   }
 
   // ---------- glyph (matrix-rain) renderer (SNAKE_RENDER === "glyph") ----------
@@ -1695,9 +1636,9 @@ export class SnakeEngine {
   }
 
   /**
-   * Draw the live game: clear field → pellet → body → head. `dpr` is the canvas
-   * device-pixel ratio (the ctx is pre-scaled by it); the rabbit sprite needs it
-   * to rasterise on whole device pixels (see {@link drawRabbit}).
+   * Draw the live game: clear field → rabbit trio → body → head → sparks. `dpr` is
+   * the canvas device-pixel ratio (the ctx is pre-scaled by it); the rabbit sprites
+   * need it to rasterise on whole device pixels (see {@link drawSprite}).
    */
   drawGame(
     ctx: CanvasRenderingContext2D,
@@ -1713,19 +1654,19 @@ export class SnakeEngine {
     ctx.fillRect(0, 0, cssW, cssH);
     this.drawGrid(ctx, cssW, cssH);
 
-    // Rabbits — the always-present white staple FOOD + every live SPECIAL (at most
-    // one of each of the five). ALWAYS the bunny-silhouette SPRITES, in BOTH render
-    // modes (owner preference — the pixel bunnies read better than glyph rabbits,
-    // even when the snake itself is the green matrix-rain glyph stream). Each
-    // special carries its own COLOR ZONE + MOTION tell (see {@link drawSpecial}) so
-    // the near-identical white variants stay instantly distinct — readability is
-    // non-negotiable. The white staple is plain + static; the specials are drawn
-    // AFTER it so an overlap (there is none — spawn exclusions) would favour them.
-    if (this.pellet) {
-      this.drawRabbit(ctx, cell, dpr, this.pellet, RABBIT_WHITE);
-    }
-    for (const [kind, s] of this.specials) {
-      this.drawSpecial(ctx, cell, dpr, s.cell, kind, animate);
+    // Rabbits — the field of FOUR (1 positive + 2 negative + the always-present
+    // killer), ALWAYS the bunny-silhouette SPRITES in BOTH render modes (owner
+    // preference — the pixel bunnies read better than glyph rabbits). All four are the
+    // SAME white bunny silhouette + size; only the colour differs: the +10 is plain
+    // WHITE (no stripes), a negative is white with 1–3 RED ear stripes + RED eyes
+    // (= −10/−20/−30), the killer is SOLID RED with BLACK eyes. The motion tell (twitch
+    // / laugh-bob / menace-pulse) is the subtler second channel. Readability is
+    // non-negotiable — the player must LOOK.
+    for (const r of this.rabbits) {
+      if (r.kind === "killer") this.drawKiller(ctx, cell, dpr, r.cell, animate);
+      else if (r.kind === "positive")
+        this.drawPositive(ctx, cell, dpr, r.cell, animate);
+      else this.drawNegative(ctx, cell, dpr, r.cell, r.rank, animate);
     }
 
     // Snake — the matrix-rain GLYPH stream (glyph mode) follows the body in one
@@ -1829,10 +1770,9 @@ export class SnakeEngine {
       SNAKE_REF_DIM
     );
 
-    // Explosion chips (a penalty "ouch" grab, or the lethal red-body death) draw on
-    // top of the snake. Only ever non-empty when a penalty/red was eaten and motion
-    // is allowed (the engine gates seeding on the `animate` flag → reduced motion =
-    // no burst).
+    // Red-spark chips (a NEGATIVE "ouch" grab or the KILLER death) draw on top of the
+    // snake. Only ever non-empty when a negative/killer was eaten and motion is
+    // allowed (the engine gates seeding on `animate` → reduced motion = no burst).
     this.drawExplosion(ctx, cell);
   }
 }

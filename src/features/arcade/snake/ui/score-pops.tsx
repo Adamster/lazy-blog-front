@@ -22,9 +22,9 @@ const RISE_PX = 22;
  * animation end (no timers to leak).
  *
  * It watches the live `score` for any real CHANGE: each jump spawns one float
- * carrying the SIGNED delta (`score - prev`). A GAIN reads `+N` in the lime
- * accent (white +10, gold-ears +20, gold +50); a PENALTY reads `−N` in the error
- * red (laugher −10, red-ears −20, red −50) — the color reinforces the hit. The
+ * carrying the SIGNED delta (`score - prev`). A GAIN reads `+N` in the lime accent
+ * (the green positive rabbit, +10/+20/+30/+50); a PENALTY reads `−N` in the error
+ * red (a negative rabbit, −10/−20/−30/−50) — the color reinforces the hit. The
  * parent mounts this ONLY while the run is live ("playing") and UNMOUNTS it the
  * moment the run ends, so the restart's score RESET (N → 0) lands while this is
  * unmounted and a fresh run remounts with `prevRef` re-seeded to 0 — no spurious

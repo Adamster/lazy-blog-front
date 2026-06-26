@@ -1,11 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { Spinner } from "@/shared/ui";
 import { BOARD_SIZE } from "../model/leaderboard";
 import type { RankedRow } from "../model/types";
 
-/** One leaderboard line. YOU rows read in accent (no wash); empty padding slots
- *  are fully muted. */
+/** One leaderboard line. The viewer's own row reads in accent (no wash); empty
+ *  padding slots are fully muted. OTHER players' `@handle`s link to their profile
+ *  (hover reveals accent); the viewer's own row stays plain text (the header
+ *  already links to your own profile) and the `··` placeholders aren't links. */
 function BoardRow({ row }: { row: RankedRow }) {
   const accent = !!row.you;
   const empty = !!row.empty;
@@ -24,7 +27,16 @@ function BoardRow({ row }: { row: RankedRow }) {
         className="overflow-hidden text-[12px] text-ellipsis whitespace-nowrap"
         style={{ color: textColor }}
       >
-        {row.you ? "YOU" : row.name}
+        {row.userName && !row.you ? (
+          <Link
+            href={`/${row.userName}`}
+            className="transition-colors hover:text-[var(--m-accent)]"
+          >
+            {row.name}
+          </Link>
+        ) : (
+          row.name
+        )}
       </span>
       <span
         className="font-display text-[14px] font-bold tabular-nums"
@@ -40,7 +52,7 @@ function BoardRow({ row }: { row: RankedRow }) {
  * The high-score panel — a `// HIGH SCORES` header + `TOP N` count + the ranked
  * rows, borderless and flush to the rail edge. The board is the cross-user
  * backend leaderboard (`useSnakeLeaderboard` → padded to {@link BOARD_SIZE} by
- * `rankApiBoard`); the viewer's own row renders in accent as `YOU`. While the
+ * `rankApiBoard`); the viewer's own row renders its `@handle` in accent. While the
  * query first loads (no data yet), the app's standard spinner shows instead of
  * the 0/·· placeholders.
  */

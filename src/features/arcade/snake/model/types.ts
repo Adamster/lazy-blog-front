@@ -21,6 +21,8 @@ export interface ScoreRow {
   name: string;
   score: number;
   you?: boolean;
+  /** Raw handle (no `@`) for the profile link; absent on padding placeholders. */
+  userName?: string;
 }
 
 /** One recent-runs sparkline bucket: a run's order label + its final score. */

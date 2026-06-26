@@ -33,6 +33,37 @@ export const useTheme = () => {
   return context;
 };
 
+/** Read the theme already applied to `<html>` (the pre-paint inline script +
+ *  `ThemeProvider` both set the `.dark`/`.neo` classes). SSR-safe: `"light"`
+ *  when there's no document. */
+function readAppliedTheme(): Theme {
+  if (typeof document === "undefined") return "light";
+  const html = document.documentElement;
+  return html.classList.contains("neo")
+    ? "neo"
+    : html.classList.contains("dark")
+      ? "dark"
+      : "light";
+}
+
+/**
+ * Like {@link useTheme} but NEVER throws — for fallback UIs that can render
+ * ABOVE or OUTSIDE the `ThemeProvider` (the root `ErrorBoundary` fallback, which
+ * sits above the provider). Returns the provider value when present, else reads
+ * the theme straight off `<html>` so the copy still matches the active theme.
+ */
+export const useThemeSafe = (): Pick<
+  ThemeContextType,
+  "theme" | "isDarkTheme"
+> => {
+  const context = useContext(ThemeContext);
+  if (context) {
+    return { theme: context.theme, isDarkTheme: context.isDarkTheme };
+  }
+  const theme = readAppliedTheme();
+  return { theme, isDarkTheme: theme !== "light" };
+};
+
 /**
  * Apply the theme to `<html>` — the single source the CSS tokens key off:
  * `data-theme` (completeness) + the `.dark` / `.neo` classes. light = neither;
