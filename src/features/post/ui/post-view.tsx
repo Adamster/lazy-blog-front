@@ -87,7 +87,10 @@ function PostByline({
           <Metric kind="views" value={post.views ?? 0} />
           {/* Comment count is a slotted client island (live query) — hand-rolled
               to match the Metric primitive (gap-1 icon→number, size-3.5 icon). */}
-          <span className="inline-flex items-center gap-1 tabular-nums">
+          <span
+            className="inline-flex items-center gap-1 tabular-nums"
+            aria-label="Comments"
+          >
             <ChatBubbleLeftIcon className="size-3.5 shrink-0" />
             {commentsCount}
           </span>

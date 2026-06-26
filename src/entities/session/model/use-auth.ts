@@ -106,7 +106,12 @@ export const useAuthActions = () => {
   // old `async`/`Promise<void>` signature was misleading — there's nothing to
   // await.
   const loginWithGoogle = () => {
-    const returnUrl = `${window.location.origin}/api/auth/external-callback`;
+    // The browser LANDS here after the Google round-trip, so it must be the
+    // FRONTEND page (`/auth/external-callback`) — which then fetches the backend
+    // `/api/auth/external-callback` to exchange the first-party external cookie
+    // for our tokens. Do NOT point this at `/api/...` (the backend endpoint):
+    // the browser would land on raw JSON instead of the page that finishes login.
+    const returnUrl = `${window.location.origin}/auth/external-callback`;
 
     const loginUrl =
       `${window.location.origin}/api/auth/Google/login?` +

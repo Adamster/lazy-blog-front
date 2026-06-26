@@ -1,11 +1,8 @@
 "use client";
 
-import {
-  HeartIcon,
-  ArrowUpIcon,
-  ArrowDownIcon,
-} from "@heroicons/react/24/solid";
+import { HeartIcon, StarIcon } from "@heroicons/react/24/solid";
 import { VoteDirection } from "@/shared/api/openapi";
+import { BrokenHeartIcon } from "@/shared/ui";
 import { useVotePost } from "../model/use-vote-post";
 
 interface IProps {
@@ -25,23 +22,6 @@ interface IProps {
 }
 
 const fmt = (n: number) => n.toLocaleString("ru-RU");
-
-// Broken-heart (dislike) glyph — matches the design's stroke svg.
-const BrokenHeartIcon = ({ className }: { className?: string }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.8}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-    aria-hidden
-  >
-    <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.572a5 5 0 1 1 7.5 6.572" />
-    <path d="M12 6l-2 4l3 3l-2 4" />
-  </svg>
-);
 
 // Smooth Catmull-Rom curve through the rating series, baseline at 0. Mirrors the
 // design's inline math (viewBox 0..100 × 0..52, baseline at y=26) so negatives
@@ -211,17 +191,11 @@ export const PostVote = ({
             />
           </div>
           <div className={subRowCls}>
-            {net < 0 ? (
-              <ArrowDownIcon
-                className="size-3.5 shrink-0"
-                style={{ color: netColor }}
-              />
-            ) : (
-              <ArrowUpIcon
-                className="size-3.5 shrink-0"
-                style={{ color: netColor }}
-              />
-            )}
+            <StarIcon
+              aria-hidden
+              className="size-3.5 shrink-0"
+              style={{ color: netColor }}
+            />
             net rating
             <span
               className="font-semibold tabular-nums"

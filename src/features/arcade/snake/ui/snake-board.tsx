@@ -103,7 +103,7 @@ export function SnakeBoard({ api }: { api: SnakeGameApi }) {
       <div className="mono-scope relative aspect-[30/18] w-full bg-[var(--m-bg)]">
         <canvas
           ref={canvasRef}
-          aria-label="Snake game board. Use arrow keys or W A S D to steer, Space to pause."
+          aria-label="Snake game board. Use the arrow keys to steer, Space to pause."
           role="img"
           className="block size-full [image-rendering:pixelated]"
         />

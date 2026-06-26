@@ -3,8 +3,7 @@ import {
   EyeIcon,
   DocumentTextIcon,
   ChatBubbleLeftIcon,
-  ArrowUpIcon,
-  ArrowDownIcon,
+  StarIcon,
 } from "@heroicons/react/24/solid";
 
 /** Locale number formatting shared by every mono metric/count. */
@@ -22,41 +21,20 @@ type MetricKind = keyof typeof ICONS | "rating";
 interface MetricProps {
   kind: MetricKind;
   value: number;
-  /**
-   * Tint the metric with the accent color (e.g. an up-voted post's likes).
-   * Ignored by `rating`, whose colour is sign-driven.
-   */
+  /** Tint the metric with the accent color (e.g. an up-voted post's likes). */
   accent?: boolean;
 }
 
 /**
  * Icon + number metric (likes / views / posts / comments / rating) used in feed
  * cards, list rows, the hero byline and profile stats. `rating` is the
- * net-rating variant — an up/down arrow whose colour follows the value's sign:
- * accent (positive) / error (negative) / muted (zero), so a zero rating reads
- * neutral and a negative one reads red rather than wearing a misleading heart.
+ * net-rating variant: a neutral STAR followed by the net value as-is — the icon
+ * never changes with sign, the NUMBER carries the +/- (a negative net reads e.g.
+ * `★ -2`). The whole row keeps the muted meta colour.
  */
 export function Metric({ kind, value, accent = false }: MetricProps) {
-  if (kind === "rating") {
-    const Icon = value < 0 ? ArrowDownIcon : ArrowUpIcon;
-    const color =
-      value > 0
-        ? "var(--m-accent)"
-        : value < 0
-          ? "var(--m-error)"
-          : "var(--m-muted)";
-    return (
-      <span
-        className="inline-flex items-center gap-1 tabular-nums"
-        style={{ color }}
-      >
-        <Icon className="size-3.5 shrink-0" />
-        {fmt(value)}
-      </span>
-    );
-  }
+  const Icon = kind === "rating" ? StarIcon : ICONS[kind];
 
-  const Icon = ICONS[kind];
   return (
     <span
       className={[
@@ -66,7 +44,11 @@ export function Metric({ kind, value, accent = false }: MetricProps) {
         .filter(Boolean)
         .join(" ")}
     >
-      <Icon className="size-3.5 shrink-0" />
+      <Icon
+        aria-label={kind === "rating" ? "Rating" : undefined}
+        role={kind === "rating" ? "img" : undefined}
+        className="size-3.5 shrink-0"
+      />
       {fmt(value)}
     </span>
   );

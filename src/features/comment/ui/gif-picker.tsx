@@ -63,12 +63,13 @@ export function GifPicker({ onPick, kind }: GifPickerProps) {
   });
 
   return (
-    // pb-4 frames the bottom. The horizontal inset (px-4 — matching the tabs) is
-    // applied PER-ELEMENT (search wrapper + grid), NOT on this root, so the
-    // scroll area runs full-width and the brutalist scrollbar sits in its own
+    // pt-4/pb-4 frame the panel (16px top gap from the tabs, matching the emoji
+    // grid + the px-4 side inset). The horizontal inset (px-4 — matching the
+    // tabs) is applied PER-ELEMENT (search wrapper + grid), NOT on this root, so
+    // the scroll area runs full-width and the brutalist scrollbar sits in its own
     // right gutter OUTSIDE the GIF grid (no scrollbar-over-GIF overlap); the
     // search + GIFs still align with the tab text at 16px.
-    <div className="pb-4">
+    <div className="pt-4 pb-4">
       {/* Search — a 36px underline field (no fill), inset px-4 to align with the
           tabs + the GIF grid. */}
       <div className="px-4">
