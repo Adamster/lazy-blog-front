@@ -1,3 +1,5 @@
+import { safeHref } from "@/shared/lib/safe-url";
+
 interface ScanLinkProps {
   /** Link label. */
   children: string;
@@ -19,10 +21,14 @@ export function ScanLink({
   href = "#",
   className = "",
 }: ScanLinkProps) {
-  const external = /^https?:\/\//.test(href);
+  // Gate the user-authored directive href: only a real http/https URL is kept;
+  // anything unsafe (`javascript:`, `data:`, malformed, …) falls back to "#" so
+  // a `:link[x]{javascript:…}` can never render an executable link.
+  const safe = safeHref(href) ?? "#";
+  const external = /^https?:\/\//.test(safe);
   return (
     <a
-      href={href}
+      href={safe}
       className={`mono-scanlink ${className}`}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
     >
