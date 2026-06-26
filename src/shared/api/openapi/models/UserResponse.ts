@@ -32,7 +32,7 @@ export interface UserResponse {
      */
     email?: string;
     /**
-     *
+     * 
      * @type {string}
      * @memberof UserResponse
      */

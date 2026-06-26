@@ -20,7 +20,7 @@ import { mapValues } from '../runtime';
  */
 export interface UpdateUserRequest {
     /**
-     *
+     * 
      * @type {string}
      * @memberof UpdateUserRequest
      */

@@ -26,7 +26,7 @@ export interface UserCommentResponse {
      */
     id: string;
     /**
-     *
+     * 
      * @type {string}
      * @memberof UserCommentResponse
      */

@@ -26,7 +26,7 @@ export interface AuthorPostResponse {
      */
     id?: string;
     /**
-     *
+     * 
      * @type {string}
      * @memberof AuthorPostResponse
      */

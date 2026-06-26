@@ -13,9 +13,7 @@ export const useCreatePost = () => {
 
   return useMutation({
     mutationFn: (data: UpdatePostRequest) =>
-      apiClient.posts.createPost({
-        createPostRequest: { userId: user?.id || "", ...data },
-      }),
+      apiClient.posts.createPost({ createPostRequest: data }),
     onSuccess: (data, variables) => {
       addToastSuccess("Post has been created");
 

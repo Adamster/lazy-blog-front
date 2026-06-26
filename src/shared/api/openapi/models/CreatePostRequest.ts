@@ -39,12 +39,6 @@ export interface CreatePostRequest {
     body: string;
     /**
      * 
-     * @type {string}
-     * @memberof CreatePostRequest
-     */
-    userId: string;
-    /**
-     * 
      * @type {Array<string>}
      * @memberof CreatePostRequest
      */
@@ -76,7 +70,6 @@ export function instanceOfCreatePostRequest(value: object): value is CreatePostR
     if (!('title' in value) || value['title'] === undefined) return false;
     if (!('summary' in value) || value['summary'] === undefined) return false;
     if (!('body' in value) || value['body'] === undefined) return false;
-    if (!('userId' in value) || value['userId'] === undefined) return false;
     if (!('tags' in value) || value['tags'] === undefined) return false;
     if (!('coverUrl' in value) || value['coverUrl'] === undefined) return false;
     return true;
@@ -95,7 +88,6 @@ export function CreatePostRequestFromJSONTyped(json: any, ignoreDiscriminator: b
         'title': json['title'],
         'summary': json['summary'],
         'body': json['body'],
-        'userId': json['userId'],
         'tags': json['tags'] == null ? null : json['tags'],
         'coverUrl': json['coverUrl'],
         'isCoverDisplayed': json['isCoverDisplayed'] == null ? undefined : json['isCoverDisplayed'],
@@ -117,7 +109,6 @@ export function CreatePostRequestToJSONTyped(value?: CreatePostRequest | null, i
         'title': value['title'],
         'summary': value['summary'],
         'body': value['body'],
-        'userId': value['userId'],
         'tags': value['tags'],
         'coverUrl': value['coverUrl'],
         'isCoverDisplayed': value['isCoverDisplayed'],

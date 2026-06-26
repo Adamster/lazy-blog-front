@@ -26,7 +26,7 @@ export interface RegisterUserRequest {
      */
     email: string;
     /**
-     *
+     * 
      * @type {string}
      * @memberof RegisterUserRequest
      */
