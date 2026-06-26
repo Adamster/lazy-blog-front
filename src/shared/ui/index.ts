@@ -3,6 +3,7 @@ export { Category } from "./category";
 export { Metric, fmt } from "./metric";
 export { StatusBadge } from "./status-badge";
 export type { Status } from "./status-badge";
+export { BrokenHeartIcon } from "./heart-icons";
 export { Dot } from "./dot";
 export { MatrixText } from "./matrix-text";
 export { Menu } from "./menu";

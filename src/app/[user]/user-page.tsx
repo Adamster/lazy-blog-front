@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { EyeIcon, ArrowUpIcon, ArrowDownIcon } from "@heroicons/react/24/solid";
+import { EyeIcon, StarIcon } from "@heroicons/react/24/solid";
 import { UserResponse } from "@/shared/api/openapi";
 import { useUser } from "@/entities/session";
 import { ErrorMessage } from "@/shared/ui/error-message";
@@ -135,11 +135,7 @@ export default function UserPage({ userName }: { userName: string }) {
                 {fmt(totalKarma)}
               </div>
               <div className="mt-2 flex items-center gap-1.5 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)]">
-                {totalKarma >= 0 ? (
-                  <ArrowUpIcon className="size-3.5" />
-                ) : (
-                  <ArrowDownIcon className="size-3.5" />
-                )}
+                <StarIcon aria-hidden className="size-3.5" />
                 net rating
               </div>
             </div>

@@ -593,7 +593,7 @@ export function ComponentsTab() {
         <Section
           index="10"
           title="STATUSES · METADATA"
-          intro="Metric (icon + tabular number, each kind) and the Sparkline (monthly series). One caption size — 12px; icons 14px; one colour — muted (except the rating kind, which is sign-coloured: ↑ accent / ↓ error / muted at 0). Byline rule: the @handle is the profile link (+ the avatar), the name is plain text; handle is muted everywhere with a muted→accent hover (never underline). Only the profile-page header @handle is accent."
+          intro="Metric (icon + tabular number, each kind) and the Sparkline (monthly series). One caption size — 12px; icons 14px; one colour — muted (the rating kind is a neutral STAR + the net value — the star never changes with sign, the number carries the +/-, the row stays muted). Byline rule: the @handle is the profile link (+ the avatar), the name is plain text; handle is muted everywhere with a muted→accent hover (never underline). Only the profile-page header @handle is accent."
         >
           <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
             <Panel caption="// METRIC — every kind">
@@ -612,7 +612,7 @@ export function ComponentsTab() {
                     <Metric kind="views" value={18241} />
                   </div>
                 </State>
-                <State caption="rating — sign-coloured (↑ accent / ↓ error / 0 muted)">
+                <State caption="rating — star + net value (neutral star, number carries the sign)">
                   <div className="flex flex-wrap items-center gap-4 text-[12px] text-[var(--m-muted)]">
                     <Metric kind="rating" value={42} />
                     <Metric kind="rating" value={-7} />
