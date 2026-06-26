@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { apiClient } from "@/shared/api/api-client";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { useUser } from "@/entities/session";
@@ -27,7 +25,7 @@ export const useDeletePost = () => {
       router.push(`/${user?.userName}`);
     },
 
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       addToastError("Error deleting post", error);
     },
   });

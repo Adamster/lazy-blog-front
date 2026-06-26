@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiClient } from "@/shared/api/api-client";
 import { UpdatePostRequest } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
@@ -29,7 +28,7 @@ export const useCreatePost = () => {
         router.push(`/${user?.userName}/${data.slug}/edit`);
       }
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       addToastError("Error adding post", error);
     },
   });

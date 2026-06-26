@@ -13,7 +13,7 @@ export const useIncrementViewPost = (
   const { user } = useUser();
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
+  const { mutate } = useMutation({
     mutationFn: () => apiClient.posts.incrementViewCount({ id: postId }),
     onSuccess: () => {
       // Reflect THIS view on the open post page right away...
@@ -41,10 +41,13 @@ export const useIncrementViewPost = (
     }
 
     const timeout = setTimeout(() => {
-      mutation.mutate();
+      mutate();
       sessionStorage.setItem(`hasViewed-${postId}`, "true");
     }, 3000);
 
     return () => clearTimeout(timeout);
-  }, [postId, postAuthorId, user?.id, mutation]);
+    // `mutate` is referentially stable across renders (React Query), so the 3s
+    // timer is no longer reset on every re-render the way the whole `mutation`
+    // object would have forced.
+  }, [postId, postAuthorId, user?.id, mutate]);
 };
