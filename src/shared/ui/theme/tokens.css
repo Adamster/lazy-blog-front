@@ -1,0 +1,101 @@
+/* Expose the Space Grotesk display font as a Tailwind utility (`font-display`). */
+@theme inline {
+  --font-display: var(--font-display);
+}
+
+/* Fixed header bar height — the SINGLE source for the bar (`h-[var(--m-header-h)]`),
+   its clearance (`pt-[var(--m-header-h)]` on the layout main) and the below-header
+   min-height utility below. */
+:root {
+  --m-header-h: 4rem;
+
+  /* Layering scale — ONE source for every fixed/portaled overlay so they stack
+     predictably: content < dropdown < header < modal < fullscreen-rain < toast.
+     The fullscreen matrix rain is a full takeover above modals but under toasts
+     so the konami unlock toast still reads.
+     - content  = in-flow lift over sibling content within a card/section
+       (cover/draft overlay, an avatar's delete affordance, a floating label).
+     - dropdown = page-level popovers/menus that must clear sibling content but
+       stay UNDER the fixed header (Select listbox, Menu row, the comment
+       emoji/GIF picker, the editor FX hint).
+     EXEMPT (intentionally NOT tokenized): purely component-internal stacking
+     contexts that order siblings WITHIN a single component and never compete
+     with the global overlays — e.g. `.mono-datamosh-main` (z 1) and
+     `.mono-compare-handle` (z 2). Those stay raw low integers. */
+  --m-z-content: 10;
+  --m-z-dropdown: 40;
+  --m-z-header: 50;
+  --m-z-modal: 60;
+  --m-z-rain: 65;
+  --m-z-toast: 70;
+}
+
+/* "Brutalist Mono" (variant B) palette — light by default, dark via the theme
+   provider's `.dark` class. Components reference these via var(--m-*).
+   `.mono-portal` mirrors the tokens for HeroUI overlays (Dropdown, etc.) that
+   render in a body-level portal outside `.mono-scope`. */
+.mono-scope,
+.mono-portal {
+  /* Design-system scope root is JetBrains Mono (data / labels / body); titles
+     opt into Space Grotesk via `font-display`. Mirrors the design file's root
+     and the per-page inline fallback, and — crucially — gives portaled overlays
+     (auth modal, dropdowns) the mono font so `// LABEL` tracking reads right
+     instead of inheriting the body `var(--font-sans)`. */
+  font-family: var(--font-mono);
+  --m-bg: #f4f4f4;
+  --m-fg: #161616;
+  --m-accent: #4d7c0f;
+  --m-line: #161616;
+  --m-panel: #e4e4e4;
+  --m-card: #eaeaea;
+  --m-muted: #6b6b6b;
+  --m-muted2: #8c8c8c;
+  --m-dim: #d6d6d6;
+  --m-error: #b91c1c;
+}
+/* `.dark` now lives on <html> (layout inline script + ThemeProvider), so this
+   reaches page scopes AND body-level portals (toasts, modals) alike.
+   `--m-card`/`--m-panel` are TRANSLUCENT (the dark #232323 / #2a2a2a at 0.70
+   alpha): composited over the opaque `--m-bg #141414` they read a touch DARKER
+   than a solid fill (~#1e1e1e / ~#232323), so every card/band sinks INTO the
+   canvas instead of sitting on top of it — the look that already shipped in neo,
+   now the baseline for dark too. `--m-bg` stays opaque (the dropdown console +
+   modals use `bg-[var(--m-bg)]`, so they stay fully solid); overlays reset to
+   solid below. neo (whose <html> also carries `.dark`) inherits all of this and
+   only adds the rain bleed. */
+.dark .mono-scope,
+.dark .mono-portal {
+  --m-bg: #141414;
+  --m-fg: #dcdcdc;
+  --m-accent: #cdff48;
+  --m-line: #e6e6e6;
+  --m-panel: rgba(42, 42, 42, 0.7);
+  --m-card: rgba(35, 35, 35, 0.7);
+  --m-muted: #9a9a9a;
+  --m-muted2: #7a7a7a;
+  --m-dim: #383838;
+  --m-error: #ff6b6b;
+}
+
+/* …but OVERLAYS must stay OPAQUE — dropdowns/menus (`role="menu"`), selects
+   (`role="listbox"`) and the editor (`.milkdown` — toolbar + popovers read
+   `--m-card`/`--m-panel` directly or via `--crepe-color-surface`). Content
+   scrolls behind them, so the translucency turns their text unreadable. Reset
+   the surface tokens to their SOLID dark values. Applies to dark AND neo (neo's
+   <html> also carries `.dark`). */
+html.dark [role="menu"],
+html.dark [role="listbox"],
+html.dark .milkdown {
+  --m-card: #232323;
+  --m-panel: #2a2a2a;
+}
+
+/* neo — the third theme ("Matrix"). It is the dark theme PLUS the rain: neo
+   always boots `.dark` + `.neo` (set pre-paint), so it inherits the dark tokens
+   above (incl. the translucent card/panel) and only drops the page-root bg to
+   transparent so the fixed Matrix-rain drape bleeds through the whole canvas.
+   The header wrapper is also a `.mono-scope` but carries no bg, so that's a
+   no-op there. */
+html.neo .mono-scope {
+  background-color: transparent;
+}
