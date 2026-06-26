@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ProtectedRoute } from "@/entities/session";
 import { useTheme } from "@/shared/providers/theme-providers";
-import { GlitchText } from "@/shared/ui";
+import { GlitchText } from "@/shared/ui/effects";
 import {
   ArcadeHeader,
   SnakeBoard,

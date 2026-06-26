@@ -4,7 +4,7 @@ import { ResponseError } from "@/shared/api/openapi";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useThemeSafe } from "@/shared/providers/theme-providers";
-import { GlitchText } from "./glitch-text";
+import { GlitchText } from "@/shared/ui/effects";
 import { Console } from "./console";
 
 /** Narrows the `{ response: { status } }` shape some fetch errors carry. */

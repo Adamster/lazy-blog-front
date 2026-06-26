@@ -10,14 +10,8 @@ import { Loading } from "@/shared/ui/loading";
 import { useAllPosts } from "@/features/post/model/use-all-posts";
 import { useHomeStats } from "@/features/post/model/use-home-stats";
 import { Sparkline, seriesFromMonths } from "@/shared/ui/sparkline";
-import {
-  Label,
-  Category,
-  Metric,
-  StatusBadge,
-  Dot,
-  MatrixText,
-} from "@/shared/ui";
+import { Label, Category, Metric, StatusBadge, Dot } from "@/shared/ui";
+import { MatrixText } from "@/shared/ui/effects";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
 import { PostCard } from "@/features/post/ui/post-card";

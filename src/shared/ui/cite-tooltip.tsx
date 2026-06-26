@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { MatrixText } from "./matrix-text";
+import { MatrixText } from "@/shared/ui/effects";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 
 interface CiteTooltipProps {
