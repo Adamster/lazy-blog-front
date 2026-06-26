@@ -14,7 +14,7 @@ export function ArcadeHeader() {
         <GlitchText>FOLLOW THE WHITE RABBIT</GlitchText>
       </h1>
       <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
-        Steer with arrows or <span className="text-[var(--m-fg)]">WASD</span>.
+        Steer with the <span className="text-[var(--m-fg)]">arrow keys</span>.
         Pausing is also a valid strategy.
       </p>
     </header>

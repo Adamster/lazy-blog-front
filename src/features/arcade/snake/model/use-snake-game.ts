@@ -269,6 +269,12 @@ export function useSnakeGame({
       }
 
       const k = e.key;
+      // WASD is matched on `e.code` (the PHYSICAL key — `KeyW/A/S/D`), NOT
+      // `e.key` (the produced CHARACTER): on a non-Latin layout (Russian, etc.)
+      // `e.key` yields "ц/ф/ы/в", so a `key`-based WASD check silently fails.
+      // `e.code` is layout-independent, so WASD steers on ANY keyboard layout.
+      // Arrows stay on `e.key` (their `key` values are already layout-independent).
+      const c = e.code;
       const isArrow =
         k === "ArrowUp" ||
         k === "ArrowDown" ||
@@ -284,10 +290,10 @@ export function useSnakeGame({
         togglePause();
         return;
       }
-      if (k === "ArrowUp" || k === "w" || k === "W") steer(0, -1);
-      else if (k === "ArrowDown" || k === "s" || k === "S") steer(0, 1);
-      else if (k === "ArrowLeft" || k === "a" || k === "A") steer(-1, 0);
-      else if (k === "ArrowRight" || k === "d" || k === "D") steer(1, 0);
+      if (k === "ArrowUp" || c === "KeyW") steer(0, -1);
+      else if (k === "ArrowDown" || c === "KeyS") steer(0, 1);
+      else if (k === "ArrowLeft" || c === "KeyA") steer(-1, 0);
+      else if (k === "ArrowRight" || c === "KeyD") steer(1, 0);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
