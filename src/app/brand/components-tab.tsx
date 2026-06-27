@@ -39,8 +39,11 @@ import {
   RadioGroup,
   type SelectOption,
 } from "@/shared/ui";
-import { Sparkline, buildMonthlySeries } from "@/shared/ui/sparkline";
-import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
+import {
+  Sparkline,
+  buildMonthlySeries,
+} from "@/shared/ui/data-display/sparkline";
+import ConfirmDeleteModal from "@/shared/ui/overlays/confirmation-modal";
 import { addToastSuccess, addToastError } from "@/shared/lib/toasts";
 import { Section, Panel, State } from "./_helpers";
 

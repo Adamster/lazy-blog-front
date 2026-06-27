@@ -5,13 +5,16 @@ import { motion, useReducedMotion } from "framer-motion";
 import { EyeIcon, StarIcon } from "@heroicons/react/24/solid";
 import { useUser } from "@/entities/session";
 import { ErrorMessage } from "@/shared/ui/error-message";
-import { Loading } from "@/shared/ui/loading";
+import { Loading } from "@/shared/ui/feedback/loading";
 import { usePostsByUserName } from "@/features/post/model/use-posts-by-username";
 import {
   PublicationsFilter,
   type PublicationsView,
 } from "@/features/post/ui/publications-filter";
-import { Sparkline, seriesFromMonths } from "@/shared/ui/sparkline";
+import {
+  Sparkline,
+  seriesFromMonths,
+} from "@/shared/ui/data-display/sparkline";
 import { Label, Avatar, Dot, fmt } from "@/shared/ui";
 import { MatrixText } from "@/shared/ui/effects";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";

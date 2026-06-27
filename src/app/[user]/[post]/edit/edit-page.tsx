@@ -2,8 +2,8 @@
 
 import { PostDetailedResponse, UpdatePostRequest } from "@/shared/api/openapi";
 import { ErrorMessage } from "@/shared/ui/error-message";
-import { Loading } from "@/shared/ui/loading";
-import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
+import { Loading } from "@/shared/ui/feedback/loading";
+import ConfirmDeleteModal from "@/shared/ui/overlays/confirmation-modal";
 import { PostForm } from "@/features/post/ui/post-form";
 import { IsAuthor, ProtectedRoute } from "@/entities/session";
 import { useParams } from "next/navigation";

@@ -8,7 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import CommentForm from "@/features/comment/ui/comment-form";
 import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
-import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
+import ConfirmDeleteModal from "@/shared/ui/overlays/confirmation-modal";
 import { Avatar, Dot, Menu, type MenuItem } from "@/shared/ui";
 import { renderCommentMarkdown } from "@/features/comment/lib/comment-markdown";
 import {

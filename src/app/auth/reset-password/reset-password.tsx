@@ -1,7 +1,7 @@
 "use client";
 
 import { ResetPasswordRequest } from "@/shared/api/openapi";
-import { Loading } from "@/shared/ui/loading";
+import { Loading } from "@/shared/ui/feedback/loading";
 import { addToastError } from "@/shared/lib/toasts";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";

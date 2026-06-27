@@ -4,7 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import { Controller, type UseFormReturn } from "react-hook-form";
 import type { UpdatePostRequest } from "@/shared/api/openapi";
 import { Field, FieldError, type SelectOption } from "@/shared/ui";
-import ConfirmModal from "@/shared/ui/confirmation-modal";
+import ConfirmModal from "@/shared/ui/overlays/confirmation-modal";
 import { useTags } from "@/entities/tag";
 import { ComposerTopBar } from "./composer-top-bar";
 import { CoverCropModal } from "./cover-crop-modal";

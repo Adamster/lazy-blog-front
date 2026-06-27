@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useThemeSafe } from "@/shared/providers/theme-providers";
 import { GlitchText } from "@/shared/ui/effects";
-import { Console } from "./console";
+import { Console } from "./overlays/console";
 
 /** Narrows the `{ response: { status } }` shape some fetch errors carry. */
 const statusOf = (error: unknown): number | undefined => {

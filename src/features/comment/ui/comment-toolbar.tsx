@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useClickOutside } from "react-haiku";
 import { FaceSmileIcon } from "@heroicons/react/24/outline";
-import { ConsoleTitleBar } from "@/shared/ui/console";
+import { ConsoleTitleBar } from "@/shared/ui/overlays/console";
 import { UnderlineTabs } from "@/shared/ui";
 import { GifPicker } from "@/features/comment/ui/gif-picker";
 import { parseGifUrl } from "@/features/comment/lib/comment-gif";

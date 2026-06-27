@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment } from "react";
-import { Dot } from "./dot";
+import { Dot } from "./data-display/dot";
 
 interface MarqueeProps {
   /** The phrases cycled across the band. */
