@@ -1,6 +1,6 @@
 "use client";
 
-import { GlitchText } from "@/shared/ui";
+import { GlitchText } from "@/shared/ui/effects";
 
 /**
  * Arcade page title block — a glitching FOLLOW THE WHITE RABBIT title (our

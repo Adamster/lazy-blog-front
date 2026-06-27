@@ -12,7 +12,8 @@ import {
   type PublicationsView,
 } from "@/features/post/ui/publications-filter";
 import { Sparkline, seriesFromMonths } from "@/shared/ui/sparkline";
-import { Label, MatrixText, Avatar, Dot, fmt } from "@/shared/ui";
+import { Label, Avatar, Dot, fmt } from "@/shared/ui";
+import { MatrixText } from "@/shared/ui/effects";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
 import { PostCard } from "@/features/post/ui/post-card";

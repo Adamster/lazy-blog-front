@@ -2,7 +2,8 @@
 
 import { CommentResponse } from "@/shared/api/openapi";
 import { IsAuth } from "@/entities/session";
-import { Label, MatrixText } from "@/shared/ui";
+import { Label } from "@/shared/ui";
+import { MatrixText } from "@/shared/ui/effects";
 import CommentView from "./comment-view";
 import CommentForm from "@/features/comment/ui/comment-form";
 

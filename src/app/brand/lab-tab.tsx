@@ -9,10 +9,6 @@ import {
 } from "react";
 import {
   ConsoleTitleBar,
-  GlitchText,
-  MatrixRain,
-  MatrixRainOverlay,
-  MatrixText,
   RevealMark,
   Kbd,
   ScanText,
@@ -43,6 +39,12 @@ import {
   WeightWave,
   BootSplash,
 } from "@/shared/ui";
+import {
+  GlitchText,
+  MatrixRain,
+  MatrixRainOverlay,
+  MatrixText,
+} from "@/shared/ui/effects";
 import { Section, Panel, Spec, State } from "./_helpers";
 import { addToastSuccess } from "@/shared/lib/toasts";
 

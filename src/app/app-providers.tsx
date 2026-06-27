@@ -5,7 +5,7 @@ import { ErrorBoundary } from "@/shared/providers/error-boundary";
 import { ReactQueryProvider } from "@/shared/providers/query-provider";
 import { ThemeProvider } from "@/shared/providers/theme-providers";
 import { Toaster } from "@/shared/ui/toaster";
-import { MatrixRain } from "@/shared/ui";
+import { MatrixRain } from "@/shared/ui/effects";
 import { Header } from "@/widgets/header";
 
 export const AppProviders = ({ children }: { children: React.ReactNode }) => {
