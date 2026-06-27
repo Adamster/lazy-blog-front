@@ -8,11 +8,11 @@ import {
   Avatar,
   Category,
   Dot,
-  DraftOverlay,
   Metric,
   PostBody,
   StatusBadge,
 } from "@/shared/ui";
+import { DraftOverlay } from "@/features/post/ui/draft-overlay";
 import type { Status } from "@/shared/ui";
 import { UNTAGGED_LABEL } from "../lib/untagged-label";
 

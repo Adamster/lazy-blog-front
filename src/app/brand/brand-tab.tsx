@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { InfoBox } from "@/shared/ui";
-import { LogoSloth } from "@/shared/ui/logo-sloth";
+import { LogoSloth } from "./logo-sloth";
 import { Section, Panel, Spec } from "./_helpers";
 
 /* ----------------------------- palettes ----------------------------- */
