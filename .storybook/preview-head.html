@@ -1,0 +1,16 @@
+<!-- The app loads its fonts via next/font (CSS vars --font-sans/display/mono).
+     Storybook has no Next, so load the same families from Google Fonts and define
+     those vars here — the design system reads them via var(--font-*). -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Mulish:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  :root {
+    --font-sans: "Mulish", system-ui, sans-serif;
+    --font-display: "Space Grotesk", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+</style>
