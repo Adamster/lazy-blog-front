@@ -34,11 +34,11 @@ import {
   Stepper,
   UnderlineTabs,
   Console,
-  Callout,
   Checkbox,
   RadioGroup,
   type SelectOption,
 } from "@/shared/ui";
+import { Callout } from "@/shared/ui/prose";
 import {
   Sparkline,
   buildMonthlySeries,

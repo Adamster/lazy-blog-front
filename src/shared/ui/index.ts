@@ -13,7 +13,6 @@ export { Select } from "./forms/select";
 export type { SelectOption } from "./forms/select";
 export { Switch } from "./forms/switch";
 export { Avatar } from "./data-display/avatar";
-export { PostBody } from "./post-body";
 export {
   Modal,
   ModalHeader,
@@ -31,8 +30,6 @@ export { UnderlineTabs } from "./navigation/underline-tabs";
 export type { UnderlineTabItem } from "./navigation/underline-tabs";
 export { Console, ConsoleTitleBar } from "./overlays/console";
 export { InfoBox } from "./feedback/info-box";
-export { RevealMark } from "./reveal-mark";
-export { AsciiDivider, Callout } from "./prose-blocks";
 export { Checkbox } from "./forms/checkbox";
 export { RadioGroup } from "./forms/radio";
 export type { RadioOption } from "./forms/radio";

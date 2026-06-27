@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { RevealMark, AsciiDivider } from "@/shared/ui";
+import { RevealMark, AsciiDivider } from "@/shared/ui/prose";
 import {
   GlitchText,
   MatrixRain,
