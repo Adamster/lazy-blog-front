@@ -20,8 +20,8 @@
        emoji/GIF picker, the editor FX hint).
      EXEMPT (intentionally NOT tokenized): purely component-internal stacking
      contexts that order siblings WITHIN a single component and never compete
-     with the global overlays — e.g. `.mono-datamosh-main` (z 1) and
-     `.mono-compare-handle` (z 2). Those stay raw low integers. */
+     with the global overlays — e.g. a component's own internal layer order
+     (a canvas overlay above its grid). Those stay raw low integers. */
   --m-z-content: 10;
   --m-z-dropdown: 40;
   --m-z-header: 50;

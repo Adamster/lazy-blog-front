@@ -410,18 +410,12 @@
     border: 1px dotted var(--m-dim);
     padding: 0 3px;
     cursor: help;
-    // Neutralise the read-view styling of the new inline marks (redact censor
-    // bar, spoiler blur, scan wash, keycap box) so the author always sees the
-    // legible text + the dotted hint frame — never the published effect.
+    // Neutralise the read-view styling of the inline marks (spoiler blur, strike
+    // line) so the author always sees the legible text + the dotted hint frame —
+    // never the published effect.
     background: none;
     filter: none;
 
-    // The redact `::before`-style censor block is on `::after` in the read view;
-    // the framed-hint tooltip owns `::after` here, so the block can't show — but
-    // make the text legible regardless (the read view sets it to `--m-bg`).
-    &.mono-redact {
-      color: inherit;
-    }
     // The strike's read-view line lives on `::after`; the hint tooltip owns
     // `::after` here, so the line can't draw — but reset the muted colour the
     // strike sets so the author reads the normal text + dotted frame.
