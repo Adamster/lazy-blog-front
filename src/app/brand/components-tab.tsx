@@ -24,7 +24,6 @@ import {
   Select,
   Switch,
   Avatar,
-  DraftOverlay,
   Modal,
   ModalHeader,
   SubmitButton,
@@ -46,6 +45,7 @@ import {
 } from "@/shared/ui/data-display/sparkline";
 import ConfirmDeleteModal from "@/shared/ui/overlays/confirmation-modal";
 import { addToastSuccess, addToastError } from "@/shared/lib/toasts";
+import { DraftOverlay } from "@/features/post/ui/draft-overlay";
 import { Section, Panel, State } from "./_helpers";
 
 /* --------------------------- shared button classes --------------------------- */

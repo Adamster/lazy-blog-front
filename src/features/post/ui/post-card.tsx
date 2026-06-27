@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { DisplayPostResponse, UserPostItem } from "@/shared/api/openapi";
-import { Category, Metric, DraftOverlay } from "@/shared/ui";
+import { Category, Metric } from "@/shared/ui";
+import { DraftOverlay } from "@/features/post/ui/draft-overlay";
 import { formatDate2 } from "@/shared/lib/utils";
 import { UNTAGGED_LABEL } from "../lib/untagged-label";
 

@@ -2,6 +2,7 @@
 
 import { useCallback, useId, useMemo, useRef, useState } from "react";
 import { useClickOutside } from "react-haiku";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { FieldError } from "./field-error";
 
 export interface SelectOption {
@@ -192,18 +193,10 @@ export function Select(props: SelectProps) {
         >
           {display ?? placeholder}
         </span>
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
+        <ChevronDownIcon
           aria-hidden="true"
-          className={`shrink-0 text-[var(--m-muted2)] transition-transform ${open ? "rotate-180" : ""}`}
-        >
-          <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+          className={`size-[14px] shrink-0 text-[var(--m-muted2)] transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
 
       {open ? (

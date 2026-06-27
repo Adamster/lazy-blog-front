@@ -1,29 +1,8 @@
 "use client";
 
 import { forwardRef, useId, useState, type ComponentPropsWithRef } from "react";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { FieldError } from "./field-error";
-
-/** Eye / eye-off toggle glyph for password fields. */
-function EyeIcon({ off }: { off: boolean }) {
-  return (
-    <svg
-      width="17"
-      height="17"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      aria-hidden="true"
-    >
-      <path
-        d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"
-        strokeLinejoin="round"
-      />
-      <circle cx="12" cy="12" r="3" />
-      {off ? <path d="M3 3l18 18" strokeLinecap="round" /> : null}
-    </svg>
-  );
-}
 
 type NativeInputProps = Omit<
   ComponentPropsWithRef<"input">,
@@ -110,7 +89,11 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
             tabIndex={-1}
             className="mono-focus absolute right-0 bottom-2 flex p-1 text-[var(--m-muted2)] transition-colors hover:text-[var(--m-accent)]"
           >
-            <EyeIcon off={showPassword} />
+            {showPassword ? (
+              <EyeSlashIcon className="size-[17px]" aria-hidden="true" />
+            ) : (
+              <EyeIcon className="size-[17px]" aria-hidden="true" />
+            )}
           </button>
         ) : null}
       </div>

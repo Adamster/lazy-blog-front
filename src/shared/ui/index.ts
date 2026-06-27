@@ -3,7 +3,6 @@ export { Category } from "./data-display/category";
 export { Metric, fmt } from "./data-display/metric";
 export { StatusBadge } from "./feedback/status-badge";
 export type { Status } from "./feedback/status-badge";
-export { BrokenHeartIcon } from "./heart-icons";
 export { Dot } from "./data-display/dot";
 export { Menu } from "./overlays/menu";
 export type { MenuItem } from "./overlays/menu";
@@ -15,7 +14,6 @@ export type { SelectOption } from "./forms/select";
 export { Switch } from "./forms/switch";
 export { Avatar } from "./data-display/avatar";
 export { PostBody } from "./post-body";
-export { DraftOverlay } from "./draft-overlay";
 export {
   Modal,
   ModalHeader,

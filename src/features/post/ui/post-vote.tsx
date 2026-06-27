@@ -2,7 +2,7 @@
 
 import { HeartIcon, StarIcon } from "@heroicons/react/24/solid";
 import { VoteDirection } from "@/shared/api/openapi";
-import { BrokenHeartIcon } from "@/shared/ui";
+import { BrokenHeartIcon } from "@/features/post/ui/heart-icons";
 import { useVotePost } from "../model/use-vote-post";
 
 interface IProps {
