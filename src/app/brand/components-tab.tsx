@@ -35,6 +35,7 @@ import {
   Stepper,
   UnderlineTabs,
   Console,
+  Callout,
   Checkbox,
   RadioGroup,
   type SelectOption,
@@ -732,6 +733,30 @@ export function ComponentsTab() {
                 </span>
               </p>
             </State>
+          </Panel>
+        </Section>
+
+        {/* 13 — CALLOUT */}
+        <Section
+          index="13"
+          title="CALLOUT — INFO / WARNING BOX"
+          intro="A card-surface info / warning box for the site — a 2px left edge, a // NOTE / // WARN eyebrow over body text (14 / 1.85), square and shadowless on the same left-edge recipe as InfoBox. Two states of one component: note (accent edge) for information, warn (red --m-error edge) for a caution."
+        >
+          <Panel caption="// CALLOUT — note · warn">
+            <div className="flex flex-col gap-7">
+              <State caption="note — information (accent edge)">
+                <Callout type="note">
+                  Drafts never reach the home feed — the unpublished overlay
+                  only ever shows to you.
+                </Callout>
+              </State>
+              <State caption="warn — caution (red edge)">
+                <Callout type="warn">
+                  Deleting a post is permanent. There is no undo, no trash, no
+                  takebacks.
+                </Callout>
+              </State>
+            </div>
           </Panel>
         </Section>
       </div>

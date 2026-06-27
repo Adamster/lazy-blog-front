@@ -2,19 +2,18 @@ import type { ReactNode } from "react";
 
 /* ---------------------------------------------------------------------------
  * Block-level prose effect primitives — the BLOCK directives the post read view
- * routes to (`::divider`, `:::quote`, `:::callout`). All static + server-safe;
- * they reuse the documented prose recipes (hr rhythm, blockquote chrome, info-
- * box) so they read identically to the rest of the article. Shown live in the
- * LAB tab too. Visual treatment lives in `.mono-divider` / `.mono-pullquote` /
- * `.mono-callout` (prose.css), so the editor preview and read view agree.
+ * routes to (`::divider`, `:::callout`). All static + server-safe; they reuse
+ * the documented prose recipes (hr rhythm, info-box) so they read identically to
+ * the rest of the article. Shown live in the LAB tab too. Visual treatment lives
+ * in `.mono-divider` / `.mono-callout` (prose.css), so the editor preview and
+ * read view agree.
  * ------------------------------------------------------------------------- */
 
-type DividerVariant = "dots" | "slash" | "mark";
+type DividerVariant = "dots" | "slash";
 
 const DIVIDER_GLYPHS: Record<DividerVariant, string> = {
   dots: "▪ ▪ ▪",
   slash: "——[ / ]——",
-  mark: "——[ ✕ ]——",
 };
 
 /**
@@ -31,29 +30,6 @@ export function AsciiDivider({
     <div className="mono-divider" role="separator" aria-hidden="true">
       {glyphs}
     </div>
-  );
-}
-
-/**
- * Terminal pull-quote — the blockquote chrome (left 2px `--m-accent`, ~6% accent
- * wash) with the quote text stepped up to H3 18px/600 (the one prose-legal step,
- * NOT an invented size), a `// QUOTE` eyebrow and an optional `— @handle`
- * attribution (12px muted). Static.
- */
-export function PullQuote({
-  children,
-  cite,
-}: {
-  children: ReactNode;
-  /** Attribution handle/name (rendered as `— …`). */
-  cite?: string;
-}) {
-  return (
-    <blockquote className="mono-pullquote">
-      <div className="mono-pullquote-eyebrow">{"// QUOTE"}</div>
-      <div className="mono-pullquote-body">{children}</div>
-      {cite ? <div className="mono-pullquote-cite">— {cite}</div> : null}
-    </blockquote>
   );
 }
 

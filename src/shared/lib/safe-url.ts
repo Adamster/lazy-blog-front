@@ -5,9 +5,8 @@
  * caller can fall back to inert text / `#` instead of an executable link.
  *
  * This is the single source of truth for "is this href safe to render": the
- * in-post `:link[…]{href}` directive (via `ScanLink`) and the comment-body
- * link/autolink renderer both gate on it, so the security posture can't drift
- * between the two UGC surfaces.
+ * comment-body link/autolink renderer gates on it, so the security posture is
+ * consistent wherever UGC links are rendered.
  */
 export function safeHref(raw: string): string | null {
   const trimmed = raw.trim();

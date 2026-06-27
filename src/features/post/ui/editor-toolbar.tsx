@@ -263,18 +263,17 @@ export function EditorToolbar({
   ];
 
   // Inline brand effects — toggle a custom mark on the selection. The Effects ▾
-  // menu offers ONLY the two approved marks (Glitch + Matrix); the other inline
-  // directives (`:redact` / `:spoiler` / `:type` / `:kbd` / `:scan` / `:strike` /
-  // `:wave`) still RENDER in the read view but are no longer authored here
-  // (pulled from the Lab prematurely, pending owner approval). Each approved mark
-  // round-trips through markdown as a remark directive (`:glitch[…]` /
-  // `:matrix[…]`) and renders its full component in the read view.
-  // TODO(block-fx): the BLOCK directives (`::divider`, `:::quote`,
-  // `:::callout`, `:::terminal`) already render in the read view (post-body.tsx
-  // + prose.css), but have NO editor authoring UI yet — Crepe block nodes are
-  // non-trivial plumbing (a node schema + a slash-menu entry each, vs the 1:1
-  // inline-mark pattern these toggles reuse). Author them by typing the raw
-  // directive for now; wire the Crepe nodes in a follow-up.
+  // menu offers ONLY the two approved marks (Glitch + Matrix); the other kept
+  // inline directives (`:spoiler` / `:strike` / `:link`) still RENDER in the read
+  // view but are not surfaced here. Each approved mark round-trips through
+  // markdown as a remark directive (`:glitch[…]` / `:matrix[…]`) and renders its
+  // full component in the read view.
+  // TODO(block-fx): the BLOCK directives (`::divider`, `:::callout`, `:::poll`,
+  // `:::fold`) already render in the read view (post-body.tsx + prose.css), but
+  // have NO editor authoring UI yet — Crepe block nodes are non-trivial plumbing
+  // (a node schema + a slash-menu entry each, vs the 1:1 inline-mark pattern
+  // these toggles reuse). Author them by typing the raw directive for now; wire
+  // the Crepe nodes in a follow-up.
   const effectItems: InsertItem[] = [
     {
       id: "glitch",
