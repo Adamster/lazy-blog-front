@@ -1,7 +1,6 @@
 "use client";
 
 import { ResponseError } from "@/shared/api/openapi";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useThemeSafe } from "@/shared/providers/theme-providers";
 import { GlitchText } from "@/shared/ui/effects";
@@ -116,12 +115,12 @@ export const ErrorMessage = ({
         ) : null}
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link
+          <a
             href="/"
             className={`mono-cta mono-focus inline-flex h-9 items-center justify-center px-4 text-[14px] font-bold tracking-[0.06em]`}
           >
             Go home
-          </Link>
+          </a>
         </div>
       </div>
     </div>

@@ -1,5 +1,13 @@
 # Project rules
 
+## Architecture — Next.js is the SEO head only; everything else is full client
+
+**Next.js serves exactly two roles: (1) the SEO meta head for crawlers & social cards, and (2) the thin routing shell. Nothing else.** Treat the app as a client SPA that happens to be prerendered for its `<head>`.
+
+- **The "head" (the ONLY genuinely server-rendered output):** `generateMetadata` (title · description · `og:image` cover · article-body snippet → meta tags for Google & social-card unfurls), the JSON-LD `Article`, `sitemap.ts`, `feed.xml`, and the meta-only **anonymous** server fetches in the route `page.tsx` files that feed those. That's it.
+- **Everything else is FULL client-side React** — all page content, every component, all data fetching (client components + TanStack Query). Pages render on the client; the server only emits the head. (This is why e.g. the post route renders `PostPageBody` client-side and must NOT server-`notFound()` — see [the draft-preview rule].)
+- **`src/shared/ui` MUST stay framework-agnostic — NO `next/*` bindings.** It's a portable component library (Storybook-able, reusable). Use plain client React instead: **`<img loading="lazy">`** not `next/image` (we run avatars/UGC `unoptimized` anyway), **`<a href>`** not `next/link`, **`React.lazy` + `Suspense`** not `next/dynamic`, plain CSS/`@font-face` not `next/font`. Any `next/*` import that creeps into `shared/ui` is a bug — replace it. (The `app/` / `widgets/` / `features/` layers may still use Next routing — `next/link`, `useRouter` — as the navigation shell; only the head is server-rendered.)
+
 ## Brutalist-Mono design system — ALWAYS follow
 
 The frontend (home / profile / post / auth) uses the "Brutalist Mono" design system. **Apply this on every UI edit and every new feature. Do NOT invent new spacing / size / letter-spacing values — pick from the scale below. If you notice a mismatch while working, flag it and propose the guide-correct value.**
