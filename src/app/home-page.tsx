@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { DisplayPostResponse } from "@/shared/api/openapi";
 import { ErrorMessage } from "@/shared/ui/error-message";
-import { Loading } from "@/shared/ui/loading";
+import { Loading } from "@/shared/ui/feedback/loading";
 import { useAllPosts } from "@/features/post/model/use-all-posts";
 import { useHomeStats } from "@/features/post/model/use-home-stats";
 import { Sparkline, seriesFromMonths } from "@/shared/ui/sparkline";

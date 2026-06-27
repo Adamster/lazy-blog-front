@@ -1,8 +1,8 @@
 export { Label } from "./forms/label";
 export { Category } from "./category";
 export { Metric, fmt } from "./metric";
-export { StatusBadge } from "./status-badge";
-export type { Status } from "./status-badge";
+export { StatusBadge } from "./feedback/status-badge";
+export type { Status } from "./feedback/status-badge";
 export { BrokenHeartIcon } from "./heart-icons";
 export { Dot } from "./dot";
 export { Menu } from "./overlays/menu";
@@ -23,8 +23,8 @@ export {
   useModalTitleId,
 } from "./overlays/modal";
 export { IconSubmitButton } from "./forms/icon-submit-button";
-export { Loading, Spinner } from "./loading";
-export { ProgressBar } from "./progress-bar";
+export { Loading, Spinner } from "./feedback/loading";
+export { ProgressBar } from "./feedback/progress-bar";
 export { StatBar } from "./stat-bar";
 export { Stepper } from "./stepper";
 export { TabNav } from "./tab-nav";
@@ -32,7 +32,7 @@ export type { TabItem } from "./tab-nav";
 export { UnderlineTabs } from "./underline-tabs";
 export type { UnderlineTabItem } from "./underline-tabs";
 export { Console, ConsoleTitleBar } from "./overlays/console";
-export { InfoBox } from "./info-box";
+export { InfoBox } from "./feedback/info-box";
 export { RevealMark } from "./reveal-mark";
 export { Kbd } from "./kbd";
 export { ScanText } from "./scan-text";

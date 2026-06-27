@@ -8,7 +8,7 @@ import { ProfileIdentityForm } from "@/features/user/ui/profile-identity-form";
 import { ProfileSecurityForm } from "@/features/user/ui/profile-security-form";
 import { ProfileSecurityIntro } from "@/features/user/ui/profile-security-intro";
 import type { ProfileTab } from "@/features/user/ui/profile-tabs";
-import { Loading } from "@/shared/ui/loading";
+import { Loading } from "@/shared/ui/feedback/loading";
 
 /**
  * Edit-profile screen — the composer's visual language re-dressed for settings.

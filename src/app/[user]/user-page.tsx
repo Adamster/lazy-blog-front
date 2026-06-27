@@ -5,7 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { EyeIcon, StarIcon } from "@heroicons/react/24/solid";
 import { useUser } from "@/entities/session";
 import { ErrorMessage } from "@/shared/ui/error-message";
-import { Loading } from "@/shared/ui/loading";
+import { Loading } from "@/shared/ui/feedback/loading";
 import { usePostsByUserName } from "@/features/post/model/use-posts-by-username";
 import {
   PublicationsFilter,
