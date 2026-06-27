@@ -98,6 +98,32 @@ const fsdBoundaries = {
   },
 };
 
+/**
+ * `src/shared/ui` is a framework-agnostic component library (Storybook-able,
+ * reusable) — it must NOT bind to Next.js (CLAUDE.md: "Next.js is the SEO head
+ * only; everything else is full client"). Ban every `next/*` import here, and
+ * turn off the Next lint rule that pushes `<Link>` onto a plain `<a>` (the lib
+ * uses plain `<a>` / `<img>` / `React.lazy` instead of next/link/image/dynamic).
+ */
+const sharedUiNextFree = {
+  files: ["src/shared/ui/**/*.{ts,tsx}"],
+  rules: {
+    "no-restricted-imports": [
+      "error",
+      {
+        patterns: [
+          {
+            group: ["next/*"],
+            message:
+              "shared/ui must stay framework-agnostic — no next/* imports. Use <img>/<a>/React.lazy/CSS instead (CLAUDE.md: Next.js is the SEO head only).",
+          },
+        ],
+      },
+    ],
+    "@next/next/no-html-link-for-pages": "off",
+  },
+};
+
 const eslintConfig = [
   {
     ignores: [".next/**", "out/**", "build/**", "next-env.d.ts"],
@@ -105,6 +131,7 @@ const eslintConfig = [
   ...coreWebVitals,
   ...typescript,
   fsdBoundaries,
+  sharedUiNextFree,
 ];
 
 export default eslintConfig;
