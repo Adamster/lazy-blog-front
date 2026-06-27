@@ -1,10 +1,10 @@
 export { Label } from "./forms/label";
-export { Category } from "./category";
-export { Metric, fmt } from "./metric";
+export { Category } from "./data-display/category";
+export { Metric, fmt } from "./data-display/metric";
 export { StatusBadge } from "./feedback/status-badge";
 export type { Status } from "./feedback/status-badge";
 export { BrokenHeartIcon } from "./heart-icons";
-export { Dot } from "./dot";
+export { Dot } from "./data-display/dot";
 export { Menu } from "./overlays/menu";
 export type { MenuItem } from "./overlays/menu";
 export { Field } from "./forms/field";
@@ -13,7 +13,7 @@ export { Textarea } from "./forms/textarea";
 export { Select } from "./forms/select";
 export type { SelectOption } from "./forms/select";
 export { Switch } from "./forms/switch";
-export { Avatar } from "./avatar";
+export { Avatar } from "./data-display/avatar";
 export { PostBody } from "./post-body";
 export { DraftOverlay } from "./draft-overlay";
 export {
@@ -25,7 +25,7 @@ export {
 export { IconSubmitButton } from "./forms/icon-submit-button";
 export { Loading, Spinner } from "./feedback/loading";
 export { ProgressBar } from "./feedback/progress-bar";
-export { StatBar } from "./stat-bar";
+export { StatBar } from "./data-display/stat-bar";
 export { Stepper } from "./navigation/stepper";
 export { TabNav } from "./navigation/tab-nav";
 export type { TabItem } from "./navigation/tab-nav";

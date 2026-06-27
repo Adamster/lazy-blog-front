@@ -11,7 +11,10 @@ import {
   PublicationsFilter,
   type PublicationsView,
 } from "@/features/post/ui/publications-filter";
-import { Sparkline, seriesFromMonths } from "@/shared/ui/sparkline";
+import {
+  Sparkline,
+  seriesFromMonths,
+} from "@/shared/ui/data-display/sparkline";
 import { Label, Avatar, Dot, fmt } from "@/shared/ui";
 import { MatrixText } from "@/shared/ui/effects";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
