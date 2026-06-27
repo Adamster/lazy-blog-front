@@ -4,14 +4,8 @@ import Link from "next/link";
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/solid";
 import { PostDetailedResponse } from "@/shared/api/openapi";
 import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
-import {
-  Avatar,
-  Category,
-  Dot,
-  Metric,
-  PostBody,
-  StatusBadge,
-} from "@/shared/ui";
+import { Avatar, Category, Dot, Metric, StatusBadge } from "@/shared/ui";
+import { PostBody } from "@/shared/ui/prose";
 import { DraftOverlay } from "@/features/post/ui/draft-overlay";
 import type { Status } from "@/shared/ui";
 import { UNTAGGED_LABEL } from "../lib/untagged-label";
