@@ -1,4 +1,3 @@
-import { notFound } from "next/navigation";
 import { generateMeta } from "@/shared/lib/head/meta-data";
 import { JsonLd } from "@/shared/lib/head/json-ld";
 import { getPostMeta } from "@/features/post/model/get-post-meta";
@@ -34,21 +33,24 @@ export default async function Page({ params }: PageProps) {
   const { user, post: slug } = await params;
 
   // META-ONLY server fetch (title / OG / JSON-LD), uncached — the page BODY
-  // loads client-side (authenticated), so vote state and view counts are live
-  // with no SSR/ISR staleness. A missing slug still returns a real 404.
+  // loads client-side AUTHENTICATED (PostPageBody), so the AUTHOR can preview
+  // their own unpublished draft and vote/view state stays live. This fetch is
+  // ANONYMOUS, so a draft (or a not-yet-visible post) comes back null — we must
+  // NOT notFound() on it, or we'd 404 the authenticated owner too. Access control
+  // lives in the client fetch: a non-owner / missing slug gets a client-side
+  // "Not Found" from PostPageBody. The JSON-LD below is gated to PUBLISHED, so a
+  // draft's body never leaks to crawlers (generateMetadata is guarded the same way).
   const postData = await getPostMeta(slug);
-  // Treat a draft exactly like a missing post for anonymous SSR: no 404-able
-  // route to a draft, and the public JSON-LD `articleBody` below never leaks.
-  if (!postData || !postData.isPublished) notFound();
-
-  const url = `/${postData.author.userName ?? user}/${postData.slug}`;
+  const url = `/${postData?.author.userName ?? user}/${postData?.slug ?? slug}`;
 
   return (
     <div
       className="mono-scope min-h-app mx-[calc(50%-50vw)] w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <JsonLd data={buildPostJsonLd(postData, url)} />
+      {postData?.isPublished && (
+        <JsonLd data={buildPostJsonLd(postData, url)} />
+      )}
       <PostPageBody slug={slug} />
     </div>
   );
