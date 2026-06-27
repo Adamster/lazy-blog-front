@@ -2,7 +2,7 @@
 
 import type { ComponentType } from "react";
 import { RocketLaunchIcon } from "@heroicons/react/24/solid";
-import { Spinner } from "./loading";
+import { Spinner } from "@/shared/ui/loading";
 
 /**
  * Icon-only primary submit — the composer-Publish pattern, generalised. A 36px
