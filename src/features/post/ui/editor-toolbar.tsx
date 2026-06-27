@@ -33,6 +33,7 @@ import {
   BoltIcon,
   CommandLineIcon,
   SwatchIcon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import { toggleSmallCommand } from "./editor-small-mark";
 import {
@@ -151,18 +152,10 @@ function ToolbarMenu({
         className={`mono-focus flex h-9 flex-none items-center gap-0.5 px-2 text-[var(--m-muted)] transition-colors hover:bg-[var(--m-panel)] hover:text-[var(--m-accent)] disabled:opacity-50`}
       >
         <Icon className="size-[18px]" />
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
+        <ChevronDownIcon
           aria-hidden="true"
-          className={`shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
-        >
-          <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+          className={`size-3 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
 
       {open ? (

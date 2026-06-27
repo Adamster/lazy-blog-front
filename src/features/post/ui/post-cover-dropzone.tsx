@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import { TrashIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, PhotoIcon } from "@heroicons/react/24/outline";
 
 /** Diagonal film-hatch fill — the empty drop-zone + the letterbox behind a
  *  centered 16:9 cover when the column is taller than the image. */
@@ -16,26 +16,6 @@ interface PostCoverDropzoneProps {
   onPick: (file: File) => void;
   /** Clear the cover (no modal). */
   onRemove: () => void;
-}
-
-/** Empty-state cloud-upload glyph. */
-function UploadGlyph() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1}
-      aria-hidden="true"
-      className="size-10 text-[var(--m-muted2)]"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 18h16.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"
-      />
-    </svg>
-  );
 }
 
 /**
@@ -95,7 +75,10 @@ export function PostCoverDropzone({
           </>
         ) : (
           <span className="flex flex-col items-center gap-3.5">
-            <UploadGlyph />
+            <PhotoIcon
+              className="size-10 text-[var(--m-muted2)]"
+              aria-hidden="true"
+            />
             <span className="text-center">
               <span className="mb-2 block text-[11px] tracking-[0.12em] text-[var(--m-muted2)]">
                 DROP COVER IMAGE
