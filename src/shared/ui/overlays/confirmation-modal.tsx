@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, useModalTitleId } from "@/shared/ui";
+import { Modal, useModalTitleId } from "./modal";
 
 interface ConfirmModalProps {
   /** 32px headline question, e.g. "Delete post?". */

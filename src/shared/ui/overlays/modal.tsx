@@ -9,7 +9,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useIsMounted } from "@/shared/lib/use-is-mounted";
-import { Spinner } from "./loading";
+import { Spinner } from "@/shared/ui/loading";
 
 const FOCUSABLE =
   'a[href],area[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"]),[contenteditable="true"]';

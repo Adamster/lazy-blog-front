@@ -9,7 +9,7 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import { Menu, type MenuItem } from "@/shared/ui";
-import ConfirmDeleteModal from "@/shared/ui/confirmation-modal";
+import ConfirmDeleteModal from "@/shared/ui/overlays/confirmation-modal";
 import { usePublishPost, useHidePost } from "../model/use-publish-post";
 import { useDeletePostMenu } from "../model/use-delete-post-menu";
 

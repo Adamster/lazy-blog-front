@@ -2,7 +2,7 @@
 
 import { useInViewOnce } from "@/shared/lib/use-in-view";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
-import { ConsoleTitleBar } from "./console";
+import { ConsoleTitleBar } from "./overlays/console";
 
 /** Prompt + output line of a transcript, mapped to the LAB tone palette. */
 export interface TranscriptLine {

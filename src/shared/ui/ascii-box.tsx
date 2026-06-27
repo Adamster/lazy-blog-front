@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useInViewOnce } from "@/shared/lib/use-in-view";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
-import { ConsoleTitleBar } from "./console";
+import { ConsoleTitleBar } from "./overlays/console";
 
 /** The FSD stack diagram, drawn with box-draw glyphs. Accent lines marked `*`. */
 const DIAGRAM: string[] = [

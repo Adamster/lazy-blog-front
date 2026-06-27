@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useInViewOnce } from "@/shared/lib/use-in-view";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
-import { ConsoleTitleBar } from "./console";
+import { ConsoleTitleBar } from "./overlays/console";
 
 const BOOT: string[] = [
   "NOT LAZY BIOS v2.0 — (c) sloth systems",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { ConsoleTitleBar } from "./console";
+import { ConsoleTitleBar } from "./overlays/console";
 
 /** Density ramp, dense → sparse (dark pixel = dense glyph). */
 const RAMP = "@%#*+=-:. ";

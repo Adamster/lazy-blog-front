@@ -5,8 +5,8 @@ export { StatusBadge } from "./status-badge";
 export type { Status } from "./status-badge";
 export { BrokenHeartIcon } from "./heart-icons";
 export { Dot } from "./dot";
-export { Menu } from "./menu";
-export type { MenuItem } from "./menu";
+export { Menu } from "./overlays/menu";
+export type { MenuItem } from "./overlays/menu";
 export { Field } from "./forms/field";
 export { FieldError } from "./forms/field-error";
 export { Textarea } from "./forms/textarea";
@@ -16,7 +16,12 @@ export { Switch } from "./forms/switch";
 export { Avatar } from "./avatar";
 export { PostBody } from "./post-body";
 export { DraftOverlay } from "./draft-overlay";
-export { Modal, ModalHeader, SubmitButton, useModalTitleId } from "./modal";
+export {
+  Modal,
+  ModalHeader,
+  SubmitButton,
+  useModalTitleId,
+} from "./overlays/modal";
 export { IconSubmitButton } from "./forms/icon-submit-button";
 export { Loading, Spinner } from "./loading";
 export { ProgressBar } from "./progress-bar";
@@ -26,7 +31,7 @@ export { TabNav } from "./tab-nav";
 export type { TabItem } from "./tab-nav";
 export { UnderlineTabs } from "./underline-tabs";
 export type { UnderlineTabItem } from "./underline-tabs";
-export { Console, ConsoleTitleBar } from "./console";
+export { Console, ConsoleTitleBar } from "./overlays/console";
 export { InfoBox } from "./info-box";
 export { RevealMark } from "./reveal-mark";
 export { Kbd } from "./kbd";

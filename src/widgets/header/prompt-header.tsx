@@ -1,4 +1,4 @@
-import { ConsoleTitleBar } from "@/shared/ui/console";
+import { ConsoleTitleBar } from "@/shared/ui/overlays/console";
 
 /**
  * Title bar atop the header menu — faux terminal window chrome: two
