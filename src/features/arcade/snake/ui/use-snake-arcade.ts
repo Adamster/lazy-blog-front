@@ -25,21 +25,11 @@ export interface SnakeArcadeApi {
 }
 
 /**
- * Page-level orchestrator + the arcade's DATA LAYER. Wraps the engine hook and
- * wires it to the backend:
- *
- *  - `useSnakeLeaderboard` → the cross-user board (mapped + viewer-highlighted).
- *  - `useMyArcadeStats`    → the viewer's `bestScore` / `rank` (the band's Best).
- *  - `useSubmitScore`      → POSTs each finished run; on success it seeds my-stats
- *                            and invalidates the board, so Best/rank/board refresh
- *                            with no manual refetch race.
- *
- * The engine stays pure-engine: it owns the live run + the localStorage
- * recent-runs sparkline (the one store with no backend endpoint), takes the
- * server `best` for its new-best test, and calls back on game over. We MERGE the
- * server `best`/`rank` onto the returned `state` so the board + stats band read
- * them straight off `game.state` (consumers unchanged). A failed submit is
- * swallowed (logged) so the game never stalls on the network.
+ * Page orchestrator + data layer: wraps the engine hook and wires it to the
+ * backend (leaderboard, my-stats, submit-score). The engine stays pure (live run
+ * + localStorage sparkline); we feed it the server `best` and merge server
+ * `best`/`rank` onto `game.state` so consumers read them straight off it. A failed
+ * submit is swallowed so the game never stalls.
  */
 export function useSnakeArcade(options?: UseSnakeGameOptions): SnakeArcadeApi {
   const { user } = useUser();
@@ -50,13 +40,10 @@ export function useSnakeArcade(options?: UseSnakeGameOptions): SnakeArcadeApi {
   const submitScore = useSubmitScore();
 
   const best = myStats.data?.bestScore ?? 0;
-  // `rank` is null until the first run; the board overlay treats 0 as "off the
-  // board", so null collapses to 0 cleanly.
+  // `rank` is null until the first run; the board treats 0 as "off the board".
   const rank = myStats.data?.rank ?? 0;
 
-  // Fired once per run by the engine. Swallow failures (don't crash the game) —
-  // the board/stats just don't move; the mutation already toasts nothing on its
-  // own, so we log for diagnosis.
+  // Swallow submit failures (board/stats just don't move) — log for diagnosis.
   const onGameOver = useCallback(
     (score: number) => {
       submitScore.mutate(score, {
@@ -70,8 +57,6 @@ export function useSnakeArcade(options?: UseSnakeGameOptions): SnakeArcadeApi {
 
   const game = useSnakeGame({ ...options, best, onGameOver });
 
-  // Merge server-truth best + rank onto the engine state so the board overlay and
-  // the stats band read them straight off `game.state` (no extra props threaded).
   const mergedGame = useMemo<SnakeGameApi>(
     () => ({ ...game, state: { ...game.state, best, rank } }),
     [game, best, rank]
@@ -85,11 +70,8 @@ export function useSnakeArcade(options?: UseSnakeGameOptions): SnakeArcadeApi {
   return {
     game: mergedGame,
     board,
-    // Spinner until REAL data lands — gate on `data === undefined`, NOT
-    // `isLoading`. A query that's idle/disabled or has errored reports
-    // `isLoading === false` while still holding no data, which would flash a
-    // misleading 0. "No value yet" holds the loader; a refetch keeps the prior
-    // data, so it never re-flashes once loaded.
+    // Gate on `data === undefined`, NOT `isLoading`: an idle/disabled/errored query
+    // reports `isLoading === false` while holding no data → would flash a misleading 0.
     statsLoading: myStats.data === undefined,
     boardLoading: leaderboard.data === undefined,
   };

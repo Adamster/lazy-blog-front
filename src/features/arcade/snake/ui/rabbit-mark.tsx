@@ -1,24 +1,17 @@
 import { RABBIT_PLAIN, RABBIT_WHITE } from "../model/engine";
 
 /**
- * The game's white-rabbit (the +10 prize), rendered 1:1 as a crisp SVG pixel grid
- * for use OUTSIDE the canvas (the hidden header easter-egg entry to the arcade). It
- * reads the exact same {@link RABBIT_PLAIN} bitmap + {@link RABBIT_WHITE} fill the
- * engine paints on the board for the plain-white positive rabbit, so the mark stays
- * identical to the in-game sprite automatically — never copy-paste the matrix.
- *
- * Each `"1"` body pixel → one 1×1 `<rect>` on the bitmap's `cols × rows` viewBox;
- * `"0"` and `"."` cells are left transparent — the silhouette gaps + the eye sockets,
- * exactly like the board bg showing through in-game (the positive rabbit's eyes are
- * transparent sockets, same as the game). Square pixels, no anti-aliasing on the grid
- * edges — crisp at any DPR. Colour defaults to the game's white.
+ * The +10 white rabbit as a crisp SVG pixel grid for use OUTSIDE the canvas (the
+ * header easter-egg). Reads the same {@link RABBIT_PLAIN} bitmap + {@link
+ * RABBIT_WHITE} fill the engine paints, so it stays identical automatically —
+ * never copy-paste the matrix. Each `"1"` → one 1×1 `<rect>`; `"0"`/`"."` stay
+ * transparent (silhouette gaps + eye sockets).
  */
 export function RabbitMark({
   size = 16,
   className,
   fill = RABBIT_WHITE,
 }: {
-  /** Rendered height in px; width follows the bitmap aspect ratio. */
   size?: number;
   className?: string;
   fill?: string;

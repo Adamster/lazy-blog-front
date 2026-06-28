@@ -2,11 +2,8 @@
 
 import { GlitchText } from "@/shared/ui/effects";
 
-/**
- * Arcade page title block — a glitching FOLLOW THE WHITE RABBIT title (our
- * {@link GlitchText}, 40px Display) + a one-line control hint. No eyebrow, no
- * NOT-LAZY lockup — the app's global header owns the brand.
- */
+/** Arcade title block — glitching headline + control hint. No lockup; the app's
+ *  global header owns the brand. */
 export function ArcadeHeader() {
   return (
     <header>

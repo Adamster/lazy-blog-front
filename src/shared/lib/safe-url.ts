@@ -1,13 +1,6 @@
-/**
- * Shared href sanitizer for user-authored links. Returns the canonicalised URL
- * when it is a safe `http:`/`https:` destination, or `null` to reject it
- * (`javascript:`, `data:`, `vbscript:`, relative/opaque, malformed, …) so the
- * caller can fall back to inert text / `#` instead of an executable link.
- *
- * This is the single source of truth for "is this href safe to render": the
- * comment-body link/autolink renderer gates on it, so the security posture is
- * consistent wherever UGC links are rendered.
- */
+// Single source of truth for "is this UGC href safe to render": returns the
+// canonical URL for `http(s):` only, else `null` (caller falls back to inert
+// text) — rejects `javascript:`/`data:`/relative/malformed.
 export function safeHref(raw: string): string | null {
   const trimmed = raw.trim();
   if (!trimmed) return null;

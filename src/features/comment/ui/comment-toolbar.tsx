@@ -9,8 +9,7 @@ import { parseGifUrl } from "@/features/comment/lib/comment-gif";
 import type { GifResult } from "@/features/comment/lib/klipy";
 import type { CommentEditorApi } from "./comment-editor";
 
-// Curated native-unicode emoji set — rendered by the OS (crisp, zero deps/CDN).
-// Sorted FACES → HANDS → everything else; 84 = a full 7×12 grid.
+// Native-unicode emoji (OS-rendered, zero deps/CDN). 84 = a full 7×12 grid.
 const EMOJIS = [
   // Faces
   "😀",
@@ -103,8 +102,6 @@ const EMOJIS = [
 
 type PickerTab = "emoji" | "gif" | "sticker";
 
-// Funny, on-brand console header line — kept as a single swap-in const so the
-// copywriter's final pick drops straight in.
 const PICKER_TITLE = "emote.sh";
 
 const TABS: readonly { id: PickerTab; label: string }[] = [
@@ -114,20 +111,9 @@ const TABS: readonly { id: PickerTab; label: string }[] = [
 ];
 
 interface CommentToolbarProps {
-  /** The live editor API (insert emoji/GIF/sticker). `null` until ready. */
   api: CommentEditorApi | null;
 }
 
-/**
- * Minimal comment-composer toolbar — TEXT + PICTURES only: comments carry no
- * formatting marks, so the toolbar is just a single picture trigger. ONE smiley
- * button toggles a shared popover laid out console-header → underline tabs →
- * panel: the emoji / GIF / sticker panels are switched by the shared
- * {@link UnderlineTabs}, a full row directly under the title bar. An emoji
- * inserts its unicode char at the cursor; a GIF/sticker inserts
- * an INLINE IMAGE node (whitelist-gated via `parseGifUrl`) that renders the
- * actual picture in the editor — never a raw URL.
- */
 export function CommentToolbar({ api }: CommentToolbarProps) {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<PickerTab>("emoji");
@@ -137,7 +123,6 @@ export function CommentToolbar({ api }: CommentToolbarProps) {
 
   useClickOutside(pickerRef, () => setOpen(false));
 
-  // Close on Escape, returning focus to the smiley trigger (matches the old form).
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
@@ -156,8 +141,7 @@ export function CommentToolbar({ api }: CommentToolbarProps) {
   };
 
   const insertGif = (gif: GifResult) => {
-    // Defence in depth: only ever insert a whitelisted KLIPY/Tenor https URL —
-    // the read view gates again, but the editor must not carry an off-list src.
+    // Defence in depth: the editor must not carry an off-list src (the read view gates again).
     const safe = parseGifUrl(gif.fullUrl);
     if (safe) api?.insertImage(safe, gif.title);
     setOpen(false);
@@ -165,8 +149,6 @@ export function CommentToolbar({ api }: CommentToolbarProps) {
 
   return (
     <div className="flex items-center gap-3">
-      {/* ONE smiley trigger; the popover is anchored to this wrapper so it opens
-          upward-left above the toolbar. */}
       <div ref={pickerRef} className="relative flex items-center">
         <button
           ref={triggerRef}
@@ -188,12 +170,7 @@ export function CommentToolbar({ api }: CommentToolbarProps) {
             aria-label="Emoji, GIF and sticker picker"
             className="absolute bottom-full left-0 z-[var(--m-z-dropdown)] mb-3 w-[420px] max-w-[calc(100vw-5rem)] border-2 border-[var(--m-dim)] bg-[var(--m-bg)]"
           >
-            {/* Terminal-chrome header (a short funny line) → shared underline
-                tab bar → active panel. The HEADER keeps its `--m-dim` divider;
-                the tab row drops its OWN baseline (`baseline={false}`) and is
-                inset (px-4) to line up with the grid below — so there's one
-                header rule plus only the active accent underline, never a
-                doubled line. */}
+            {/* tab row drops its OWN baseline (`baseline={false}`) so there's one header rule plus the active accent underline, never a doubled line. */}
             <ConsoleTitleBar title={PICKER_TITLE} />
 
             <UnderlineTabs
@@ -206,7 +183,6 @@ export function CommentToolbar({ api }: CommentToolbarProps) {
             />
 
             {tab === "emoji" ? (
-              // Edge inset (px-4) matches the header-menu panel's rows.
               <div className="grid grid-cols-12 gap-[2px] px-4 pt-4 pb-4">
                 {EMOJIS.map((emoji) => (
                   <button

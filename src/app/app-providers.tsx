@@ -13,9 +13,7 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => {
       <ReactQueryProvider>
         <AuthProvider>
           <ThemeProvider>
-            {/* Global header (fixed burger + logo) — rendered once for every
-                page, so error / 404 / loading states keep navigation too. The
-                `.mono-scope` wrapper gives the fixed chrome the `--m-*` tokens. */}
+            {/* Rendered once for every route so error / 404 / loading states keep navigation too. */}
             <div className="mono-scope">
               <Header />
             </div>

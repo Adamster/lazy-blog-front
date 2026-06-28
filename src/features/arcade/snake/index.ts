@@ -1,4 +1,3 @@
-/** Snake Arcade — public API for the route page. */
 export { useSnakeArcade } from "./ui/use-snake-arcade";
 export type { SnakeArcadeApi } from "./ui/use-snake-arcade";
 export { SnakeBoard } from "./ui/snake-board";

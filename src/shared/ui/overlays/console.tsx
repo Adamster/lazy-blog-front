@@ -1,19 +1,12 @@
 import type { ReactNode } from "react";
 
 interface ConsoleProps {
-  /** Window title in the title bar (e.g. "stacktrace.log"). */
   title: string;
-  /** Terminal body — monospace 11px content. */
   children: ReactNode;
   className?: string;
 }
 
-/**
- * Console title bar — the two square "traffic light" close/minimise marks + a
- * filename/label. Shared by {@link Console} and the header menu (a faux terminal
- * window too) so the window chrome stays identical. `trailing` slots extra
- * content after the title (e.g. a blinking terminal cursor).
- */
+// Shared by Console + the header menu so the window chrome stays identical.
 export function ConsoleTitleBar({
   title,
   trailing,
@@ -43,11 +36,6 @@ export function ConsoleTitleBar({
   );
 }
 
-/**
- * Faux terminal window — a 2px square frame with a {@link ConsoleTitleBar} over
- * a monospace body. Used for the error page's `stacktrace.log`; reusable
- * anywhere a terminal panel reads well.
- */
 export function Console({ title, children, className = "" }: ConsoleProps) {
   return (
     <div

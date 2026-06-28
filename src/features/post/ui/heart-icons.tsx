@@ -1,9 +1,4 @@
-/**
- * The HATE-IT glyph for the post vote band (`// LOVE IT` / `// HATE IT`), paired
- * with the solid heroicon `HeartIcon` on the LOVE side. It's a hand-drawn stroke
- * SVG (no solid heroicon match) — kept here as a shared primitive so any surface
- * needing it uses the identical glyph instead of forking it.
- */
+// Hand-drawn — no solid heroicon match; shared so surfaces don't fork the glyph.
 export const BrokenHeartIcon = ({ className }: { className?: string }) => (
   <svg
     viewBox="0 0 24 24"

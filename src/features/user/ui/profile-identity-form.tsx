@@ -12,12 +12,6 @@ interface ProfileIdentityFormProps {
   userData: UserResponse | undefined;
 }
 
-/**
- * Profile-tab identity form — RHF over the {@link useUpdateUser} mutation
- * (success toast + cache invalidation), wrapped in the shared
- * {@link ProfileFormSection} chrome (fields → Save changes). About carries a
- * live char counter like the composer Summary.
- */
 export function ProfileIdentityForm({ userData }: ProfileIdentityFormProps) {
   const updateUser = useUpdateUser(userData?.id ?? "");
 

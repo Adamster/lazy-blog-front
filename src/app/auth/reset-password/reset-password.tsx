@@ -17,20 +17,13 @@ import {
   ErrorMessage,
 } from "@/shared/ui";
 
-// Password strength: ≥6 chars with lower, upper, digit and a special char.
 const PASSWORD_PATTERN = {
   value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/,
   message:
     "At least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character",
 } as const;
 
-/**
- * Reset-password route. The auth {@link Modal} is open by default with the
- * reset form INSIDE it — one visual language for the whole auth flow (no
- * bespoke full-page layout). This is the TERMINAL step of recovery: there's no
- * "back" control; closing OR a successful reset returns home, where the standard
- * auth modal can take over.
- */
+// Terminal recovery step — no "back" control; closing or a successful reset returns home.
 export default function ResetPassword() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -54,8 +47,6 @@ export default function ResetPassword() {
 
   const onSubmit = (data: ResetPasswordRequest) => {
     if (token && user?.id) {
-      // Terminal step of the recovery flow: on success, close the modal and
-      // return home where the standard auth modal can take over.
       resetPasswordMutation.mutate(data, { onSuccess: goHome });
     } else {
       addToastError("Very Funny :)");
@@ -112,7 +103,6 @@ export default function ResetPassword() {
               />
             </div>
 
-            {/* Requirements hint BELOW all inputs (consistent with register). */}
             <InfoBox className="mb-6">
               Use 6+ characters with at least one uppercase, one lowercase, a
               number, and a special character.

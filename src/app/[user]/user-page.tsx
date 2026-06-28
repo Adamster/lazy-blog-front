@@ -28,11 +28,8 @@ export default function UserPage({ userName }: { userName: string }) {
   const query = usePostsByUserName(userName);
   const reduceMotion = useReducedMotion();
 
-  // Author-only published/drafts toggle. The authenticated profile-posts query
-  // already returns the owner's DRAFTS mixed into `postItems` (the backend
-  // includes them only when the viewer === the page owner — verified in the
-  // handler), so the toggle is a client-side split of the same stream, never a
-  // second fetch. There's no draft-only endpoint/param.
+  // The backend mixes the owner's drafts into `postItems` only when viewer === owner,
+  // so the toggle is a client-side split of one stream, never a second fetch.
   const { user: viewer, isUserResolved } = useUser();
   const [view, setView] = useState<PublicationsView>("all");
 
@@ -51,35 +48,23 @@ export default function UserPage({ userName }: { userName: string }) {
   const user = profile?.user;
   const handle = user?.userName ?? userName;
 
-  // The viewer owns this profile → they may flip published/drafts. Everyone
-  // else only ever sees published (the backend never sends them drafts).
   const isOwner = isUserResolved && !!viewer?.id && viewer.id === user?.id;
   const showDrafts = isOwner && view === "drafts";
-  // "all" (the default) shows everything — published + drafts mixed; published /
-  // drafts filter the owner's own stream. Visitors always get the backend's
-  // published-only stream (they never receive drafts).
   const posts =
     isOwner && view !== "all"
       ? allPosts.filter((p) => (showDrafts ? !p.isPublished : p.isPublished))
       : allPosts;
 
-  // While the DRAFTS view is open we must surface the COMPLETE draft set, but
-  // drafts are interleaved across the paginated stream — a page can be all
-  // published. So keep paging until the stream is exhausted (the sentinel below
-  // self-advances), and only call a draft view "empty" once there are no more
-  // pages to pull. Same guard keeps a published page that's all-drafts paging.
+  // Drafts are interleaved across the paginated stream, so keep paging until it's
+  // exhausted before calling a filtered view "empty".
   const isExhausting = isOwner && posts.length === 0 && query.hasNextPage;
   const emptyState = posts.length === 0 && !isExhausting;
 
-  // Karma (net rating) / views / activity are whole-account aggregates off the
-  // profile response — NOT summed from the loaded page (which only sees what's
-  // paginated in so far).
+  // Whole-account aggregates off the profile response, NOT summed from the loaded page.
   const totalKarma =
     (profile?.totalUpVotes ?? 0) - (profile?.totalDownVotes ?? 0);
   const totalViews = profile?.totalViews ?? 0;
 
-  // Activity: rolling "last 6 months" window (0 for empty months), mapped from
-  // the per-month post counts the backend returns.
   const series = seriesFromMonths(profile?.activity ?? []);
 
   return (
@@ -88,7 +73,6 @@ export default function UserPage({ userName }: { userName: string }) {
       style={{ fontFamily: "var(--font-mono)" }}
     >
       <main className="mx-auto max-w-[1240px] px-10 pb-10">
-        {/* Profile header */}
         <section className="flex flex-col gap-10 pb-10 sm:flex-row sm:items-center">
           <Avatar
             src={user?.avatarUrl}
@@ -123,7 +107,6 @@ export default function UserPage({ userName }: { userName: string }) {
           </div>
         </section>
 
-        {/* Stat row — karma / views / activity sparkline */}
         <section className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
           <div className="mx-auto grid max-w-[1240px] gap-10 px-10 py-10 sm:grid-cols-3">
             <div>
@@ -160,8 +143,7 @@ export default function UserPage({ userName }: { userName: string }) {
 
             <div>
               <Label>ACTIVITY · 6M</Label>
-              {/* Always draw the chart — an empty profile reads as a flat
-                  line of zeros rather than a "no data" message. */}
+              {/* Always draw the chart — an empty profile reads as a flat line of zeros, not "no data". */}
               <div className="mt-4">
                 <Sparkline
                   series={series}
@@ -175,12 +157,8 @@ export default function UserPage({ userName }: { userName: string }) {
           </div>
         </section>
 
-        {/* Publications. For the OWNER the eyebrow is always `// PUBLICATIONS`
-            with the published/drafts filter on the right (so the toggle stays
-            reachable even when the current view is empty). For a visitor (or
-            the owner with NO posts at all) the scramble takes over the label
-            itself, a terminal section (symmetric py-10); otherwise the eyebrow
-            hugs its content below (pt-10 pb-6). */}
+        {/* Owner keeps the filter reachable even when the view is empty; a visitor
+            (or a postless owner) gets the scramble in place of the label. */}
         {isOwner && allPosts.length > 0 ? (
           <div className="flex items-center justify-between pt-10 pb-6">
             <Label className="mono-label">PUBLICATIONS</Label>
@@ -200,8 +178,6 @@ export default function UserPage({ userName }: { userName: string }) {
           </Label>
         )}
 
-        {/* Owner, current view exhausted to empty → a tasteful inline empty
-            state (the toggle above lets them flip back). */}
         {isOwner && allPosts.length > 0 && emptyState && (
           <p className="pb-10 text-[14px] leading-[1.6] text-[var(--m-muted)]">
             {showDrafts

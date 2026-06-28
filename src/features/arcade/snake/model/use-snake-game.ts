@@ -26,33 +26,23 @@ const INITIAL_STATE: SnakeGameState = {
 };
 
 /**
- * The Snake Arcade engine as a React hook. Owns one {@link SnakeEngine}, runs
- * the rAF render loop (+ a `setInterval` fallback for throttled tabs), wires the
- * keyboard / resize listeners, and projects engine events (eat / die) onto
- * React state.
+ * The Snake Arcade engine as a React hook. Owns one {@link SnakeEngine}, runs the
+ * rAF render loop (+ a `setInterval` fallback for throttled tabs), wires the
+ * keyboard / resize listeners, and projects engine events onto React state.
  *
- * Data layer split: the engine owns the LIVE run only (score / length / screen /
- * pause + the recent-runs sparkline, which is still localStorage — see
- * `score-history.ts`, the one store with no backend endpoint). The cross-user
- * board, the personal `best` and the global `rank` are server-truth — the
- * orchestrator (`useSnakeArcade`) feeds `best` in (for the new-best test) and
- * fires `onGameOver(score)` once per finished run so the data layer can submit.
- *
- * Reduced motion: the red HAZARD-rabbit's size pulse freezes to a legible
- * static frame and the death EXPLOSION is skipped (the game still responds to
- * input and steps on its timer); no information is conveyed by motion alone.
+ * Data-layer split: the engine owns the LIVE run + the localStorage sparkline;
+ * the board, `best` and `rank` are server-truth, fed in by `useSnakeArcade` (which
+ * also takes `onGameOver(score)` once per run to submit).
  */
 export function useSnakeGame({
   speed = "classic",
-  // Wrap-walls ON by default: edges are pass-through, so the run ends only from
-  // a self-hit or the red hazard (the page uses defaults).
   wrapWalls = true,
   best = 0,
   onGameOver,
 }: UseSnakeGameOptions = {}): SnakeGameApi {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  // Lazily create the engine once (a getter keeps it out of the render body —
-  // the compiler forbids reading/writing refs during render).
+  // Lazy getter keeps engine creation out of the render body (the compiler forbids
+  // reading/writing refs during render).
   const engineRef = useRef<SnakeEngine | null>(null);
   const getEngine = () => {
     engineRef.current ??= new SnakeEngine(speed, wrapWalls);
@@ -60,39 +50,30 @@ export function useSnakeGame({
   };
 
   const [state, setState] = useState<SnakeGameState>(INITIAL_STATE);
-  // Recent-runs sparkline series (last N scores, newest on the right).
   const [history, setHistory] = useState<HistoryPoint[]>(() =>
     recentSeries([])
   );
 
   // Mutable mirrors so the rAF loop / key handler / game-over read fresh values
-  // without re-subscribing. Synced in effects (never written during render).
+  // without re-subscribing (synced in effects, never written during render).
   const screenRef = useRef(state.screen);
   const pausedRef = useRef(state.paused);
-  // Server-truth best (for the new-best test on game over). Kept on a ref so the
-  // game-over closure reads the latest without re-binding the render loop.
   const bestRef = useRef(best);
-  // The latest game-over callback, mirrored so the render-loop effect (keyed only
-  // on the engine) always calls the current closure without re-subscribing.
   const onGameOverRef = useRef(onGameOver);
-  // Raw score log (oldest → newest); the single source the game-over handler
-  // appends to, so a re-render can never double-count a run.
+  // The single score-log source the game-over handler appends to, so a re-render can't double-count.
   const historyRef = useRef<number[]>([]);
   useEffect(() => {
     screenRef.current = state.screen;
     pausedRef.current = state.paused;
   }, [state.screen, state.paused]);
 
-  // Keep the server best + the game-over callback live without re-binding the
-  // render loop (refs only — no render).
   useEffect(() => {
     bestRef.current = best;
     onGameOverRef.current = onGameOver;
   }, [best, onGameOver]);
 
-  // Reflect the incoming server best into the visible state. Deferred via rAF so
-  // the setState lands in a fresh frame, not synchronously in the effect body
-  // (repo convention / lint rule: no synchronous setState inside an effect).
+  // Reflect the incoming server best into state. Deferred via rAF — repo lint rule:
+  // no synchronous setState inside an effect.
   useEffect(() => {
     const raf = requestAnimationFrame(() =>
       setState((s) => (s.best === best ? s : { ...s, best }))
@@ -108,9 +89,7 @@ export function useSnakeGame({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speed, wrapWalls]);
 
-  // Hydrate the recent-runs log from localStorage on mount (client only).
-  // Deferred via rAF so the setState lands in a fresh frame, not synchronously
-  // in the effect (repo convention / lint rule).
+  // Hydrate the log from localStorage on mount; deferred via rAF (repo lint rule).
   useEffect(() => {
     let raf = 0;
     raf = requestAnimationFrame(() => {
@@ -146,27 +125,22 @@ export function useSnakeGame({
     setState((s) => ({ ...s, paused: !s.paused }));
   }, []);
 
-  // Game over fires exactly ONCE per run: the engine reports `dead` on a single
-  // step, then `screen` flips to "over" so `engine.step` no longer runs — so the
-  // localStorage append + the `onGameOver` submit each happen once per run.
+  // Fires exactly ONCE per run: the engine reports `dead` on one step, then `screen`
+  // flips to "over" so `engine.step` no longer runs — the append + submit happen once.
   const handleGameOver = useCallback((score: number) => {
-    // Log this run's score exactly once (off the ref, never a re-read).
     const log = recordScore(historyRef.current, score);
     historyRef.current = log;
     setHistory(recentSeries(log));
-    // Hand the finished score to the data layer (submit) — once per run.
     onGameOverRef.current?.(score);
     setState((s) => ({
       ...s,
       screen: "over",
       paused: false,
-      // Optimistic new-best vs the server best we hold; the submit will reconcile
-      // the authoritative best/rank into the band.
+      // Optimistic new-best vs our held server best; the submit reconciles it.
       isNewBest: score > 0 && score > bestRef.current,
     }));
   }, []);
 
-  // ----- render loop + listeners -----
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -176,8 +150,7 @@ export function useSnakeGame({
 
     let cssW = 0;
     let cssH = 0;
-    // Device-pixel ratio of the backing store — kept live by `resize` and fed to
-    // the engine so the rabbit sprite rasterises on whole device pixels.
+    // Kept live by `resize`; fed to the engine so sprites rasterise on whole device pixels.
     let dpr = 1;
     let lastStep = 0;
     let lastFrame = 0;
@@ -186,9 +159,8 @@ export function useSnakeGame({
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       const w = canvas.clientWidth || 760;
-      // The element's aspect ratio is pinned to GRID_W/GRID_H, so derive the
-      // height from the width — this guarantees square cells even mid-layout
-      // before the element has settled its measured height.
+      // Aspect is pinned to GRID_W/GRID_H, so derive height from width — square cells
+      // even mid-layout, before the element has settled its measured height.
       const h = canvas.clientHeight || Math.round((w * GRID_H) / GRID_W);
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
@@ -254,7 +226,6 @@ export function useSnakeGame({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleGameOver]);
 
-  // ----- keyboard -----
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       // Never hijack typing in a field (defensive — no inputs on the page).
@@ -269,11 +240,9 @@ export function useSnakeGame({
       }
 
       const k = e.key;
-      // WASD is matched on `e.code` (the PHYSICAL key — `KeyW/A/S/D`), NOT
-      // `e.key` (the produced CHARACTER): on a non-Latin layout (Russian, etc.)
-      // `e.key` yields "ц/ф/ы/в", so a `key`-based WASD check silently fails.
-      // `e.code` is layout-independent, so WASD steers on ANY keyboard layout.
-      // Arrows stay on `e.key` (their `key` values are already layout-independent).
+      // WASD matched on `e.code` (the PHYSICAL key), not `e.key`: on a non-Latin
+      // layout `e.key` yields "ц/ф/ы/в", so a key-based check silently fails.
+      // `e.code` is layout-independent. Arrows stay on `e.key` (already layout-independent).
       const c = e.code;
       const isArrow =
         k === "ArrowUp" ||

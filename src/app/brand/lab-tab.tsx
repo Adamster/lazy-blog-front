@@ -3,8 +3,6 @@
 import { RevealMark, AsciiDivider } from "@/shared/ui/prose";
 import { Section, Panel, State } from "./_helpers";
 
-/* ------------------------------ post fx ------------------------------ */
-
 function PostFxSection() {
   return (
     <Section
@@ -13,7 +11,6 @@ function PostFxSection() {
       intro="The in-article marks kept for a later lib migration — each round-trips as a remark directive and renders here exactly as in the read view. Inline: `:spoiler`, `:strike`. Block: `::divider`. All bounded and reading-safe."
     >
       <div className="flex flex-col gap-7">
-        {/* Inline marks */}
         <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
           <Panel caption="// :spoiler — signal blur">
             <State caption="click to sharpen (stays revealed)">
@@ -32,7 +29,6 @@ function PostFxSection() {
           </Panel>
         </div>
 
-        {/* Block directives */}
         <Panel caption="// ::divider — ASCII section break">
           <div className="mono-prose">
             <AsciiDivider variant="dots" />
@@ -44,12 +40,9 @@ function PostFxSection() {
   );
 }
 
-/* --------------------------------- the tab --------------------------------- */
-
 export function LabTab() {
   return (
     <>
-      {/* Masthead — mirrors ComponentsTab. */}
       <div className="text-[11px] tracking-[0.12em] text-[var(--m-accent)]">
         {"// NOT LAZY — LAB · EFFECTS & TOYS"}
       </div>

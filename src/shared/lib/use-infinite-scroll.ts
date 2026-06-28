@@ -1,34 +1,17 @@
 import { useCallback, useEffect, useRef } from "react";
 
 interface UseInfiniteScrollOptions {
-  /** Whether another page can still be loaded. */
   hasNextPage: boolean;
-  /** Fetch the next page; called once each time the sentinel enters view. */
   fetchNextPage: () => void;
-  /** Suppress fetches while a page is already in flight. */
   isFetching?: boolean;
-  /**
-   * How far below the viewport to trigger the next fetch (px). Defaults to
-   * `200px` so the next page is requested just before the sentinel is reached.
-   */
   rootMargin?: string;
 }
 
 /**
- * Backs an infinite-scroll feed with an `IntersectionObserver`. Returns a
- * **callback ref** to attach to a sentinel element rendered at the end of the
- * list; when it enters view (and `hasNextPage`), `fetchNextPage` fires.
- *
- * Why a callback ref (not `useRef` + a mount effect): feeds render the sentinel
- * CONDITIONALLY (`hasNextPage && <div ref={…} />`), so on a fresh load it mounts
- * only AFTER page 1 resolves — later than a one-shot mount effect runs. An
- * observer created in that effect sees `current === null` and never re-attaches
- * when the sentinel appears, so page 2 silently never loads (the request just
- * isn't made). A callback ref runs every time the node mounts/unmounts, so the
- * observer attaches the moment the sentinel exists — and re-attaches if it's
- * remounted. The latest `fetchNextPage`/flags are read through a ref so the
- * observer reads fresh values at intersection time without re-creating on
- * query-object churn.
+ * Returns a CALLBACK ref for an end-of-list sentinel; fires `fetchNextPage` when
+ * it enters view. A callback ref (not `useRef` + mount effect) because feeds
+ * render the sentinel conditionally — it mounts only after page 1 resolves, so a
+ * one-shot mount effect would see `null` and never re-attach (page 2 never loads).
  */
 export function useInfiniteScroll<T extends Element = HTMLDivElement>({
   hasNextPage,
@@ -39,13 +22,12 @@ export function useInfiniteScroll<T extends Element = HTMLDivElement>({
   const handlers = useRef({ hasNextPage, fetchNextPage, isFetching });
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // Keep the latest query callbacks/flags available to the observer without
-  // re-creating it: the observer reads `handlers.current` at intersection time.
+  // The observer reads `handlers.current` at intersection time, so it stays
+  // current without being re-created on query-object churn.
   useEffect(() => {
     handlers.current = { hasNextPage, fetchNextPage, isFetching };
   });
 
-  // Tear down on unmount so a stale observer can't fire after the feed is gone.
   useEffect(() => () => observerRef.current?.disconnect(), []);
 
   return useCallback(

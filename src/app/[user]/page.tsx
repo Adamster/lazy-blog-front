@@ -30,11 +30,8 @@ export async function generateMetadata({ params }: PageProps) {
   });
 }
 
-// No SSR feed seed: the profile feed loads client-side (authenticated, so the
-// OWNER sees their own drafts directly) — this removes the no-auth published-only
-// seed that flashed + made the likes/views stats jump when drafts loaded in.
-// `generateMetadata` above still emits the social/SEO meta tags; missing users
-// surface via the client query's error state.
+// No SSR feed seed — a published-only seed flashed and made the stats jump once the
+// authenticated client feed (with the owner's drafts) loaded in. Meta still comes from above.
 export default async function Page({ params }: PageProps) {
   const { user: userName } = await params;
   return <UserPage userName={userName} />;

@@ -22,7 +22,6 @@ const EMAIL_PATTERN = {
   message: "Enter a valid email address",
 } as const;
 
-// Password strength: ≥6 chars with lower, upper, digit and a special char.
 const PASSWORD_PATTERN = {
   value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/,
   message:
@@ -31,10 +30,8 @@ const PASSWORD_PATTERN = {
 
 const accentLink = `text-[var(--m-fg)] font-semibold transition-colors hover:text-[var(--m-accent)] mono-focus`;
 
-/* ----------------------------- shared bits ----------------------------- */
-
 function GoogleGlyph() {
-  // Official multicolor Google "G" — the one sanctioned color exception.
+  // Official Google "G" — the one sanctioned color exception.
   return (
     <svg viewBox="0 0 24 24" className="size-3.5 shrink-0" aria-hidden="true">
       <path
@@ -68,8 +65,7 @@ function GoogleButton({
     <button
       type="button"
       onClick={onClick}
-      // Full-width outline button → matches the submit height (36px / h-9).
-      className={`mono-btn-outline mono-focus flex h-9 w-full items-center justify-center gap-2.5 bg-transparent px-4 text-[14px] font-semibold tracking-[0.06em] text-[var(--m-fg)] hover:bg-[var(--m-panel)] hover:text-[var(--m-fg)]`}
+      className={`mono-btn-outline mono-focus flex h-9 w-full items-center justify-center gap-2.5 bg-transparent px-4 font-semibold tracking-[0.06em] text-[var(--m-fg)] hover:bg-[var(--m-panel)] hover:text-[var(--m-fg)]`}
     >
       <GoogleGlyph />
       {label}
@@ -87,7 +83,6 @@ function OrRule() {
   );
 }
 
-/** Centered 14px helper line under the form (with an inline accent link). */
 function HelperLine({ children }: { children: React.ReactNode }) {
   return (
     <p className="mt-6 text-center text-[14px] text-[var(--m-muted)]">
@@ -96,12 +91,7 @@ function HelperLine({ children }: { children: React.ReactNode }) {
   );
 }
 
-/**
- * Left-aligned, muted "← Back" navigation link — the SAME treatment as the
- * composer Cancel link (11px / 0.12em uppercase, muted → muted hover). The `←`
- * is a directional/navigation marker (per the arrow rule: arrows are for
- * direction only, never on action buttons).
- */
+/** The `←` is a directional marker (arrow rule), never an action button. */
 function BackLink({
   children,
   onClick,
@@ -122,8 +112,6 @@ function BackLink({
     </div>
   );
 }
-
-/* ------------------------------- LOGIN ------------------------------- */
 
 type LoginFields = { email: string; password: string };
 
@@ -180,12 +168,7 @@ function LoginView({
           />
         </div>
 
-        {/* Password + a right-aligned "Forgot?" link. Field no longer reserves
-            space below the underline, so add a deliberate 16 (`mt-4`) gap
-            between the field and the link so it isn't cramped, then the
-            canonical 24 (`mt-6`) before the submit — matches the field→submit
-            rhythm across every auth view, clean in both empty and error
-            states. */}
+        {/* Field reserves no space below the underline, so mt-4 before the link, mt-6 before submit. */}
         <Field
           id="login-password"
           label="Password"
@@ -224,8 +207,6 @@ function LoginView({
     </>
   );
 }
-
-/* ------------------------------- FORGOT ------------------------------- */
 
 type ForgotFields = { email: string };
 
@@ -284,8 +265,6 @@ function ForgotView({
   );
 }
 
-/* ------------------------------- REGISTER ------------------------------- */
-
 type RegisterFields = RegisterUserRequest & { confirmPassword: string };
 
 function RegisterView({
@@ -321,8 +300,7 @@ function RegisterView({
         password: data.password,
         biography: null,
       });
-      // register() logs the user in on success → the parent's auth effect closes
-      // the modal. If we somehow land here unauthenticated, fall back to login.
+      // register() logs in on success → the parent auth effect closes the modal; fall back to login if not.
       if (!isAuthenticated) {
         goLogin();
       }
@@ -344,7 +322,6 @@ function RegisterView({
       />
 
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
-        {/* Email — full width */}
         <Field
           id="reg-email"
           label="Email"
@@ -358,7 +335,6 @@ function RegisterView({
           })}
         />
 
-        {/* Username + Display name */}
         <div className="mt-4 grid grid-cols-2 gap-4">
           <Field
             id="reg-username"
@@ -389,7 +365,6 @@ function RegisterView({
           />
         </div>
 
-        {/* Password + Confirm */}
         <div className="mt-4 grid grid-cols-2 gap-4">
           <Field
             id="reg-password"
@@ -419,7 +394,6 @@ function RegisterView({
           />
         </div>
 
-        {/* Password requirements — chrome info-box (same as reset / edit-profile). */}
         <InfoBox className="mt-4">
           Use 6+ characters with at least one uppercase, one lowercase, a
           number, and a special character.
@@ -445,8 +419,6 @@ function RegisterView({
   );
 }
 
-/* ------------------------------- MODAL ------------------------------- */
-
 export function AuthModal({
   isOpen,
   onOpenChange,
@@ -458,9 +430,7 @@ export function AuthModal({
   const { isAuthenticated } = useAuth();
   const titleId = useModalTitleId();
 
-  // Close the overlay once authentication succeeds (login or register). This is
-  // a sync-to-external-system effect — lifted here so it lives in one place
-  // instead of being duplicated across the login/register views.
+  // Lifted here so the close-on-auth effect isn't duplicated across the login/register views.
   useEffect(() => {
     if (isOpen && isAuthenticated) {
       onOpenChange();
@@ -471,7 +441,6 @@ export function AuthModal({
     <Modal
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      // Reset to login whenever the modal fully closes, so reopening starts fresh.
       onClose={() => setView("login")}
       width={view === "register" ? "wide" : "md"}
       labelledBy={titleId}

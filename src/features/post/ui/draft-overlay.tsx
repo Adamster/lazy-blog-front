@@ -1,22 +1,13 @@
 import { EyeSlashIcon } from "@heroicons/react/24/outline";
 
 interface DraftOverlayProps {
-  /** Icon scale: `card` (profile feed cover) = 32px · `page` (post cover) = 40px. */
   size?: "card" | "page";
-  /**
-   * Let clicks fall through to an underlying link (the feed card's stretched
-   * title link, so the cover stays a post link). The post page has no link
-   * under the cover, so it stays interactive (the default).
-   */
+  // Let clicks fall through to an underlying link (the feed card's stretched
+  // title link); the post page has no such link, so it stays interactive.
   pointerThrough?: boolean;
 }
 
-/**
- * Draft / unpublished marker — the ONE treatment (CLAUDE.md): a dimmed cover
- * overlay (`--m-bg`/70) with a crossed-out eye + `Unpublished` label. Shown on
- * the post-page cover and the author's own profile feed cards — only the author
- * ever sees drafts. Caller provides the `relative` positioned cover wrapper.
- */
+// The ONE draft marker (CLAUDE.md). Caller provides the `relative` cover wrapper.
 export function DraftOverlay({
   size = "page",
   pointerThrough = false,

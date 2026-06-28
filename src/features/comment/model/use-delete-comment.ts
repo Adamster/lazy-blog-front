@@ -4,11 +4,6 @@ import { CommentResponse } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { commentKeys } from "./comment-keys";
 
-/**
- * Delete a comment with an optimistic removal: `onMutate` snapshots the thread
- * and drops the matching comment immediately; `onError` rolls back; `onSettled`
- * invalidates. Keyed by `postId`, matching `useCommentsById`.
- */
 export const useDeleteComment = (postId: string, commentId: string) => {
   const queryClient = useQueryClient();
   const key = commentKeys.byPost(postId);

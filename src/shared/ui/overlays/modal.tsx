@@ -22,20 +22,8 @@ const widthClass = {
   xl: "max-w-[760px]",
 } as const;
 
-/**
- * Brutalist-Mono modal shell. The single source of modal chrome for the app
- * (auth, confirm, …): square, 2px dim frame + 2px accent top stripe, blurred
- * backdrop. Portals into a self-created `.mono-portal` node so the themed
- * `--m-*` tokens + mono font resolve (the body-level portal otherwise mounts
- * outside the `.dark` scope).
- *
- * A hand-rolled accessible dialog: `role="dialog"` + `aria-modal`, focus moved
- * in on open, Tab/Shift+Tab trapped within, focus restored on close, Esc +
- * backdrop click close (via `onOpenChange`), and body scroll locked while open.
- *
- * `width` picks one of the canonical modal widths. Children receive an
- * `onClose` callback that triggers `onOpenChange`.
- */
+// Portals into a self-created `.mono-portal` node so the `--m-*` tokens + mono
+// font resolve (a body-level portal otherwise mounts outside the `.dark` scope).
 export function Modal({
   isOpen,
   onOpenChange,
@@ -47,27 +35,20 @@ export function Modal({
 }: {
   isOpen: boolean;
   onOpenChange: () => void;
-  /** Fires when the modal fully closes (e.g. to reset internal view state). */
   onClose?: () => void;
   width?: "sm" | "md" | "lg" | "wide" | "xl";
-  /** Top-stripe colour: accent (default) or error (destructive confirms). */
   tone?: "default" | "danger";
-  /** id of the heading element, wired to the dialog via `aria-labelledby`. */
   labelledBy?: string;
   children: (close: () => void) => ReactNode;
 }) {
-  // Portal only after mount (SSR-safe).
   const mounted = useIsMounted();
   const dialogRef = useRef<HTMLDivElement>(null);
-  // Element focused before the modal opened, restored on close.
   const restoreFocusRef = useRef<HTMLElement | null>(null);
 
-  // Non-reactive bridges to the caller's (often inline) callbacks: read the
-  // latest value without making the open/close effect depend on them.
+  // useEffectEvent: read the latest callbacks without re-running the open effect.
   const requestClose = useEffectEvent(() => onOpenChange());
   const handleClosed = useEffectEvent(() => onClose?.());
 
-  // Open lifecycle: scroll lock, focus move-in, focus restore + onClose fire.
   useEffect(() => {
     if (!isOpen) return;
 
@@ -76,7 +57,7 @@ export function Modal({
         ? document.activeElement
         : null;
 
-    // Body scroll lock, compensating for the scrollbar width to avoid shift.
+    // Scroll lock compensates for the scrollbar width to avoid a layout shift.
     const { body } = document;
     const prevOverflow = body.style.overflow;
     const prevPaddingRight = body.style.paddingRight;
@@ -84,7 +65,6 @@ export function Modal({
     body.style.overflow = "hidden";
     if (scrollbar > 0) body.style.paddingRight = `${scrollbar}px`;
 
-    // Move focus into the dialog (first focusable, else the dialog itself).
     const dialog = dialogRef.current;
     const first = dialog?.querySelector<HTMLElement>(FOCUSABLE);
     (first ?? dialog)?.focus();
@@ -98,7 +78,6 @@ export function Modal({
     };
   }, [isOpen]);
 
-  // Esc to close + Tab focus trap.
   useEffect(() => {
     if (!isOpen) return;
 
@@ -144,15 +123,13 @@ export function Modal({
 
   return createPortal(
     <div className="mono-portal fixed inset-0 z-[var(--m-z-modal)]">
-      {/* Backdrop — click closes; clicks inside the dialog don't bubble here. */}
       <div
         className="mono-backdrop-enter absolute inset-0 bg-[#0a0a0a]/70 backdrop-blur-[2px]"
         aria-hidden="true"
         onClick={() => onOpenChange()}
       />
 
-      {/* Scroll wrapper — `outside` semantics: the page scrolls when the modal
-          is taller than the viewport (no inner modal scroll). */}
+      {/* Page scrolls when the modal is taller than the viewport (no inner scroll). */}
       <div className="absolute inset-0 flex items-center justify-center overflow-y-auto py-6">
         <div
           ref={dialogRef}
@@ -178,12 +155,6 @@ export function Modal({
   );
 }
 
-/**
- * Canonical modal header: `// EYEBROW` (mono-label, mb-6) + 32px title + optional
- * 14px subtitle (mt-4), with a 36px close ✕ control top-right. Returns the
- * heading `id` via `titleId` so the caller can wire `aria-labelledby` on
- * {@link Modal}.
- */
 export function ModalHeader({
   eyebrow,
   title,
@@ -228,12 +199,6 @@ export function ModalHeader({
   );
 }
 
-/**
- * Accent submit button — the canonical auth/reset primary action. 36px (`h-9`),
- * Space Grotesk 700 / 14px, accent fill. Full-width by default (the auth form
- * primary); pass `fullWidth={false}` for an inline `px-4` button (e.g. the
- * /brand demo). Shows `pendingLabel` while disabled-pending.
- */
 export function SubmitButton({
   children,
   pending = false,
@@ -265,7 +230,6 @@ export function SubmitButton({
   );
 }
 
-/** Stable id helper for wiring a modal title to `aria-labelledby`. */
 export function useModalTitleId() {
   return useId();
 }

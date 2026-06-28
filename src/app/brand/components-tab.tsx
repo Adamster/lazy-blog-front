@@ -27,6 +27,7 @@ import {
   Modal,
   ModalHeader,
   SubmitButton,
+  Button,
   useModalTitleId,
   Loading,
   ProgressBar,
@@ -47,19 +48,9 @@ import { addToastSuccess, addToastError } from "@/shared/lib/toasts";
 import { DraftOverlay } from "@/features/post/ui/draft-overlay";
 import { Section, Panel, State } from "./_helpers";
 
-/* --------------------------- shared button classes --------------------------- */
-const ctaCls =
-  "mono-cta inline-flex h-9 items-center justify-center px-4 text-[14px] font-bold tracking-[0.06em]";
-const outlineCls =
-  "mono-btn-outline inline-flex h-9 items-center justify-center px-4 text-[14px] font-semibold tracking-[0.06em]";
-const dangerCls =
-  "inline-flex h-9 items-center justify-center border-2 border-[var(--m-error)] bg-[var(--m-error)] px-4 text-[14px] font-bold tracking-[0.06em] text-[var(--m-bg)] uppercase transition-colors hover:bg-transparent hover:text-[var(--m-error)] disabled:opacity-60";
-// Directional / abort nav (Back · Next · Cancel) — LINK treatment, never a boxed
-// button: 11px label, muted2 → muted, no border / fill.
 const navLinkCls =
   "inline-flex items-center gap-2 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)]";
 
-/* ------------------------------ static data ------------------------------ */
 const CAT_OPTIONS: SelectOption[] = [
   { value: "ai", label: "AI" },
   { value: "design", label: "Design" },
@@ -78,9 +69,7 @@ const SPARK_DATES = [
   "2025-06-10",
 ];
 
-/* ------------------------------- the tab ------------------------------- */
 export function ComponentsTab() {
-  // Interactive demo state.
   const [demoOpen, setDemoOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [filledText, setFilledText] = useState("hello@notlazy.dev");
@@ -100,7 +89,6 @@ export function ComponentsTab() {
 
   return (
     <>
-      {/* Masthead */}
       <div className="text-[11px] tracking-[0.12em] text-[var(--m-accent)]">
         {"// NOT LAZY — COMPONENTS · KITCHEN SINK"}
       </div>
@@ -117,7 +105,6 @@ export function ComponentsTab() {
       </p>
 
       <div className="mt-10 flex flex-col gap-10">
-        {/* 01 — BUTTONS */}
         <Section
           index="01"
           title="BUTTONS"
@@ -127,15 +114,9 @@ export function ComponentsTab() {
             <div className="grid grid-cols-1 gap-x-7 gap-y-7 sm:grid-cols-3">
               <State caption="default">
                 <div className="flex flex-wrap items-center gap-4">
-                  <button type="button" className={ctaCls}>
-                    Primary
-                  </button>
-                  <button type="button" className={outlineCls}>
-                    Outline
-                  </button>
-                  <button type="button" className={dangerCls}>
-                    Delete
-                  </button>
+                  <Button>Primary</Button>
+                  <Button variant="outline">Outline</Button>
+                  <Button variant="danger">Delete</Button>
                   <button
                     type="button"
                     aria-label="Copy link"
@@ -146,9 +127,7 @@ export function ComponentsTab() {
                 </div>
               </State>
               <State caption="disabled">
-                <button type="button" disabled className={ctaCls}>
-                  Primary
-                </button>
+                <Button disabled>Primary</Button>
               </State>
               <State caption="pending — spinner + label, action disabled">
                 <form onSubmit={(e) => e.preventDefault()}>
@@ -169,7 +148,6 @@ export function ComponentsTab() {
             </p>
           </Panel>
 
-          {/* The arrow rule — directional vs action. */}
           <Panel
             caption="// ARROWS — direction only, never on action buttons"
             className="mt-7"
@@ -200,7 +178,6 @@ export function ComponentsTab() {
           </Panel>
         </Section>
 
-        {/* 02 — LABELS · CATEGORY · EYEBROWS */}
         <Section
           index="02"
           title="LABELS · CATEGORY · EYEBROWS"
@@ -251,7 +228,6 @@ export function ComponentsTab() {
           </div>
         </Section>
 
-        {/* 03 — AVATAR */}
         <Section
           index="03"
           title="AVATAR"
@@ -283,7 +259,6 @@ export function ComponentsTab() {
           </Panel>
         </Section>
 
-        {/* 04 — INPUTS: FIELD */}
         <Section
           index="04"
           title="INPUTS — FIELD"
@@ -325,7 +300,6 @@ export function ComponentsTab() {
           </Panel>
         </Section>
 
-        {/* 05 — TEXTAREA */}
         <Section
           index="05"
           title="TEXTAREA"
@@ -364,7 +338,6 @@ export function ComponentsTab() {
           </Panel>
         </Section>
 
-        {/* 06 — SELECT */}
         <Section
           index="06"
           title="SELECT"
@@ -417,7 +390,6 @@ export function ComponentsTab() {
           </Panel>
         </Section>
 
-        {/* 07 — FORM CONTROLS: SWITCH · CHECKBOX · RADIO */}
         <Section
           index="07"
           title="FORM CONTROLS — SWITCH · CHECKBOX · RADIO"
@@ -503,7 +475,6 @@ export function ComponentsTab() {
           </div>
         </Section>
 
-        {/* 08 — MENU · MODALS */}
         <Section
           index="08"
           title="MENU · MODALS"
@@ -543,20 +514,12 @@ export function ComponentsTab() {
 
             <Panel caption="// MODALS">
               <div className="flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  className={outlineCls}
-                  onClick={() => setDemoOpen(true)}
-                >
+                <Button variant="outline" onClick={() => setDemoOpen(true)}>
                   Open demo modal
-                </button>
-                <button
-                  type="button"
-                  className={dangerCls}
-                  onClick={() => setConfirmOpen(true)}
-                >
+                </Button>
+                <Button variant="danger" onClick={() => setConfirmOpen(true)}>
                   Confirm delete
-                </button>
+                </Button>
               </div>
               <p className="mt-7 text-[12px] leading-[1.6] text-[var(--m-muted2)]">
                 Real Modal shell: focus-trapped, Esc + backdrop close, scroll
@@ -566,7 +529,6 @@ export function ComponentsTab() {
           </div>
         </Section>
 
-        {/* 09 — FEEDBACK · TOASTS */}
         <Section
           index="09"
           title="FEEDBACK · TOASTS"
@@ -574,25 +536,21 @@ export function ComponentsTab() {
         >
           <Panel caption="// TOASTS">
             <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                className={ctaCls}
+              <Button
                 onClick={() => addToastSuccess("Post published successfully")}
               >
                 Show success
-              </button>
-              <button
-                type="button"
-                className={dangerCls}
+              </Button>
+              <Button
+                variant="danger"
                 onClick={() => addToastError("Something went wrong")}
               >
                 Show error
-              </button>
+              </Button>
             </div>
           </Panel>
         </Section>
 
-        {/* 10 — STATUSES · METADATA */}
         <Section
           index="10"
           title="STATUSES · METADATA"
@@ -637,7 +595,6 @@ export function ComponentsTab() {
           </div>
         </Section>
 
-        {/* 11 — LOADERS · PROGRESS */}
         <Section
           index="11"
           title="LOADERS · PROGRESS"
@@ -707,7 +664,6 @@ export function ComponentsTab() {
           </Panel>
         </Section>
 
-        {/* 12 — TABS */}
         <Section
           index="12"
           title="TABS (UnderlineTabs)"
@@ -735,7 +691,6 @@ export function ComponentsTab() {
           </Panel>
         </Section>
 
-        {/* 13 — CALLOUT */}
         <Section
           index="13"
           title="CALLOUT — INFO / WARNING BOX"
@@ -784,7 +739,6 @@ export function ComponentsTab() {
         </Section>
       </div>
 
-      {/* ----------------------------- live overlays ----------------------------- */}
       <Modal
         isOpen={demoOpen}
         onOpenChange={() => setDemoOpen(false)}

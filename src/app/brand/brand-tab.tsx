@@ -3,8 +3,7 @@ import { InfoBox } from "@/shared/ui";
 import { LogoSloth } from "./logo-sloth";
 import { Section, Panel, Spec } from "./_helpers";
 
-/* ----------------------------- palettes ----------------------------- */
-// Explicit hex so the light/dark logo & colour demos render correctly
+// Explicit hex (not tokens) so the light/dark demos render both themes
 // regardless of the ambient page theme. Mirrors the tokens in tailwind.css.
 type Pal = {
   bg: string;
@@ -68,7 +67,6 @@ const DARK_HEX: Record<string, string> = {
   error: "#ff6b6b",
 };
 
-/* ----------------------------- colour ----------------------------- */
 function Palette({
   title,
   hex,
@@ -109,7 +107,6 @@ function Palette({
   );
 }
 
-/* ------------------------------ logo ------------------------------ */
 function LogoCard({ dark }: { dark: boolean }) {
   const p = dark ? DARK : LIGHT;
   return (
@@ -124,7 +121,6 @@ function LogoCard({ dark }: { dark: boolean }) {
         {dark ? "// DARK" : "// LIGHT"}
       </div>
 
-      {/* [ TEAM ] NOT LAZY lockup */}
       <div className="flex flex-wrap items-center gap-5">
         <span
           className="px-4 py-2 text-[14px] tracking-[0.2em]"
@@ -137,7 +133,6 @@ function LogoCard({ dark }: { dark: boolean }) {
         </span>
       </div>
 
-      {/* Sloth mark — MONO ONLY: dark on light, light on dark. Never accent. */}
       <div className="flex items-center gap-7">
         <LogoSloth className="h-16 w-16" />
         <span
@@ -152,7 +147,6 @@ function LogoCard({ dark }: { dark: boolean }) {
   );
 }
 
-/* --------------------------- typography --------------------------- */
 const TYPE: {
   spec: string;
   sample: string;
@@ -214,11 +208,9 @@ const TYPE: {
   },
 ];
 
-/* ------------------------------ the tab ------------------------------ */
 export function BrandTab() {
   return (
     <>
-      {/* Masthead */}
       <div className="text-[11px] tracking-[0.12em] text-[var(--m-accent)]">
         {"// NOT LAZY — BRAND IDENTITY · BRUTALIST MONO"}
       </div>
@@ -240,7 +232,6 @@ export function BrandTab() {
       </p>
 
       <div className="mt-10 flex flex-col gap-10">
-        {/* 01 COLOR */}
         <Section
           index="01"
           title="COLOR SYSTEM"
@@ -252,7 +243,6 @@ export function BrandTab() {
           </div>
         </Section>
 
-        {/* 02 LOGO & MARK */}
         <Section
           index="02"
           title="LOGO & MARK"
@@ -264,7 +254,6 @@ export function BrandTab() {
           </div>
         </Section>
 
-        {/* 03 TYPOGRAPHY */}
         <Section
           index="03"
           title="TYPOGRAPHY"
@@ -290,7 +279,6 @@ export function BrandTab() {
           </div>
         </Section>
 
-        {/* 04 GEOMETRY & LAYOUT */}
         <Section
           index="04"
           title="GEOMETRY & LAYOUT"
@@ -337,7 +325,6 @@ export function BrandTab() {
           </div>
         </Section>
 
-        {/* 05 SPACING & RHYTHM */}
         <Section
           index="05"
           title="SPACING & RHYTHM"
@@ -370,7 +357,6 @@ export function BrandTab() {
           </InfoBox>
         </Section>
 
-        {/* 06 LETTER-SPACING & LINE-HEIGHT */}
         <Section
           index="06"
           title="LETTER-SPACING & LINE-HEIGHT"

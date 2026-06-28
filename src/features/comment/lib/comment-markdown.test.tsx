@@ -7,8 +7,6 @@ const Body = ({ md }: { md: string }) => <div>{renderCommentMarkdown(md)}</div>;
 describe("renderCommentMarkdown — inline marks", () => {
   it("renders bold / italic / strike", () => {
     const { container } = render(<Body md="**b** *i* ~~s~~" />);
-    // The leaf text is wrapped in a <span> inside each mark element; assert the
-    // mark element exists and carries the right text.
     expect(container.querySelector("strong")?.textContent).toBe("b");
     expect(container.querySelector("em")?.textContent).toBe("i");
     const strike = container.querySelector(".line-through");
@@ -51,7 +49,6 @@ describe("renderCommentMarkdown — inline GIF images (security)", () => {
   it("never emits raw HTML — a literal <img> tag stays text", () => {
     const md = '<img src="https://evil.example.com/x.gif" onerror="alert(1)">';
     const { container } = render(<Body md={md} />);
-    // Our own renderer must not have produced a real <img>.
     expect(container.querySelector("img")).toBeNull();
     expect(container.textContent).toContain("<img");
   });

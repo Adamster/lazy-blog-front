@@ -36,14 +36,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Resolve + apply the theme to <html> BEFORE first paint (no
-            light→dark flash). MUST be a RAW inline <script> in <head> so it runs
-            SYNCHRONOUSLY during HTML parse — `next/script` `beforeInteractive`
-            loads via Next's loader AFTER first paint, which reintroduces the
-            flash. (Tradeoff: React 19 dev-only logs a "script tag in component"
-            notice on client nav; harmless, prod-clean.) ONE source of truth —
-            `localStorage.theme` ∈ light|dark. light = no class; dark = `.dark`.
-            Stale `neo`/legacy values fall back to the OS preference. */}
+        {/* Must be a RAW inline <script> so it runs SYNCHRONOUSLY during parse,
+            before first paint — `next/script` beforeInteractive loads after first
+            paint and reintroduces the light→dark flash. */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var e=document.documentElement;var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}e.setAttribute('data-theme',t);e.classList.toggle('dark',t==='dark');e.classList.remove('neo');}catch(e){}})();`,
@@ -57,12 +52,8 @@ export default function RootLayout({
 
       <body className={`${font.variable} ${display.variable} ${mono.variable}`}>
         <AppProviders>
-          {/* This `<main>` clears the fixed header bar for EVERY route
-              (`pt-[var(--m-header-h)]`); pages add no own page-top padding.
-              Intentionally full-width: every page owns its own horizontal
-              constraint (the `mono-scope` breakout pages re-constrain to
-              `max-w-[1240px]` / `780` / `864`; `ErrorMessage`/`Loading`/the auth
-              `Modal` portal self-cap). */}
+          {/* Clears the fixed header bar for every route; intentionally
+              full-width so each page owns its own horizontal constraint. */}
           <main className="pt-[var(--m-header-h)]">{children}</main>
         </AppProviders>
         <SpeedInsights />

@@ -5,13 +5,13 @@ import { DisplayPostResponse, UserPostItem } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { postKeys } from "./post-keys";
 
-/** `useAllPosts` infinite-cache shape: each page is a flat post array. */
+// `useAllPosts` infinite-cache: each page is a flat array.
 type AllPostsCache = {
   pages: DisplayPostResponse[][];
   pageParams: unknown[];
 };
 
-/** `usePostsByUserName` infinite-cache shape: each page wraps `postItems`. */
+// `usePostsByUserName` infinite-cache: each page wraps `postItems`.
 type UserPostsCache = {
   pages: { postItems: UserPostItem[]; [k: string]: unknown }[];
   pageParams: unknown[];
@@ -38,12 +38,8 @@ const removeFromUserPosts = (
     })),
   };
 
-/**
- * Delete a post from the owner kebab with an optimistic removal: the post drops
- * out of every loaded feed (`getAllPosts` + `getPostsByUserName`) immediately,
- * then navigates home. On error the snapshots are restored. Distinct from the
- * shared `useDeletePost` (edit page → author profile); this one returns to `/`.
- */
+// Optimistically removes the post from every loaded feed, then navigates home.
+// Distinct from the edit page's `useDeletePost` (which routes to the profile).
 export const useDeletePostMenu = (postId: string) => {
   const queryClient = useQueryClient();
   const router = useRouter();

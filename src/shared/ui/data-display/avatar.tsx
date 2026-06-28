@@ -3,9 +3,7 @@
 import { useState } from "react";
 
 interface AvatarProps {
-  /** Avatar image URL; falls back to the initial when absent or broken. */
   src?: string | null;
-  /** Full name — drives the alt text and the single-letter fallback. */
   name: string;
   /** 40px byline/comment avatar (16px letter) or 128px profile-header avatar. */
   size?: "sm" | "lg";
@@ -16,17 +14,7 @@ const SIZES = {
   lg: { box: 128, letter: "text-[44px]" },
 } as const;
 
-/**
- * Brutalist-Mono avatar — a square 2px-border tile with the user's photo, or
- * their first initial on the panel surface when no image is set. `sm` (40px) is
- * the byline/comment size; `lg` (128px) is the profile header.
- *
- * The initial sits BEHIND the image as a zero-cost placeholder: it shows while
- * the photo loads (the fixed box already reserves space, so there's no layout
- * shift) and stays if the photo is missing or fails to load (`onError`). Plain
- * `<img>`, not next/image — shared/ui is framework-agnostic and the avatar ran
- * `unoptimized` anyway (arbitrary Azure-blob UGC URLs).
- */
+// Plain <img>, not next/image — shared/ui stays framework-agnostic and avatars run unoptimized (arbitrary UGC URLs).
 export function Avatar({ src, name, size = "sm" }: AvatarProps) {
   const { box, letter } = SIZES[size];
   const initial = name.trim().charAt(0).toUpperCase() || "?";

@@ -24,8 +24,6 @@ export function CommentsSection({
 
   return (
     <section>
-      {/* Compose — straight to add comment (no header/line).
-          40px section rhythm: each block sits 40px from the band/each other. */}
       {isPostPublished && (
         <IsAuth>
           <div className="pt-10">
@@ -49,8 +47,7 @@ export function CommentsSection({
         </div>
       ) : (
         <>
-          {/* Eyebrow hugs the comment list below (pt-10 pb-6); when empty the
-              scramble IS the content, so it's a terminal section (py-10). */}
+          {/* When empty the scramble IS the content, so it's a terminal section (py-10) rather than hugging a list. */}
           <Label className={`mono-label ${count > 0 ? "pt-10 pb-6" : "py-10"}`}>
             {count > 0 ? (
               `${count} COMMENTS`

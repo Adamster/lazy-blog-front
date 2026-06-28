@@ -4,11 +4,6 @@ import { enUS } from "date-fns/locale";
 export const delay = (seconds: number) =>
   new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 
-/**
- * Resolve a user's shown name from the single `displayName`, falling back to the
- * `@userName`, then a caller-chosen placeholder. One model for every byline /
- * profile / comment surface so the name reads identically everywhere.
- */
 export const displayNameOf = (
   user?: { displayName?: string | null; userName?: string | null },
   fallback = "Unknown"

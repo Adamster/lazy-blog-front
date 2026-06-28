@@ -8,7 +8,6 @@ import { displayNameOf } from "@/shared/lib/utils";
 import { AvatarCropModal } from "./avatar-crop-modal";
 import { useDeleteAvatar } from "../model/use-delete-avatar";
 
-/** Diagonal film-hatch fill — the same letterbox texture as the cover dropzone. */
 const FILM_BG =
   "repeating-linear-gradient(135deg,var(--m-panel) 0 1px,transparent 1px 10px)";
 
@@ -16,17 +15,7 @@ interface ProfileAvatarZoneProps {
   userData: UserResponse | undefined;
 }
 
-/**
- * Step-1 LEFT panel of the edit-profile card — the avatar equivalent of
- * {@link PostCoverDropzone}, same INTERACTION model: the centered 128px avatar
- * IS the click target (click → replace), hover reveals a `Replace`/`Add` overlay
- * and, when an avatar is set, a corner trash — no standalone hint or `Change`
- * button. Unlike the cover it stays centered (not stretched to the column).
- * Closed 2px box + diagonal film-hatch fill + `md:h-full` stretch. Picking a
- * file opens the {@link AvatarCropModal} (the composer's cover-crop modal
- * language — never an inline cropper). Owns the {@link useDeleteAvatar} mutation;
- * the modal owns the upload.
- */
+/** Picking a file opens the crop MODAL, never an inline cropper (would reflow the panel). */
 export function ProfileAvatarZone({ userData }: ProfileAvatarZoneProps) {
   const userId = userData?.id ?? "";
   const inputRef = useRef<HTMLInputElement>(null);
@@ -57,9 +46,6 @@ export function ProfileAvatarZone({ userData }: ProfileAvatarZoneProps) {
         className="flex items-center justify-center border-2 border-[var(--m-dim)] p-10 md:h-full"
         style={{ background: FILM_BG }}
       >
-        {/* The avatar IS the click target — same model as the cover dropzone:
-            click to replace, hover reveals the overlay + (when set) a corner
-            trash. Centered (NOT stretched to the column like the cover). */}
         <div className="group relative">
           <button
             type="button"

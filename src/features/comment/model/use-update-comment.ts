@@ -6,12 +6,6 @@ import { commentKeys } from "./comment-keys";
 
 type UpdateVars = { commentId: string; body: string };
 
-/**
- * Edit a comment with an optimistic replace: `onMutate` snapshots the thread and
- * rewrites the matching comment's body in place so the edit shows instantly;
- * `onError` rolls back; `onSettled` invalidates. Keyed by `postId`, matching
- * `useCommentsById`.
- */
 export const useUpdateComment = (postId: string, userId: string) => {
   const queryClient = useQueryClient();
   const key = commentKeys.byPost(postId);

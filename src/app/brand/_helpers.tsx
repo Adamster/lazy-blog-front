@@ -1,11 +1,7 @@
 import type { ReactNode } from "react";
 
-/* ---------------------------------------------------------------------------
- * Shared layout helpers for the /brand tabbed reference (Brand + Components).
- * One source for both tabs — do not fork these per-tab.
- * ------------------------------------------------------------------------- */
+// Shared layout helpers for the /brand tabs — one source, don't fork per-tab.
 
-/** Top-level section — `NN — TITLE` eyebrow + 40px section rhythm. */
 export function Section({
   index,
   title,
@@ -32,11 +28,6 @@ export function Section({
   );
 }
 
-/**
- * A `--m-card` panel grouping related content, with its own caption.
- * `accent` caption (// X, default) for component states; pass a muted2 caption
- * via `tone="muted"` for the brand-foundation demos that used the old `Demo`.
- */
 export function Panel({
   caption,
   tone = "accent",
@@ -64,7 +55,6 @@ export function Panel({
   );
 }
 
-/** One labelled state cell — small caption above the live primitive. */
 export function State({
   caption,
   children,
@@ -84,7 +74,6 @@ export function State({
   );
 }
 
-/** Spec table row — label on the left, accent token value on the right. */
 export function Spec({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid grid-cols-[1fr_auto] items-baseline gap-6 border-b-2 border-[var(--m-dim)] py-3">

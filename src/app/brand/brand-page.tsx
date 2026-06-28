@@ -24,7 +24,6 @@ export default function BrandPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Active tab lives in the URL (`?tab=…`) so it survives refresh / back-forward.
   const requested = searchParams.get("tab");
   const activeTab: TabId = isTabId(requested) ? requested : "brand";
 
@@ -44,7 +43,6 @@ export default function BrandPage() {
       style={{ fontFamily: "var(--font-mono)" }}
     >
       <main className="mx-auto max-w-[1240px] px-10 pt-10 pb-10">
-        {/* Mono tab bar — 2px dim baseline, accent underline on the active tab. */}
         <UnderlineTabs
           className="mb-10"
           ariaLabel="Brand reference"

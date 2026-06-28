@@ -3,36 +3,21 @@
 import { useRef } from "react";
 
 export interface UnderlineTabItem {
-  /** Stable id — reported by `onSelect` and matched against `current`. */
   id: string;
-  /** Visible uppercase label. */
   label: string;
 }
 
 interface UnderlineTabsProps {
   tabs: readonly UnderlineTabItem[];
-  /** id of the active tab. */
   current: string;
-  /** Free-switch select (no validation gate). */
   onSelect: (id: string) => void;
-  /** `aria-label` for the tablist. */
   ariaLabel: string;
-  /** Wires `aria-controls`/`id` on each tab to its panel (`${idPrefix}${id}`). */
   panelIdPrefix?: string;
-  /** The 2px `--m-dim` baseline under the row. Set `false` to show ONLY the
-   *  active-tab accent underline (e.g. under a header that already has a
-   *  divider), so the row doesn't carry a second full line. */
+  /** Set `false` under a header that already has a divider, to avoid a second line. */
   baseline?: boolean;
   className?: string;
 }
 
-/**
- * The plainer underline tab bar — a 2px `--m-dim` baseline with an accent
- * underline on the active tab (no marker boxes; the lighter chrome of a
- * reference index, as opposed to {@link TabNav}'s letter-box steps). Labels are
- * 11px / 0.12em uppercase, pinned `leading-none`. Roving tabindex + arrow
- * navigation, full tab a11y (`role="tablist"` / `role="tab"` / `aria-selected`).
- */
 export function UnderlineTabs({
   tabs,
   current,

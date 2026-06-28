@@ -3,14 +3,7 @@ import { Editor, rootCtx, defaultValueCtx } from "@milkdown/kit/core";
 import { getMarkdown } from "@milkdown/kit/utils";
 import { commentMarks } from "./comment-editor-config";
 
-/**
- * Headless round-trip for the minimal comment editor's plugin set: parse a
- * markdown string into the editor doc, serialize it back, and assert the
- * supported constructs survive (plain text/paragraphs + inline GIF image — the
- * editor is TEXT + PICTURES only, no formatting marks). This is the load-bearing
- * check that the curated plugin list has every base parser/serializer plugin it
- * needs — a missing one would drop or mangle output.
- */
+// Load-bearing check that the curated plugin list has every base parser/serializer plugin — a missing one would drop or mangle output.
 async function roundTrip(md: string): Promise<string> {
   const root = document.createElement("div");
   document.body.appendChild(root);

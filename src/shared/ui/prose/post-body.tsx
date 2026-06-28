@@ -18,14 +18,8 @@ type MdNode = {
   data?: { hName?: string; hProperties?: Record<string, unknown> };
 };
 
-/**
- * Milkdown's "preserve empty line" plugin serialises blank lines as literal
- * `<br />` HTML (e.g. the trailing empty paragraph Crepe auto-adds after a
- * divider). We don't render raw HTML (no `rehype-raw`), so those would show as
- * the text "<br />". Drop those exact `<br>` nodes (and any paragraph they leave
- * empty) so only Crepe's real line breaks remain — every other HTML node is
- * left untouched (still not rendered), so the security posture is unchanged.
- */
+// Milkdown serialises blank lines as literal `<br />`; we render no raw HTML, so
+// these would show as the text "<br />" — drop the exact `<br>` nodes + empty paragraphs.
 function remarkDropEmptyLines() {
   const isBr = (n: MdNode) =>
     n.type === "html" && /^<br\s*\/?>$/i.test((n.value ?? "").trim());
@@ -44,16 +38,6 @@ function remarkDropEmptyLines() {
   };
 }
 
-/**
- * Bridge our custom `:small[…]` text directive to a `<small>` element. The
- * editor stores the "small" inline mark as a remark `textDirective` named
- * `small` (see `editor-small-mark.ts`); here we set its hast name so
- * react-markdown renders `<small>` (styled 12px by `.mono-prose small`).
- *
- * Scoped to the ONE directive name we own — any UNKNOWN directive is left as a
- * bare `textDirective` mdast node with no `hName`, so react-markdown renders
- * nothing for it (it executes nothing): the directive syntax stays inert/safe.
- */
 function remarkSmallDirective() {
   return (tree: MdNode) => {
     const walk = (node: MdNode) => {
@@ -66,13 +50,6 @@ function remarkSmallDirective() {
   };
 }
 
-/**
- * Bridge our custom `:glitch[…]` / `:matrix[…]` text directives to custom hast
- * tags (`glitch` / `matrix`) so react-markdown routes them to the `GlitchText` /
- * `MatrixText` components below (via the `components` map). Same pattern and same
- * safety stance as `remarkSmallDirective`: scoped to the exact directive names
- * we own — any UNKNOWN directive keeps no `hName` and renders nothing (inert).
- */
 const INLINE_EFFECT_TAGS = new Set(["glitch", "matrix", "spoiler", "strike"]);
 
 function remarkEffectDirectives() {
@@ -94,15 +71,7 @@ function remarkEffectDirectives() {
   };
 }
 
-/**
- * Bridge our BLOCK effect directives — the leaf `::divider` and the container
- * `:::callout` — to custom hast tags routed to the block primitives below. Same
- * safety stance as the inline bridge: scoped to the exact names we own (any other
- * leaf/container directive keeps no `hName` and is literalised by
- * `remarkLiteralizeUnknownDirectives`). Directive ATTRIBUTES (the `{variant}` /
- * `{type}` braces remark-directive parses into `attributes`) are forwarded as
- * plain string props — never as colours/styles.
- */
+// Directive ATTRIBUTES (`{variant}`/`{type}` braces) are forwarded as plain string props — never colours/styles.
 const LEAF_BLOCK_TAGS = new Set(["divider"]);
 const CONTAINER_BLOCK_TAGS = new Set(["callout"]);
 
@@ -124,7 +93,6 @@ function remarkBlockDirectives() {
         node.name &&
         CONTAINER_BLOCK_TAGS.has(node.name)
       ) {
-        // `:::callout` keeps its rendered children (real prose).
         node.data = {
           ...node.data,
           hName: node.name,
@@ -137,19 +105,8 @@ function remarkBlockDirectives() {
   };
 }
 
-/**
- * Bridge our custom text-colour directives (`:primary[…]` / `:muted[…]` /
- * `:error[…]`) to a `<span>` carrying a FIXED, whitelisted class — the editor
- * stores each colour as its own inline mark/directive (see
- * `editor-color-marks.ts`).
- *
- * SECURITY: the colour is NEVER taken from a directive-supplied value. We map
- * the directive NAME (a member of this closed whitelist) to a hard-coded CSS
- * class (`mono-color-*`), and the actual colour lives in `prose.css` as a token.
- * Nothing user-controlled reaches an inline `style`, so arbitrary-colour
- * injection is impossible. Any other directive name keeps no `hName` and renders
- * nothing (inert), same stance as the small/effect bridges.
- */
+// SECURITY: colour comes from the directive NAME mapped to a hard-coded class, never
+// a directive-supplied value — nothing user-controlled reaches an inline `style`.
 const COLOR_DIRECTIVE_CLASS = {
   primary: "mono-color-primary",
   muted: "mono-color-muted",
@@ -178,16 +135,9 @@ function remarkColorDirectives() {
   };
 }
 
-/**
- * Catch-all for directives we DON'T own. `remark-directive` parses any `:name`
- * in the markdown as a directive — including incidental colons in existing
- * content (e.g. a "1:30:00" timestamp parses `:00` as a directive). An unhandled
- * directive is rendered as a block `<div>` by mdast-util-to-hast, which inside a
- * paragraph is invalid HTML (`<div>` in `<p>`) and crashes hydration. So AFTER
- * the known-directive bridges (small/effect/colour) have set their `hName`,
- * convert every remaining (un-`hName`'d) directive back to its literal source
- * text — it then renders as plain inline text, harmlessly, with no content lost.
- */
+// remark-directive parses incidental colons (e.g. "1:30:00" → `:00`) as directives; an
+// unhandled one renders as `<div>` inside `<p>` and crashes hydration. After the known
+// bridges set `hName`, turn every remaining directive back into literal inert text.
 function remarkLiteralizeUnknownDirectives() {
   const isDirective = (n: MdNode) =>
     n.type === "textDirective" ||
@@ -221,13 +171,8 @@ function remarkLiteralizeUnknownDirectives() {
   };
 }
 
-/**
- * Flatten a directive's rendered React children to a plain string — both effect
- * components take their text as a string prop (`GlitchText` needs `children:
- * string`, `MatrixText` needs `text: string`), but react-markdown hands us
- * React nodes. The directive content is plain inline text, so this recursion
- * over string/number/array/element-children resolves to the underlying text.
- */
+// Flatten directive children to a plain string — the effect components take text as a
+// string prop, but react-markdown hands us React nodes.
 function childrenToString(children: ReactNode): string {
   return Children.toArray(children)
     .map((child) => {
@@ -250,23 +195,8 @@ function childrenToString(children: ReactNode): string {
     .join("");
 }
 
-/**
- * Shared, server-compatible markdown renderer for the "Brutalist Mono" prose
- * sub-scale. Used by BOTH the server-rendered post read view AND the editor's
- * live preview, so the two are identical by construction.
- *
- * Security: raw HTML is intentionally NOT rendered (no `rehype-raw`). Content is
- * user-generated markdown; only markdown syntax is honoured. Images render as a
- * plain lazy <img> (arbitrary UGC URLs; we deliberately avoid next/image domain
- * whitelisting here). Styling lives in `src/assets/styles/prose.css`, scoped to
- * the `.mono-prose` wrapper.
- */
-
-/**
- * Element → design mapping. The visual treatment is driven by the `.mono-prose`
- * stylesheet; here we only set element-level attributes that CSS can't (lazy
- * images, safe link rel, code language hook).
- */
+// Security: raw HTML is intentionally NOT rendered (no `rehype-raw`); only markdown
+// syntax is honoured. Styling lives in `prose.css`, scoped to `.mono-prose`.
 const components = {
   a: ({ href, children, ...props }: ComponentPropsWithoutRef<"a">) => {
     const external = typeof href === "string" && /^https?:\/\//.test(href);
@@ -281,17 +211,10 @@ const components = {
     );
   },
   img: ({ src, alt, ...props }: ComponentPropsWithoutRef<"img">) => (
-    // Plain <img>, not next/image: prose images are arbitrary UGC URLs and we
-    // deliberately avoid next/image domain whitelisting here. `alt` comes from
-    // the markdown (`![alt](src)`), falling back to "" for decorative images.
+    // Plain <img>, not next/image: prose images are arbitrary UGC URLs (no domain whitelisting).
     // eslint-disable-next-line @next/next/no-img-element
     <img src={src} alt={alt ?? ""} loading="lazy" {...props} />
   ),
-  // Custom inline brand effects, routed here by `remarkEffectDirectives` (which
-  // sets `hName: "glitch" | "matrix"`). Both pull their text out of `children`
-  // (plain inline text) and hand it to the component as the string prop it
-  // expects. `react-markdown`'s `Components` type only knows HTML tags, so the
-  // custom keys are added via the cast below.
   glitch: ({ children }: { children?: ReactNode }) => (
     <GlitchText>{childrenToString(children)}</GlitchText>
   ),
@@ -301,23 +224,16 @@ const components = {
   spoiler: ({ children }: { children?: ReactNode }) => (
     <RevealMark variant="blur">{childrenToString(children)}</RevealMark>
   ),
-  // `:strike[…]` — a static struck-out edit (permanent line-through).
   strike: ({ children }: { children?: ReactNode }) => (
     <RevealMark variant="strike">{childrenToString(children)}</RevealMark>
   ),
-  // BLOCK directives. `::divider{variant}` → an ASCII section break; the
-  // whitelisted variant comes from the directive attribute (never a style).
   divider: ({ variant }: { variant?: string }) => (
     <AsciiDivider variant={variant === "slash" ? "slash" : "dots"} />
   ),
-  // `:::callout{type}` → a console callout (note | warn); content is prose.
   callout: ({ children, type }: { children?: ReactNode; type?: string }) => (
     <Callout type={type === "warn" ? "warn" : "note"}>{children}</Callout>
   ),
-  // YouTube / Spotify embed — `remarkMediaEmbeds` rewrites a paragraph that is
-  // ONLY a YT/Spotify link into this node, forwarding the VALIDATED kind/id/type
-  // as plain string props (never the raw URL). Reconstruct the discriminated
-  // descriptor here and hand it to `<MediaEmbed>`, which rebuilds the iframe src.
+  // Forwards the VALIDATED kind/id/type as plain string props (never the raw URL); rebuild the descriptor for <MediaEmbed>.
   "media-embed": (props: {
     kind?: string;
     videoId?: string;
@@ -343,7 +259,6 @@ const components = {
 } as Components;
 
 interface PostBodyProps {
-  /** Raw markdown source. */
   markdown: string;
 }
 
@@ -358,12 +273,8 @@ export function PostBody({ markdown }: PostBodyProps) {
           remarkEffectDirectives,
           remarkBlockDirectives,
           remarkColorDirectives,
-          // Turn a paragraph that is ONLY a YouTube/Spotify link into an embed
-          // node (existing posts carry plain links — no migration needed).
           remarkMediaEmbeds,
-          // Turn pasted raw `<iframe>` embed HTML (Spotify/YouTube "Copy embed
-          // code") into the same embed node — lights up existing posts at render
-          // time, no re-save (the read view literalises raw HTML otherwise).
+          // Raw `<iframe>` embed HTML → embed node (the read view literalises raw HTML otherwise).
           remarkIframeEmbeds,
           remarkLiteralizeUnknownDirectives,
           remarkDropEmptyLines,

@@ -47,7 +47,6 @@ import {
   clearColorCommand,
 } from "./editor-color-marks";
 
-/** Dispatch a Milkdown command into the live editor (owned by `crepe.tsx`). */
 export type RunCommand = <T>(cmd: $Command<T>, payload?: T) => void;
 
 function ToolBtn({
@@ -59,10 +58,8 @@ function ToolBtn({
   disabled,
 }: {
   label: string;
-  /** Text glyph (B/I/S/H2/…) — preferred where a clean letterform exists. */
   glyph?: string;
   glyphClass?: string;
-  /** Line icon — for actions with no clean glyph (e.g. Link). */
   icon?: ComponentType<{ className?: string }>;
   onPress: () => void;
   disabled?: boolean;
@@ -102,22 +99,14 @@ function Divider() {
 interface InsertItem {
   id: string;
   label: string;
-  /** Line icon for the row. Optional when a `swatch` colour is supplied. */
   icon?: ComponentType<{ className?: string }>;
-  /** A CSS colour (token) — renders a small square swatch instead of an icon
-   *  (the Text-colour menu). Takes precedence over `icon` when set. */
+  // Takes precedence over `icon` when set.
   swatch?: string;
   run: () => void;
 }
 
-/**
- * Icon-triggered toolbar dropdown (Insert, Effects, …). Brutalist-Mono: a `h-9`
- * icon trigger + chevron, opening a square 2px-`--m-dim` `--m-card` popover of
- * mono rows. The popover rows match `Select`'s highlight (panel bg + fg text on
- * hover — NOT accent) so all dropdowns read identically. Like the `ToolBtn`s,
- * every interactive part `preventDefault`s on mousedown so dispatching a command
- * never blurs the live editor (the selection the command acts on must survive).
- */
+// Every interactive part preventDefaults on mousedown so dispatching a command
+// never blurs the live editor (the command's selection must survive).
 function ToolbarMenu({
   icon: Icon,
   label,
@@ -168,8 +157,7 @@ function ToolbarMenu({
               key={item.id}
               type="button"
               role="menuitem"
-              // Same selection guard — the command must act on the editor's
-              // current selection, not blur it first.
+              // Selection guard — act on the editor's current selection, not blur it.
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => {
                 setOpen(false);
@@ -179,9 +167,7 @@ function ToolbarMenu({
               style={{ fontFamily: "var(--font-mono)" }}
             >
               {item.swatch ? (
-                // Brutalist colour swatch — a square 2px-bordered chip filled
-                // with the token (sized to the icon slot). The border keeps a
-                // pale/transparent swatch visible against the row.
+                // Border keeps a pale/transparent swatch visible against the row.
                 <span
                   aria-hidden="true"
                   className="size-3.5 shrink-0 border-2 border-[var(--m-dim)]"
@@ -199,21 +185,13 @@ function ToolbarMenu({
   );
 }
 
-/**
- * Persistent formatting toolbar — the top edge of the Step-2 editor frame and
- * the SINGLE source of formatting (the slash menu is gone). Standing buttons
- * cover the common actions; the "Insert ▾" dropdown holds block-level inserts.
- * Buttons dispatch Milkdown commands into the live editor via `onCommand`; the
- * Image button uploads through `onInsertImage`. Sticky so it stays put on long
- * posts; horizontally scrollable (brutalist scrollbar) when it can't fit.
- */
+// The SINGLE source of formatting — the slash menu is gone.
 export function EditorToolbar({
   onCommand,
   onInsertImage,
   disabled = false,
 }: {
   onCommand: RunCommand;
-  /** Upload + insert an image at the selection (owned by `crepe.tsx`). */
   onInsertImage: (file: File) => void;
   disabled?: boolean;
 }) {
@@ -224,11 +202,9 @@ export function EditorToolbar({
       id: "image",
       label: "Image",
       icon: PhotoIcon,
-      // Opens the hidden file picker → authed upload → insert (see below).
       run: () => fileInputRef.current?.click(),
     },
-    // A small starter grid (3 rows × 3 cols incl. the header row) — enough to
-    // show structure without flooding the column; the user grows it inline.
+    // Small starter grid — enough to show structure without flooding the column.
     {
       id: "table",
       label: "Table",
@@ -255,18 +231,10 @@ export function EditorToolbar({
     },
   ];
 
-  // Inline brand effects — toggle a custom mark on the selection. The Effects ▾
-  // menu offers ONLY the two approved marks (Glitch + Matrix); the other kept
-  // inline directives (`:spoiler` / `:strike` / `:link`) still RENDER in the read
-  // view but are not surfaced here. Each approved mark round-trips through
-  // markdown as a remark directive (`:glitch[…]` / `:matrix[…]`) and renders its
-  // full component in the read view.
   // TODO(block-fx): the BLOCK directives (`::divider`, `:::callout`, `:::poll`,
-  // `:::fold`) already render in the read view (post-body.tsx + prose.css), but
-  // have NO editor authoring UI yet — Crepe block nodes are non-trivial plumbing
-  // (a node schema + a slash-menu entry each, vs the 1:1 inline-mark pattern
-  // these toggles reuse). Author them by typing the raw directive for now; wire
-  // the Crepe nodes in a follow-up.
+  // `:::fold`) render in the read view but have NO editor authoring UI yet —
+  // Crepe block nodes are non-trivial plumbing vs the 1:1 inline-mark pattern
+  // here. Author them by typing the raw directive for now; wire nodes later.
   const effectItems: InsertItem[] = [
     {
       id: "glitch",
@@ -282,10 +250,6 @@ export function EditorToolbar({
     },
   ];
 
-  // Text colour — tint the selection one of four brand colours. Each colour is
-  // its own mutually-exclusive inline mark round-tripping as a remark directive
-  // (`:primary[…]` / `:muted[…]` / `:error[…]`); "Default" clears them all
-  // (back to `--m-fg`). Rows show a colour swatch rather than an icon.
   const colorItems: InsertItem[] = [
     {
       id: "color-default",
@@ -315,11 +279,9 @@ export function EditorToolbar({
 
   return (
     <div className="sticky top-0 z-[var(--m-z-content)] flex items-center gap-1 border-2 border-[var(--m-dim)] bg-[var(--m-card)] px-4 py-2">
-      {/* Scrollable format buttons. The horizontal scroll lives on THIS inner
-          row (not the bar) so the Insert popover — a sibling in the non-overflow
-          outer — isn't clipped by `overflow-x-auto`. */}
+      {/* Horizontal scroll lives on THIS inner row (not the bar) so the Insert
+          popover — a sibling in the non-overflow outer — isn't clipped. */}
       <div className="mono-scrollbar flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
-        {/* Headings + paragraph */}
         <ToolBtn
           label="Heading 2"
           glyph="H2"
@@ -344,7 +306,6 @@ export function EditorToolbar({
 
         <Divider />
 
-        {/* Inline marks */}
         <ToolBtn
           label="Small text"
           glyph="SM"
@@ -377,14 +338,12 @@ export function EditorToolbar({
           label="Link"
           icon={LinkIcon}
           disabled={disabled}
-          // Toggle a link on the selection; the (enabled) LinkTooltip edits the URL.
           onPress={() => onCommand(toggleLinkCommand, { href: "" })}
         />
 
         <Divider />
 
-        {/* Lists — standing buttons (used often enough that the dropdown was
-          fiddly); the rarer inserts stay in the Insert ▾ menu. */}
+        {/* Lists are standing buttons — used often enough that the dropdown was fiddly. */}
         <ToolBtn
           label="Bullet list"
           icon={ListBulletIcon}
@@ -398,8 +357,6 @@ export function EditorToolbar({
           onPress={() => onCommand(wrapInOrderedListCommand)}
         />
 
-        {/* Hidden file picker — opened by the Insert ▾ "Image" item; the chosen
-          file is uploaded (authed) and inserted via `onInsertImage`. */}
         <input
           ref={fileInputRef}
           type="file"
@@ -416,8 +373,7 @@ export function EditorToolbar({
 
       <Divider />
 
-      {/* Block-level inserts — outside the scroll row so the popover isn't
-          clipped by the inner `overflow-x-auto`. */}
+      {/* Outside the scroll row so the popover isn't clipped by `overflow-x-auto`. */}
       <ToolbarMenu
         icon={PlusIcon}
         label="Insert"
@@ -425,8 +381,6 @@ export function EditorToolbar({
         disabled={disabled}
       />
 
-      {/* Inline brand effects (Glitch / Matrix) — custom marks that wrap the
-          selection and round-trip as remark directives. */}
       <ToolbarMenu
         icon={SparklesIcon}
         label="Effects"
@@ -434,9 +388,6 @@ export function EditorToolbar({
         disabled={disabled}
       />
 
-      {/* Text colour — tint the selection one of four whitelisted brand colours
-          (Default clears any colour mark). Custom marks that round-trip as
-          remark directives, same pattern as Effects. */}
       <ToolbarMenu
         icon={SwatchIcon}
         label="Text colour"

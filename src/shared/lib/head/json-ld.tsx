@@ -1,8 +1,5 @@
-/**
- * Emits a JSON-LD `<script>` for SEO. `<` is escaped to `<` so a value can
- * never break out of the script tag (the one safe `dangerouslySetInnerHTML` use
- * here). Server-rendered; pass a schema.org object.
- */
+// `<` is escaped so a value can never break out of the script tag (the one safe
+// `dangerouslySetInnerHTML` here).
 export function JsonLd({ data }: { data: Record<string, unknown> }) {
   return (
     <script

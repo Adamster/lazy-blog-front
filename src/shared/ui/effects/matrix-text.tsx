@@ -5,32 +5,14 @@ import { pick } from "@/shared/lib/glyphs";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 
 interface Props {
-  /** The message that resolves out of the scramble. */
   text: string;
   className?: string;
-  /** ms per character as the message decodes. */
   speed?: number;
-  /** ms to hold the fully-revealed message. */
   holdMs?: number;
-  /** ms of pure scramble before the decode begins. */
   scrambleMs?: number;
-  /**
-   * `"loop"` (default) — scramble forever; `"hover"` — rest as plain text and
-   * run ONE decode pass on pointer-enter / focus; `"scroll"` — rest as plain
-   * text and run ONE decode pass when first scrolled into view (the `:type`
-   * post directive + LAB "decode on scroll").
-   */
   trigger?: "loop" | "hover" | "scroll";
 }
 
-/**
- * "Matrix" decode text — random glyphs (from the shared {@link MATRIX_GLYPHS})
- * scramble and resolve left-to-right into `text`. `trigger="loop"` cycles
- * forever (empty states, etc.); `trigger="hover"` runs a single decode on
- * enter/focus; `trigger="scroll"` runs a single decode the first time it scrolls
- * into view. Reusable across the mono surfaces. Respects reduced-motion: in
- * every mode the static `text` is shown and no scramble runs.
- */
 export function MatrixText({
   text,
   className = "",
@@ -43,7 +25,6 @@ export function MatrixText({
   const frameRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const spanRef = useRef<HTMLSpanElement>(null);
 
-  // Looping decode — runs while mounted (loop mode only).
   useEffect(() => {
     if (trigger !== "loop") return;
     if (prefersReducedMotion()) return; // keep the static message
@@ -72,7 +53,6 @@ export function MatrixText({
     return () => clearInterval(id);
   }, [text, speed, holdMs, scrambleMs, trigger]);
 
-  // One decode pass — shared by the hover/focus and scroll-in triggers.
   const runOnce = useCallback(() => {
     if (trigger === "loop" || prefersReducedMotion()) return;
     if (frameRef.current) clearInterval(frameRef.current);
@@ -98,13 +78,11 @@ export function MatrixText({
   }, [text, trigger]);
 
   useEffect(() => {
-    // Cleanup any in-flight one-shot pass on unmount.
     return () => {
       if (frameRef.current) clearInterval(frameRef.current);
     };
   }, []);
 
-  // Scroll trigger — run the single decode the first time the span is in view.
   useEffect(() => {
     if (trigger !== "scroll") return;
     const node = spanRef.current;

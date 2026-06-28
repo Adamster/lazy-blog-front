@@ -7,19 +7,10 @@ import type { SelectOption } from "@/shared/ui";
 
 interface PostTagPickerProps {
   options: SelectOption[];
-  /** Selected tag ids (API accepts multiple tags). */
   value: string[];
   onChange: (value: string[]) => void;
 }
 
-/**
- * Bracket-style multi-tag picker for Step 1. The collapsed trigger carries the
- * `[ … ]` brackets as the selected-tag preview — `[ SELECT TAG ]` (muted) when
- * empty, `[ a, b ]` (accent) once chosen. The open list renders plain labels
- * (no brackets) sized to fit the tags (no inner scrollbar). Backed by a real
- * `aria-multiselectable` listbox with full keyboard support (↑/↓ move,
- * Enter/Space toggle, Esc close).
- */
 export function PostTagPicker({
   options,
   value,

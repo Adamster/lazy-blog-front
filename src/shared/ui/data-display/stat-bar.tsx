@@ -1,22 +1,12 @@
 interface StatBarProps {
-  /** 11px / 0.12em uppercase label (e.g. `CPU`). */
   label: string;
-  /** 0–100 fill percentage. */
   value: number;
-  /** Below this the fill reads as critical (`--m-error`). Default 10. */
+  /** Below this the fill reads as critical (`--m-error`). */
   lowThreshold?: number;
-  /** Cells in the track. Default 24. */
   cells?: number;
   className?: string;
 }
 
-/**
- * A determinate statistics bar — `LABEL ████░░░░░ 38%`. A block track (filled
- * accent run + dotted `░` remainder) with a leading label and a right-aligned
- * tabular `%`. Values under `lowThreshold` flip the fill to `--m-error`
- * (a critical reading). On the closed scale: 11px / 0.12em label, 2px geometry,
- * tabular-nums percent.
- */
 export function StatBar({
   label,
   value,

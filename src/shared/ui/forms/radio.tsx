@@ -5,12 +5,7 @@ interface RadioOption {
   label: string;
 }
 
-/**
- * One radio — a native `input[type=radio]` (kept `sr-only`; the visible box is
- * its `peer`) + an 18px 2px-bordered SQUARE with an 8px INNER FILLED SQUARE when
- * selected (square, not a dot — the system has no circles). Rendered only by
- * {@link RadioGroup}.
- */
+// Native input kept `sr-only` (a11y); the visible square box is its `peer`.
 function Radio({
   name,
   option,
@@ -64,17 +59,11 @@ interface RadioGroupProps {
   value: string;
   onChange: (value: string) => void;
   options: RadioOption[];
-  /** Group label — 11px / 0.12em field label; `required` appends the asterisk. */
   label?: string;
   required?: boolean;
   disabled?: boolean;
 }
 
-/**
- * Brutalist-Mono radio group — a `role="radiogroup"` stack of square radios.
- * `gap-4` (16px) between options matching the form sibling-control rhythm;
- * optional 11px / 0.12em group label with the canonical required asterisk.
- */
 export function RadioGroup({
   name,
   value,

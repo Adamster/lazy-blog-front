@@ -29,17 +29,9 @@ export function useAuth() {
 export const useAuthState = () => {
   const queryClient = useQueryClient();
 
-  // Keep the `["auth"]` cache in sync with localStorage from BOTH directions of
-  // out-of-band change:
-  //   • `auth-changed` (same tab) — the api-client middleware refreshes/clears
-  //     the session by writing localStorage, not the query cache. On a failed
-  //     refresh this drops the UI to logged-out instead of leaving authed chrome
-  //     that 401s on every call; on a success it's a harmless re-read.
-  //   • `storage` (OTHER tabs) — a refresh/clear in a sibling tab rotates the
-  //     token in localStorage but fires NO `auth-changed` here. Without this,
-  //     this tab would keep serving the now-rotated token from its cache and
-  //     401-loop. The `storage` event only fires in tabs OTHER than the writer,
-  //     so it's exactly the cross-tab gap the same-tab event misses.
+  // Sync the `["auth"]` cache with out-of-band localStorage writes: `auth-changed`
+  // covers same-tab middleware refresh/clear; `storage` covers OTHER tabs (it
+  // fires only in non-writer tabs, the cross-tab gap the same-tab event misses).
   useEffect(() => {
     const sync = () => queryClient.setQueryData(["auth"], getAuthState());
 
@@ -55,11 +47,9 @@ export const useAuthState = () => {
     };
   }, [queryClient]);
 
-  // PURE READER: just mirror localStorage into the cache. The api-client
-  // middleware now guarantees no request leaves with a dead token (proactive
-  // `pre` refresh + 401 safety net), so the cache no longer needs to pre-refresh
-  // on read. `isAuthenticated` keys off `userId`, so a momentarily-stale token
-  // sitting in the cache is harmless — the next request refreshes it in-band.
+  // Pure reader — the api-client middleware guarantees no request leaves with a
+  // dead token, so the cache needn't pre-refresh on read (a stale token here is
+  // harmless: `isAuthenticated` keys off `userId`, next request refreshes it).
   return useQuery<AuthState>({
     queryKey: ["auth"],
     queryFn: () => getAuthState(),
@@ -80,8 +70,6 @@ export const useAuthActions = () => {
         userId: response.user.id!,
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
-        // Anchor expiry to the token's own `exp` (scheduling only), not a
-        // hardcoded TTL + the client clock at receipt.
         accessTokenExpires: expiryFromToken(response.accessToken),
       };
 
@@ -102,15 +90,10 @@ export const useAuthActions = () => {
     }
   };
 
-  // Synchronous: this only navigates the browser away (the page unloads), so the
-  // old `async`/`Promise<void>` signature was misleading — there's nothing to
-  // await.
   const loginWithGoogle = () => {
-    // The browser LANDS here after the Google round-trip, so it must be the
-    // FRONTEND page (`/auth/external-callback`) — which then fetches the backend
-    // `/api/auth/external-callback` to exchange the first-party external cookie
-    // for our tokens. Do NOT point this at `/api/...` (the backend endpoint):
-    // the browser would land on raw JSON instead of the page that finishes login.
+    // returnUrl is the FRONTEND page (not the backend `/api/...`): the browser
+    // lands here after Google, then that page exchanges the cookie for tokens.
+    // Pointing at `/api/...` would land the browser on raw JSON.
     const returnUrl = `${window.location.origin}/auth/external-callback`;
 
     const loginUrl =
@@ -121,9 +104,8 @@ export const useAuthActions = () => {
   };
 
   const logout = () => {
-    // Best-effort server-side revocation FIRST, then tear down locally. The
-    // revoke is fire-and-forget (never awaited, errors swallowed) so a network
-    // failure or an expired-access-token 401 can't keep the user logged in.
+    // Fire-and-forget revoke (never awaited) so a network failure or 401 can't
+    // keep the user logged in; tear down locally regardless.
     revokeRefreshToken(getAuthState());
 
     clearAuthState();
