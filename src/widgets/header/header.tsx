@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { useClickOutside } from "react-haiku";
 import { Bars3Icon } from "@heroicons/react/24/solid";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
-import { useTheme } from "@/shared/providers/theme-providers";
+import { useTheme } from "@/shared/ui/theme";
 import { useUser, useAuth } from "@/entities/session";
 import { AuthModal } from "@/features/auth/ui/auth-modal";
 import { RabbitMark } from "@/features/arcade/snake";
@@ -40,24 +40,26 @@ export function Header() {
           the 1240 content column). */}
       <header className="fixed inset-x-0 top-0 z-[var(--m-z-header)] h-[var(--m-header-h)] border-b-2 border-[var(--m-card)] bg-[var(--m-bg)]/70 backdrop-blur-md">
         <div className="flex h-full items-center justify-between px-5">
-          {/* Lockup + the hidden NEO easter-egg: the game's white rabbit sits
-              right AFTER the lockup's blinking cursor (a `ml-3` = 12px gap, one
-              step up the scale from the cursor), ONLY in the neo theme AND only
-              when signed in — "follow the white rabbit" to the arcade (which is
-              login-only, so there's no point dangling it to logged-out visitors).
-              On hover/focus it `mono-jiggle`s (a playful "laughing" wobble;
-              transform-only, no layout shift, dropped under reduced-motion).
-              Hidden under `sm` so it never crowds / wraps the wordmark on a
-              narrow phone bar. Not on light/dark. */}
+          {/* Lockup + the game's white rabbit: it sits right AFTER the lockup's
+              blinking cursor (a `ml-3` = 12px gap), shown when signed in — the
+              link into the arcade (which is login-only, so there's no point
+              dangling it to logged-out visitors). On hover/focus it
+              `mono-jiggle`s (a playful "laughing" wobble; transform-only, no
+              layout shift, dropped under reduced-motion). Hidden under `sm` so it
+              never crowds / wraps the wordmark on a narrow phone bar. */}
           <div className="flex items-center">
             <HeaderLockup />
-            {theme === "neo" && isAuthenticated && (
+            {isAuthenticated && (
               <Link
                 href="/arcade/follow-the-rabbit"
                 aria-label="Follow the white rabbit"
                 className="mono-jiggle mono-focus ml-3 hidden shrink-0 opacity-80 transition-opacity hover:opacity-100 focus-visible:opacity-100 sm:inline-flex"
               >
-                <RabbitMark size={16} className="mono-jiggle__mark" />
+                <RabbitMark
+                  size={16}
+                  fill={theme === "light" ? "var(--m-error)" : undefined}
+                  className="mono-jiggle__mark"
+                />
               </Link>
             )}
           </div>

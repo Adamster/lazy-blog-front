@@ -2,7 +2,6 @@
 
 import { ResponseError } from "@/shared/api/openapi";
 import { useEffect, useState } from "react";
-import { useThemeSafe } from "@/shared/providers/theme-providers";
 import { GlitchText } from "@/shared/ui/effects";
 import { Console } from "./overlays/console";
 
@@ -40,10 +39,6 @@ export const ErrorMessage = ({
   status?: number;
 }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  // The root ErrorBoundary fallback renders ABOVE ThemeProvider, so read the
-  // theme defensively (off <html>) instead of throwing when there's no provider.
-  const { theme } = useThemeSafe();
-  const isNeo = theme === "neo";
 
   useEffect(() => {
     const fetchErrorMessage = async () => {
@@ -75,14 +70,9 @@ export const ErrorMessage = ({
   const statusLine =
     status === 404 ? "NOT FOUND · 404" : `RUNTIME EXCEPTION · ${status ?? 500}`;
 
-  // NEO theme swaps the generic error chrome for a Matrix line (ties into the
-  // neo matrix-rain). Same layout/scale — eyebrow + headline + lead all stay in
-  // the ONE opening-transmission scene so it reads cohesive, not stitched.
-  const eyebrowText = isNeo ? "FOLLOW THE WHITE RABBIT" : statusLine;
-  const headline = isNeo ? "The matrix has you…" : "A glitch in the Lazyverse";
-  const lead = isNeo
-    ? "Knock, knock, Neo."
-    : "Error detected. Motivation to fix it: pending.";
+  const eyebrowText = statusLine;
+  const headline = "A glitch in the Lazyverse";
+  const lead = "Error detected. Motivation to fix it: pending.";
 
   return (
     <div

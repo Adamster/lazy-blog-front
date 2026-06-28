@@ -2,12 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { RevealMark, AsciiDivider } from "@/shared/ui/prose";
-import {
-  GlitchText,
-  MatrixRain,
-  MatrixRainOverlay,
-  MatrixText,
-} from "@/shared/ui/effects";
+import { MatrixRain, MatrixRainOverlay } from "@/shared/ui/effects";
 import { Section, Panel, Spec, State } from "./_helpers";
 import { addToastSuccess } from "@/shared/lib/toasts";
 
@@ -38,42 +33,12 @@ function RainSection({ onFullscreen }: { onFullscreen: () => void }) {
   );
 }
 
-/* ------------------------------ 02 · text fx ------------------------------ */
-
-function TextFxSection() {
-  return (
-    <Section
-      index="02"
-      title="TEXT FX"
-      intro="The base text-effect primitives the rest of the lab sits on. GlitchText (jitter + accent/error chromatic ghosts — the error-page headline) auto-beats on its own; MatrixText decodes a string from scrambled glyphs and loops. Both are theme-aware and hold a single static frame under reduced-motion."
-    >
-      <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
-        <Panel caption="// GLITCHTEXT — auto beat">
-          <State caption="jitter + accent/error ghosts (error pages)">
-            <span className="font-display text-[32px] leading-none font-bold tracking-[-0.02em] text-[var(--m-fg)]">
-              <GlitchText>Glitch</GlitchText>
-            </span>
-          </State>
-        </Panel>
-        <Panel caption="// MATRIXTEXT — decode loop">
-          <State caption="scrambled → resolved · respects reduced-motion">
-            <MatrixText
-              text="// SIGNAL SENT ... NO REPLY YET"
-              className="mono-label"
-            />
-          </State>
-        </Panel>
-      </div>
-    </Section>
-  );
-}
-
-/* ------------------------------ 03 · post fx ------------------------------ */
+/* ------------------------------ 02 · post fx ------------------------------ */
 
 function PostFxSection() {
   return (
     <Section
-      index="03"
+      index="02"
       title="POST FX"
       intro="The in-article marks kept for a later lib migration — each round-trips as a remark directive and renders here exactly as in the read view. Inline: `:spoiler`, `:strike`. Block: `::divider`. All bounded and reading-safe."
     >
@@ -163,11 +128,11 @@ export function LabTab() {
         Lab
       </h1>
       <p className="mt-5 text-[14px] leading-[1.7] text-[var(--m-muted)]">
-        The effect primitives — Matrix Rain, the glitch beat, the
-        decode/scramble text — plus the in-post marks kept for a later lib
-        migration. They react to hover, click or your keyboard, and every
-        animation degrades under reduced-motion. Theme follows the header
-        toggle.
+        The effect primitives — the Matrix Rain canvas + the in-post marks kept
+        for a later lib migration. They react to hover, click or your keyboard,
+        and every animation degrades under reduced-motion. Theme follows the
+        header toggle. (Text FX — GlitchText / MatrixText — live on the
+        Components tab; the glyph-rain experiments on the Glyph Rain tab.)
       </p>
 
       <div className="mt-7 border-l-2 border-[var(--m-accent)] bg-[var(--m-card)] p-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
@@ -180,7 +145,6 @@ export function LabTab() {
 
       <div className="mt-10 flex flex-col gap-10">
         <RainSection onFullscreen={openRain} />
-        <TextFxSection />
         <PostFxSection />
       </div>
 

@@ -126,7 +126,14 @@ const sharedUiNextFree = {
 
 const eslintConfig = [
   {
-    ignores: [".next/**", "out/**", "build/**", "next-env.d.ts"],
+    ignores: [
+      ".next/**",
+      "out/**",
+      "build/**",
+      "storybook-static/**",
+      ".claude/**",
+      "next-env.d.ts",
+    ],
   },
   ...coreWebVitals,
   ...typescript,

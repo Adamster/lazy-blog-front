@@ -1,13 +1,13 @@
-import { MATRIX_GLYPHS } from "@/shared/lib/glyphs";
 import type { Cell, Speed } from "./types";
 
 /**
  * RENDER MODE for the snake + rabbits — the ONE switch the owner flips.
  *
- *  - `"glyph"` (DEFAULT): the snake is drawn as a MATRIX-RAIN STREAM of glyphs
- *    bending along its body (bright near-white head → green {@link ACCENT} body
- *    dimming to {@link ACCENT_DIM} at the tail) — the on-theme "Matrix code"
- *    look, see {@link drawSnakeGlyphs}. The rabbits are ALWAYS the bunny-
+ *  - `"glyph"` (DEFAULT): the snake is drawn as a SOLID-SQUARE STREAM — one
+ *    near-full-cell square per body segment, in the segment colour (bright
+ *    near-white head → green {@link ACCENT} body dimming to a STILL-VISIBLE
+ *    {@link ACCENT_DIM} tail) — the on-theme "Matrix code" look, see
+ *    {@link drawSnakeGlyphs}. The rabbits are ALWAYS the bunny-
  *    silhouette pixel SPRITES (owner preference — they read better than glyph
  *    rabbits), independent of this flag.
  *  - `"sprite"`: the ORIGINAL pixel-art look — the grey sentinel head/body/tail
@@ -274,60 +274,27 @@ const GRID_LINE = "rgba(255,255,255,0.01)";
  *  grid so the board's rim always reads as a distinct field boundary. */
 const FRAME_LINE = "rgba(255,255,255,0.22)";
 
-// ---- glyph (matrix-rain) snake palette + cadence (SNAKE_RENDER === "glyph") ----
+// ---- glyph (square-stream) snake palette (SNAKE_RENDER === "glyph") ----
 
 /**
- * GLYPH-MODE colours. The snake is a rain stream, so it goes GREEN — the
- * authentic Matrix-rain palette (the same lime `--m-accent` family the on-page
- * `MatrixRain` uses), NOT the sprite mode's grey sentinel. The HEAD is the
- * bright leading glyph (near-white, like a rain column's head); the body fades
- * head→tail from {@link ACCENT} (bright green) to {@link ACCENT_DIM} (deep
- * green). (Owner note: if you'd rather the stream be GREY to match the sprite
- * sentinel, swap {@link GLYPH_HEAD}/{@link GLYPH_BODY}/{@link GLYPH_TAIL} to
- * `#f4f6f8` / {@link SENTINEL} / {@link SENTINEL_DIM} — a one-line trio swap.)
+ * SQUARE-STREAM colours. The snake is a stream of solid squares in the lime
+ * `--m-accent` family (the same the on-page rain uses), NOT the sprite mode's
+ * grey sentinel. The HEAD square is the bright accent green ({@link GLYPH_BODY});
+ * the body dims toward {@link GLYPH_TAIL} (deep green) AND fades in opacity
+ * head→tail, so the figure is brightest where the creature is "now" and
+ * dissolves into its wake. (Owner note: for a GREY stream, swap
+ * {@link GLYPH_BODY}/{@link GLYPH_TAIL} to {@link SENTINEL}/{@link SENTINEL_DIM}.)
  */
-const GLYPH_HEAD = "#eaffc0"; // near-white lime — the bright rain head
-const GLYPH_BODY = ACCENT; // bright green stream
+const GLYPH_BODY = ACCENT; // bright accent-green head + stream
 const GLYPH_TAIL = ACCENT_DIM; // deep-green tail end
+/** Opacity floor at the tail end (head = 1) — the stream fades into its wake. */
+const GLYPH_TAIL_ALPHA = 0.3;
 /**
- * Glyph cell coverage (fraction of the cell the glyph FONT is sized to). Sized
- * generously so the code reads, but under 1 so adjacent stream cells stay
- * legible as separate characters.
+ * Per-side inset of each body SQUARE, as a fraction of a cell — a small square
+ * centred in its cell (clear gaps between segments so they read as distinct
+ * blocks, not one solid worm). Snapped to the device-pixel grid (no blur).
  */
-const GLYPH_FILL = 0.5;
-/**
- * Faint cell-BACKGROUND wash behind each glyph snake segment (glyph mode only) —
- * a subtle accent-green fill on the cell so the body reads more clearly on the
- * dark {@link BOARD_BG}, WITHOUT competing with the glyphs (which still paint at
- * full strength on top). The wash's OPACITY tapers head→tail: brightest at the
- * head, fading to ~transparent at the tail, so the snake visibly dissolves into
- * its wake (the owner's "from first to last cell the opacity decreases so it
- * fades out").
- *
- *  - {@link GLYPH_BG} is the wash colour (the lime {@link ACCENT}, mirroring
- *    `--m-accent` on the dark theme — the canvas can't read CSS vars).
- *  - {@link GLYPH_BG_HEAD_ALPHA} → {@link GLYPH_BG_TAIL_ALPHA} are the alpha
- *    endpoints, LERPED linearly across the body by each segment's head→tail
- *    position. Head sits at the high end (~0.18), the tail floor is ~0
- *    (transparent), so the fill genuinely fades out.
- *  - The wash fills a slightly INSET rect (a {@link GLYPH_BG_INSET}-cell margin
- *    each side) so the squares read as a soft body trail, not a hard grid of
- *    full cells; the inset is snapped to the device-pixel grid (no blur).
- */
-const GLYPH_BG = ACCENT;
-const GLYPH_BG_HEAD_ALPHA = 0.18;
-const GLYPH_BG_TAIL_ALPHA = 0;
-/** Per-side inset of the wash rect, as a fraction of a cell (keeps the fill off
- *  the grid lines so adjacent segments read as a trail, not a solid block). */
-const GLYPH_BG_INSET = 0.08;
-/**
- * Churn cadence — how many render frames a stream POSITION holds its glyph
- * before re-rolling (the rain flicker). The HEAD re-rolls faster (it's the live
- * leading glyph). Bigger = calmer/more readable; smaller = busier shimmer. Kept
- * slow enough to read, never a strobe. Frozen entirely under reduced motion.
- */
-const GLYPH_CHURN_FRAMES = 16;
-const GLYPH_HEAD_CHURN_FRAMES = 7;
+const GLYPH_BG_INSET = 0.18;
 
 // ---- RED-SPARK ("ouch" / death) particle burst ----
 // Fires on EVERY NEGATIVE grab AND on the KILLER death (nothing else explodes —
@@ -818,21 +785,6 @@ function lerpHex(a: string, b: string, t: number): string {
   const g = Math.round(ag + (bg - ag) * t);
   const bl = Math.round(ab + (bb - ab) * t);
   return `rgb(${r},${g},${bl})`;
-}
-
-/**
- * Deterministic glyph picker for the matrix-rain stream. Hashes the integer
- * inputs (a stream POSITION + a churn epoch, or a rabbit's cell + epoch) into an
- * index of {@link MATRIX_GLYPHS} — same inputs always yield the same glyph, so
- * the shimmer is reproducible (no `Math.random()` strobe, honoring the engine's
- * determinism intent). A cheap xorshift-style integer mix over a 2D-ish key;
- * `>>> 0` keeps it an unsigned 32-bit int before the modulo.
- */
-function glyphFor(a: number, b: number): string {
-  let h = (a * 73856093) ^ (b * 19349663);
-  h = Math.imul(h ^ (h >>> 13), 0x5bd1e995);
-  h ^= h >>> 15;
-  return MATRIX_GLYPHS[(h >>> 0) % MATRIX_GLYPHS.length];
 }
 
 /**
@@ -1479,63 +1431,24 @@ export class SnakeEngine {
     return sampleTwitch(phase / TWITCH_DUR_FRAMES);
   }
 
-  // ---------- glyph (matrix-rain) renderer (SNAKE_RENDER === "glyph") ----------
+  // ---------- glyph (square-stream) renderer (SNAKE_RENDER === "glyph") ----------
 
   /**
-   * Draw ONE matrix glyph centred in cell `at`, in `color`, with an optional
-   * vertical bob (`yOffsetCells`, fraction of a cell — kept for symmetry with the
-   * sprite path's bob). The font is sized to {@link GLYPH_FILL} of the cell and the draw
-   * origin is snapped to the device-pixel grid (the ctx is `dpr`-scaled, so we
-   * snap in device px then divide back) — keeping the glyph from blurring across
-   * a half-pixel boundary even though text isn't a hard pixel grid. `textAlign`/
-   * `textBaseline` are centred so the glyph sits dead-centre regardless of font
-   * metrics.
+   * Paint one snake-body SQUARE for cell `at`, in `color`, at full opacity. A
+   * slightly inset square (a {@link GLYPH_BG_INSET}-cell margin each side) so the
+   * body reads as a stream of distinct squares on the dark {@link BOARD_BG}
+   * rather than one solid block; the inset + box are snapped to the device-pixel
+   * grid so the fill stays crisp (no blur), matching the sprite rasteriser's
+   * discipline. The size is floored to ≥1 device px so the square never rounds
+   * away to nothing at small cell sizes.
    */
-  private drawGlyph(
+  private drawSquare(
     ctx: CanvasRenderingContext2D,
     cell: number,
     dpr: number,
     at: Cell,
-    glyph: string,
     color: string,
-    yOffsetCells = 0
-  ) {
-    const sizeCss = cell * GLYPH_FILL;
-    // Centre of the cell, in device px, snapped to a whole device pixel so the
-    // glyph baseline lands crisply.
-    const cellDev = cell * dpr;
-    const cxDev = Math.round((at.x + 0.5) * cellDev);
-    // `textBaseline:"middle"` centres on the em-box middle, which for these mono
-    // glyphs sits a hair ABOVE the optical centre — nudge down ~6% of a cell so
-    // the glyph reads centred in its square.
-    const cyDev =
-      Math.round((at.y + 0.5 + yOffsetCells) * cellDev) +
-      Math.round(cellDev * 0.06);
-    // The 2D context can't resolve CSS vars (same reason the palette is literal
-    // hex), so `var(--font-mono)` made the whole font string invalid → it was
-    // silently ignored and the weight never applied. Use a literal monospace
-    // stack so the weight actually lands.
-    ctx.font = `800 ${sizeCss}px ui-monospace, "JetBrains Mono", Menlo, monospace`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = color;
-    ctx.fillText(glyph, cxDev / dpr, cyDev / dpr);
-  }
-
-  /**
-   * Paint the faint inset cell-BACKGROUND wash behind one glyph snake segment
-   * (glyph mode), at `alpha` (the head→tail-faded opacity). A slightly inset
-   * square of {@link GLYPH_BG} so the body trail reads on the dark field; the
-   * inset + box are snapped to the device-pixel grid so the fill stays crisp
-   * (no blur), matching the sprite rasteriser's discipline. No-op at alpha ≤ 0
-   * (the tail end), so the very end of the snake costs nothing and is invisible.
-   */
-  private drawGlyphBg(
-    ctx: CanvasRenderingContext2D,
-    cell: number,
-    dpr: number,
-    at: Cell,
-    alpha: number
+    alpha = 1
   ) {
     if (alpha <= 0) return;
     const cellDev = cell * dpr;
@@ -1545,64 +1458,36 @@ export class SnakeEngine {
     const sizeDev = Math.round(cellDev) - insetDev * 2;
     if (sizeDev <= 0) return;
     ctx.globalAlpha = alpha;
-    ctx.fillStyle = GLYPH_BG;
+    ctx.fillStyle = color;
     // Device px → CSS px (the ctx is pre-scaled by `dpr`).
     ctx.fillRect(leftDev / dpr, topDev / dpr, sizeDev / dpr, sizeDev / dpr);
     ctx.globalAlpha = 1;
   }
 
   /**
-   * Draw the snake as a MATRIX-RAIN STREAM that follows its body. Each cell is
-   * one glyph; the HEAD is the bright leading glyph ({@link GLYPH_HEAD}) and the
-   * body fades head→tail from {@link GLYPH_BODY} (bright green) to
-   * {@link GLYPH_TAIL} (deep green), so the whole figure reads like a rain
-   * column bent along the path — brightest where the creature is "now", dimming
-   * into its wake.
+   * Draw the snake as a STREAM OF SQUARES that follows its body. The HEAD is a
+   * bright accent-green square ({@link GLYPH_BODY}) at full opacity; toward the
+   * tail the square BOTH dims in colour (lerps to {@link GLYPH_TAIL}, deep green)
+   * AND fades in opacity (down to {@link GLYPH_TAIL_ALPHA}), so the figure is
+   * brightest where the creature is "now" and dissolves into its wake.
    *
-   * Glyph CHURN (the rain flicker): each STREAM POSITION (index from the head,
-   * NOT the moving cell) re-rolls its glyph every {@link GLYPH_CHURN_FRAMES}
-   * render frames; the head re-rolls faster ({@link GLYPH_HEAD_CHURN_FRAMES}).
-   * The glyph is chosen by {@link glyphFor} from `(position, churnEpoch)` — fully
-   * deterministic, so the shimmer is reproducible and never a random strobe.
-   * Seeding by position-from-head (not by board cell) means the pattern reads as
-   * a STABLE stream that flickers in place, the way a rain column does, rather
-   * than scrambling on every move.
-   *
-   * Painted TAIL→HEAD so the brighter near-head glyphs land on top at any
-   * overlap. `animate=false` (reduced motion) freezes the churn to epoch 0 — a
-   * legible STATIC stream, no flicker.
+   * No glyphs, no churn/flicker — every square is a static fill, so the body is
+   * identical with or without animation (nothing to freeze under reduced motion).
+   * Painted TAIL→HEAD so the brighter near-head squares land on top at any overlap.
    */
   private drawSnakeGlyphs(
     ctx: CanvasRenderingContext2D,
     cell: number,
-    dpr: number,
-    animate: boolean
+    dpr: number
   ) {
     const len = this.snake.length;
-    const headEpoch = animate
-      ? Math.floor(this.frame / GLYPH_HEAD_CHURN_FRAMES)
-      : 0;
-    const bodyEpoch = animate ? Math.floor(this.frame / GLYPH_CHURN_FRAMES) : 0;
     for (let i = len - 1; i >= 0; i--) {
       const seg = this.snake[i];
-      // Faint cell-background wash UNDER the glyph, opacity tapering head→tail:
-      // `t` is 0 at the head, 1 at the tail, so the alpha lerps from the bright
-      // head endpoint down to the (transparent) tail floor — the body fades out.
-      // Painted first so the full-strength glyph always lands on top.
+      // `t` is 0 at the head, 1 at the tail.
       const t = len <= 1 ? 0 : i / (len - 1);
-      const bgAlpha =
-        GLYPH_BG_HEAD_ALPHA + (GLYPH_BG_TAIL_ALPHA - GLYPH_BG_HEAD_ALPHA) * t;
-      this.drawGlyphBg(ctx, cell, dpr, seg, bgAlpha);
-      if (i === 0) {
-        // HEAD — bright leading glyph, fast flicker.
-        this.drawGlyph(ctx, cell, dpr, seg, glyphFor(0, headEpoch), GLYPH_HEAD);
-      } else {
-        // Body fades from bright green just behind the head to deep green at the
-        // tail (eased so most of the stream stays clearly green and only the
-        // last cells go dim).
-        const color = lerpHex(GLYPH_BODY, GLYPH_TAIL, t * 0.9);
-        this.drawGlyph(ctx, cell, dpr, seg, glyphFor(i, bodyEpoch), color);
-      }
+      const color = lerpHex(GLYPH_BODY, GLYPH_TAIL, t * 0.9);
+      const alpha = 1 - (1 - GLYPH_TAIL_ALPHA) * t;
+      this.drawSquare(ctx, cell, dpr, seg, color, alpha);
     }
   }
 
@@ -1682,12 +1567,12 @@ export class SnakeEngine {
       else this.drawNegative(ctx, cell, dpr, r.cell, r.rank, animate);
     }
 
-    // Snake — the matrix-rain GLYPH stream (glyph mode) follows the body in one
-    // call (head/body fade + churn handled inside); skip the entire sprite path
-    // below. Returns early after the head + explosion so the sprite head doesn't
+    // Snake — the square stream (glyph mode) follows the body in one call
+    // (head→tail colour gradient handled inside); skip the entire sprite path
+    // below. Returns early after the body + explosion so the sprite head doesn't
     // double-draw.
     if (SNAKE_RENDER === "glyph") {
-      this.drawSnakeGlyphs(ctx, cell, dpr, animate);
+      this.drawSnakeGlyphs(ctx, cell, dpr);
       this.drawExplosion(ctx, cell);
       return;
     }

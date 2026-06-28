@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import type { Theme } from "@/shared/providers/theme-providers";
+import type { Theme } from "@/shared/ui/theme";
 import { CommandButton } from "./command-row";
 
 /** Bracketed `[ value ]` indicator on the right of a settings toggle row. */
@@ -33,10 +33,8 @@ interface SettingsTogglesProps {
  * the menu open so the user can flip it in place. (The lang toggle is HIDDEN for
  * now — i18n is a backlog item; re-add the row here when wiring i18n.)
  *
- * `theme` is a single cycling control (light → dark → neo → light) — a theme is
- * mutually-exclusive by nature, so neo is just a third theme value here, not a
- * separate toggle. The indicator is accent whenever the canvas is dark
- * (dark/neo), muted on light.
+ * `theme` is a single cycling control (light → dark → light). The indicator is
+ * accent on dark, muted on light.
  */
 export function SettingsToggles({
   open,

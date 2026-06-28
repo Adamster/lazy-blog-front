@@ -5,11 +5,13 @@ import { UnderlineTabs } from "@/shared/ui";
 import { BrandTab } from "./brand-tab";
 import { ComponentsTab } from "./components-tab";
 import { LabTab } from "./lab-tab";
+import { GlyphRainTab } from "./glyph-rain-lab";
 
 const TABS = [
   { id: "brand", label: "Brand" },
   { id: "components", label: "Components" },
   { id: "lab", label: "Lab" },
+  { id: "glyph-rain", label: "Glyph Rain" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -61,6 +63,8 @@ export default function BrandPage() {
             <ComponentsTab />
           ) : activeTab === "lab" ? (
             <LabTab />
+          ) : activeTab === "glyph-rain" ? (
+            <GlyphRainTab />
           ) : (
             <BrandTab />
           )}
