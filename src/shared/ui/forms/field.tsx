@@ -90,9 +90,9 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
             className="mono-focus absolute right-0 bottom-2 flex p-1 text-[var(--m-muted2)] transition-colors hover:text-[var(--m-accent)]"
           >
             {showPassword ? (
-              <EyeSlashIcon className="size-[17px]" aria-hidden="true" />
+              <EyeSlashIcon className="size-3.5" aria-hidden="true" />
             ) : (
-              <EyeIcon className="size-[17px]" aria-hidden="true" />
+              <EyeIcon className="size-3.5" aria-hidden="true" />
             )}
           </button>
         ) : null}

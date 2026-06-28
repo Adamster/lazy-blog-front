@@ -72,7 +72,7 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
           up on focus/fill. Mirrors the auth/composer floating-label feel. */}
       <div className="relative">
         <span
-          className={`pointer-events-none absolute left-0 z-[var(--m-z-content)] text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-all duration-150 ${
+          className={`pointer-events-none absolute left-0 z-[var(--m-z-content)] text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-all duration-150 ${
             floated ? "top-0" : "top-5"
           }`}
         >

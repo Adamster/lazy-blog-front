@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { ErrorMessage } from "@/shared/ui/error-message";
+import { ErrorMessage } from "@/shared/ui";
 
 type ErrorProps = {
   error: Error & { digest?: string };

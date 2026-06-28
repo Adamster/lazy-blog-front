@@ -35,12 +35,9 @@ export function CommentsSection({
       )}
 
       {postCommentsLoading ? (
-        <div className="flex flex-col pt-10">
+        <div className="flex flex-col gap-7 pt-10">
           {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="grid grid-cols-[40px_1fr] gap-4 border-b-2 border-[var(--m-dim)] py-6"
-            >
+            <div key={i} className="grid grid-cols-[40px_1fr] gap-4">
               <div className="size-10 border-2 border-[var(--m-dim)] bg-[var(--m-panel)]" />
               <div className="space-y-2">
                 <div className="h-3 w-40 bg-[var(--m-panel)]" />

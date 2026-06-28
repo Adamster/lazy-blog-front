@@ -23,11 +23,11 @@ export function Section({
         {index} — {title}
       </div>
       {intro ? (
-        <p className="mt-7 text-[14px] leading-[1.6] text-[var(--m-muted)]">
+        <p className="mt-6 text-[14px] leading-[1.6] text-[var(--m-muted)]">
           {intro}
         </p>
       ) : null}
-      <div className="mt-7">{children}</div>
+      <div className="mt-6">{children}</div>
     </section>
   );
 }
@@ -51,7 +51,7 @@ export function Panel({
   return (
     <div className={`bg-[var(--m-card)] p-7 ${className}`}>
       <div
-        className={`mb-5 text-[11px] tracking-[0.12em] ${
+        className={`mb-4 text-[11px] tracking-[0.12em] ${
           tone === "accent"
             ? "text-[var(--m-accent)]"
             : "text-[var(--m-muted2)]"

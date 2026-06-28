@@ -6,7 +6,12 @@ import {
   ArrowRightStartOnRectangleIcon,
   ArrowRightEndOnRectangleIcon,
 } from "@heroicons/react/24/outline";
-import { BracketIcon, CommandButton, CommandLink } from "./command-row";
+import {
+  BracketIcon,
+  CommandButton,
+  CommandLink,
+  MenuGroupLabel,
+} from "./command-row";
 
 interface AccountCommandsProps {
   isAuthenticated: boolean;
@@ -60,9 +65,7 @@ export function AccountCommands({
       {/* `// account` console comment — mirrors the `// settings` group label
           below; only shown when signed in. The @handle profile link now lives
           in the header bar, so the account group here is edit_profile + logout. */}
-      <div className="px-4 pt-3 pb-1 text-[11px] tracking-[0.12em] text-[var(--m-muted2)]">
-        {"// account"}
-      </div>
+      <MenuGroupLabel>{"// account"}</MenuGroupLabel>
 
       {/* edit_profile → the profile settings page (redesign pending). */}
       <CommandLink

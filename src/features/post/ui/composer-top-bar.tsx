@@ -3,9 +3,9 @@
 import {
   AdjustmentsHorizontalIcon,
   ArrowTopRightOnSquareIcon,
+  BookOpenIcon,
   EyeIcon,
   EyeSlashIcon,
-  PencilIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import { CheckIcon, RocketLaunchIcon } from "@heroicons/react/24/solid";
@@ -50,11 +50,11 @@ export function ComposerTopBar({
 }: ComposerTopBarProps) {
   return (
     <div className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
-      <div className="mx-auto flex max-w-[1240px] items-center px-10 py-5">
+      <div className="mx-auto flex max-w-[1240px] items-center px-6 py-5 md:px-10">
         {/* LEFT — the stepper nav (Setup / Write) */}
         <Stepper
           steps={["Setup", "Write"]}
-          icons={[AdjustmentsHorizontalIcon, PencilIcon]}
+          icons={[AdjustmentsHorizontalIcon, BookOpenIcon]}
           current={step}
           errorSteps={errorSteps}
           completeSteps={completeSteps}

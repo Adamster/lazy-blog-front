@@ -10,12 +10,12 @@
   /* Eyebrow / section label — the accent `// LABEL` line. Add `uppercase` where
      the source did. */
   .mono-label {
-    @apply text-[11px] font-medium tracking-[0.12em] text-[var(--m-accent)];
+    @apply text-[11px] leading-[1.2] font-medium tracking-[0.12em] text-[var(--m-accent)];
   }
 
   /* `[ cat ]` category line — always uppercase, accent. */
   .mono-cat {
-    @apply text-[11px] font-medium tracking-[0.12em] text-[var(--m-accent)] uppercase;
+    @apply text-[11px] leading-[1.2] font-medium tracking-[0.12em] text-[var(--m-accent)] uppercase;
   }
 
   /* Card / content title (H3 size). Pair with `group-hover:text-[var(--m-accent)]`
@@ -58,7 +58,7 @@
      Select / hand-rolled composer fields) so tracking + spacing never drift.
      Rendered by the `FieldError` primitive. */
   .mono-error {
-    @apply mt-2 text-[11px] tracking-[0.12em] text-[var(--m-error)];
+    @apply mt-2 text-[11px] leading-[1.2] tracking-[0.12em] text-[var(--m-error)];
   }
 
   /* Square icon-only button — dim border, accent on hover (no uppercase). */

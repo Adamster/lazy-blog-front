@@ -1,7 +1,6 @@
 "use client";
 
-import { Label, Spinner } from "@/shared/ui";
-import { Sparkline } from "@/shared/ui/data-display/sparkline";
+import { Label, Spinner, Sparkline } from "@/shared/ui";
 import { formatScore } from "../model/leaderboard";
 import { HISTORY_RECENT } from "../model/score-history";
 import type { HistoryPoint, SnakeGameState } from "../model/types";

@@ -1,12 +1,10 @@
 "use client";
 
 import { ResetPasswordRequest } from "@/shared/api/openapi";
-import { Loading } from "@/shared/ui/feedback/loading";
 import { addToastError } from "@/shared/lib/toasts";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useUserById } from "@/entities/session";
-import { ErrorMessage } from "@/shared/ui/error-message";
 import { useResetPassword } from "@/features/auth/model/use-reset-password";
 import {
   Field,
@@ -15,6 +13,8 @@ import {
   ModalHeader,
   SubmitButton,
   useModalTitleId,
+  Loading,
+  ErrorMessage,
 } from "@/shared/ui";
 
 // Password strength: ≥6 chars with lower, upper, digit and a special char.

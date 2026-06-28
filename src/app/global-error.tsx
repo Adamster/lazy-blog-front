@@ -35,6 +35,14 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           fontFamily: "'JetBrains Mono', ui-monospace, monospace",
         }}
       >
+        {/* Scoped style — global-error replaces the root layout, so neither the
+            global CSS nor Tailwind utilities are loaded here. Reproduce the
+            in-set H1→Display responsive step (32px → 40px at the md/768px
+            breakpoint, matching error-message.tsx) without the banned clamp(). */}
+        <style>{`
+          .ge-headline { font-size: 32px; }
+          @media (min-width: 768px) { .ge-headline { font-size: 40px; } }
+        `}</style>
         <div style={{ width: "100%", maxWidth: 640, margin: "0 auto" }}>
           <div
             style={{
@@ -55,10 +63,10 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           </div>
 
           <h1
+            className="ge-headline"
             style={{
               margin: 0,
               fontFamily: display,
-              fontSize: "clamp(32px,6vw,40px)",
               lineHeight: 1.04,
               fontWeight: 700,
               letterSpacing: "-0.02em",

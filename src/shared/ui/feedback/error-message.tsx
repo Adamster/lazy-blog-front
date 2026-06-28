@@ -3,7 +3,7 @@
 import { ResponseError } from "@/shared/api/openapi";
 import { useEffect, useState } from "react";
 import { GlitchText } from "@/shared/ui/effects";
-import { Console } from "./overlays/console";
+import { Console } from "../overlays/console";
 
 /** Narrows the `{ response: { status } }` shape some fetch errors carry. */
 const statusOf = (error: unknown): number | undefined => {

@@ -7,7 +7,7 @@ import {
 } from "@heroicons/react/24/solid";
 
 /** Locale number formatting shared by every mono metric/count. */
-export const fmt = (n?: number) => (n ?? 0).toLocaleString("ru-RU");
+export const fmt = (n?: number) => (n ?? 0).toLocaleString("en-US");
 
 const ICONS = {
   likes: HeartIcon,
@@ -38,7 +38,7 @@ export function Metric({ kind, value, accent = false }: MetricProps) {
   return (
     <span
       className={[
-        "inline-flex items-center gap-1 tabular-nums",
+        "inline-flex items-center gap-2.5 tabular-nums",
         accent && "text-[var(--m-accent)]",
       ]
         .filter(Boolean)

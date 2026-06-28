@@ -1,5 +1,5 @@
 import dynamic from "next/dynamic";
-import { Loading } from "@/shared/ui/feedback/loading";
+import { Loading } from "@/shared/ui";
 
 /**
  * Client-only entry for the WYSIWYG editor. `ssr:false` is correct here: the

@@ -36,7 +36,7 @@ export function EditProfileTopBar({
 }: EditProfileTopBarProps) {
   return (
     <div className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
-      <div className="mx-auto flex max-w-[1240px] items-center px-10 py-5">
+      <div className="mx-auto flex max-w-[1240px] items-center px-6 py-5 md:px-10">
         {/* LEFT — the free-switch tab boxes (P / S) */}
         <TabNav
           tabs={TABS}

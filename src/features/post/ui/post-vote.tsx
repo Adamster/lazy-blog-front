@@ -21,7 +21,7 @@ interface IProps {
   canVote: boolean;
 }
 
-const fmt = (n: number) => n.toLocaleString("ru-RU");
+const fmt = (n: number) => n.toLocaleString("en-US");
 
 // Smooth Catmull-Rom curve through the rating series, baseline at 0. Mirrors the
 // design's inline math (viewBox 0..100 × 0..52, baseline at y=26) so negatives
@@ -106,7 +106,7 @@ export const PostVote = ({
             aria-label="Like this post"
             disabled={!canVote || handleVote.isPending}
             className={
-              "font-display mt-2 inline-flex items-center gap-2.5 bg-transparent p-0 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[var(--m-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--m-card)] disabled:opacity-100 " +
+              "mono-focus font-display mt-2 inline-flex items-center gap-2.5 bg-transparent p-0 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums transition-colors disabled:opacity-100 " +
               (liked
                 ? "text-[var(--m-accent)]"
                 : "text-[var(--m-muted2)] " +
@@ -132,7 +132,7 @@ export const PostVote = ({
             aria-label="Dislike this post"
             disabled={!canVote || handleVote.isPending}
             className={
-              "font-display mt-2 inline-flex items-center gap-2.5 bg-transparent p-0 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[var(--m-error)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--m-card)] disabled:opacity-100 " +
+              "mono-focus font-display mt-2 inline-flex items-center gap-2.5 bg-transparent p-0 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums transition-colors disabled:opacity-100 " +
               (disliked
                 ? "text-[var(--m-error)]"
                 : "text-[var(--m-muted2)] " +
@@ -186,7 +186,7 @@ export const PostVote = ({
             </svg>
             <span
               aria-hidden
-              className="absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
+              className="absolute size-1.5 -translate-x-1/2 -translate-y-1/2"
               style={{ left: dotLeft, top: dotTop, backgroundColor: dotColor }}
             />
           </div>

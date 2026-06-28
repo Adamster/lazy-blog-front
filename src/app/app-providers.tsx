@@ -4,7 +4,7 @@ import { AuthProvider } from "@/entities/session";
 import { ErrorBoundary } from "@/shared/providers/error-boundary";
 import { ReactQueryProvider } from "@/shared/providers/query-provider";
 import { ThemeProvider } from "@/shared/ui/theme";
-import { Toaster } from "@/shared/ui/overlays/toaster";
+import { Toaster } from "@/shared/ui";
 import { Header } from "@/widgets/header";
 
 export const AppProviders = ({ children }: { children: React.ReactNode }) => {

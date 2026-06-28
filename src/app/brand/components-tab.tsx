@@ -36,15 +36,13 @@ import {
   Console,
   Checkbox,
   RadioGroup,
+  Sparkline,
+  buildMonthlySeries,
+  ConfirmModal,
   type SelectOption,
 } from "@/shared/ui";
 import { Callout } from "@/shared/ui/prose";
 import { GlitchText, MatrixText } from "@/shared/ui/effects";
-import {
-  Sparkline,
-  buildMonthlySeries,
-} from "@/shared/ui/data-display/sparkline";
-import ConfirmDeleteModal from "@/shared/ui/overlays/confirmation-modal";
 import { addToastSuccess, addToastError } from "@/shared/lib/toasts";
 import { DraftOverlay } from "@/features/post/ui/draft-overlay";
 import { Section, Panel, State } from "./_helpers";
@@ -106,10 +104,10 @@ export function ComponentsTab() {
       <div className="text-[11px] tracking-[0.12em] text-[var(--m-accent)]">
         {"// NOT LAZY — COMPONENTS · KITCHEN SINK"}
       </div>
-      <h1 className="font-display mt-7 text-[40px] leading-none font-bold tracking-[-0.02em]">
+      <h1 className="font-display mt-6 text-[40px] leading-none font-bold tracking-[-0.02em]">
         Components
       </h1>
-      <p className="mt-5 text-[14px] leading-[1.6] text-[var(--m-muted)]">
+      <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
         Every Brutalist-Mono primitive from{" "}
         <code className="text-[var(--m-fg)]">src/shared/ui</code> and every
         state, side by side. A living reference — these are the real components,
@@ -126,7 +124,7 @@ export function ComponentsTab() {
           intro="36px controls (h-9). Primary (.mono-cta), outline (.mono-btn-outline), destructive (--m-error) and icon (.mono-icon-btn) — shown default, then a single disabled example, then the loading/pending submit (spinner + label, action disabled). Hover is CSS. Arrows are direction-only and live below as LINK-style nav, never on action buttons."
         >
           <Panel caption="// PRIMARY · OUTLINE · DESTRUCTIVE · ICON">
-            <div className="grid grid-cols-1 gap-x-7 gap-y-9 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-x-7 gap-y-7 sm:grid-cols-3">
               <State caption="default">
                 <div className="flex flex-wrap items-center gap-4">
                   <button type="button" className={ctaCls}>
@@ -292,7 +290,7 @@ export function ComponentsTab() {
           intro="Underline Field (text / email), shown empty (required *) → filled → error → disabled, side by side. Error text (! …, 11px / --m-error) renders only when present; the floating label always reads uppercase and only animates POSITION."
         >
           <Panel caption="// FIELD — text · email">
-            <div className="grid grid-cols-1 gap-x-7 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-x-7 gap-y-7 sm:grid-cols-2 lg:grid-cols-4">
               <State caption="empty (required *)">
                 <Field id="cs-f-empty" label="Email" type="email" required />
               </State>
@@ -334,7 +332,7 @@ export function ComponentsTab() {
           intro="The multi-line Field sibling — same underline + floating label, shown empty → filled → error → disabled."
         >
           <Panel caption="// TEXTAREA">
-            <div className="grid grid-cols-1 gap-x-7 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-x-7 gap-y-7 sm:grid-cols-2 lg:grid-cols-4">
               <State caption="empty">
                 <Textarea id="cs-ta-empty" label="Biography" />
               </State>
@@ -373,7 +371,7 @@ export function ComponentsTab() {
           intro="The custom Select (single + multiple), shown empty (placeholder) → filled → error (a multiple-select, required) → disabled. Click to open the listbox — ↑/↓ to move, Enter/Space to toggle, Esc to close, type-ahead supported."
         >
           <Panel caption="// SELECT — single · multiple">
-            <div className="grid grid-cols-1 gap-x-7 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-x-7 gap-y-7 sm:grid-cols-2 lg:grid-cols-4">
               <State caption="empty (placeholder)">
                 <Select
                   id="cs-sel-empty"
@@ -814,7 +812,7 @@ export function ComponentsTab() {
         )}
       </Modal>
 
-      <ConfirmDeleteModal
+      <ConfirmModal
         isOpen={confirmOpen}
         onOpenChange={() => setConfirmOpen(false)}
         title="Delete this post?"

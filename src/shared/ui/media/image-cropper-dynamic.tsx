@@ -1,7 +1,7 @@
 "use client";
 
 import { lazy, Suspense } from "react";
-import { Loading } from "@/shared/ui/feedback/loading";
+import { Loading } from "../feedback/loading";
 import type { ImageCropperProps } from "./image-cropper";
 
 const LazyImageCropper = lazy(() => import("./image-cropper"));

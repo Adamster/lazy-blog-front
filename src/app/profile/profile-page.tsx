@@ -8,7 +8,7 @@ import { ProfileIdentityForm } from "@/features/user/ui/profile-identity-form";
 import { ProfileSecurityForm } from "@/features/user/ui/profile-security-form";
 import { ProfileSecurityIntro } from "@/features/user/ui/profile-security-intro";
 import type { ProfileTab } from "@/features/user/ui/profile-tabs";
-import { Loading } from "@/shared/ui/feedback/loading";
+import { Loading } from "@/shared/ui";
 
 /**
  * Edit-profile screen — the composer's visual language re-dressed for settings.
@@ -64,7 +64,7 @@ export default function Profile() {
             height) — one closed 2px `--m-dim` box. Identity's left is the avatar
             zone; Security's is the lock context panel. The form inputs measure
             the right panel (≈ comfortable), not the full 1240. */}
-        <section className="mx-auto max-w-[1240px] px-10 pt-10 pb-10">
+        <section className="mx-auto max-w-[1240px] px-6 pt-10 pb-10 md:px-10">
           <div className="grid grid-cols-1 md:grid-cols-2">
             {activeTab === "security" ? (
               <ProfileSecurityIntro />
@@ -76,7 +76,7 @@ export default function Profile() {
               role="tabpanel"
               id={`panel-${activeTab}`}
               aria-labelledby={`tab-${activeTab}`}
-              className="border-2 border-t-0 border-[var(--m-dim)] bg-[var(--m-card)] p-7 md:border-t-2 md:border-l-0 md:p-10"
+              className="border-2 border-t-0 border-[var(--m-dim)] bg-[var(--m-card)] p-10 md:border-t-2 md:border-l-0"
             >
               {activeTab === "security" ? (
                 <ProfileSecurityForm />

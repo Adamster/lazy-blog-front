@@ -41,7 +41,7 @@ export function Menu({ items, triggerLabel }: MenuProps) {
         onClick={() => setOpen((v) => !v)}
         className="mono-focus flex size-9 items-center justify-center text-[var(--m-muted2)] transition-colors hover:text-[var(--m-accent)]"
       >
-        <EllipsisHorizontalCircleIcon className="size-[18px]" />
+        <EllipsisHorizontalCircleIcon className="size-4" />
       </button>
 
       {/* Minimal popout: BORDERED icon buttons (size-8, smaller than the

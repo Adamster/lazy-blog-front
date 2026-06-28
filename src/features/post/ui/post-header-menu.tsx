@@ -8,8 +8,7 @@ import {
   EyeIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import { Menu, type MenuItem } from "@/shared/ui";
-import ConfirmDeleteModal from "@/shared/ui/overlays/confirmation-modal";
+import { Menu, ConfirmModal, type MenuItem } from "@/shared/ui";
 import { usePublishPost, useHidePost } from "../model/use-publish-post";
 import { useDeletePostMenu } from "../model/use-delete-post-menu";
 
@@ -74,7 +73,7 @@ export const PostHeaderMenu = ({
   return (
     <>
       <Menu items={items} triggerLabel="Post options" />
-      <ConfirmDeleteModal
+      <ConfirmModal
         title="Delete post?"
         description="This post and all its comments will be permanently removed. This can't be undone."
         confirmLabel="Delete post"
@@ -85,7 +84,7 @@ export const PostHeaderMenu = ({
           deletePost.mutate();
         }}
       />
-      <ConfirmDeleteModal
+      <ConfirmModal
         tone="default"
         eyebrow="// Visibility"
         title="Unpublish post?"
@@ -98,7 +97,7 @@ export const PostHeaderMenu = ({
           hidePost.mutate();
         }}
       />
-      <ConfirmDeleteModal
+      <ConfirmModal
         tone="default"
         eyebrow="// Visibility"
         title="Publish post?"

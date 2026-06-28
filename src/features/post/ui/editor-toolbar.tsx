@@ -151,7 +151,7 @@ function ToolbarMenu({
         }}
         className={`mono-focus flex h-9 flex-none items-center gap-0.5 px-2 text-[var(--m-muted)] transition-colors hover:bg-[var(--m-panel)] hover:text-[var(--m-accent)] disabled:opacity-50`}
       >
-        <Icon className="size-[18px]" />
+        <Icon className="size-4" />
         <ChevronDownIcon
           aria-hidden="true"
           className={`size-3 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}

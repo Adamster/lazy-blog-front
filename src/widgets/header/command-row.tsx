@@ -34,6 +34,19 @@ export function BracketIcon({
   );
 }
 
+/**
+ * Console-comment group label (`// account`, `// settings`) above a block of
+ * command rows — 11px / 0.12em muted2, line box pinned (`leading-none`) so it
+ * renders at the label scale. One source so the two menu groups stay identical.
+ */
+export function MenuGroupLabel({ children }: { children: ReactNode }) {
+  return (
+    <div className="px-4 pt-3 pb-1 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)]">
+      {children}
+    </div>
+  );
+}
+
 interface CommandRowProps {
   children: ReactNode;
   /** Trailing slot (e.g. a `BracketIcon` or a `[ on ]` toggle indicator). */

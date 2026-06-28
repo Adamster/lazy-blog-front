@@ -74,7 +74,7 @@ export function PostCoverDropzone({
             </span>
           </>
         ) : (
-          <span className="flex flex-col items-center gap-3.5">
+          <span className="flex flex-col items-center gap-4">
             <PhotoIcon
               className="size-10 text-[var(--m-muted2)]"
               aria-hidden="true"
@@ -96,7 +96,7 @@ export function PostCoverDropzone({
           type="button"
           onClick={onRemove}
           aria-label="Remove cover image"
-          className={`mono-focus absolute top-3 right-3 z-[var(--m-z-content)] flex size-9 items-center justify-center border-2 border-[var(--m-dim)] bg-[var(--m-bg)] text-[var(--m-error)] opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 hover:border-[var(--m-error)]`}
+          className={`mono-icon-btn mono-focus absolute top-3 right-3 z-[var(--m-z-content)] size-9 bg-[var(--m-bg)] text-[var(--m-error)] opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 hover:border-[var(--m-error)] hover:text-[var(--m-error)]`}
         >
           <TrashIcon className="size-3.5" />
         </button>

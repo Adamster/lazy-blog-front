@@ -1,9 +1,7 @@
 "use client";
 
 import { PostDetailedResponse, UpdatePostRequest } from "@/shared/api/openapi";
-import { ErrorMessage } from "@/shared/ui/error-message";
-import { Loading } from "@/shared/ui/feedback/loading";
-import ConfirmDeleteModal from "@/shared/ui/overlays/confirmation-modal";
+import { ErrorMessage, Loading, ConfirmModal } from "@/shared/ui";
 import { PostForm } from "@/features/post/ui/post-form";
 import { IsAuthor, ProtectedRoute } from "@/entities/session";
 import { useParams } from "next/navigation";
@@ -89,13 +87,14 @@ const EditForm = ({ postData }: { postData: PostDetailedResponse }) => {
       <PostForm
         form={form}
         onSubmit={onSubmit}
+        isEdit
         isPending={updatePostMutation.isPending}
         onDelete={() => setIsModalOpen(true)}
         viewHref={`/${postData.author.userName}/${postData.slug}`}
       />
 
       {isModalOpen && (
-        <ConfirmDeleteModal
+        <ConfirmModal
           title="Delete post?"
           description="This post and all its comments will be permanently removed. This can't be undone."
           confirmLabel="Delete post"

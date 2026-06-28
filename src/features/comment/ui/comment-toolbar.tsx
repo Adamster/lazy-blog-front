@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useClickOutside } from "react-haiku";
 import { FaceSmileIcon } from "@heroicons/react/24/outline";
-import { ConsoleTitleBar } from "@/shared/ui/overlays/console";
-import { UnderlineTabs } from "@/shared/ui";
+import { ConsoleTitleBar, UnderlineTabs } from "@/shared/ui";
 import { GifPicker } from "@/features/comment/ui/gif-picker";
 import { parseGifUrl } from "@/features/comment/lib/comment-gif";
 import type { GifResult } from "@/features/comment/lib/klipy";
@@ -180,7 +179,7 @@ export function CommentToolbar({ api }: CommentToolbarProps) {
           onClick={() => setOpen((cur) => !cur)}
           className={`mono-icon-btn mono-focus size-9`}
         >
-          <FaceSmileIcon className="size-[18px] shrink-0" />
+          <FaceSmileIcon className="size-4 shrink-0" />
         </button>
 
         {open && (

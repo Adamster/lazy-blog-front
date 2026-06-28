@@ -138,19 +138,21 @@ export function Header() {
                 />
               </motion.div>
 
-              {/* The single burger — always top-right, the toggle, layered ABOVE
-                the panel (`z-[1]`) as the `menu.sh` header's right cap. Closed it
-                reads like every other icon button: a 2px `--m-dim` border + card
-                fill (hover → accent border). OPEN, both the border AND the fill
-                fade to transparent (`transition-colors`), leaving just the `≡`
-                icon in the header row — no box to mis-size against the row. */}
+              {/* The single burger — always top-right, the toggle, the
+                `menu.sh` header's right cap. Rendered AFTER the panel, so normal
+                DOM stacking already paints it on top — no z-index needed (a
+                `z-[1]` once raised for the neo layering has been reverted to the
+                default). Closed it reads like every other icon button: a 2px
+                `--m-dim` border + card fill (hover → accent border). OPEN, both
+                the border AND the fill fade to transparent (`transition-colors`),
+                leaving just the `≡` icon in the header row. */}
               <button
                 type="button"
                 aria-label={open ? "Close menu" : "Open menu"}
                 aria-expanded={open}
                 aria-haspopup="menu"
                 onClick={() => setOpen((v) => !v)}
-                className={`relative z-[1] flex size-9 items-center justify-center border-2 text-[var(--m-fg)] transition-colors hover:text-[var(--m-accent)] ${
+                className={`relative flex size-9 items-center justify-center border-2 text-[var(--m-fg)] transition-colors hover:text-[var(--m-accent)] ${
                   open
                     ? "border-transparent bg-transparent"
                     : "border-[var(--m-dim)] bg-[var(--m-card)] hover:border-[var(--m-accent)]"

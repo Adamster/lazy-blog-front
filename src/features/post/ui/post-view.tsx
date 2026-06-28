@@ -62,7 +62,7 @@ function PostByline({
           <span className="font-display block truncate text-[14px] font-semibold">
             {displayNameOf(post.author)}
           </span>
-          <span className="flex flex-wrap items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
+          <span className="mt-1 flex flex-wrap items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
             <Link
               href={`/${authorHandle}`}
               className="transition-colors hover:text-[var(--m-accent)]"
@@ -70,7 +70,9 @@ function PostByline({
               @{authorHandle}
             </Link>
             <Dot />
-            <span>{formatDate2(post.createdAtUtc)}</span>
+            <span className="tabular-nums">
+              {formatDate2(post.createdAtUtc)}
+            </span>
           </span>
         </div>
 
@@ -78,9 +80,9 @@ function PostByline({
         <div className="flex items-center gap-4 text-[12px] text-[var(--m-muted)] sm:ml-auto">
           <Metric kind="views" value={post.views ?? 0} />
           {/* Comment count is a slotted client island (live query) — hand-rolled
-              to match the Metric primitive (gap-1 icon→number, size-3.5 icon). */}
+              to match the Metric primitive (gap-2.5 icon→number, size-3.5 icon). */}
           <span
-            className="inline-flex items-center gap-1 tabular-nums"
+            className="inline-flex items-center gap-2.5 tabular-nums"
             aria-label="Comments"
           >
             <ChatBubbleLeftIcon className="size-3.5 shrink-0" />

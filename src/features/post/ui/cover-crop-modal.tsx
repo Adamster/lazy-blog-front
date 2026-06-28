@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Modal, ModalHeader, useModalTitleId } from "@/shared/ui";
-import { ImageCropper } from "@/shared/ui/image-cropper-dynamic";
+import { Modal, ModalHeader, useModalTitleId, ImageCropper } from "@/shared/ui";
 import { useCoverUpload } from "@/features/post/model/use-cover-upload";
 
 interface CoverCropModalProps {

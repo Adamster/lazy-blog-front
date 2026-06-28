@@ -4,18 +4,21 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { EyeIcon, StarIcon } from "@heroicons/react/24/solid";
 import { useUser } from "@/entities/session";
-import { ErrorMessage } from "@/shared/ui/error-message";
-import { Loading } from "@/shared/ui/feedback/loading";
 import { usePostsByUserName } from "@/features/post/model/use-posts-by-username";
 import {
   PublicationsFilter,
   type PublicationsView,
 } from "@/features/post/ui/publications-filter";
 import {
+  Label,
+  Avatar,
+  Dot,
+  fmt,
+  Loading,
+  ErrorMessage,
   Sparkline,
   seriesFromMonths,
-} from "@/shared/ui/data-display/sparkline";
-import { Label, Avatar, Dot, fmt } from "@/shared/ui";
+} from "@/shared/ui";
 import { MatrixText } from "@/shared/ui/effects";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
@@ -86,7 +89,7 @@ export default function UserPage({ userName }: { userName: string }) {
     >
       <main className="mx-auto max-w-[1240px] px-10 pb-10">
         {/* Profile header */}
-        <section className="flex flex-col gap-10 pt-10 pb-10 sm:flex-row sm:items-center">
+        <section className="flex flex-col gap-10 pb-10 sm:flex-row sm:items-center">
           <Avatar
             src={user?.avatarUrl}
             name={displayNameOf(user, "—")}
@@ -126,7 +129,7 @@ export default function UserPage({ userName }: { userName: string }) {
             <div>
               <Label>KARMA</Label>
               <div
-                className="font-display mt-2 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums"
+                className="font-display mt-4 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums"
                 style={{
                   color:
                     totalKarma > 0
@@ -146,7 +149,7 @@ export default function UserPage({ userName }: { userName: string }) {
 
             <div>
               <Label>TOTAL VIEWS</Label>
-              <div className="font-display mt-2 text-[46px] leading-none font-bold tracking-[-0.02em] text-[var(--m-accent)] tabular-nums">
+              <div className="font-display mt-4 text-[46px] leading-none font-bold tracking-[-0.02em] text-[var(--m-accent)] tabular-nums">
                 {fmt(totalViews)}
               </div>
               <div className="mt-2 flex items-center gap-2.5 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)]">
@@ -159,7 +162,7 @@ export default function UserPage({ userName }: { userName: string }) {
               <Label>ACTIVITY · 6M</Label>
               {/* Always draw the chart — an empty profile reads as a flat
                   line of zeros rather than a "no data" message. */}
-              <div className="mt-2">
+              <div className="mt-4">
                 <Sparkline
                   series={series}
                   gradientId="profileSparkGrad"

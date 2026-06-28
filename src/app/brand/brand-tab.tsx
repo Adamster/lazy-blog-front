@@ -222,13 +222,13 @@ export function BrandTab() {
       <div className="text-[11px] tracking-[0.12em] text-[var(--m-accent)]">
         {"// NOT LAZY — BRAND IDENTITY · BRUTALIST MONO"}
       </div>
-      <div className="mt-7 flex items-center gap-5">
+      <div className="mt-6 flex items-center gap-5">
         <LogoSloth className="h-12 w-12 text-[var(--m-fg)]" />
         <div className="font-display text-[40px] leading-none font-bold tracking-[-0.02em] whitespace-nowrap">
           NOT <span className="text-[var(--m-accent)]">LAZY</span>
         </div>
       </div>
-      <p className="mt-5 text-[14px] leading-[1.7] text-[var(--m-muted)]">
+      <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
         Space Grotesk — for identity, headings and numbers; JetBrains Mono — for
         data, code, body and labels. Dark-grey base, never pure black. The
         project accent is{" "}
@@ -276,7 +276,7 @@ export function BrandTab() {
                 key={t.spec}
                 className="grid grid-cols-[200px_1fr] items-baseline gap-6 border-b-2 border-[var(--m-dim)] py-5"
               >
-                <div className="text-[11px] tracking-[0.06em] text-[var(--m-muted2)]">
+                <div className="text-[11px] tracking-[0.12em] text-[var(--m-muted2)]">
                   {t.spec}
                 </div>
                 <div
@@ -379,7 +379,7 @@ export function BrandTab() {
           <Panel caption="✕ 0 vs ✓ 0.12em" tone="muted" className="mb-7">
             <div className="grid grid-cols-1 gap-7 sm:grid-cols-2">
               <div>
-                <div className="mb-2 text-[11px] tracking-[0.1em] text-[var(--m-muted2)]">
+                <div className="mb-2 text-[11px] tracking-[0.12em] text-[var(--m-muted2)]">
                   ✕ tracking 0 — flat
                 </div>
                 <div className="text-[11px] tracking-[0] text-[var(--m-muted)]">
@@ -387,7 +387,7 @@ export function BrandTab() {
                 </div>
               </div>
               <div>
-                <div className="mb-2 text-[11px] tracking-[0.1em] text-[var(--m-muted2)]">
+                <div className="mb-2 text-[11px] tracking-[0.12em] text-[var(--m-muted2)]">
                   ✓ tracking 0.12em — standard
                 </div>
                 <div className="text-[11px] tracking-[0.12em] text-[var(--m-accent)]">

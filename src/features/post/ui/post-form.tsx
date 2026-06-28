@@ -2,9 +2,14 @@
 
 import { useMemo, useRef, useState } from "react";
 import { Controller, type UseFormReturn } from "react-hook-form";
+import { PencilIcon } from "@heroicons/react/24/outline";
 import type { UpdatePostRequest } from "@/shared/api/openapi";
-import { Field, FieldError, type SelectOption } from "@/shared/ui";
-import ConfirmModal from "@/shared/ui/overlays/confirmation-modal";
+import {
+  Field,
+  FieldError,
+  ConfirmModal,
+  type SelectOption,
+} from "@/shared/ui";
 import { useTags } from "@/entities/tag";
 import { ComposerTopBar } from "./composer-top-bar";
 import { CoverCropModal } from "./cover-crop-modal";
@@ -24,6 +29,9 @@ interface PostFormProps {
   onDelete?: () => void;
   /** Edit-only: link to the live post, surfaced in the top bar. */
   viewHref?: string;
+  /** Edit mode — surfaces the (locked-by-default) slug / permalink field. On
+   *  create the slug is auto-generated server-side, so it's hidden there. */
+  isEdit?: boolean;
   isPending: boolean;
 }
 
@@ -61,11 +69,15 @@ export const PostForm = ({
   onSubmit,
   onDelete,
   viewHref,
+  isEdit = false,
   isPending,
 }: PostFormProps) => {
   const { data: tags } = useTags();
   const [step, setStep] = useState<ComposerStep>(1);
   const [cropTarget, setCropTarget] = useState<CropTarget | null>(null);
+  // The slug is the post's permalink — locked by default (it's auto-generated
+  // and changing it breaks existing links); the pencil unlocks it on demand.
+  const [slugEditable, setSlugEditable] = useState(false);
   // A validated submit awaiting a visibility-transition confirm (the rocket
   // gates the create/update mutation behind this dialog). `null` = no pending
   // submit / dialog closed; the boolean is the about-to-save `isPublished`.
@@ -176,7 +188,7 @@ export const PostForm = ({
 
       {/* ── STEP 1: SETUP — 1240 canvas, cover | form panel ── */}
       <section
-        className={`mx-auto max-w-[1240px] px-10 pt-10 pb-10 ${
+        className={`mx-auto max-w-[1240px] px-6 pt-10 pb-10 md:px-10 ${
           step === 1 ? "" : "hidden"
         }`}
       >
@@ -197,8 +209,8 @@ export const PostForm = ({
           />
 
           {/* Form — right panel, on the card background, content vertically
-              centered (matches the cover). Tag on top; no slug field (it's
-              auto-generated server-side). */}
+              centered (matches the cover). Tag → (edit only) locked slug →
+              title → summary. */}
           <div className="flex flex-col justify-center border-2 border-t-0 border-[var(--m-dim)] bg-[var(--m-card)] p-10 md:border-t-2 md:border-l-0">
             <Controller
               name="tags"
@@ -211,6 +223,57 @@ export const PostForm = ({
                 />
               )}
             />
+
+            {/* Slug / permalink — EDIT ONLY (create auto-generates it). Locked
+                by default; the lock toggle unlocks it (editing it rewrites the
+                post URL). */}
+            {isEdit && (
+              <div className="mt-4">
+                <label htmlFor="post-slug" className="mono-field-label">
+                  Slug
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    id="post-slug"
+                    disabled={!slugEditable}
+                    aria-invalid={Boolean(errors.slug)}
+                    className={`block w-full border-0 border-b-2 bg-transparent px-0 pb-2 text-[14px] leading-[1.6] text-[var(--m-fg)] caret-[var(--m-accent)] outline-none disabled:cursor-not-allowed disabled:text-[var(--m-muted2)] ${
+                      errors.slug
+                        ? "border-[var(--m-error)]"
+                        : "border-[var(--m-dim)] focus:border-[var(--m-accent)]"
+                    }`}
+                    style={{ fontFamily: "var(--font-mono)" }}
+                    {...register("slug", {
+                      required: "Slug is required",
+                      pattern: {
+                        value: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+                        message: "Lowercase letters, numbers and hyphens only",
+                      },
+                    })}
+                  />
+                  <button
+                    type="button"
+                    aria-label={slugEditable ? "Lock slug" : "Edit slug"}
+                    aria-pressed={slugEditable}
+                    onClick={() => setSlugEditable((v) => !v)}
+                    className="mono-icon-btn mono-focus size-9 shrink-0"
+                    style={
+                      slugEditable
+                        ? {
+                            borderColor: "var(--m-accent)",
+                            color: "var(--m-accent)",
+                          }
+                        : undefined
+                    }
+                  >
+                    <PencilIcon className="size-4" />
+                  </button>
+                </div>
+                {errors.slug ? (
+                  <FieldError error={errors.slug.message ?? ""} />
+                ) : null}
+              </div>
+            )}
 
             <div className="mt-4">
               <Field
@@ -270,7 +333,7 @@ export const PostForm = ({
           `.ProseMirror` so it stays 1:1 with the read view's 700 (780 − px-10).
           See `crepe-overrides.scss`. ── */}
       <section
-        className={`mx-auto max-w-[1240px] px-10 py-10 ${
+        className={`mx-auto max-w-[1240px] px-6 py-10 md:px-10 ${
           step === 2 ? "" : "hidden"
         }`}
       >
@@ -294,10 +357,7 @@ export const PostForm = ({
           )}
         />
         {errors.body ? (
-          <p
-            role="alert"
-            className="mx-auto mt-4 max-w-[700px] text-[11px] tracking-[0.12em] text-[var(--m-error)]"
-          >
+          <p role="alert" className="mono-error mx-auto max-w-[700px]">
             {`! ${errors.body.message}`}
           </p>
         ) : null}
