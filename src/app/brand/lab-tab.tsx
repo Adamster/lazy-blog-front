@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { RevealMark, AsciiDivider } from "@/shared/ui/prose";
 import { MatrixRain, MatrixRainOverlay } from "@/shared/ui/effects";
 import { Section, Panel, Spec, State } from "./_helpers";
-import { GlyphRainVariantsSection } from "./glyph-rain-lab";
 import { addToastSuccess } from "@/shared/lib/toasts";
 
 /* ------------------------------- 01 · rain ------------------------------- */
@@ -129,11 +128,11 @@ export function LabTab() {
         Lab
       </h1>
       <p className="mt-5 text-[14px] leading-[1.7] text-[var(--m-muted)]">
-        The effect primitives — Matrix Rain + the glyph-rain experiments — plus
-        the in-post marks kept for a later lib migration. They react to hover,
-        click or your keyboard, and every animation degrades under
-        reduced-motion. Theme follows the header toggle. (Text FX — GlitchText /
-        MatrixText — now live on the Components tab.)
+        The effect primitives — the Matrix Rain canvas + the in-post marks kept
+        for a later lib migration. They react to hover, click or your keyboard,
+        and every animation degrades under reduced-motion. Theme follows the
+        header toggle. (Text FX — GlitchText / MatrixText — live on the
+        Components tab; the glyph-rain experiments on the Glyph Rain tab.)
       </p>
 
       <div className="mt-7 border-l-2 border-[var(--m-accent)] bg-[var(--m-card)] p-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
@@ -147,7 +146,6 @@ export function LabTab() {
       <div className="mt-10 flex flex-col gap-10">
         <RainSection onFullscreen={openRain} />
         <PostFxSection />
-        <GlyphRainVariantsSection />
       </div>
 
       <MatrixRainOverlay isOpen={rainOpen} onClose={closeRain} />

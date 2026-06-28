@@ -26,7 +26,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
         style={{
           margin: 0,
           minHeight: "100vh",
-          background: "#141414",
+          background: "#181818",
           color: "#dcdcdc",
           display: "flex",
           flexDirection: "column",
@@ -94,7 +94,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                 height: 36,
                 padding: "0 16px",
                 background: "#cdff48",
-                color: "#141414",
+                color: "#181818",
                 border: 0,
                 fontFamily: display,
                 fontWeight: 700,

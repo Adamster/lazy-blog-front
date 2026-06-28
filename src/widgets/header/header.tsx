@@ -55,7 +55,11 @@ export function Header() {
                 aria-label="Follow the white rabbit"
                 className="mono-jiggle mono-focus ml-3 hidden shrink-0 opacity-80 transition-opacity hover:opacity-100 focus-visible:opacity-100 sm:inline-flex"
               >
-                <RabbitMark size={16} className="mono-jiggle__mark" />
+                <RabbitMark
+                  size={16}
+                  fill={theme === "light" ? "var(--m-error)" : undefined}
+                  className="mono-jiggle__mark"
+                />
               </Link>
             )}
           </div>

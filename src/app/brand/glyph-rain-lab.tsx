@@ -886,7 +886,7 @@ const HRAIN_VARIANTS: HRainVariant[] = [
   },
   {
     key: "8 · SMALL + FAST",
-    note: "Smaller dense bits, faster streams — busier, more Matrix.",
+    note: "Smaller dense bits, faster streams — busier, denser.",
     props: {
       glyphs: BIN,
       track: 9,
@@ -1040,9 +1040,9 @@ export function GlyphRainVariantsSection() {
 
   return (
     <Section
-      index="03"
+      index="01"
       title="GLYPH-RAIN — EXPERIMENTS"
-      intro="Our own falling-glyph effect, distanced from The Matrix (0/1, not katakana). 1–6 a grey-LANES fade take; 7–11 a Matrix-style RAIN turned 90° (white-head streams flow horizontally, random speed/direction); 12–16 the SAME falling top→bottom (classic vertical), with knobs for trail / density / opacity. Hit Fullscreen on any box to see it on the whole screen (Esc / click to exit)."
+      intro="Our own falling-glyph backdrop — binary 0/1 in our colour + mono font, a data shimmer of its own. 1–6 a grey-LANES fade take; 7–11 horizontal streams (white head, fading trail, random speed/direction); 12–16 the same falling top→bottom (vertical), with knobs for trail / density / opacity. Hit Fullscreen on any box to see it on the whole screen (Esc / click to exit)."
     >
       <div className="grid grid-cols-1 gap-7 md:grid-cols-2">
         {VARIANTS.map((v) => box(v.key, v.note, <GlyphFade {...v.props} />))}
@@ -1055,5 +1055,30 @@ export function GlyphRainVariantsSection() {
       </div>
       {fs && <FullscreenRain onClose={() => setFs(null)}>{fs}</FullscreenRain>}
     </Section>
+  );
+}
+
+/** The Glyph Rain tab — masthead + the experiments. */
+export function GlyphRainTab() {
+  return (
+    <>
+      <div className="text-[11px] tracking-[0.12em] text-[var(--m-accent)]">
+        {"// NOT LAZY — GLYPH RAIN"}
+      </div>
+      <h1 className="font-display mt-7 text-[40px] leading-none font-bold tracking-[-0.02em]">
+        Glyph Rain
+      </h1>
+      <p className="mt-5 text-[14px] leading-[1.7] text-[var(--m-muted)]">
+        Our own falling-glyph backdrop — binary 0/1 in the live accent + the
+        mono font, a data shimmer of its own. Several directions below (grey
+        lanes, horizontal streams, vertical fall); each can be opened
+        Fullscreen. Theme follows the header toggle; everything degrades under
+        reduced-motion.
+      </p>
+
+      <div className="mt-10">
+        <GlyphRainVariantsSection />
+      </div>
+    </>
   );
 }

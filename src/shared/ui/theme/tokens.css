@@ -56,14 +56,16 @@
 /* `.dark` now lives on <html> (layout inline script + ThemeProvider), so this
    reaches page scopes AND body-level portals (toasts, modals) alike.
    `--m-card`/`--m-panel` are TRANSLUCENT (the dark #232323 / #2a2a2a at 0.70
-   alpha): composited over the opaque `--m-bg #141414` they read a touch DARKER
-   than a solid fill (~#1e1e1e / ~#232323), so every card/band sinks INTO the
-   canvas instead of sitting on top of it. `--m-bg` stays opaque (the dropdown
-   console + modals use `bg-[var(--m-bg)]`, so they stay fully solid); overlays
-   reset to solid below. */
+   alpha): composited over the opaque `--m-bg #181818` they read a touch DARKER
+   than a solid fill (~#1f1f1f / ~#242424), so every card/band sinks INTO the
+   canvas instead of sitting on top of it. `--m-bg` is a hair above pitch black
+   (#181818, not #141414) so the canvas reads as an intentional charcoal that
+   harmonizes with the lime accent rather than pure black. `--m-bg` stays opaque
+   (the dropdown console + modals use `bg-[var(--m-bg)]`, so they stay fully
+   solid); overlays reset to solid below. */
 .dark .mono-scope,
 .dark .mono-portal {
-  --m-bg: #141414;
+  --m-bg: #181818;
   --m-fg: #dcdcdc;
   --m-accent: #cdff48;
   --m-line: #e6e6e6;
