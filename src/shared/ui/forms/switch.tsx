@@ -5,17 +5,11 @@ import { useId } from "react";
 interface SwitchProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
-  /** Visible text label, rendered to the right of the toggle. */
   label: string;
   id?: string;
   disabled?: boolean;
 }
 
-/**
- * Brutalist-Mono toggle — a square, 2px-border switch that fills accent when on.
- * Built on a real `role="switch"` button (`aria-checked`) so it's keyboard- and
- * screen-reader-accessible; the whole row (track + label) is the hit target.
- */
 export function Switch({
   checked,
   onChange,
@@ -52,7 +46,7 @@ export function Switch({
           }`}
         />
       </span>
-      <span className="text-[11px] leading-none tracking-[0.06em] text-[var(--m-fg)] uppercase">
+      <span className="text-[11px] leading-none tracking-[0.12em] text-[var(--m-fg)] uppercase">
         {label}
       </span>
     </button>

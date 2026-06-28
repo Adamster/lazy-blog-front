@@ -12,30 +12,14 @@ import { UNTAGGED_LABEL } from "../lib/untagged-label";
 
 interface IProps {
   post: PostDetailedResponse;
-  /**
-   * Author kebab menu (edit / publish / delete). A client island, gated on the
-   * viewer being the author; injected by the route so this server component
-   * stays free of session/`"use client"`.
-   */
+  // The interactive props below are client islands injected by the route, so this
+  // server component stays session-free and avoids sideways FSD feature imports.
   headerMenu?: ReactNode;
-  /**
-   * Vote band. A client island (needs auth to decide `canVote` and to mutate);
-   * injected by the route.
-   */
   vote?: ReactNode;
-  /**
-   * Comments block, injected by the route (the composition root). Keeping the
-   * comment feature out of this post-feature file avoids a sideways FSD import.
-   */
   comments?: ReactNode;
-  /**
-   * Live comment-count metric for the byline. A client island (the route owns
-   * the comment query); slotted so the byline itself stays server-rendered.
-   */
   commentsCount?: ReactNode;
 }
 
-/** Author tile + name/handle/date + view·like·comment metrics band. */
 function PostByline({
   post,
   commentsCount,
@@ -76,13 +60,11 @@ function PostByline({
           </span>
         </div>
 
-        {/* Right side: metrics cluster — between-metrics gap 16 (gap-4). */}
         <div className="flex items-center gap-4 text-[12px] text-[var(--m-muted)] sm:ml-auto">
           <Metric kind="views" value={post.views ?? 0} />
-          {/* Comment count is a slotted client island (live query) — hand-rolled
-              to match the Metric primitive (gap-2.5 icon→number, size-3.5 icon). */}
+          {/* Hand-rolled to match the Metric primitive (the count is a live island). */}
           <span
-            className="inline-flex items-center gap-2.5 tabular-nums"
+            className="inline-flex items-center gap-1 tabular-nums"
             aria-label="Comments"
           >
             <ChatBubbleLeftIcon className="size-3.5 shrink-0" />
@@ -95,12 +77,8 @@ function PostByline({
   );
 }
 
-/**
- * Server-rendered article: chip, `<h1>`, summary, byline, cover, and the prose
- * body all reach the HTML so crawlers (and the no-JS path) get real content.
- * Interactive pieces — the author kebab, the vote band, the comments composer —
- * are passed in as client islands and slotted into this server tree.
- */
+// Server-rendered so crawlers + the no-JS path get real content; interactive
+// pieces are slotted in as client islands.
 export const PostView = ({
   post,
   headerMenu,
@@ -110,23 +88,18 @@ export const PostView = ({
 }: IProps) => {
   const cat = post.tags?.[0]?.tag ?? UNTAGGED_LABEL;
 
-  // Status badge slot — pinned top-right of the header, same accent-chip
-  // treatment as the home hero. No backing field yet; set this when a
-  // pinned / latest-drop flag lands on the post model.
+  // No backing field yet — set when a pinned / latest-drop flag lands on the model.
   const status: Status | null = null;
 
   return (
     <>
-      {/* Above — on normal --m-bg: chip, title, summary */}
       <div className="mx-auto max-w-[780px] px-10 pt-10">
-        {/* Tag + draft + owner kebab */}
         <div className="mb-2 flex flex-wrap items-center gap-3">
           <Category>{cat}</Category>
           {status && <StatusBadge status={status} className="ml-auto" />}
           {headerMenu}
         </div>
 
-        {/* Title */}
         <h1 className="font-display text-[32px] leading-[1.04] font-bold tracking-[-0.02em] text-balance md:text-[40px]">
           {post.title}
         </h1>
@@ -138,11 +111,9 @@ export const PostView = ({
         )}
       </div>
 
-      {/* Byline band — full-bleed --m-card strip; no inner borders */}
       <PostByline post={post} commentsCount={commentsCount} />
 
       <article className="mx-auto max-w-[780px] px-10 pt-10">
-        {/* Cover */}
         {post.coverUrl && (
           <div className="relative aspect-[16/9] w-full overflow-hidden border-2 border-[var(--m-dim)] bg-[var(--m-panel)]">
             <Image
@@ -154,27 +125,21 @@ export const PostView = ({
               unoptimized
               className="object-cover [filter:contrast(1.03)]"
             />
-            {/* Draft overlay — the hidden state is obvious; only the author
-                ever sees this page anyway. */}
             {!post.isPublished && <DraftOverlay size="page" />}
           </div>
         )}
 
-        {/* Prose — server-rendered markdown, shared with the editor preview.
-            The mt-10 only separates the prose from the COVER; with no cover the
-            article's own pt-10 is the single top gap (else they double up). */}
+        {/* mt-10 only separates prose from the COVER; with no cover the article's
+            own pt-10 is the single top gap (else they double up). */}
         <div className={post.coverUrl ? "mt-10" : ""}>
           <PostBody markdown={post.body} />
         </div>
       </article>
 
-      {/* Rating band — full-bleed, shown to all readers; the vote click is gated
-          inside the island. Outside the article text flow so the w-screen
-          break-out can't trigger horizontal scroll. */}
+      {/* Outside the article text flow so the w-screen break-out can't trigger
+          horizontal scroll. */}
       {vote}
 
-      {/* Comments — injected by the route to keep the comment feature out of
-          this post-feature file (FSD: no sideways feature imports). */}
       <div className="mx-auto max-w-[780px] px-10 pb-10">{comments}</div>
     </>
   );

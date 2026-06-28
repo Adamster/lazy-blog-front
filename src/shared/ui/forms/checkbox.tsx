@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckIcon } from "@heroicons/react/24/solid";
+import { FieldError } from "./field-error";
 
 interface CheckboxProps {
   id: string;
@@ -8,19 +9,11 @@ interface CheckboxProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
   disabled?: boolean;
-  /** Required-field asterisk + native `required` attribute. */
   required?: boolean;
-  /** Error message (11px / 0.12em, `--m-error`) — also reddens the box border. */
   error?: string;
 }
 
-/**
- * Brutalist-Mono checkbox — a native `input[type=checkbox]` (kept `sr-only` for
- * a11y; the visible box is its `peer`) + an 18px 2px-bordered SQUARE (no
- * circles here). Checked = accent fill with a `✓`; focus-visible draws the
- * accent ring on the box. 14px UI-body label; `required` renders the canonical
- * asterisk; `error` reddens the border and shows an 11px / 0.12em message.
- */
+// Native input kept `sr-only` (a11y); the visible square box is its `peer`.
 export function Checkbox({
   id,
   label,
@@ -30,6 +23,7 @@ export function Checkbox({
   required = false,
   error,
 }: CheckboxProps) {
+  const errorId = `${id}-error`;
   return (
     <div>
       <label
@@ -46,6 +40,7 @@ export function Checkbox({
           disabled={disabled}
           required={required}
           aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
           onChange={(e) => onChange(e.target.checked)}
         />
         <span
@@ -65,11 +60,7 @@ export function Checkbox({
           ) : null}
         </span>
       </label>
-      {error ? (
-        <p className="mt-2 text-[11px] tracking-[0.12em] text-[var(--m-error)] uppercase">
-          {error}
-        </p>
-      ) : null}
+      {error ? <FieldError id={errorId} error={error} /> : null}
     </div>
   );
 }

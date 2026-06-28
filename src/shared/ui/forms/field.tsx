@@ -10,28 +10,16 @@ type NativeInputProps = Omit<
 >;
 
 interface FieldProps extends NativeInputProps {
-  /** Visible label — floats up when the field has content, ALWAYS uppercase. */
   label: string;
-  /** Underline text input type. Password adds the eye toggle. */
   type?: "text" | "email" | "password";
   value?: string;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
-  /** DOM id — also wires label/error a11y. Auto-generated when omitted. */
   id?: string;
-  /** Validation message; presence switches the field to its error state. */
   error?: string;
 }
 
-/**
- * Underline text field with a Material floating label. The label rests in the
- * placeholder spot when empty + blurred and floats up — always uppercase — on
- * focus OR whenever the input has content. "Has content" is detected purely in
- * CSS via `:not(:placeholder-shown)` (the input carries an invisible `" "`
- * placeholder), so it works for typed text, `value`, `defaultValue`, react-hook-
- * form's imperative `register()` values, and browser autofill alike — no JS
- * "filled" state to drift out of sync. Underline is dim by default, accent on
- * focus (error → `--m-error`). Pass react-hook-form's error message into `error`.
- */
+// Float is CSS-driven via `:placeholder-shown` (invisible `" "` placeholder), so
+// no JS "filled" state can drift from value/defaultValue/register/autofill.
 export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
   { label, type = "text", value, onChange, id, error, required, ...inputProps },
   ref
@@ -49,7 +37,7 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
       <div className="group relative">
         <label
           htmlFor={fieldId}
-          className="pointer-events-none absolute top-5 left-0 text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-all duration-150 group-focus-within:top-0 group-has-[input:not(:placeholder-shown)]:top-0"
+          className="pointer-events-none absolute top-6 left-0 text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-all duration-150 group-focus-within:top-0 group-has-[input:not(:placeholder-shown)]:top-0"
         >
           {label}
           {required ? (
@@ -64,8 +52,7 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
           value={value}
           onChange={onChange}
           required={required}
-          // Invisible placeholder so `:placeholder-shown` reflects emptiness —
-          // this is what drives the float, independent of value source.
+          // Invisible placeholder so `:placeholder-shown` drives the float.
           placeholder=" "
           aria-invalid={hasError}
           aria-describedby={hasError ? errorId : undefined}

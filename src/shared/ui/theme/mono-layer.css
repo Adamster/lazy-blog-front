@@ -1,77 +1,47 @@
-/* ───────────────────────── Brutalist Mono primitives ─────────────────────────
-   Reusable atomic style batches so the same look is applied via ONE class name
-   everywhere (no copy-pasted long class strings, no drift). These encode the
-   unified label/category tracking standard (text-[11px] tracking-[0.12em]) and
-   the shared display/title/field/control treatments. Apply with `className`;
-   compose freely with extra utilities (color overrides, spacing, hover).
-   Used by the .tsx primitives in src/shared/ui/mono and directly where only
-   styling (not markup) repeats. */
 @layer components {
-  /* Eyebrow / section label — the accent `// LABEL` line. Add `uppercase` where
-     the source did. */
   .mono-label {
     @apply text-[11px] leading-[1.2] font-medium tracking-[0.12em] text-[var(--m-accent)];
   }
 
-  /* `[ cat ]` category line — always uppercase, accent. */
   .mono-cat {
     @apply text-[11px] leading-[1.2] font-medium tracking-[0.12em] text-[var(--m-accent)] uppercase;
   }
 
-  /* Card / content title (H3 size). Pair with `group-hover:text-[var(--m-accent)]`
-     (or the hover variant) where the source had a hover. */
   .mono-title {
     @apply font-display text-[18px] leading-[1.18] font-semibold;
   }
 
-  /* Field label for the mono auth + reset forms. */
   .mono-field-label {
-    @apply mb-2 block text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase;
+    @apply mb-2 block text-[11px] leading-[1.2] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase;
   }
 
-  /* Underline-style text input (auth + reset). Border color is applied per
-     state by the caller (error vs dim/focus). */
+  /* Border color is applied per state by the caller (error vs dim/focus). */
   .mono-input {
     @apply w-full border-0 border-b-2 bg-transparent text-[var(--m-fg)] caret-[var(--m-accent)] transition-colors outline-none placeholder:text-[var(--m-muted2)];
   }
 
-  /* Inverted-accent primary button (filled accent → hollow on hover). */
+  /* Bakes the boxed-button type at source so call sites don't inherit the body font / unpinned line-height; weight + tracking stay at the call site. */
   .mono-cta {
-    @apply border-2 border-[var(--m-accent)] bg-[var(--m-accent)] text-[var(--m-bg)] uppercase transition-colors hover:bg-transparent hover:text-[var(--m-accent)] disabled:opacity-60;
+    @apply font-display border-2 border-[var(--m-accent)] bg-[var(--m-accent)] text-[14px] leading-none text-[var(--m-bg)] uppercase transition-colors hover:bg-transparent hover:text-[var(--m-accent)] disabled:opacity-60;
   }
 
-  /* Outline button — dim border, accent on hover. */
   .mono-btn-outline {
-    @apply border-2 border-[var(--m-dim)] text-[var(--m-muted)] uppercase transition-colors hover:border-[var(--m-accent)] hover:text-[var(--m-accent)];
+    @apply font-display border-2 border-[var(--m-dim)] text-[14px] leading-none text-[var(--m-muted)] uppercase transition-colors hover:border-[var(--m-accent)] hover:text-[var(--m-accent)];
   }
 
-  /* Shared focus-visible ring — accent 2px outline at 2px offset. The ONE
-     source for the keyboard-focus ring (replaces the `focusRing` string that
-     used to be copy-pasted across ~28 call sites). Add `mono-focus` to any
-     interactive element. */
   .mono-focus {
     @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--m-accent)];
   }
 
-  /* Field validation message — 11px terminal label scale, accent-error, hugs
-     the control at 8px. ONE source for every form error (Field / Textarea /
-     Select / hand-rolled composer fields) so tracking + spacing never drift.
-     Rendered by the `FieldError` primitive. */
   .mono-error {
     @apply mt-2 text-[11px] leading-[1.2] tracking-[0.12em] text-[var(--m-error)];
   }
 
-  /* Square icon-only button — dim border, accent on hover (no uppercase). */
   .mono-icon-btn {
-    /* Pure border, NO fill — consistent everywhere (the floating kebab/dropdown
-       no longer carries an ad-hoc `--m-card` bg either, so all icon buttons read
-       the same: a 2px box, transparent interior). */
+    /* Pure border, NO fill — every icon button reads the same (no ad-hoc --m-card bg). */
     @apply flex flex-none items-center justify-center border-2 border-[var(--m-dim)] text-[var(--m-muted)] transition-colors hover:border-[var(--m-accent)] hover:text-[var(--m-accent)];
   }
 
-  /* Brutalist scrollbar — square, 2px-inset dim thumb on the page background.
-     Apply to any capped/overflowing list (Crepe slash menu, etc.) so it never
-     falls back to the OS chrome. */
   .mono-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: var(--m-dim) var(--m-bg);

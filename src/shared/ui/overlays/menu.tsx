@@ -5,26 +5,18 @@ import { useClickOutside } from "react-haiku";
 import { EllipsisHorizontalCircleIcon } from "@heroicons/react/24/outline";
 
 export interface MenuItem {
-  /** Stable id for the row (React key + onSelect dispatch). */
   id: string;
   label: ReactNode;
   icon?: ReactNode;
   onSelect: () => void;
-  /** Render the row in the error color (destructive actions). */
   danger?: boolean;
 }
 
 interface MenuProps {
   items: MenuItem[];
-  /** Accessible label for the trigger (e.g. "Post options"). */
   triggerLabel: string;
 }
 
-/**
- * Brutalist 3-dot kebab — opens a minimal icon-only action row to the LEFT of
- * the dots. Shared by the post header and own-comment rows so the two kebabs
- * can never drift apart.
- */
 export function Menu({ items, triggerLabel }: MenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -44,15 +36,11 @@ export function Menu({ items, triggerLabel }: MenuProps) {
         <EllipsisHorizontalCircleIcon className="size-4" />
       </button>
 
-      {/* Minimal popout: BORDERED icon buttons (size-8, smaller than the
-          trigger) in a row, to the LEFT of the dots — the 3-dot TRIGGER itself is
-          borderless (plain MUTED dots → accent on hover, so the kebab stays
-          quiet until reached). Centered to the trigger via `inset-y-0`
-          + `items-center`. */}
+      {/* Icon buttons to the LEFT of the dots, centered to the trigger via inset-y-0. */}
       {open && (
         <div
           role="menu"
-          className="absolute inset-y-0 right-full z-[var(--m-z-dropdown)] mr-1 flex items-center gap-2"
+          className="absolute inset-y-0 right-full z-[var(--m-z-dropdown)] mr-1 flex items-center gap-3"
         >
           {items.map((item) => {
             const label = typeof item.label === "string" ? item.label : item.id;

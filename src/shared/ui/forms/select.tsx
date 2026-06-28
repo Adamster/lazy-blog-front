@@ -6,22 +6,16 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { FieldError } from "./field-error";
 
 export interface SelectOption {
-  /** Stable value stored in form state + used as the option key. */
   value: string;
-  /** Visible option text. */
   label: string;
 }
 
 interface SelectBaseProps {
-  /** Uppercase 11px terminal label rendered above the control. */
   label: string;
   options: SelectOption[];
-  /** DOM id — wires label/error a11y. Auto-generated when omitted. */
   id?: string;
-  /** Validation message; presence switches the control to its error state. */
   error?: string;
   required?: boolean;
-  /** Placeholder shown when nothing is selected. */
   placeholder?: string;
   disabled?: boolean;
 }
@@ -40,14 +34,8 @@ interface MultiSelectProps extends SelectBaseProps {
 
 type SelectProps = SingleSelectProps | MultiSelectProps;
 
-/**
- * Brutalist-Mono select — a custom accessible listbox matching {@link Field}'s
- * underline look (2px dim border → accent on focus, 14px, square, conditional
- * error). Native `<select>` can't hit the brutalist popup look across browsers,
- * so this is a `role="listbox"` button + popover with full keyboard support
- * (↑/↓ to move, Enter/Space to toggle, Esc to close, type-ahead). Supports
- * single (`value: string`) and `multiple` (`value: string[]`) modes.
- */
+// Custom listbox button + popover: native `<select>` can't hit the brutalist
+// popup look across browsers.
 export function Select(props: SelectProps) {
   const {
     label,
@@ -100,8 +88,6 @@ export function Select(props: SelectProps) {
     [multiple, props, selectedValues]
   );
 
-  // Open the listbox, parking the active descendant on the first selected option
-  // (or the top) so keyboard nav starts from a sensible place — no effect needed.
   const openListbox = useCallback(() => {
     const firstSelected = options.findIndex((o) =>
       selectedValues.includes(o.value)
@@ -195,13 +181,13 @@ export function Select(props: SelectProps) {
         </span>
         <ChevronDownIcon
           aria-hidden="true"
-          className={`size-[14px] shrink-0 text-[var(--m-muted2)] transition-transform ${open ? "rotate-180" : ""}`}
+          className={`size-3.5 shrink-0 text-[var(--m-muted2)] transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open ? (
         <ul
-          // Focus the list on mount so keyboard nav works immediately.
+          // Focus on mount so keyboard nav works immediately.
           ref={(node) => node?.focus()}
           role="listbox"
           tabIndex={-1}

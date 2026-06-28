@@ -30,7 +30,7 @@ export function BracketIcon({
 
 export function MenuGroupLabel({ children }: { children: ReactNode }) {
   return (
-    <div className="px-4 pt-3 pb-1 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)]">
+    <div className="px-4 py-3 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)]">
       {children}
     </div>
   );

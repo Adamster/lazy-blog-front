@@ -1,33 +1,18 @@
 import React from "react";
 import { Modal, useModalTitleId } from "./modal";
+import { Button } from "../forms/button";
 
 interface ConfirmModalProps {
-  /** 32px headline question, e.g. "Delete post?". */
   title: string;
-  /** Optional 14px body explaining the consequence. */
   description?: string;
-  /** Confirm button label (default "Delete"). */
   confirmLabel?: string;
-  /**
-   * Severity. `"danger"` (default) = destructive: error top-stripe + `// DANGER`
-   * eyebrow + filled-error confirm. `"default"` = a neutral confirm (a reversible
-   * action like unpublish): accent top-stripe + `// CONFIRM` eyebrow + the accent
-   * `.mono-cta` confirm.
-   */
   tone?: "danger" | "default";
-  /** Override the eyebrow label (defaults from `tone`). */
   eyebrow?: string;
   isOpen: boolean;
   onOpenChange: () => void;
   onConfirm: () => void;
 }
 
-/**
- * Confirm modal — Brutalist-Mono. Two tones: destructive (`danger`, the default)
- * with the error stripe + filled-error action, and a neutral `default` (accent
- * stripe + `.mono-cta`) for reversible confirms like unpublish. Eyebrow → 32px
- * title → optional 14px body, then two equal-width actions (Cancel + confirm).
- */
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
   title,
   description,
@@ -55,7 +40,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           <div className="mb-6 flex items-start justify-between gap-4">
             <div>
               <div
-                className={`mb-6 text-[11px] font-medium tracking-[0.12em] uppercase ${
+                className={`mono-label mb-6 uppercase ${
                   isDanger ? "text-[var(--m-error)]" : "text-[var(--m-accent)]"
                 }`}
               >
@@ -85,27 +70,19 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           </div>
 
           <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className={`mono-btn-outline mono-focus inline-flex h-9 flex-1 items-center justify-center text-[14px] font-semibold tracking-[0.06em]`}
-            >
+            <Button variant="outline" onClick={onClose} className="flex-1">
               Cancel
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              variant={isDanger ? "danger" : "primary"}
               onClick={() => {
                 onConfirm();
                 onClose();
               }}
-              className={
-                isDanger
-                  ? `mono-focus inline-flex h-9 flex-1 items-center justify-center border-2 border-[var(--m-error)] bg-[var(--m-error)] text-[14px] font-bold tracking-[0.06em] text-[var(--m-bg)] uppercase transition-colors hover:bg-transparent hover:text-[var(--m-error)]`
-                  : `mono-cta mono-focus inline-flex h-9 flex-1 items-center justify-center text-[14px] font-bold tracking-[0.06em]`
-              }
+              className="flex-1"
             >
               {confirmLabel}
-            </button>
+            </Button>
           </div>
         </>
       )}

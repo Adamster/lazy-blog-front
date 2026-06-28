@@ -3,21 +3,14 @@
 import { useEffect, useState } from "react";
 
 interface ProgressBarProps {
-  /** `// LABEL` eyebrow above the bar. */
   label?: string;
-  /** Number of cells in the track. Default 20. */
   cells?: number;
   className?: string;
 }
 
-/** Width of the moving filled run. */
 const RUN = 4;
 
-/**
- * Terminal indeterminate progress bar — `░░██░░` (a filled accent run sweeping
- * across an empty dim track). For "working / processing" states of unknown
- * duration. Saved for future long-task UIs — not yet wired anywhere.
- */
+// Indeterminate `░░██░░` sweep. Saved for future long-task UIs — not yet wired.
 export function ProgressBar({
   label,
   cells = 20,
@@ -37,7 +30,7 @@ export function ProgressBar({
   return (
     <div className={className} style={{ fontFamily: "var(--font-mono)" }}>
       {label ? (
-        <div className="mb-2 text-[11px] tracking-[0.12em] text-[var(--m-muted2)] uppercase">
+        <div className="mb-2 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)] uppercase">
           {`// ${label}`}
         </div>
       ) : null}

@@ -73,7 +73,7 @@ export default function UserPage({ userName }: { userName: string }) {
       style={{ fontFamily: "var(--font-mono)" }}
     >
       <main className="mx-auto max-w-[1240px] px-10 pb-10">
-        <section className="flex flex-col gap-10 pb-10 sm:flex-row sm:items-center">
+        <section className="flex flex-col gap-10 pt-10 pb-10 sm:flex-row sm:items-center">
           <Avatar
             src={user?.avatarUrl}
             name={displayNameOf(user, "—")}

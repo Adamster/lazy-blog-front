@@ -20,6 +20,7 @@ export {
   useModalTitleId,
 } from "./overlays/modal";
 export { IconSubmitButton } from "./forms/icon-submit-button";
+export { Button } from "./forms/button";
 export { Loading, Spinner } from "./feedback/loading";
 export { ProgressBar } from "./feedback/progress-bar";
 export { ErrorMessage } from "./feedback/error-message";
