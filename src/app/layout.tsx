@@ -37,17 +37,16 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* Resolve + apply the theme to <html> BEFORE first paint (no
-            light→dark / non-neo→neo flash). MUST be a RAW inline <script> in
-            <head> so it runs SYNCHRONOUSLY during HTML parse — `next/script`
-            `beforeInteractive` loads via Next's loader AFTER first paint, which
-            reintroduces the flash. (Tradeoff: React 19 dev-only logs a
-            "script tag in component" notice on client nav; harmless, prod-clean.)
-            ONE source of truth — `localStorage.theme` ∈ light|dark|neo. light =
-            neither class; dark = `.dark`; neo = `.dark` + `.neo`. Migrates the
-            old build's `neo==='on'` flag to the `neo` theme on first read. */}
+            light→dark flash). MUST be a RAW inline <script> in <head> so it runs
+            SYNCHRONOUSLY during HTML parse — `next/script` `beforeInteractive`
+            loads via Next's loader AFTER first paint, which reintroduces the
+            flash. (Tradeoff: React 19 dev-only logs a "script tag in component"
+            notice on client nav; harmless, prod-clean.) ONE source of truth —
+            `localStorage.theme` ∈ light|dark. light = no class; dark = `.dark`.
+            Stale `neo`/legacy values fall back to the OS preference. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var e=document.documentElement;var t=localStorage.getItem('theme');if(localStorage.getItem('neo')==='on'){t='neo';localStorage.setItem('theme','neo');localStorage.removeItem('neo');}if(t!=='light'&&t!=='dark'&&t!=='neo'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}e.setAttribute('data-theme',t);e.classList.toggle('dark',t==='dark'||t==='neo');e.classList.toggle('neo',t==='neo');}catch(e){}})();`,
+            __html: `(function(){try{var e=document.documentElement;var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}e.setAttribute('data-theme',t);e.classList.toggle('dark',t==='dark');e.classList.remove('neo');}catch(e){}})();`,
           }}
         />
 

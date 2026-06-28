@@ -58,11 +58,9 @@
    `--m-card`/`--m-panel` are TRANSLUCENT (the dark #232323 / #2a2a2a at 0.70
    alpha): composited over the opaque `--m-bg #141414` they read a touch DARKER
    than a solid fill (~#1e1e1e / ~#232323), so every card/band sinks INTO the
-   canvas instead of sitting on top of it — the look that already shipped in neo,
-   now the baseline for dark too. `--m-bg` stays opaque (the dropdown console +
-   modals use `bg-[var(--m-bg)]`, so they stay fully solid); overlays reset to
-   solid below. neo (whose <html> also carries `.dark`) inherits all of this and
-   only adds the rain bleed. */
+   canvas instead of sitting on top of it. `--m-bg` stays opaque (the dropdown
+   console + modals use `bg-[var(--m-bg)]`, so they stay fully solid); overlays
+   reset to solid below. */
 .dark .mono-scope,
 .dark .mono-portal {
   --m-bg: #141414;
@@ -81,21 +79,10 @@
    (`role="listbox"`) and the editor (`.milkdown` — toolbar + popovers read
    `--m-card`/`--m-panel` directly or via `--crepe-color-surface`). Content
    scrolls behind them, so the translucency turns their text unreadable. Reset
-   the surface tokens to their SOLID dark values. Applies to dark AND neo (neo's
-   <html> also carries `.dark`). */
+   the surface tokens to their SOLID dark values. */
 html.dark [role="menu"],
 html.dark [role="listbox"],
 html.dark .milkdown {
   --m-card: #232323;
   --m-panel: #2a2a2a;
-}
-
-/* neo — the third theme ("Matrix"). It is the dark theme PLUS the rain: neo
-   always boots `.dark` + `.neo` (set pre-paint), so it inherits the dark tokens
-   above (incl. the translucent card/panel) and only drops the page-root bg to
-   transparent so the fixed Matrix-rain drape bleeds through the whole canvas.
-   The header wrapper is also a `.mono-scope` but carries no bg, so that's a
-   no-op there. */
-html.neo .mono-scope {
-  background-color: transparent;
 }

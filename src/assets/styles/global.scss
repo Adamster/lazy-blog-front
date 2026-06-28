@@ -17,9 +17,7 @@ html {
      block so the header column aligns with the page column under it. */
   scrollbar-gutter: stable;
 }
-/* Key on the `.dark` CLASS (set for BOTH dark and neo — neo extends the dark
-   canvas) so the html bg follows the theme. `data-theme` is "neo" for neo, so an
-   attribute selector would miss it and leave the page light. */
+/* Key on the `.dark` CLASS so the html bg follows the theme. */
 html.dark {
   background-color: #141414; /* --m-bg, dark */
 }

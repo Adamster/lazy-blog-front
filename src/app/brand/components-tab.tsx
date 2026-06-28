@@ -39,6 +39,7 @@ import {
   type SelectOption,
 } from "@/shared/ui";
 import { Callout } from "@/shared/ui/prose";
+import { GlitchText, MatrixText } from "@/shared/ui/effects";
 import {
   Sparkline,
   buildMonthlySeries,
@@ -758,6 +759,30 @@ export function ComponentsTab() {
               </State>
             </div>
           </Panel>
+        </Section>
+
+        <Section
+          index="14"
+          title="TEXT FX"
+          intro="Base text-effect primitives. GlitchText (jitter + accent/error chromatic ghosts — the error-page headline) auto-beats on its own; MatrixText decodes a string from scrambled glyphs and loops. Both are theme-aware and hold a single static frame under reduced-motion."
+        >
+          <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
+            <Panel caption="// GLITCHTEXT — auto beat">
+              <State caption="jitter + accent/error ghosts (error pages)">
+                <span className="font-display text-[32px] leading-none font-bold tracking-[-0.02em] text-[var(--m-fg)]">
+                  <GlitchText>Glitch</GlitchText>
+                </span>
+              </State>
+            </Panel>
+            <Panel caption="// MATRIXTEXT — decode loop">
+              <State caption="scrambled → resolved · respects reduced-motion">
+                <MatrixText
+                  text="// SIGNAL SENT ... NO REPLY YET"
+                  className="mono-label"
+                />
+              </State>
+            </Panel>
+          </div>
         </Section>
       </div>
 

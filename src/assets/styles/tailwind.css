@@ -194,15 +194,6 @@
    a `prefers-reduced-motion: reduce` fallback that drops the motion to a static
    end-state (the visual stays legible, just stops moving). */
 
-/* Ambient Matrix-rain backdrop — NEO THEME ONLY. The rain (the global drape +
-   the error-page backdrop) is the headline visual of the `neo` theme; outside
-   neo it's hidden so the light/dark themes look exactly as before. neo always
-   carries `.dark` + `.neo` (set pre-paint), so the rain only ever paints on the
-   dark canvas. The `neo` class is set pre-paint, so no flash. */
-html:not(.neo) .mono-rain-bg {
-  display: none;
-}
-
 /* Signal blur (`:spoiler[…]` / RevealMark variant="blur") — a `blur(5px)` span
    in a 2px `--m-dim` box; sharpens to blur(0) on hover/focus and stays sharp
    (focus is sticky via tabindex). Inline, server-safe. */

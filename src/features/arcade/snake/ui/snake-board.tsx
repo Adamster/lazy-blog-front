@@ -152,7 +152,7 @@ export function SnakeBoard({ api }: { api: SnakeGameApi }) {
                   New record
                 </div>
               ) : (
-                <Eyebrow color="var(--m-error)">{"// GAME OVER, NEO"}</Eyebrow>
+                <Eyebrow color="var(--m-error)">{"// GAME OVER"}</Eyebrow>
               )}
               <div className="font-display text-[46px] leading-none font-bold text-[var(--m-accent)] tabular-nums">
                 {formatScore(state.score)}
