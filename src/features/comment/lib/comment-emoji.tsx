@@ -6,13 +6,7 @@ const graphemeSegmenter =
     : null;
 const EMOJI_RE = /\p{Extended_Pictographic}/u;
 
-/**
- * Render text with emoji enlarged (~1.5em). Native emoji otherwise inherit the
- * 14px body size and read tiny; we segment into graphemes (so ZWJ sequences /
- * variation selectors stay intact) and wrap emoji ones in a larger span,
- * leaving the surrounding text at body size. Falls back to plain text where
- * `Intl.Segmenter` is unavailable.
- */
+// Segment into graphemes so ZWJ sequences / variation selectors stay intact; falls back to plain text without Intl.Segmenter.
 export function withBigEmoji(text: string): ReactNode {
   if (!graphemeSegmenter) return text;
   const out: ReactNode[] = [];

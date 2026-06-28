@@ -5,10 +5,8 @@ import { Spinner } from "@/shared/ui";
 import { BOARD_SIZE } from "../model/leaderboard";
 import type { RankedRow } from "../model/types";
 
-/** One leaderboard line. The viewer's own row reads in accent (no wash); empty
- *  padding slots are fully muted. OTHER players' `@handle`s link to their profile
- *  (hover reveals accent); the viewer's own row stays plain text (the header
- *  already links to your own profile) and the `··` placeholders aren't links. */
+/** One leaderboard line. Viewer's row = accent plain text (the header already
+ *  links to your profile); other players' `@handle`s link; `··` placeholders don't. */
 function BoardRow({ row }: { row: RankedRow }) {
   const accent = !!row.you;
   const empty = !!row.empty;
@@ -48,21 +46,14 @@ function BoardRow({ row }: { row: RankedRow }) {
   );
 }
 
-/**
- * The high-score panel — a `// HIGH SCORES` header + `TOP N` count + the ranked
- * rows, borderless and flush to the rail edge. The board is the cross-user
- * backend leaderboard (`useSnakeLeaderboard` → padded to {@link BOARD_SIZE} by
- * `rankApiBoard`); the viewer's own row renders its `@handle` in accent. While the
- * query first loads (no data yet), the app's standard spinner shows instead of
- * the 0/·· placeholders.
- */
+/** High-score panel — header + ranked rows (padded to {@link BOARD_SIZE}). Spinner
+ *  on first load instead of the 0/·· placeholders. */
 export function SnakeLeaderboard({
   board,
   loading = false,
   className = "",
 }: {
   board: RankedRow[];
-  /** The board query is on its first load → skeleton rows, not 0/·· placeholders. */
   loading?: boolean;
   className?: string;
 }) {

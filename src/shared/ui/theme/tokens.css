@@ -1,27 +1,12 @@
-/* Expose the Space Grotesk display font as a Tailwind utility (`font-display`). */
 @theme inline {
   --font-display: var(--font-display);
 }
 
-/* Fixed header bar height — the SINGLE source for the bar (`h-[var(--m-header-h)]`),
-   its clearance (`pt-[var(--m-header-h)]` on the layout main) and the below-header
-   min-height utility below. */
 :root {
   --m-header-h: 4rem;
 
-  /* Layering scale — ONE source for every fixed/portaled overlay so they stack
-     predictably: content < dropdown < header < modal < fullscreen-rain < toast.
-     The fullscreen matrix rain is a full takeover above modals but under toasts
-     so the konami unlock toast still reads.
-     - content  = in-flow lift over sibling content within a card/section
-       (cover/draft overlay, an avatar's delete affordance, a floating label).
-     - dropdown = page-level popovers/menus that must clear sibling content but
-       stay UNDER the fixed header (Select listbox, Menu row, the comment
-       emoji/GIF picker, the editor FX hint).
-     EXEMPT (intentionally NOT tokenized): purely component-internal stacking
-     contexts that order siblings WITHIN a single component and never compete
-     with the global overlays — e.g. a component's own internal layer order
-     (a canvas overlay above its grid). Those stay raw low integers. */
+  /* Layering scale — content < dropdown < header < modal < rain < toast.
+     Rain sits above modals but under toasts so the konami unlock toast still reads. */
   --m-z-content: 10;
   --m-z-dropdown: 40;
   --m-z-header: 50;
@@ -30,17 +15,10 @@
   --m-z-toast: 70;
 }
 
-/* "Brutalist Mono" (variant B) palette — light by default, dark via the theme
-   provider's `.dark` class. Components reference these via var(--m-*).
-   `.mono-portal` mirrors the tokens for HeroUI overlays (Dropdown, etc.) that
-   render in a body-level portal outside `.mono-scope`. */
+/* .mono-portal mirrors the tokens for body-level portals (HeroUI overlays) outside .mono-scope. */
 .mono-scope,
 .mono-portal {
-  /* Design-system scope root is JetBrains Mono (data / labels / body); titles
-     opt into Space Grotesk via `font-display`. Mirrors the design file's root
-     and the per-page inline fallback, and — crucially — gives portaled overlays
-     (auth modal, dropdowns) the mono font so `// LABEL` tracking reads right
-     instead of inheriting the body `var(--font-sans)`. */
+  /* Mono font on the scope root — also gives portaled overlays (modal, dropdowns) the mono font so `// LABEL` tracking reads right instead of inheriting var(--font-sans). */
   font-family: var(--font-mono);
   --m-bg: #f4f4f4;
   --m-fg: #161616;
@@ -53,16 +31,7 @@
   --m-dim: #d6d6d6;
   --m-error: #b91c1c;
 }
-/* `.dark` now lives on <html> (layout inline script + ThemeProvider), so this
-   reaches page scopes AND body-level portals (toasts, modals) alike.
-   `--m-card`/`--m-panel` are TRANSLUCENT (the dark #232323 / #2a2a2a at 0.70
-   alpha): composited over the opaque `--m-bg #181818` they read a touch DARKER
-   than a solid fill (~#1f1f1f / ~#242424), so every card/band sinks INTO the
-   canvas instead of sitting on top of it. `--m-bg` is a hair above pitch black
-   (#181818, not #141414) so the canvas reads as an intentional charcoal that
-   harmonizes with the lime accent rather than pure black. `--m-bg` stays opaque
-   (the dropdown console + modals use `bg-[var(--m-bg)]`, so they stay fully
-   solid); overlays reset to solid below. */
+/* --m-card/--m-panel are TRANSLUCENT (0.70 alpha over the opaque --m-bg) so cards sink INTO the canvas; --m-bg stays opaque so the dropdown console + modals stay solid. Overlays reset to solid below. */
 .dark .mono-scope,
 .dark .mono-portal {
   --m-bg: #181818;
@@ -77,11 +46,7 @@
   --m-error: #ff6b6b;
 }
 
-/* …but OVERLAYS must stay OPAQUE — dropdowns/menus (`role="menu"`), selects
-   (`role="listbox"`) and the editor (`.milkdown` — toolbar + popovers read
-   `--m-card`/`--m-panel` directly or via `--crepe-color-surface`). Content
-   scrolls behind them, so the translucency turns their text unreadable. Reset
-   the surface tokens to their SOLID dark values. */
+/* Overlays must stay OPAQUE — content scrolls behind them, so translucency would make their text unreadable; reset surface tokens to solid. */
 html.dark [role="menu"],
 html.dark [role="listbox"],
 html.dark .milkdown {

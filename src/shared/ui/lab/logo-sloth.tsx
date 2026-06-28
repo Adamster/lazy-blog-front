@@ -5,7 +5,6 @@ interface LogoSlothProps {
 export function LogoSloth({
   className = "h-9 w-9 shrink-0 text-[var(--m-fg)]",
 }: LogoSlothProps) {
-  // Brand sloth mark (same shape as the favicon), tinted with the accent color.
   return (
     <svg
       viewBox="0 0 500 500"

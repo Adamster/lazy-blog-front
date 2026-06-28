@@ -1,45 +1,19 @@
 /**
- * Minimal, safe inline-markdown renderer for COMMENT bodies.
+ * Hand-rolled inline-markdown tokenizer for COMMENT bodies — a restricted subset,
+ * NOT the PostBody pipeline. The composer no longer authors marks, but the read
+ * view keeps tokenizing them so already-authored comments still render.
  *
- * Comments render a TINY, restricted subset only — NOT the heavy PostBody
- * pipeline (no react-markdown, no remark/rehype, no directives, no blocks). This
- * is a hand-rolled inline tokenizer (one pass over the text, a small set of
- * inline rules) that emits React nodes directly. Zero new deps, zero added
- * bundle weight, and full control of the security posture.
- *
- * SUPPORTED (inline only):
- *   - **bold**            → <strong>  (LEGACY: the composer no longer authors
- *   - *italic* / _italic_ → <em>       marks — comments are now TEXT + PICTURES
- *   - `inline code`       → mono chip  only — but the read view keeps tokenizing
- *   - ~~strike~~          → line/muted these so already-authored comments still
- *                                       render correctly. Safe to keep: pure
- *                                       rendering, no raw HTML, no added deps.)
- *   - ![alt](url)         → INLINE GIF image — ONLY when `url` passes the
- *                           KLIPY/Tenor whitelist (`parseGifUrl`); otherwise the
- *                           literal `![..](..)` source text is shown.
- *   - [label](url)        → safe external link (http/https only)
- *   - bare http(s):// URL → autolinked
- *   - line / paragraph breaks (handled by the caller's `whitespace-pre-line`)
- *
- * SECURITY (same posture as PostBody): we render ZERO raw HTML — there is no
- * `dangerouslySetInnerHTML` anywhere; every node is a real React element with
- * text children, so any literal `<script>`/`<img>` in the body is shown as text.
- * Image `src` is whitelist-gated to KLIPY/Tenor https CDNs (`parseGifUrl`); a
- * non-whitelisted `![..](..)` is rendered as its literal source text (it never
- * reaches an `<img src>`). Link hrefs are sanitized to http/https ONLY
- * (javascript:/data:/mailto:/etc. rejected) and a rejected link renders as its
- * plain source text. Safe links get `target="_blank"` +
- * `rel="nofollow ugc noopener noreferrer"`.
+ * SECURITY: renders ZERO raw HTML (no `dangerouslySetInnerHTML`) — literal
+ * `<script>`/`<img>` shows as text. Image `src` is whitelist-gated to KLIPY/Tenor
+ * https CDNs (`parseGifUrl`); link hrefs sanitized to http/https only (`safeHref`);
+ * a rejected URL renders as its literal source text.
  */
 
 import { type ReactNode } from "react";
 
-/** Single source of truth for the http/https href whitelist (shared with `:link`). */
 import { safeHref } from "@/shared/lib/safe-url";
 
-/** Reuse the project's emoji-enlarging pass on each plain-text leaf. */
 import { withBigEmoji } from "./comment-emoji";
-/** Whitelist gate — only KLIPY/Tenor https URLs become an `<img src>`. */
 import { parseGifUrl } from "./comment-gif";
 
 function Link({ href, children }: { href: string; children: ReactNode }) {
@@ -55,27 +29,16 @@ function Link({ href, children }: { href: string; children: ReactNode }) {
   );
 }
 
-/**
- * Inline rules, tried left-to-right at each position. Each rule's regex is
- * anchored implicitly via `lastIndex` (we scan char-by-char and test at the
- * current cursor), and `render` turns the match into a node. `code` is matched
- * FIRST so backticks shield their content from the emphasis rules; the IMAGE
- * rule precedes the link rule (both start with `[`, but the image's `!` prefix
- * is matched first); links before emphasis so `*` inside a URL isn't italic.
- *
- * Kept as a SOURCE string (not a shared `RegExp`): `renderInline` recurses into
- * emphasis content (bold/italic/strike), so a single global `/g` regex would
- * share `lastIndex` across the nested call and corrupt the outer scan (it
- * deadlocks on any multi-mark line like `**a** *b*`). Each call builds its OWN
- * regex instance below, so the stateful `lastIndex` is never shared.
- */
+// Order matters: code FIRST (backticks shield emphasis), image before link (both start `[`, image's `!` wins),
+// links before emphasis (so `*` inside a URL isn't italic).
+// Kept as a SOURCE string, not a shared RegExp: renderInline recurses into emphasis, and a shared global `/g`
+// regex would share `lastIndex` across the nested call and deadlock on any multi-mark line like `**a** *b*`.
 const TOKEN_SOURCE =
   // code | image ![alt](url) | link [label](url) | autolink | bold | italic(*) | italic(_) | strike
   "(`+)([^`]*?)\\1|!\\[([^\\]]*)\\]\\(([^()\\s]+)\\)|\\[([^\\]]+)\\]\\(([^()\\s]+)\\)|(https?:\\/\\/[^\\s<]+[^\\s<.,;:!?)\\]}'\"])|\\*\\*([^*]+?)\\*\\*|(?<![A-Za-z0-9])_([^_]+?)_(?![A-Za-z0-9])|(?<![*\\w])\\*(?!\\s)([^*]+?)\\*|~~([^~]+?)~~";
 
-/** Render the inline-markdown subset of a single text run to React nodes. */
 function renderInline(text: string): ReactNode {
-  // Fresh per call → an independent `lastIndex`, safe under recursion.
+  // Fresh per call → independent `lastIndex`, safe under recursion.
   const tokenRe = new RegExp(TOKEN_SOURCE, "g");
   const out: ReactNode[] = [];
   let last = 0;
@@ -115,11 +78,7 @@ function renderInline(text: string): ReactNode {
         </code>
       );
     } else if (imageUrl !== undefined) {
-      // INLINE GIF — only a whitelisted KLIPY/Tenor https URL becomes an <img>;
-      // anything else falls back to the literal `![alt](url)` source text (it
-      // never reaches an `<img src>`). These hosts aren't in next.config
-      // remotePatterns (owner can't edit Vercel config), so a plain <img> —
-      // framed on-system, capped width, lazy.
+      // Plain <img> not next/image: these hosts aren't in next.config remotePatterns (owner can't edit Vercel config).
       const safe = parseGifUrl(imageUrl);
       if (safe) {
         out.push(
@@ -137,7 +96,6 @@ function renderInline(text: string): ReactNode {
       }
     } else if (linkLabel !== undefined && linkUrl !== undefined) {
       const href = safeHref(linkUrl);
-      // A malformed / unsafe link falls back to the literal source text.
       if (href) {
         out.push(
           <Link key={key++} href={href}>
@@ -185,7 +143,6 @@ function renderInline(text: string): ReactNode {
   return out;
 }
 
-/** Render a comment's TEXT portion (GIF tail already split off) as nodes. */
 export function renderCommentMarkdown(text: string): ReactNode {
   return renderInline(text);
 }

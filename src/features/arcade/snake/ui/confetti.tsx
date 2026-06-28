@@ -3,11 +3,8 @@
 import { useEffect, useRef } from "react";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 
-/** On-system palette: the lime accent + two complementary tones (fg + muted2). */
 const CONFETTI_COLORS = ["#cdff48", "#e6e6e6", "#7d7d7d"] as const;
-/** Particle count — a lively-but-tasteful burst (not a full-screen storm). */
 const PARTICLE_COUNT = 90;
-/** Burst lifetime (ms) before the loop stops and the canvas clears. */
 const DURATION_MS = 2600;
 
 interface Particle {
@@ -21,15 +18,8 @@ interface Particle {
   vr: number;
 }
 
-/**
- * A self-contained, fire-once confetti burst — square brutalist chips (no
- * circles, no gradients) in the on-system palette, sprayed from the board's
- * horizontal center, fading out over ~2.6s before the loop tears itself down.
- *
- * Lightweight (one canvas, one rAF loop, no deps). Mount it ONLY for a record
- * game-over; under `prefers-reduced-motion` it renders nothing (the bigger
- * "New record" headline carries the celebration instead).
- */
+/** Fire-once confetti burst — square chips, on-system palette. Mount ONLY for a
+ *  record game-over; renders nothing under `prefers-reduced-motion`. */
 export function Confetti() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -54,8 +44,6 @@ export function Confetti() {
     };
     size();
 
-    // Seed the burst from the upper-center, spraying out + down (gravity pulls
-    // them past the bottom edge as they fade).
     particles = Array.from({ length: PARTICLE_COUNT }, () => ({
       x: w * (0.35 + Math.random() * 0.3),
       y: h * (0.18 + Math.random() * 0.12),
@@ -74,7 +62,7 @@ export function Confetti() {
       if (!start) start = now;
       const elapsed = now - start;
       const life = Math.min(elapsed / DURATION_MS, 1);
-      const alpha = 1 - life * life; // ease-out fade
+      const alpha = 1 - life * life;
 
       ctx.clearRect(0, 0, w, h);
       ctx.globalAlpha = alpha;
@@ -87,7 +75,7 @@ export function Confetti() {
         ctx.translate(p.x, p.y);
         ctx.rotate(p.rot);
         ctx.fillStyle = p.color;
-        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size); // square chips
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
         ctx.restore();
       }
       ctx.globalAlpha = 1;

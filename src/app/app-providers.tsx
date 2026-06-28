@@ -4,7 +4,7 @@ import { AuthProvider } from "@/entities/session";
 import { ErrorBoundary } from "@/shared/providers/error-boundary";
 import { ReactQueryProvider } from "@/shared/providers/query-provider";
 import { ThemeProvider } from "@/shared/ui/theme";
-import { Toaster } from "@/shared/ui/overlays/toaster";
+import { Toaster } from "@/shared/ui";
 import { Header } from "@/widgets/header";
 
 export const AppProviders = ({ children }: { children: React.ReactNode }) => {
@@ -13,9 +13,7 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => {
       <ReactQueryProvider>
         <AuthProvider>
           <ThemeProvider>
-            {/* Global header (fixed burger + logo) — rendered once for every
-                page, so error / 404 / loading states keep navigation too. The
-                `.mono-scope` wrapper gives the fixed chrome the `--m-*` tokens. */}
+            {/* Rendered once for every route so error / 404 / loading states keep navigation too. */}
             <div className="mono-scope">
               <Header />
             </div>

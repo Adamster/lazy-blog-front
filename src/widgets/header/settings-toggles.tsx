@@ -2,9 +2,8 @@
 
 import type { ReactNode } from "react";
 import type { Theme } from "@/shared/ui/theme";
-import { CommandButton } from "./command-row";
+import { CommandButton, MenuGroupLabel } from "./command-row";
 
-/** Bracketed `[ value ]` indicator on the right of a settings toggle row. */
 function ToggleIndicator({
   active,
   children,
@@ -28,36 +27,27 @@ interface SettingsTogglesProps {
   onCycleTheme: () => void;
 }
 
-/**
- * Settings block — the theme control under a `// settings` console comment. Keeps
- * the menu open so the user can flip it in place. (The lang toggle is HIDDEN for
- * now — i18n is a backlog item; re-add the row here when wiring i18n.)
- *
- * `theme` is a single cycling control (light → dark → light). The indicator is
- * accent on dark, muted on light.
- */
+// The lang toggle is HIDDEN until i18n is wired — re-add the row here then.
 export function SettingsToggles({
   open,
   theme,
   onCycleTheme,
 }: SettingsTogglesProps) {
+  const dark = theme === "dark";
   return (
     <div>
-      <div className="px-4 pt-3 pb-1 text-[11px] tracking-[0.12em] text-[var(--m-muted2)]">
-        {"// settings"}
-      </div>
+      <MenuGroupLabel>{"// settings"}</MenuGroupLabel>
 
-      {/* theme — cycles light → dark → neo → light. */}
       <CommandButton
         onClick={onCycleTheme}
         tabbable={open}
         trailing={
-          <ToggleIndicator active={theme !== "light"}>
-            [ {theme} ]
+          <ToggleIndicator active={dark}>
+            [ {dark ? "on" : "off"} ]
           </ToggleIndicator>
         }
       >
-        theme
+        dark
       </CommandButton>
     </div>
   );

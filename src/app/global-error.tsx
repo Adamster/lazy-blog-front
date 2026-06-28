@@ -10,11 +10,7 @@ type GlobalErrorProps = {
 
 const display = "'Space Grotesk', system-ui, sans-serif";
 
-/**
- * Root-level error boundary — replaces the whole layout, so it can't rely on
- * the design tokens / Tailwind being present. Self-contained inline styles
- * approximate the Brutalist-Mono "glitch" error page (dark, mono, accent).
- */
+/** Replaces the whole layout, so tokens / Tailwind aren't loaded — hence the inline styles. */
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
   useEffect(() => {
     console.error(error);
@@ -35,6 +31,11 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           fontFamily: "'JetBrains Mono', ui-monospace, monospace",
         }}
       >
+        {/* Tailwind isn't loaded here — reproduce the 32→40px step at md without the banned clamp(). */}
+        <style>{`
+          .ge-headline { font-size: 32px; }
+          @media (min-width: 768px) { .ge-headline { font-size: 40px; } }
+        `}</style>
         <div style={{ width: "100%", maxWidth: 640, margin: "0 auto" }}>
           <div
             style={{
@@ -55,10 +56,10 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           </div>
 
           <h1
+            className="ge-headline"
             style={{
               margin: 0,
               fontFamily: display,
-              fontSize: "clamp(32px,6vw,40px)",
               lineHeight: 1.04,
               fontWeight: 700,
               letterSpacing: "-0.02em",

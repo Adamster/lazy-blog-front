@@ -1,4 +1,4 @@
-import { Loading } from "@/shared/ui/feedback/loading";
+import { Loading } from "@/shared/ui";
 
 export default function UserLoading() {
   return <Loading />;

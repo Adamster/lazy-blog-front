@@ -11,11 +11,7 @@ interface IProps {
   isPublished: boolean;
 }
 
-/**
- * Client island for the author kebab (edit / publish / delete). Gated on the
- * viewer being the author; slotted into the server-rendered post header so the
- * read view stays a Server Component.
- */
+// Client island slotted into the server-rendered header so the read view stays a Server Component.
 export const PostHeaderMenuIsland = ({
   postId,
   postSlug,

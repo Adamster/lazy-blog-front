@@ -1,42 +1,68 @@
 import type { ReactNode } from "react";
 
-/* ---------------------------------------------------------------------------
- * Shared layout helpers for the /brand tabbed reference (Brand + Components).
- * One source for both tabs — do not fork these per-tab.
- * ------------------------------------------------------------------------- */
+// Shared layout helpers for the /brand tabs — one source, don't fork per-tab.
 
-/** Top-level section — `NN — TITLE` eyebrow + 40px section rhythm. */
+// Offsets anchor jumps so a target clears the fixed 64px header bar.
+const ANCHOR_OFFSET = "scroll-mt-[calc(var(--m-header-h)+24px)]";
+
 export function Section({
+  id,
   index,
   title,
   intro,
   children,
 }: {
+  id?: string;
   index: string;
   title: string;
   intro?: string;
   children: ReactNode;
 }) {
   return (
-    <section className="border-t-2 border-[var(--m-line)] pt-10">
-      <div className="text-[11px] tracking-[0.12em] text-[var(--m-muted2)]">
+    <section
+      id={id}
+      className={`border-t-2 border-[var(--m-dim)] pt-10 ${ANCHOR_OFFSET}`}
+    >
+      <div className="text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)]">
         {index} — {title}
       </div>
       {intro ? (
-        <p className="mt-7 text-[14px] leading-[1.6] text-[var(--m-muted)]">
+        <p className="mt-6 text-[14px] leading-[1.6] text-[var(--m-muted)]">
           {intro}
         </p>
       ) : null}
-      <div className="mt-7">{children}</div>
+      <div className="mt-6">{children}</div>
     </section>
   );
 }
 
-/**
- * A `--m-card` panel grouping related content, with its own caption.
- * `accent` caption (// X, default) for component states; pass a muted2 caption
- * via `tone="muted"` for the brand-foundation demos that used the old `Demo`.
- */
+// The layer band that opens each group of component stories in the storybook.
+export function GroupBand({
+  id,
+  layer,
+  title,
+  intro,
+}: {
+  id: string;
+  layer: string;
+  title: string;
+  intro: string;
+}) {
+  return (
+    <div id={id} className={ANCHOR_OFFSET}>
+      <div className="text-[11px] leading-none tracking-[0.12em] text-[var(--m-accent)]">
+        {`// LAYER · ${layer}`}
+      </div>
+      <h2 className="font-display mt-6 text-[32px] leading-none font-bold tracking-[-0.02em]">
+        {title}
+      </h2>
+      <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
+        {intro}
+      </p>
+    </div>
+  );
+}
+
 export function Panel({
   caption,
   tone = "accent",
@@ -51,7 +77,7 @@ export function Panel({
   return (
     <div className={`bg-[var(--m-card)] p-7 ${className}`}>
       <div
-        className={`mb-5 text-[11px] tracking-[0.12em] ${
+        className={`mb-4 text-[11px] leading-none tracking-[0.12em] ${
           tone === "accent"
             ? "text-[var(--m-accent)]"
             : "text-[var(--m-muted2)]"
@@ -64,7 +90,6 @@ export function Panel({
   );
 }
 
-/** One labelled state cell — small caption above the live primitive. */
 export function State({
   caption,
   children,
@@ -76,7 +101,7 @@ export function State({
 }) {
   return (
     <div className={className}>
-      <div className="mb-2.5 text-[11px] tracking-[0.12em] text-[var(--m-muted2)] uppercase">
+      <div className="mb-2.5 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)] uppercase">
         {caption}
       </div>
       {children}
@@ -84,7 +109,6 @@ export function State({
   );
 }
 
-/** Spec table row — label on the left, accent token value on the right. */
 export function Spec({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid grid-cols-[1fr_auto] items-baseline gap-6 border-b-2 border-[var(--m-dim)] py-3">

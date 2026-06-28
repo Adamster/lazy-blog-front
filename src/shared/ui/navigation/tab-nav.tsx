@@ -4,35 +4,21 @@ import { STEP_BOX, stepBoxClass } from "./step-box";
 type TabIcon = ComponentType<{ className?: string }>;
 
 export interface TabItem {
-  /** Stable id — the value reported by `onSelect` and matched against `current`. */
   id: string;
-  /** Icon rendered INSIDE the box (replaces the old letter marker). */
   icon: TabIcon;
-  /** Accessible name (`aria-label`) — the visible box content is the icon. */
   label: string;
 }
 
 interface TabNavProps {
   tabs: TabItem[];
-  /** id of the active tab. */
   current: string;
-  /** Free-switch select (no validation gate — tabs, not steps). */
   onSelect: (id: string) => void;
-  /** Wires `aria-controls` on each tab to its panel id (`${idPrefix}${id}`). */
   panelIdPrefix?: string;
   className?: string;
 }
 
-/**
- * The edit-profile tab band — TABS, not a progress stepper. It borrows the
- * composer {@link Stepper}'s box language (the shared `STEP_BOX` +
- * `stepBoxClass` tokens), but reads as tabs: only the ACTIVE box highlights
- * (accent), the inactive boxes stay dim, and the connector is a STATIC dim rule
- * (NOT a progress bar — it never goes accent). The section name is a11y-only
- * (`aria-label`), so there's no visible text (icons only). Carries true tab a11y
- * (`role="tablist"` / `role="tab"` / `aria-selected` / `aria-controls`) and
- * switching is unconditional (no forward/back gate).
- */
+// TABS, not a stepper: borrows the Stepper box language but the connector is a
+// STATIC dim rule (never goes accent) and only the active box highlights.
 export function TabNav({
   tabs,
   current,

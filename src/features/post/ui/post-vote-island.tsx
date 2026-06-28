@@ -11,17 +11,11 @@ interface IProps {
   postSlug: string;
   authorId: string;
   voteDirection: VoteDirection | null;
-  /** REAL net rating from the API (upvotes − downvotes). */
   rating: number;
 }
 
-/**
- * Client island for the rating band. The viewer's `voteDirection` + net `rating`
- * come from the parent (which owns the authenticated detail query) — the vote
- * mutation patches that shared cache, so the parent re-renders these props in
- * sync, no second observer needed here. This island only adds the up/down counts
- * + cumulative series, the `canVote` gate, and the debounced view-increment.
- */
+// `voteDirection`/`rating` come from the parent's detail query, which the vote
+// mutation patches — so the parent re-renders in sync, no second observer here.
 export const PostVoteIsland = ({
   postId,
   postSlug,

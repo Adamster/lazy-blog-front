@@ -27,26 +27,12 @@ export function Header() {
 
   const auth = useToggle();
 
-  // Lang toggle is hidden for now (i18n is a backlog item) — no lang state here.
-
   const close = () => setOpen(false);
 
   return (
     <>
-      {/* Fixed full-width header bar — frosted glass (translucent `--m-bg` +
-          backdrop blur) so the page shows through, with a 2px `--m-card` bottom
-          border separating it from the content. The lockup hugs the far LEFT
-          edge and the menu burger the far RIGHT edge (a 20px edge gutter, NOT
-          the 1240 content column). */}
       <header className="fixed inset-x-0 top-0 z-[var(--m-z-header)] h-[var(--m-header-h)] border-b-2 border-[var(--m-card)] bg-[var(--m-bg)]/70 backdrop-blur-md">
         <div className="flex h-full items-center justify-between px-5">
-          {/* Lockup + the game's white rabbit: it sits right AFTER the lockup's
-              blinking cursor (a `ml-3` = 12px gap), shown when signed in — the
-              link into the arcade (which is login-only, so there's no point
-              dangling it to logged-out visitors). On hover/focus it
-              `mono-jiggle`s (a playful "laughing" wobble; transform-only, no
-              layout shift, dropped under reduced-motion). Hidden under `sm` so it
-              never crowds / wraps the wordmark on a narrow phone bar. */}
           <div className="flex items-center">
             <HeaderLockup />
             {isAuthenticated && (
@@ -64,10 +50,8 @@ export function Header() {
             )}
           </div>
 
-          {/* Right cap — the authed `@handle` profile link sits to the LEFT of
-              the burger; both ride the bar's far-right edge. The `@handle` lives
-              OUTSIDE `menuRef` so it never trips the burger morph or the
-              click-outside gate. */}
+          {/* The `@handle` lives OUTSIDE `menuRef` so it doesn't trip the
+              burger's click-outside gate. */}
           <div className="flex items-center gap-4">
             {isAuthenticated && user?.userName && (
               <Link
@@ -79,16 +63,8 @@ export function Header() {
               </Link>
             )}
 
-            {/* Menu — ONE burger pinned top-right (`size-9`, `z-[1]` ABOVE the
-                panel) so it reads as the `menu.sh` header's right cap; the
-                full-size `w-[280px]` panel is anchored at the burger's row
-                (`top-0 right-0`). OPEN, the burger drops its `bg-[var(--m-card)]`
-                box (→ transparent) so only the bare `≡` icon sits in the header
-                row — no mismatched box. Closed, it keeps the card box (the panel
-                is invisible behind it). The panel is STATIC-sized (no
-                width/height morph — animating layout every frame was janky); it
-                just DROPS in with a cheap GPU-composited `opacity` +
-                `translateY` (no reflow). */}
+            {/* Static-sized panel (no layout morph — that was janky); it just
+                fades + translates in. */}
             <div ref={menuRef} className="relative">
               <motion.div
                 initial={false}
@@ -138,19 +114,13 @@ export function Header() {
                 />
               </motion.div>
 
-              {/* The single burger — always top-right, the toggle, layered ABOVE
-                the panel (`z-[1]`) as the `menu.sh` header's right cap. Closed it
-                reads like every other icon button: a 2px `--m-dim` border + card
-                fill (hover → accent border). OPEN, both the border AND the fill
-                fade to transparent (`transition-colors`), leaving just the `≡`
-                icon in the header row — no box to mis-size against the row. */}
               <button
                 type="button"
                 aria-label={open ? "Close menu" : "Open menu"}
                 aria-expanded={open}
                 aria-haspopup="menu"
                 onClick={() => setOpen((v) => !v)}
-                className={`relative z-[1] flex size-9 items-center justify-center border-2 text-[var(--m-fg)] transition-colors hover:text-[var(--m-accent)] ${
+                className={`relative flex size-9 items-center justify-center border-2 text-[var(--m-fg)] transition-colors hover:text-[var(--m-accent)] ${
                   open
                     ? "border-transparent bg-transparent"
                     : "border-[var(--m-dim)] bg-[var(--m-card)] hover:border-[var(--m-accent)]"

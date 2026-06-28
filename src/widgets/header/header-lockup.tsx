@@ -4,17 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 
-/**
- * In-bar brand lockup → home. `[ NOT ] LAZY` is FIXED (accent badge + fg base);
- * only the witty SUFFIX after it types / holds / erases, looping — trailed by
- * the blinking terminal caret (`.mono-caret`). All caps, 11px / 0.12em mono
- * label scale. Under `prefers-reduced-motion` it rests on bare `[ NOT ] LAZY`.
- *
- * Suffixes + timings are tweakable constants — the cadence isn't final yet. An
- * empty `""` suffix is the bare-`LAZY` anchor beat in the loop.
- */
-// Gimmick parked for now — show static `[ NOT ] LAZY`. Flip to `false` to bring
-// the typewriter cycle back (the SUFFIXES + loop below are kept intact).
+// Gimmick parked — static `[ NOT ] LAZY`. Flip to `false` to bring the
+// typewriter cycle back (the SUFFIXES + loop below are kept intact).
 const PAUSED = true;
 
 const BADGE = "not";
@@ -36,11 +27,11 @@ export function HeaderLockup() {
   const [suffix, setSuffix] = useState(SUFFIXES[0]);
 
   useEffect(() => {
-    if (PAUSED || prefersReducedMotion()) return; // rest on bare `[ NOT ] LAZY`
+    if (PAUSED || prefersReducedMotion()) return;
 
     let timer: ReturnType<typeof setTimeout>;
-    let i = 0; // current suffix
-    let len = SUFFIXES[0].length; // chars of the suffix shown
+    let i = 0;
+    let len = SUFFIXES[0].length;
     let erasing = true;
 
     const tick = () => {
@@ -62,12 +53,11 @@ export function HeaderLockup() {
           timer = setTimeout(tick, TYPE_MS);
         } else {
           erasing = true;
-          timer = setTimeout(tick, HOLD_MS); // hold finished phrase, then erase
+          timer = setTimeout(tick, HOLD_MS);
         }
       }
     };
 
-    // base phrase is already rendered — hold it, then start cycling
     timer = setTimeout(tick, HOLD_MS);
     return () => clearTimeout(timer);
   }, []);

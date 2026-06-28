@@ -1,5 +1,5 @@
 import { Component, ReactNode } from "react";
-import { ErrorMessage } from "@/shared/ui/error-message";
+import { ErrorMessage } from "@/shared/ui";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -31,8 +31,7 @@ export class ErrorBoundary extends Component<
 
   render() {
     if (this.state.hasError) {
-      // One error surface: the runtime boundary renders the SAME glitch page
-      // (`ErrorMessage`) the route error / 404 use, instead of its own variant.
+      // Reuse the same glitch page the route error / 404 use, not a variant.
       return (
         this.props.fallback ?? (
           <ErrorMessage error={this.state.error} reset={this.resetError} />

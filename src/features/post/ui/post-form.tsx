@@ -2,9 +2,14 @@
 
 import { useMemo, useRef, useState } from "react";
 import { Controller, type UseFormReturn } from "react-hook-form";
+import { PencilIcon } from "@heroicons/react/24/outline";
 import type { UpdatePostRequest } from "@/shared/api/openapi";
-import { Field, FieldError, type SelectOption } from "@/shared/ui";
-import ConfirmModal from "@/shared/ui/overlays/confirmation-modal";
+import {
+  Field,
+  FieldError,
+  ConfirmModal,
+  type SelectOption,
+} from "@/shared/ui";
 import { useTags } from "@/entities/tag";
 import { ComposerTopBar } from "./composer-top-bar";
 import { CoverCropModal } from "./cover-crop-modal";
@@ -22,53 +27,38 @@ interface PostFormProps {
   form: UseFormReturn<UpdatePostRequest>;
   onSubmit: () => void;
   onDelete?: () => void;
-  /** Edit-only: link to the live post, surfaced in the top bar. */
   viewHref?: string;
+  /** Edit only — create auto-generates the slug server-side, so it's hidden there. */
+  isEdit?: boolean;
   isPending: boolean;
 }
 
-/** Mounted state for the cover-crop modal (object URL of the picked file). */
 interface CropTarget {
   src: string;
 }
 
-/**
- * True when `value` holds at least one real character of content — used to
- * reject "empty" markdown (Crepe emits a non-empty string for an empty doc) and
- * whitespace-only title/summary. Strips zero-width chars (BOM / ZWSP / ZWNJ /
- * ZWJ) and all whitespace, then checks the remainder is non-empty.
- */
+// Crepe emits a non-empty string for an empty doc — reject whitespace-only +
+// zero-width content as "empty".
 const ZERO_WIDTH = /[\u200b-\u200d\ufeff]/g;
 const hasContent = (value: string | null | undefined): boolean =>
   Boolean(value?.replace(ZERO_WIDTH, "").trim());
 
-/**
- * Two-step post composer (Setup → Write) for create & edit. A single
- * react-hook-form instance (owned by the route wrapper) spans both steps; the
- * step is local UI state and BOTH panels stay mounted — only visibility toggles
- * — so the Crepe editor never unmounts and no field value is lost between
- * steps. One {@link ComposerTopBar} (numbered step boxes 1/2 · publish
- * toggle + delete + Publish) sits above both. Step 1 is a 1240-wide two-panel
- * card (cover | form on `--m-card`: tag + title + description); Step 2 is the
- * 780-wide Crepe column. The cover crop happens in {@link CoverCropModal} so
- * this canvas never reflows.
- *
- * The `.mono-scope` / page background / Header live in the route wrapper (app
- * layer) so the header tokens resolve too — this renders only the composer.
- */
+// BOTH step panels stay mounted (only visibility toggles) so the Crepe editor
+// never unmounts and no field value is lost between steps.
 export const PostForm = ({
   form,
   onSubmit,
   onDelete,
   viewHref,
+  isEdit = false,
   isPending,
 }: PostFormProps) => {
   const { data: tags } = useTags();
   const [step, setStep] = useState<ComposerStep>(1);
   const [cropTarget, setCropTarget] = useState<CropTarget | null>(null);
-  // A validated submit awaiting a visibility-transition confirm (the rocket
-  // gates the create/update mutation behind this dialog). `null` = no pending
-  // submit / dialog closed; the boolean is the about-to-save `isPublished`.
+  // Slug locked by default — it's auto-generated and changing it breaks links.
+  const [slugEditable, setSlugEditable] = useState(false);
+  // null = no pending submit; the boolean is the about-to-save `isPublished`.
   const [pendingSubmit, setPendingSubmit] = useState<boolean | null>(null);
 
   const {
@@ -80,11 +70,8 @@ export const PostForm = ({
     formState: { errors },
   } = form;
 
-  // The post's ORIGINAL published state, captured ONCE before RHF mutates the
-  // live value: on edit it's the loaded post's `isPublished` (seeded into
-  // `defaultValues` by the route wrapper, which RHF never rewrites during
-  // editing); on create the post doesn't exist yet → `false`. Drives whether a
-  // save is a visibility TRANSITION (publish / unpublish) needing a confirm.
+  // Original published state, captured ONCE before RHF mutates the live value —
+  // drives whether a save is a visibility transition needing a confirm.
   const wasPublished = useRef(
     Boolean(form.formState.defaultValues?.isPublished)
   ).current;
@@ -96,28 +83,14 @@ export const PostForm = ({
 
   const published = Boolean(watch("isPublished"));
 
-  // Step "completeness" = required DATA present (filled), NOT full validation —
-  // it drives the Stepper's accent-outline layer so the bar reflects, at a
-  // glance, which steps have their content. `hasContent` is the SAME real-content
-  // predicate the body validator uses (strips whitespace + zero-width chars).
-  // Step 1 (Setup) = title + summary filled; Step 2 (Write) = body has content.
+  // Step "completeness" = required DATA present, NOT full validation.
   const completeSteps = completeStepsFrom({
     setup: hasContent(watch("title")) && hasContent(watch("summary")),
     write: hasContent(watch("body")),
   });
 
-  /**
-   * Publish (the rocket): validate the whole form ourselves so we can POINT the
-   * user at the problem. ORDER: validate FIRST — on failure jump to the first
-   * step holding an error (inline message + highlighted step box on-screen) and
-   * stop, so the mutation never fires and there's no second validation pass on
-   * the fail path. Only once valid do we look at the visibility TRANSITION: a
-   * draft going live (`willPublish && !wasPublished`) or a live post being
-   * hidden (`!willPublish && wasPublished`) opens a confirm and defers the
-   * mutation to {@link confirmSubmit}; a no-op transition (draft→draft /
-   * published→published) submits silently. The parent's `onSubmit` (a guarded
-   * `handleSubmit`) is the single place the mutation fires.
-   */
+  // Validate FIRST and jump to the failing step before checking the visibility
+  // transition, so the mutation never fires on the fail path.
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const valid = await trigger();
@@ -163,9 +136,8 @@ export const PostForm = ({
         errorSteps={errorStepsFrom(errors)}
         completeSteps={completeSteps}
         published={published}
-        // The eye silently flips the pending `isPublished` flag; the actual
-        // visibility CHANGE is confirmed on Publish (the rocket), gated by the
-        // transition confirm in `handleSubmit` — not the instant you toggle.
+        // The eye only flips the pending flag; the visibility change is confirmed
+        // on Publish, not the instant you toggle.
         onPublishedChange={(v) =>
           setValue("isPublished", v, { shouldDirty: true })
         }
@@ -174,16 +146,12 @@ export const PostForm = ({
         isPending={isPending}
       />
 
-      {/* ── STEP 1: SETUP — 1240 canvas, cover | form panel ── */}
       <section
-        className={`mx-auto max-w-[1240px] px-10 pt-10 pb-10 ${
+        className={`mx-auto max-w-[1240px] px-6 pt-10 pb-10 md:px-10 ${
           step === 1 ? "" : "hidden"
         }`}
       >
-        {/* Two adjacent equal-height panels (grid `items-stretch`): the 16:9
-            cover sets the row height, the form panel fills it on `--m-card`. */}
         <div className="grid grid-cols-1 md:grid-cols-2">
-          {/* Cover — left panel */}
           <Controller
             name="coverUrl"
             control={control}
@@ -196,9 +164,6 @@ export const PostForm = ({
             )}
           />
 
-          {/* Form — right panel, on the card background, content vertically
-              centered (matches the cover). Tag on top; no slug field (it's
-              auto-generated server-side). */}
           <div className="flex flex-col justify-center border-2 border-t-0 border-[var(--m-dim)] bg-[var(--m-card)] p-10 md:border-t-2 md:border-l-0">
             <Controller
               name="tags"
@@ -211,6 +176,54 @@ export const PostForm = ({
                 />
               )}
             />
+
+            {isEdit && (
+              <div className="mt-4">
+                <label htmlFor="post-slug" className="mono-field-label">
+                  Slug
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    id="post-slug"
+                    disabled={!slugEditable}
+                    aria-invalid={Boolean(errors.slug)}
+                    className={`block w-full border-0 border-b-2 bg-transparent px-0 pb-2 text-[14px] leading-[1.6] text-[var(--m-fg)] caret-[var(--m-accent)] outline-none disabled:cursor-not-allowed disabled:text-[var(--m-muted2)] ${
+                      errors.slug
+                        ? "border-[var(--m-error)]"
+                        : "border-[var(--m-dim)] focus:border-[var(--m-accent)]"
+                    }`}
+                    style={{ fontFamily: "var(--font-mono)" }}
+                    {...register("slug", {
+                      required: "Slug is required",
+                      pattern: {
+                        value: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+                        message: "Lowercase letters, numbers and hyphens only",
+                      },
+                    })}
+                  />
+                  <button
+                    type="button"
+                    aria-label={slugEditable ? "Lock slug" : "Edit slug"}
+                    aria-pressed={slugEditable}
+                    onClick={() => setSlugEditable((v) => !v)}
+                    className="mono-icon-btn mono-focus size-9 shrink-0"
+                    style={
+                      slugEditable
+                        ? {
+                            borderColor: "var(--m-accent)",
+                            color: "var(--m-accent)",
+                          }
+                        : undefined
+                    }
+                  >
+                    <PencilIcon className="size-4" />
+                  </button>
+                </div>
+                {errors.slug ? (
+                  <FieldError error={errors.slug.message ?? ""} />
+                ) : null}
+              </div>
+            )}
 
             <div className="mt-4">
               <Field
@@ -226,10 +239,7 @@ export const PostForm = ({
               />
             </div>
 
-            {/* Summary — STATIC label + an auto-grow box capped at 3 lines
-                (`max-h`), scrolling with an INVISIBLE scrollbar past that, so it
-                can never stretch the card (newlines allowed). The static label
-                (vs the floating one) avoids the label/text overlap. */}
+            {/* Static label (not floating) avoids the label/text overlap. */}
             <div className="mt-4">
               <label htmlFor="post-summary" className="mono-field-label">
                 Summary
@@ -264,13 +274,10 @@ export const PostForm = ({
         </div>
       </section>
 
-      {/* ── STEP 2: WRITE — full 1240 canvas (matching the Step-1 setup canvas).
-          The toolbar spans the column; the editable text is no longer sized by
-          the column — it carries its OWN fixed 700 measure (centered) on the
-          `.ProseMirror` so it stays 1:1 with the read view's 700 (780 − px-10).
-          See `crepe-overrides.scss`. ── */}
+      {/* The editable text carries its OWN fixed 700 measure (in
+          `crepe-overrides.scss`), staying 1:1 with the read view's 700. */}
       <section
-        className={`mx-auto max-w-[1240px] px-10 py-10 ${
+        className={`mx-auto max-w-[1240px] px-6 py-10 md:px-10 ${
           step === 2 ? "" : "hidden"
         }`}
       >
@@ -279,10 +286,8 @@ export const PostForm = ({
           control={control}
           rules={{
             required: "Body is required",
-            // Crepe emits a non-empty markdown string for an EMPTY doc (a lone
-            // placeholder paragraph / stray whitespace / zero-width chars), so
-            // `required` alone passes on "empty". Strip whitespace + zero-width
-            // chars and require at least one real character of content.
+            // `required` alone passes on "empty" — Crepe emits a non-empty string
+            // for an empty doc; hasContent strips whitespace + zero-width chars.
             validate: (v) => (hasContent(v) ? true : "Body is required"),
           }}
           render={({ field }) => (
@@ -294,10 +299,7 @@ export const PostForm = ({
           )}
         />
         {errors.body ? (
-          <p
-            role="alert"
-            className="mx-auto mt-4 max-w-[700px] text-[11px] tracking-[0.12em] text-[var(--m-error)]"
-          >
+          <p role="alert" className="mono-error mx-auto max-w-[700px]">
             {`! ${errors.body.message}`}
           </p>
         ) : null}
@@ -310,11 +312,6 @@ export const PostForm = ({
         onUploaded={onCoverUploaded}
       />
 
-      {/* Visibility-TRANSITION confirm on save (the rocket). Only opens when the
-          save crosses a boundary — a draft going live or a live post being
-          hidden; mirrors the post-page kebab's publish/unpublish copy so the two
-          surfaces read identically (`// Visibility`, default tone). Confirm →
-          fire the mutation; Cancel → abort, stay in the composer. */}
       <ConfirmModal
         isOpen={pendingSubmit !== null}
         onOpenChange={() => setPendingSubmit(null)}

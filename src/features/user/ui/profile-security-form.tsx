@@ -10,21 +10,12 @@ interface FormValues extends ChangePasswordRequest {
   confirmPassword: string;
 }
 
-// Password strength: ≥6 chars with lower, upper, digit and a special char.
 const PASSWORD_PATTERN = {
   value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/,
   message:
     "At least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character",
 } as const;
 
-/**
- * Security-tab password form — RHF over the {@link useUpdatePassword} mutation
- * (success toast + home redirect + sign-out), wrapped in the shared
- * {@link ProfileFormSection} chrome. The password-rules info box reuses the
- * accent-left-edge treatment from the brand sheet / auth lead. The sign-out
- * heads-up lives on the left {@link ProfileSecurityIntro} context panel, so the
- * form starts at the Current-password field.
- */
 export function ProfileSecurityForm() {
   const changePassword = useUpdatePassword();
 
@@ -87,8 +78,7 @@ export function ProfileSecurityForm() {
         />
       </div>
 
-      {/* Requirements hint sits BELOW all the inputs (consistent with the auth
-          register form), not wedged between New and Confirm. */}
+      {/* Hint sits BELOW all inputs (like auth register), not wedged between New and Confirm. */}
       <InfoBox className="mt-4">
         Use 6+ characters with at least one uppercase, one lowercase, a number,
         and a special character.

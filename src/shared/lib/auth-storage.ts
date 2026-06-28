@@ -1,4 +1,3 @@
-/** The localStorage key the auth snapshot lives under. */
 export const AUTH_STORAGE_KEY = "auth";
 
 export interface AuthState {
@@ -8,12 +7,6 @@ export interface AuthState {
   accessTokenExpires: number | null;
 }
 
-/**
- * The single canonical "logged-out" snapshot. Hoisted here so every consumer
- * (storage reader, auth provider fallback, login-error reset) shares ONE shape
- * instead of re-declaring the empty object — DRY, and a guarantee they can't
- * drift apart.
- */
 export const EMPTY_AUTH: AuthState = {
   userId: null,
   accessToken: null,
@@ -30,11 +23,8 @@ export const getAuthState = (): AuthState => {
   try {
     return JSON.parse(storedAuth) as AuthState;
   } catch {
-    // A corrupt `auth` key (truncated write, manual tampering, a half-migrated
-    // value) used to throw on EVERY render of every component that reads auth —
-    // a total client lockout with no way out but devtools. Treat corruption as
-    // "no session": purge the bad value and fall back to logged-out so the app
-    // stays usable and the user can simply log in again.
+    // A corrupt `auth` key would otherwise throw on every read → total client
+    // lockout; treat corruption as "no session" (purge + logged-out).
     clearAuthState();
     return emptyAuth();
   }

@@ -1,38 +1,19 @@
 import type { Cell, Speed } from "./types";
 
 /**
- * RENDER MODE for the snake + rabbits — the ONE switch the owner flips.
- *
- *  - `"glyph"` (DEFAULT): the snake is drawn as a SOLID-SQUARE STREAM — one
- *    near-full-cell square per body segment, in the segment colour (bright
- *    near-white head → green {@link ACCENT} body dimming to a STILL-VISIBLE
- *    {@link ACCENT_DIM} tail) — the on-theme "Matrix code" look, see
- *    {@link drawSnakeGlyphs}. The rabbits are ALWAYS the bunny-
- *    silhouette pixel SPRITES (owner preference — they read better than glyph
- *    rabbits), independent of this flag.
- *  - `"sprite"`: the ORIGINAL pixel-art look — the grey sentinel head/body/tail
- *    bitmaps (plus the same bunny rabbits). Flipping back to `"sprite"` restores
- *    today's behaviour EXACTLY (every sprite const, {@link drawSprite}, {@link
- *    rotateSprite} and the M/R colour maps are all still here, just gated by this
- *    flag). Only the SNAKE body changes between modes; the rabbits do not.
- *
- * Mechanics / collisions / spawns / teardown are IDENTICAL in both modes — this
- * is purely a render swap. To revert to the sprites, change this one line to
- * `"sprite"`. (HMR won't re-instantiate the engine, so a HARD REFRESH is needed
- * to see a flag flip.)
+ * RENDER MODE switch: `"glyph"` (default, the snake is a square stream — see
+ * {@link drawSnakeGlyphs}) | `"sprite"` (the original grey-sentinel bitmaps). Only
+ * the SNAKE body changes; the rabbits are ALWAYS bunny sprites (owner preference).
+ * HMR won't re-instantiate the engine — a flag flip needs a HARD REFRESH.
  */
 const SNAKE_RENDER: "glyph" | "sprite" = "glyph";
 
-/**
- * Play-field grid, in cells. The board is a LANDSCAPE rectangle (wider than
- * tall) so its height lands near the high-scores leaderboard column; cells stay
- * SQUARE because the board element's aspect ratio is pinned to `GRID_W / GRID_H`
- * (see `<SnakeBoard>`), so `cssW / GRID_W === cssH / GRID_H`.
- */
+/** Play-field grid (cells). Cells stay SQUARE because the board's aspect is pinned
+ *  to `GRID_W / GRID_H`, so `cssW / GRID_W === cssH / GRID_H`. */
 export const GRID_W = 30;
 export const GRID_H = 18;
 
-/** Per-preset step interval (ms). Accelerates per pellet down to STEP_FLOOR. */
+/** Per-preset step interval (ms). */
 export const SPEED_MS: Record<Speed, number> = {
   chill: 165,
   classic: 125,
@@ -41,96 +22,24 @@ export const SPEED_MS: Record<Speed, number> = {
 const STEP_ACCEL = 1.5;
 const STEP_FLOOR = 60;
 
-/**
- * ============================ RABBIT VALUE SYSTEM ============================
- *
- * "Follow the Rabbit" core loop (owner spec): the board ALWAYS carries EXACTLY FOUR
- * rabbits — ONE POSITIVE (a bonus that ADDS points), TWO NEGATIVE penalties, and ONE
- * KILLER (always present, its own dedicated slot — NOT a rare escalation). Eating ANY
- * of the four RE-GENERATES the WHOLE field: fresh cells for all four (the killer
- * relocates too) AND freshly-rolled ranks for the positive + the two negatives.
- * Nothing is on a clock — the field only ever changes the instant the player eats.
- *
- * THE THREE "AVOID" RABBITS are the two negatives + the killer (eating the killer is
- * death; eating a negative costs score). Only the positive is safe to chase.
- *
- * VISUAL MODEL (the final scheme — NO stripes on the bonus):
- *  - POSITIVE = a PLAIN WHITE bunny, no stripes, no rank — and a FIXED +10 (it is NOT
- *    rolled by magnitude). It's the prize the player chases; white = good.
- *  - NEGATIVE = a white bunny with `rank + 1` RED ear stripes ({@link stripeColor} +
- *    {@link RABBIT_RED}) → 1 / 2 / 3 stripes for −10 / −20 / −30, PLUS RED eyes. So the
- *    count of RED stripes reads the size of the penalty at a glance.
- *  - KILLER = the SAME white bunny silhouette filled SOLID RED, no stripes, with BLACK
- *    eyes (red eyes would vanish on the red body) in the SAME cells as the negatives'
- *    eyes — solid red = death. So the read is dead simple: white = good, red stripes
- *    (1–3) = penalty, all-red = death; and the "dangerous" rabbits (negatives + killer)
- *    share visible eyes in one spot (red on white, black on red).
- * Body silhouette + size are IDENTICAL across all four (the killer shares the exact
- * {@link RABBIT_PLAIN} geometry). The MOTION is the subtler second tell: the white +10
- * TWITCHES about its axis (the nav-bar `.mono-jiggle`), the negatives BOB + laugh-
- * SHAKE, the killer slowly MENACE-pulses.
- *
- * NEGATIVE MAGNITUDES are {@link RABBIT_VALUES} (10/20/30 — a 3-tier penalty ladder,
- * the old −50 is GONE), rolled by {@link RABBIT_VALUE_WEIGHTS} where bigger = rarer.
- * The two negative slots roll INDEPENDENTLY and MAY COINCIDE (two −10 at once is fine;
- * there is no de-dup between them). The positive is a fixed +10 (no roll); the killer
- * has no magnitude (lethal, not scored) and no roll — it's simply always there.
- *
- * BALANCE GUARDS:
- *  - SCORE is CLAMPED at >= 0 ({@link SCORE_FLOOR}) — a penalty costs progress, never
- *    a meaningless negative trophy / negative leaderboard.
- *  - LENGTH: every NON-lethal eat (the +10 or a negative) grows the snake by EXACTLY
- *    +1 cell — nothing shrinks. The KILLER never grows it (eating it ends the run).
- *  - LETHALITY: exactly ONE kind is lethal — the KILLER. Eating it is INSTANT game
- *    over, like a wall/self hit. The walls (when not wrapping) and the snake's own
- *    body are still the other death causes; the +10 and the negatives are never lethal.
- *  - AVOIDABILITY: all THREE avoid rabbits (the two negatives AND the killer) honour
- *    the head-path spawn exclusion ({@link headExclusion}) so a −score grab — or an
- *    instant DEATH — can never materialise on the head's unavoidable next cells. The
- *    +10 is a free target (no exclusion) — it may appear anywhere, even in your lap.
- */
-
-/** The FIXED score of the positive rabbit — always +10 (no per-magnitude roll). */
 const POSITIVE_VALUE = 10;
 
-/**
- * The NEGATIVE penalty MAGNITUDES — a 3-tier ladder (10/20/30; the old −50 is gone).
- * The array index is the negative's RANK (0..2), which maps to its RED EAR-STRIPE
- * COUNT (`rank + 1` → 1 / 2 / 3 stripes). Only the negatives use this; the positive is
- * a fixed {@link POSITIVE_VALUE}.
- */
+/** Negative penalty magnitudes; index = a negative's RANK (0..2) = its RED ear-stripe
+ *  COUNT (`rank + 1` → 1/2/3 stripes). */
 const RABBIT_VALUES = [10, 20, 30] as const;
 
-/**
- * WEIGHTED magnitude roll for a NEGATIVE — index-aligned with {@link RABBIT_VALUES},
- * monotonically DECREASING so the bigger the penalty the RARER it appears (the level-
- * design call). Read as ~percentages (they sum to 100): −10 lands ~60% of negative
- * rolls, −20 ~30%, and the worst −30 only ~10%. The two negative slots each draw from
- * this table INDEPENDENTLY (they may land the same rank — no de-dup). The positive +
- * killer are not rolled.
- */
+/** Weighted rank roll, index-aligned with {@link RABBIT_VALUES}: bigger penalty = rarer
+ *  (~60/30/10%). The two negative slots each draw INDEPENDENTLY (may coincide). */
 const RABBIT_VALUE_WEIGHTS = [60, 30, 10] as const;
 
-/** Exactly one positive (fixed +10) + two negative rabbits (rolled) each field; the
- *  killer is the always-present, un-rolled 4th slot (see {@link SnakeEngine.spawnField}). */
 const POSITIVE_COUNT = 1;
 const NEGATIVE_COUNT = 2;
 
-/**
- * SCORE FLOOR — the running score can never read below this. A penalty that would
- * push it negative just pins it here. Rationale: a negative score is a
- * demoralizing, meaningless trophy and breaks the leaderboard / sparkline (which
- * assume non-negative). The penalty's real teeth are the lost points + the extra
- * (unwanted) length + the speed-accel progress a +10 grab would have given.
- */
+/** Score can't go below 0 — a negative score breaks the leaderboard/sparkline (both
+ *  assume non-negative). */
 const SCORE_FLOOR = 0;
 
-/**
- * Pick a NEGATIVE's RANK (an index into {@link RABBIT_VALUES}) by the weighted table —
- * a standard cumulative-weight roll. Bigger magnitudes have smaller weights, so the
- * draw is biased toward −10 (the −30 is rare). Called once per negative slot, each an
- * INDEPENDENT draw (the two may coincide). The positive is fixed +10, never rolled.
- */
+/** Cumulative-weight roll for a negative's rank; each negative draws independently (may coincide). */
 function pickRank(): number {
   const total = RABBIT_VALUE_WEIGHTS.reduce((a, b) => a + b, 0);
   let r = Math.random() * total;
@@ -141,30 +50,14 @@ function pickRank(): number {
   return RABBIT_VALUE_WEIGHTS.length - 1;
 }
 
-/**
- * Fairness: cells an "AVOID" rabbit (a negative OR the lethal killer) may NEVER spawn
- * into, measured from the snake head. `HEAD_AHEAD` blocks the next N cells the head
- * will step through on its current heading (zero-reaction-time grabs) and
- * `HEAD_RADIUS` blocks a small Chebyshev ring around the head (a hazard materialising
- * right beside the head is just as unfair). Applied to all THREE avoid rabbits so a
- * −score grab — or an instant DEATH on the killer — is always AVOIDABLE. The single
- * +10 positive skips the exclusion (a free target — it may appear in your lap).
- */
+/** Cells an "avoid" rabbit (a negative or the killer) may never spawn into:
+ *  `HEAD_AHEAD` blocks the reaction-zero path straight ahead, `HEAD_RADIUS` a ring
+ *  around the head — so a penalty/death is always avoidable. The +10 skips this. */
 const HEAD_AHEAD = 3;
 const HEAD_RADIUS = 2;
 
-/**
- * POSITIVE rabbit "twitch around its own axis" — the SAME wobble the nav-bar
- * white-rabbit easter-egg plays on hover (`@keyframes mono-jiggle` in
- * `tailwind.css`), ported to the canvas so the prize jerks on its axis with the
- * exact same character. The CSS keyframes (phase → degrees) ARE reproduced verbatim
- * in {@link NAVBAR_TWITCH_KEYS}; {@link sampleTwitch} eases between the stops the way
- * the CSS `ease-in-out` does. The CSS loop is 0.4s (~{@link TWITCH_DUR_FRAMES} frames
- * at ~60fps); we play that wobble, then HOLD STILL for the rest of a
- * {@link TWITCH_PERIOD_FRAMES} cycle, so it reads as a periodic TWITCH (a jerk, then
- * a beat of stillness) rather than a constant spin. Frozen under reduced motion
- * (deg → 0 → a static plain-white bunny; the white body alone then says "chase me").
- */
+/** Positive-rabbit twitch — the nav-bar `@keyframes mono-jiggle` (phase → degrees)
+ *  reproduced verbatim for the canvas; {@link sampleTwitch} eases between the stops. */
 const NAVBAR_TWITCH_KEYS: { t: number; deg: number }[] = [
   { t: 0, deg: 0 },
   { t: 0.2, deg: -7 },
@@ -176,48 +69,25 @@ const NAVBAR_TWITCH_KEYS: { t: number; deg: number }[] = [
 const TWITCH_DUR_FRAMES = 24; // the 0.4s mono-jiggle loop at ~60fps
 const TWITCH_PERIOD_FRAMES = 78; // wobble (24) + ~0.9s still beat between jerks
 
-/**
- * NEGATIVE rabbit motion — the penalties "laugh": a CONTINUOUS gentle vertical BOB
- * (up/down, never a rotation — owner spec) PLUS an INTERMITTENT horizontal SHAKE in
- * "ha-ha-ha" bursts so the silhouette visibly trembles with laughter. The bob runs
- * the whole time (so a negative never sits perfectly still and is always told from
- * the twitching positive); the laugh-shake fires in bursts via {@link burstWave}.
- * Both freeze under reduced motion (a static striped bunny; the RED ear stripes then
- * carry the "dodge me"). The two negatives are de-phased by their cell so they don't
- * bob in lockstep (see {@link drawNegative}).
- *  - BOB:   vertical offset, amplitude {@link NEG_BOB_AMP} of a cell, continuous.
- *  - SHAKE: horizontal jitter, amplitude {@link LAUGH_SHAKE_AMP} of a cell, bursty.
- */
+/** Negative-rabbit motion: a continuous vertical bob + an intermittent horizontal
+ *  "ha-ha" laugh-shake (bursts via {@link burstWave}). */
 const NEG_BOB_AMP = 0.1;
 const NEG_BOB_FREQ = 0.18;
 const LAUGH_SHAKE_AMP = 0.06;
 const LAUGH_SHAKE_FREQ = 0.9;
-/** The "ha-ha-ha" laugh-burst envelope: animate the first {@link SPECIAL_ANIM_BURST}
- *  frames of each {@link SPECIAL_ANIM_CYCLE}-frame cycle, hold still the rest (see
- *  {@link burstWave}) — rhythmic shaking bursts with still pauses, like laughter. */
+/** Laugh-burst envelope: animate the first BURST frames of each CYCLE, hold still the rest. */
 const SPECIAL_ANIM_CYCLE = 100;
 const SPECIAL_ANIM_BURST = 35;
 
-/**
- * KILLER "menace" pulse — the lethal red bunny slowly BREATHES (a size throb) so it
- * reads as alive + dangerous, NOT a joke (it never "laughs"). A slow, ominous swell
- * rather than the negatives' jittery bob. Frozen to scale 1 under reduced motion (a
- * static solid-red silhouette — the colour alone then carries the "death").
- */
+/** Killer "menace" pulse — a slow size throb (not the negatives' jittery bob). */
 const KILLER_PULSE_AMP = 0.1;
 const KILLER_PULSE_FREQ = 0.12;
 
-/** Cubic smoothstep — a cheap stand-in for CSS `ease-in-out` between twitch stops. */
+/** Cubic smoothstep ≈ CSS `ease-in-out` between twitch stops. */
 function easeInOut(t: number): number {
   return t * t * (3 - 2 * t);
 }
 
-/**
- * Sample the nav-bar twitch curve at phase `p` in [0,1] → degrees. Walks
- * {@link NAVBAR_TWITCH_KEYS} (the verbatim `mono-jiggle` keyframes) and eases
- * between the bracketing stops, so the canvas twitch traces the exact same
- * wobble path as the header rabbit.
- */
 function sampleTwitch(p: number): number {
   for (let i = 1; i < NAVBAR_TWITCH_KEYS.length; i++) {
     const a = NAVBAR_TWITCH_KEYS[i - 1];
@@ -230,184 +100,98 @@ function sampleTwitch(p: number): number {
   return 0;
 }
 
-// ---- canvas palette (literal hex — the 2D context can't resolve CSS vars) ----
+// Canvas palette — literal hex (the 2D context can't resolve CSS vars).
 
-/**
- * Board field — a fixed dark gray, painted OPAQUE every frame on EVERY theme. (A
- * transparent / theme-following canvas was tried and reverted: the game palette
- * is dark-tuned, so the board just stays this gray everywhere.) The head's
- * direction notch is punched back to this same gray.
- */
+/** Board field gray. (A transparent / theme-following canvas was tried and reverted —
+ *  the game palette is dark-tuned, so the board just stays this gray everywhere.) */
 const BOARD_BG = "#141414";
-/** Snake head / fresh body — the lime accent (`--m-accent`, dark theme). */
+/** = `--m-accent` (dark). */
 const ACCENT = "#cdff48";
-/** Tail-end body tint — a dimmer accent so the body reads with subtle depth. */
+/** Dimmer accent for the tail tint. */
 const ACCENT_DIM = "#5f7a23";
-/**
- * The SENTINEL creature is metallic GREY (the Matrix machine reads grey-black on
- * screen, never lime): light at the head, dimming toward the tail. Light enough
- * to read on {@link BOARD_BG} and distinctly greyer than the white rabbit so the
- * two never blur.
- */
+/** Sentinel grey (light head → dim tail) — deliberately not lime, kept distinctly
+ *  greyer than the white rabbit so the two never blur. */
 const SENTINEL = "#a8acb2";
 const SENTINEL_DIM = "#565a60";
-/** White rabbit (the food) — `--m-fg` on the dark theme. Exported so the hidden
- *  header easter-egg ({@link RabbitMark}) paints the food its exact game colour. */
+/** White rabbit (food) = `--m-fg` (dark). Exported so {@link RabbitMark} uses the exact game colour. */
 export const RABBIT_WHITE = "#e6e6e6";
-/** Red rabbit / red tint — `--m-error` (dark theme): the penalty/danger colour.
- *  Used for the negatives' RED ear stripes (1–3, the only stripe colour now), the
- *  solid-RED killer body, and the red explosion chips. (The positive has NO stripes —
- *  it's a plain white bunny — so there is no longer a bonus-stripe colour at all.) */
+/** Red/danger = `--m-error` (dark): the negatives' ear stripes, the solid killer body, the red chips. */
 const RABBIT_RED = "#ff6b6b";
-/**
- * Faint cell grid — a SEMI-TRANSPARENT white so it adapts to whatever theme bg
- * shows through the transparent canvas (dark `--m-bg #141414`, neo's slightly
- * different shade + rain bleed, light) instead of a fixed `#333` that only
- * suited one field. The low alpha keeps it quiet during active play (it must
- * not compete with the snake); the overlay-wash reduction (see `<SnakeBoard>`)
- * is what makes it read clearly on the menu / pause / game-over screens, so the
- * grid itself can stay muted. The outer frame ({@link FRAME_LINE}) is a touch
- * stronger to delineate the board edge on every screen.
- */
+/** Faint cell grid — a semi-transparent white so it adapts to any theme bg showing
+ *  through the canvas (a fixed `#333` only suited one field). */
 const GRID_LINE = "rgba(255,255,255,0.01)";
-/** Outer board-edge frame — a stronger semi-transparent white than the inner
- *  grid so the board's rim always reads as a distinct field boundary. */
+/** Board-edge frame — stronger than the inner grid so the rim always reads. */
 const FRAME_LINE = "rgba(255,255,255,0.22)";
 
-// ---- glyph (square-stream) snake palette (SNAKE_RENDER === "glyph") ----
-
-/**
- * SQUARE-STREAM colours. The snake is a stream of solid squares in the lime
- * `--m-accent` family (the same the on-page rain uses), NOT the sprite mode's
- * grey sentinel. The HEAD square is the bright accent green ({@link GLYPH_BODY});
- * the body dims toward {@link GLYPH_TAIL} (deep green) AND fades in opacity
- * head→tail, so the figure is brightest where the creature is "now" and
- * dissolves into its wake. (Owner note: for a GREY stream, swap
- * {@link GLYPH_BODY}/{@link GLYPH_TAIL} to {@link SENTINEL}/{@link SENTINEL_DIM}.)
- */
-const GLYPH_BODY = ACCENT; // bright accent-green head + stream
-const GLYPH_TAIL = ACCENT_DIM; // deep-green tail end
-/** Opacity floor at the tail end (head = 1) — the stream fades into its wake. */
+/** Square-stream snake colours (lime `--m-accent` family). HEAD bright → tail dims +
+ *  fades. (For a grey stream, swap to {@link SENTINEL}/{@link SENTINEL_DIM}.) */
+const GLYPH_BODY = ACCENT;
+const GLYPH_TAIL = ACCENT_DIM;
+/** Opacity floor at the tail end (head = 1). */
 const GLYPH_TAIL_ALPHA = 0.3;
-/**
- * Per-side inset of each body SQUARE, as a fraction of a cell — a small square
- * centred in its cell (clear gaps between segments so they read as distinct
- * blocks, not one solid worm). Snapped to the device-pixel grid (no blur).
- */
+/** Per-side inset of each body SQUARE so segments read as distinct blocks, not one
+ *  solid worm; snapped to the device-pixel grid. */
 const GLYPH_BG_INSET = 0.18;
 
-// ---- RED-SPARK ("ouch" / death) particle burst ----
-// Fires on EVERY NEGATIVE grab AND on the KILLER death (nothing else explodes —
-// the +10 never does; a wall/self death stays silent). The chips are ALWAYS pure RED
-// ({@link RABBIT_RED} / `--m-error`) — never any accent/white mix (owner rule: a
-// penalty sparks red, full stop). The MAGNITUDE maps to one thing only: the COUNT of
-// red chips — bigger minus → MORE red sparks (−10 = few, −30 = more, the KILLER = the
-// maximal blast at {@link KILLER_SPARK_MAGNITUDE}). Size/spread keep a light scale so
-// a big hit reads bigger, but the COLOUR is 100% red at every magnitude. Purely
-// cosmetic; frozen under reduced motion (the hook passes `animate = false`, so the
-// engine never seeds a burst — no info is motion-only).
+// Red-spark burst on every NEGATIVE grab + the KILLER death (nothing else explodes).
+// Chips are ALWAYS pure red (owner rule); the magnitude maps ONLY to the chip COUNT,
+// never the colour. Never seeded under reduced motion (the hook passes animate=false).
 
-/** Chips for the MAXIMAL blast (the killer) — the full punchy spray. Penalties scale
- *  DOWN from this anchor. */
 const EXPLOSION_COUNT_MAX = 26;
-/** The spark-intensity reference (count = `magnitude / PENALTY_REF`). Held at 50 —
- *  ABOVE the worst penalty (−30) on purpose, so the negative ladder (−10/−20/−30)
- *  scales BELOW the cap and the KILLER (passing {@link KILLER_SPARK_MAGNITUDE}) is the
- *  strictly biggest burst, not tied with −30. */
+/** Spark-intensity reference (count = `magnitude / PENALTY_REF`). 50 is ABOVE the worst
+ *  −30 on purpose, so the killer is the strictly biggest burst, not tied with −30. */
 const PENALTY_REF = 50;
-/** The KILLER death-burst magnitude — the reference (50), so it yields the maximal
- *  red blast (full count + widest spread); the killer is the biggest "ouch" there is. */
 const KILLER_SPARK_MAGNITUDE = PENALTY_REF;
-/** Floor so even the smallest penalty (−10) still reads as a real little burst,
- *  not one or two stray chips. −10 → ~max(6, 26·10/50 = ~5) = 6 chips. */
+/** Floor so even −10 reads as a real little burst, not one or two stray chips. */
 const EXPLOSION_COUNT_MIN = 6;
-/** Burst lifetime (ms): ~0.7s of gravity + fade, then it self-clears. */
 const EXPLOSION_MS = 700;
-/** Extra spray spread + chip size at the killer vs the −10 (a bigger blast throws
- *  chips a touch wider/larger — colour is unaffected, always red). */
+/** Bigger blasts throw chips a touch wider/larger (colour stays red). */
 const SPARK_SPEED_BOOST = 0.6;
 
-/** Normalised penalty intensity in [0,1]: 0 at the smallest magnitude (10), 1 at
- *  the reference (50 = the killer). Drives the light size/spread scale (NOT colour). */
+/** Normalised penalty intensity [0,1]; drives the size/spread scale, NOT colour. */
 function penaltyIntensity(magnitude: number): number {
   const lo = RABBIT_VALUES[0];
   return Math.min(1, Math.max(0, (magnitude - lo) / (PENALTY_REF - lo)));
 }
 
-/**
- * Map a magnitude (`abs(score delta)`) → red-chip COUNT, scaled linearly off the
- * PENALTY_REF anchor and floored so a small penalty still reads as a burst:
- *   −10 → 6 (fewest) · −20 → ~10 · −30 → ~16 · killer (50) → 26 (most). Every chip is
- * red; only the count grows. The +10 never calls this (only negatives + the killer
- * explode).
- */
+/** Magnitude → red-chip COUNT, scaled off PENALTY_REF and floored. Only negatives +
+ *  the killer call this; every chip is red, only the count grows. */
 function explosionCountFor(magnitude: number): number {
   const scaled = Math.round((EXPLOSION_COUNT_MAX * magnitude) / PENALTY_REF);
   return Math.max(EXPLOSION_COUNT_MIN, Math.min(EXPLOSION_COUNT_MAX, scaled));
 }
 
-/**
- * One explosion chip. Position/velocity are in CELL units (offset from the
- * explosion cell's centre), resolved to CSS px at draw time against the live
- * cell size — so the burst stays correct across a board resize. `size` is a
- * fraction of a cell.
- */
+/** One explosion chip. Position/velocity are in CELL units, resolved to CSS px at
+ *  draw time against the live cell size — so the burst stays correct across a resize. */
 interface Chip {
-  /** Offset from the explosion cell centre, in cell units (updated per frame). */
   ox: number;
   oy: number;
-  /** Velocity in cell-units per frame. */
   vx: number;
   vy: number;
-  /** Chip side as a fraction of a cell. */
   size: number;
   color: string;
 }
 
-/** Sprite occupies this fraction of the cell (a touch smaller, centered). */
 const SPRITE_FILL = 0.85;
-/** Body + tail render a touch larger — `scale` lifts their effective fill to ~0.9
- *  of the cell (owner request); the snake HEAD stays at the 0.85 default. */
+/** Body + tail render at ~0.9 cell fill (owner request); the HEAD stays at 0.85. */
 const BODY_TAIL_SCALE = 0.9 / SPRITE_FILL;
-/** Every rabbit renders at this effective cell-fill — a hair larger than the base so
- *  the thin EAR STRIPES stay legible at game cell size. IDENTICAL for ALL four (owner:
- *  same body size — the plain-white +10 and the red-striped negatives are the same
- *  bunny, and the KILLER stands out ONLY by its solid-red fill + menace pulse, NEVER by
- *  size). `scale` is relative to {@link SPRITE_FILL}. */
+/** All four rabbits share this fill — a hair larger so the thin EAR STRIPES stay
+ *  legible; size is IDENTICAL (the killer stands out by colour, never size). */
 const RABBIT_BODY_SCALE = 0.96 / SPRITE_FILL;
 
 /**
- * IN-GAME rabbit bitmap — ALL four rabbits share ONE WHITE-bodied bunny silhouette of
- * identical geometry/size; only the colouring differs. A 7-wide × 13-tall bunny: two
- * long ears (rows 0–6) over a white head/body (rows 7–12; the eyes are the transparent
- * `0` gaps, neutral). {@link stripedRabbit} builds the NEGATIVE variant per RANK,
- * colouring `rank + 1` RED stripe bands across BOTH ears, bottom-anchored on
- * alternating rows so 1..3 stay countable. The POSITIVE (+10) and the KILLER use the
- * un-striped {@link RABBIT_PLAIN} (the same bitmap with NO `C` bands), filled white and
- * solid-red respectively.
- *
- *  - `1` = white body ({@link RABBIT_WHITE}).
- *  - `C` = a STRIPE pixel — RED ({@link RABBIT_RED}), the penalty colour, supplied at
- *    draw time by {@link stripeColor}. (Only negatives have stripes now.)
- *  - `.` = transparent (board shows through).
- *
- * The ear columns (1–2 and 4–5) are filled every row so each ear reads as a solid
- * white blade; a stripe row just recolours those ear pixels. Because stripes live IN
- * the bitmap, the existing sprite transforms (bob / shake / twitch) carry them along
- * automatically — no separate overlay to keep in sync.
+ * In-game rabbit bitmap — all four rabbits share ONE white-bunny silhouette; only the
+ * colouring differs. `1` = white body, `C` = a RED stripe pixel (supplied at draw time
+ * by {@link stripeColor}), `.` = transparent. Stripes live IN the bitmap, so the
+ * sprite transforms carry them — no separate overlay to keep in sync.
  */
 const RABBIT_EAR_WHITE = ".11.11.";
 const RABBIT_EAR_STRIPE = ".CC.CC.";
-/** Stripe SLOT rows on the 7-row ear region, bottom → top — THREE slots now (the
- *  ladder tops out at 3 stripes / −30). A rank lights the first `rank + 1` of these,
- *  so rank 0 shows the single lowest band and rank 2 all three; the alternating gap
- *  rows (5/3) keep the bands visually separate at cell size, and the top ear rows
- *  (0/1) stay white tips. */
+/** Stripe SLOT rows (bottom → top, three slots); a rank lights the first `rank + 1`,
+ *  the alternating gap rows keep the bands countable at cell size. */
 const RABBIT_STRIPE_SLOTS = [6, 4, 2] as const;
 const RABBIT_EAR_ROWS = 7;
-/** The white head/body/feet beneath the ears, eye row PLAIN — the eyes are the `0`
- *  gaps (transparent sockets), nose = the `0`. Used by {@link RABBIT_PLAIN} (the
- *  POSITIVE +10 and the KILLER), so neither gets coloured eyes. */
+/** White face; eyes are the transparent `0` sockets. Used by {@link RABBIT_PLAIN}. */
 const RABBIT_FACE = [
   "1111111",
   "1011101",
@@ -417,24 +201,19 @@ const RABBIT_FACE = [
   "0100010",
 ] as const;
 
-/** The SAME face but with RED-marked eyes. Each eye is **2px wide** (`EE` at cols
- *  1–2 and 4–5 of the eye row — a touch bigger than a 1px dot so the red eyes read,
- *  but still restrained, the silhouette unchanged) and sits directly UNDER the red ear
- *  stripes (same cols 1–2 / 4–5), so the red eyes line up with the red ears. Used by
- *  {@link stripedRabbit} — the NEGATIVE rabbits get RED eyes bundled with their red
- *  stripes (owner). The positive/killer keep the plain {@link RABBIT_FACE} (transparent
- *  sockets). Footprint is identical to {@link RABBIT_FACE} (same 7×6 grid). */
+/** Face with `EE` eye cells (2px, cols 1–2/4–5) under the ear stripes — red on the
+ *  negatives, black on the killer. */
 const RABBIT_FACE_EYES = [
   "1111111",
-  "1EE1EE1", // eyes (cols 1–2 & 4–5, 2px wide) → red on the negative variant
+  "1EE1EE1",
   "1110111",
   "1111111",
   "0111110",
   "0100010",
 ] as const;
 
-/** Build the striped (NEGATIVE) bunny bitmap for `rank` (0..2): `rank + 1` RED-`C`
- *  stripe bands across both ears (bottom-anchored), then the RED-EYED white face. */
+/** Build the striped (NEGATIVE) bitmap for `rank` (0..2): `rank + 1` red bands across
+ *  both ears (bottom-anchored), then the red-eyed face. */
 function stripedRabbit(rank: number): string[] {
   const lit = new Set<number>(RABBIT_STRIPE_SLOTS.slice(0, rank + 1));
   const rows: string[] = [];
@@ -445,26 +224,13 @@ function stripedRabbit(rank: number): string[] {
   return rows;
 }
 
-/**
- * The POSITIVE (+10) bunny silhouette — the EXACT same geometry/size as
- * {@link stripedRabbit} (the same 7-row white ears + the plain {@link RABBIT_FACE})
- * but with NO stripe bands. Filled white ({@link RABBIT_WHITE}) via {@link solidColor}
- * it's the plain white prize, its eyes left as transparent sockets (same as in-game).
- * All four rabbits are PIXEL-FOR-PIXEL the same silhouette + size — only the colouring
- * differs (plain white / white + red stripes + red eyes / solid red + black eyes). The
- * killer reuses the same ears + an eye-face ({@link RABBIT_KILLER}); there is no second
- * geometry. Exported so the header easter-egg ({@link RabbitMark}) renders this EXACT
- * silhouette as its SVG icon, 1:1 with the in-game white (+10) rabbit (`1` = a body
- * pixel; `0`/`.` = transparent — the eye sockets + outline gaps).
- */
+/** The POSITIVE (+10) silhouette — same geometry as the others, no stripes. Exported
+ *  so {@link RabbitMark} renders the EXACT in-game bunny (`1` = body pixel, `0`/`.` = transparent). */
 export const RABBIT_PLAIN: readonly string[] = [
   ...Array.from({ length: RABBIT_EAR_ROWS }, () => RABBIT_EAR_WHITE),
   ...RABBIT_FACE,
 ];
 
-/** Resolve a striped (NEGATIVE) rabbit cell: `1` = white body, `C` = the RED stripe
- *  colour, `E` = a RED eye (always {@link RABBIT_RED} — the red eyes ride along with
- *  the red stripes), else transparent. */
 function stripeColor(stripe: string): (ch: string) => string | null {
   return (ch) =>
     ch === "1"
@@ -476,54 +242,29 @@ function stripeColor(stripe: string): (ch: string) => string | null {
           : null;
 }
 
-/** Resolve a single-fill silhouette ({@link RABBIT_PLAIN}): `1` = the fill, else
- *  transparent. Used by the POSITIVE (filled white, transparent eye sockets). */
 function solidColor(fill: string): (ch: string) => string | null {
   return (ch) => (ch === "1" ? fill : null);
 }
 
-/** KILLER eye colour — pure BLACK. The killer body is solid {@link RABBIT_RED}, so a
- *  red eye would vanish on it; black reads with hard contrast (~6:1+ on the red) and
- *  gives the lethal bunny a menacing stare. */
+/** Killer eye black — a red eye would vanish on the solid-red body. */
 const KILLER_EYE = "#000000";
 
-/**
- * The KILLER bitmap — the EXACT same geometry/size as {@link RABBIT_PLAIN} (same white
- * ears + the {@link RABBIT_FACE_EYES} face), so its silhouette/footprint is identical
- * to every other rabbit. The difference is purely colour, via {@link killerColor}: the
- * whole body (`1`) fills solid red and the eye cells (`E`, the SAME 2px cols 1–2 / 4–5
- * as the negatives' red eyes) fill BLACK. So the "dangerous" rabbits — the negatives
- * and the killer — all carry visible eyes in the same spot (red on white, black on
- * red), reading as one family. No extra geometry: it reuses the shared ear + eye-face.
- */
+/** Killer bitmap — same geometry as {@link RABBIT_PLAIN} + the eye face; the body
+ *  fills solid red and the eyes black ({@link killerColor}). */
 const RABBIT_KILLER: readonly string[] = [
   ...Array.from({ length: RABBIT_EAR_ROWS }, () => RABBIT_EAR_WHITE),
   ...RABBIT_FACE_EYES,
 ];
 
-/** Resolve a KILLER cell: `1` = the solid-red body, `E` = a BLACK eye, else
- *  transparent. */
 function killerColor(ch: string): string | null {
   return ch === "1" ? RABBIT_RED : ch === "E" ? KILLER_EYE : null;
 }
 
 /**
- * Sentinel HEAD sprite — the owner's hand-decoded 7×8 Matrix-"sentinel" bitmap,
- * AUTHORED FACING UP (the spiky `.M.M.M.` antennae/sensor row is at the TOP =
- * the creature's FRONT; the rounded `.MMMMM.` / `..MMM..` chin is at the BOTTOM
- * = the back, where the body trails off). `M` = the creature's body pixel (the
- * bright lime accent — kept identical to the body so head + body read as ONE
- * creature, and so the sentinel stays VISIBLE on the dark `#141414` field; it is
- * deliberately NOT black), `R` = a RED sensor/eye light (the hazard red — the
- * sentinel's menacing red ocelli), `.` = transparent (the board shows through).
- * The two `R` in row 3 (`MRMMMRM`) + the single `R` in row 4 (`MMMRMMM`) are the
- * sentinel's red eye-cluster. The spiky antennae row makes the head instantly
- * distinct from the smooth-rectangle body and the splaying-tentacle tail at a
- * glance. All three snake parts are 7×8 and render off a common reference
- * dimension ({@link SNAKE_REF_DIM}) so every pixel is one block size and the
- * figure reads continuous. At draw time the matrix is pre-rotated in 90° steps
- * to face {@link dir} (see {@link rotateSprite} / {@link headQuarters}) so the
- * spikes + eyes always point the way the creature moves.
+ * Sentinel HEAD bitmap (7×8), AUTHORED FACING UP (the spiky `.M.M.M.` antennae row =
+ * the front). `M` = body pixel (lime, deliberately NOT black so the sentinel reads on
+ * the dark `#141414`), `R` = a red eye, `.` = transparent. Pre-rotated at draw time to
+ * face {@link dir} (see {@link rotateSprite} / {@link headQuarters}).
  */
 const HEAD_SPRITE = [
   ".M.M.M.",
@@ -535,46 +276,22 @@ const HEAD_SPRITE = [
   ".MMMMM.",
   "..MMM..",
 ] as const;
-/** Head pixel → fill: `M` = grey body, `R` = red sensor/eye, `.` = transparent. */
 const HEAD_COLORS: Record<string, string | null> = {
   M: SENTINEL,
   R: RABBIT_RED,
   ".": null,
 };
 
-/**
- * Common reference dimension for the SNAKE parts (head + body + tail). All three
- * are rasterised off this single max-dimension so every snake pixel is the SAME
- * device-pixel block size, regardless of each sprite's own bounding box. With
- * the sentinel art the three parts share ONE 7-wide × 8-tall bounding box (head,
- * body and tail are each 7×8), so they ALL key off 8 and butt together into one
- * continuous creature — the head's spiky front, the smooth body tube with its
- * red seam, and the splaying tentacle tail all render at the same pixel pitch
- * (the previous narrower 5-wide body/tail are gone). Keeping the shared `refDim`
- * (rather than letting each part fit its own box, the rabbits' behaviour) is
- * what guarantees the block size matches across segments — a per-part fit would
- * desync the pixel size on parts whose bounding box differs. The rabbits keep
- * fitting their own cell (they pass no `refDim`).
- */
+/** Shared reference dim for ALL snake parts (head/body/tail, each 7×8) so every snake
+ *  pixel is the SAME device-pixel block size — a per-part fit would desync the block
+ *  size between segments. Rabbits pass nothing (fit their own box). */
 const SNAKE_REF_DIM = 8;
 
 /**
- * Sentinel BODY sprite (middle segments) — the owner's hand-decoded 7×8 bitmap,
- * a smooth 5-wide tube (cols 1..5 filled, a 1px transparent gap each side) with
- * a RED SEAM band across it. Authored as a vertical tube running top→bottom
- * (`+y`). `M` = body pixel, `R` = the red seam, `.` = transparent.
- *
- * The seam is authored at ROW 3 (4th of 8) — slightly above centre — exactly as
- * in the source art. It runs PERPENDICULAR to the tube's flow, so on a straight
- * run it reads as a recurring red rib banding the creature (a sentinel "spinal
- * segment"), distinct from the head's red eye-cluster and the tail's bare
- * tentacles. At draw time the sprite is ROTATED so its long (flow) axis aligns
- * with the segment's direction of travel (see {@link bodyQuarters}) and it draws
- * in `fillToCell` so the long axis slightly overflows the cell — two consecutive
- * segments butt end-to-end into one continuous tube on straight runs; on a turn
- * the two perpendicular tubes overlap at the shared corner cell, minimising the
- * inner-corner seam. Rendered via {@link drawSprite} off {@link SNAKE_REF_DIM}
- * so the pixel block matches the head/tail (the figure reads as one creature).
+ * Sentinel BODY bitmap (7×8) — a 5-wide tube with a red seam, authored running DOWN
+ * (`+y`). Rotated at draw time to align with travel (see {@link bodyQuarters}) and
+ * drawn in `fillToCell` so consecutive segments butt end-to-end into one tube (on a
+ * turn the perpendicular tubes overlap at the corner). `M` = body, `R` = seam, `.` = transparent.
  */
 const BODY_SPRITE = [
   ".......",
@@ -586,37 +303,19 @@ const BODY_SPRITE = [
   ".MMMMM.",
   ".M...M.",
 ] as const;
-/**
- * Clockwise 90° turns to align the tube-DOWN {@link BODY_SPRITE} with the
- * segment's flow `dir` (the toroidal step between this segment and the next).
- * The tube is authored running vertically (`+y`), so `+y` = 0 turns. A
- * horizontal flow rotates the narrow axis to run across the page, keeping the
- * tube thin in the perpendicular dimension while it fills the cell along travel.
- * (The body is rotationally symmetric except for the red seam, which is fine —
- * the seam just bands whichever way the segment flows.)
- */
+/** CW 90° turns to align the DOWN-authored {@link BODY_SPRITE} with flow `dir` (`+y` = 0). */
 function bodyQuarters(dir: Cell): number {
-  if (dir.x === 1) return 3; // tube runs right
-  if (dir.x === -1) return 1; // tube runs left
-  if (dir.y === -1) return 2; // tube runs up
-  return 0; // tube runs down (and the default)
+  if (dir.x === 1) return 3;
+  if (dir.x === -1) return 1;
+  if (dir.y === -1) return 2;
+  return 0;
 }
 
 /**
- * Sentinel TAIL sprite (the last segment) — the owner's hand-decoded 7×8 bitmap,
- * AUTHORED TIP-DOWN: a WIDE solid cap at the TOP (rows 0–1, 5–7 wide — matching
- * the body tube so the body→tail junction is seamless) that SPLAYS into a bunch
- * of metallic TENTACLES/tendrils dangling DOWN (rows 2–5, the alternating
- * `M.M.M.M` columns + the two outer strands). The tentacle tips trail off into
- * transparency at the bottom (rows 6–7 blank). `M` = body/tendril pixel, `.` =
- * transparent. It runs the full 8-row long axis (like the body) so, drawn in
- * `fillToCell`, its wide cap fills the cell pitch along travel and connects to
- * the preceding body segment; the lower rows splay into the multi-strand
- * tentacle bunch. The splaying tentacles make the tail instantly distinct from
- * the smooth body tube and the spiky head. At draw time the matrix is
- * pre-rotated in 90° steps (see {@link rotateSprite}) so the tentacles always
- * trail AWAY from the body — aimed along the tail's trailing direction (from
- * `snake[len-2]` toward `snake[len-1]`).
+ * Sentinel TAIL bitmap (7×8) — a wide cap (matching the body tube) splaying into
+ * dangling tentacles, AUTHORED TIP-DOWN. Drawn in `fillToCell` so the wide cap
+ * connects to the preceding body segment; rotated at draw time (see {@link
+ * rotateSprite}) so the tentacles trail AWAY from the body. `M` = pixel, `.` = transparent.
  */
 const TAIL_SPRITE = [
   ".MMMMM.",
@@ -628,57 +327,33 @@ const TAIL_SPRITE = [
   ".......",
   ".......",
 ] as const;
-/**
- * Bodyward nudge (fraction of a cell) applied to the tail when it draws in
- * `fillToCell`. The tail now runs the FULL 8-row long axis like the body, so it
- * already fills the cell pitch along travel and the wide end butts against the
- * preceding body segment without help — the nudge is 0 (kept as a named knob in
- * case the taper authoring changes and a small overlap is wanted again).
- */
+/** Bodyward tail nudge — 0 (the tail now fills the cell pitch itself; kept as a knob
+ *  in case the taper authoring changes). */
 const TAIL_CONNECT_SHIFT = 0;
 
-/**
- * Resolve a BODY sprite character to a fill, given the segment's gradient color
- * `g` (the head→tail dim lerp applied per segment). `M` = that grey body pixel,
- * `R` = the sentinel's RED SEAM (a fixed hazard red, NOT lerped — the red rib
- * must stay vividly red on every segment so it reads as the sentinel's seam,
- * matching the head's red eyes and the red hazard rabbit), `.` = transparent.
- */
+/** Body char → fill, given the per-segment gradient `g`: `M` = grey body, `R` = the
+ *  red seam (a fixed hazard red, NOT lerped, so it stays vivid on every segment), `.` = transparent. */
 function bodyColors(g: string): (ch: string) => string | null {
   return (ch) => (ch === "M" ? g : ch === "R" ? RABBIT_RED : null);
 }
 
-/** Resolve a TAIL sprite character to a fill: `M` = the segment's grey tendril,
- *  else transparent. (The tail's tentacles are flat body-grey; no red here.) */
 function tailColors(g: string): (ch: string) => string | null {
   return (ch) => (ch === "M" ? g : null);
 }
 
-/**
- * Clockwise 90° turns to aim the TIP-DOWN tail sprite along a trailing
- * direction `dir` (pointing from the body toward the tail tip — i.e. AWAY from
- * the snake). The tentacle tips are authored dangling DOWN (`{0,+1}` → 0 turns),
- * so this maps the trailing vector onto that rest pose. (The head is authored
- * facing UP and the tail tentacles DOWN — opposite ends of the creature — so the
- * two `*Quarters` mappings differ; see {@link headQuarters}.) Kept as its own
- * function for intent clarity.
- */
+/** CW 90° turns to aim the TIP-DOWN tail along its trailing `dir`. (Head is authored
+ *  UP, tail DOWN — opposite ends — so this mapping differs from {@link headQuarters}.) */
 function tailQuarters(dir: Cell): number {
-  if (dir.x === 1) return 3; // tip points right
-  if (dir.x === -1) return 1; // tip points left
-  if (dir.y === -1) return 2; // tip points up
-  return 0; // tip points down (and the default)
+  if (dir.x === 1) return 3;
+  if (dir.x === -1) return 1;
+  if (dir.y === -1) return 2;
+  return 0;
 }
 
 /**
- * Rotate a bitmap (rows of equal-length strings) by `quarters` × 90° clockwise.
- * Used to aim the UP-authored sentinel head (and the tube-down body / tip-down
- * tail) at the snake's heading. Rotating the MATRIX (not the canvas) keeps every
- * "on" bit on an integer device-pixel block, so the sprite stays hard 8-bit
- * crisp at any angle — a canvas `rotate()` would resample and smear the pixels.
- * Square/non-square bitmaps both handled; the sentinel parts are 7×8, so a
- * 90°/270° turn yields an 8×7 matrix (the rasteriser fits the larger dim into
- * the cell, so it still centers cleanly).
+ * Rotate a bitmap by `quarters` × 90° clockwise. Rotating the MATRIX (not the canvas)
+ * keeps every bit on an integer device-pixel block — a canvas `rotate()` would resample
+ * and smear. 7×8 → 8×7 on a 90/270 turn.
  */
 function rotateSprite(
   sprite: readonly string[],
@@ -701,34 +376,23 @@ function rotateSprite(
   return rows;
 }
 
-/**
- * Clockwise 90° turns to map the UP-authored sentinel head sprite onto a
- * heading. The head bitmap's FRONT (the spiky `.M.M.M.` antennae row + the red
- * eye-cluster just below it) is at the TOP, so it is authored facing UP
- * (`{0,-1}`) → 0 turns. One CW turn takes "up" → "right", another → "down",
- * another → "left": `{1,0}` (right) → 1, `{0,+1}` (down) → 2, `{-1,0}` (left)
- * → 3. So the spikes + eyes always point the way the creature moves.
- */
+/** CW 90° turns mapping the UP-authored head onto a heading (up = 0). */
 function headQuarters(dir: Cell): number {
-  if (dir.x === 1) return 1; // right
-  if (dir.x === -1) return 3; // left
-  if (dir.y === 1) return 2; // down
-  return 0; // up (and the default)
+  if (dir.x === 1) return 1;
+  if (dir.x === -1) return 3;
+  if (dir.y === 1) return 2;
+  return 0;
 }
 
 /**
- * Unit step FROM cell `a` TO the adjacent cell `b`, wrap-corrected. Two
- * segments that are visually adjacent can sit on OPPOSITE edges of the board
- * once the snake crosses a wrap-wall seam (e.g. `a.x = GRID_W-1`, `b.x = 0`) —
- * the raw delta would be `+(GRID_W-1)` (a huge wrong vector). Each axis collapses
- * to the minimal toroidal step in {-1,0,+1}: if the raw delta's magnitude exceeds
- * half the grid, the real move went the SHORT way across the seam, so the sign is
- * flipped. Used to aim the tail tip along its true trailing direction.
+ * Unit step `a`→`b`, wrap-corrected: across a wrap seam two visually-adjacent
+ * segments sit on OPPOSITE edges, so the raw delta is a huge wrong vector. If
+ * `|delta|` > half the grid the move went the SHORT way, so the sign is flipped.
  */
 function wrapStep(a: Cell, b: Cell): Cell {
   const step = (d: number, span: number) => {
-    if (d > span / 2) return d - span; // wrapped the short way (negative)
-    if (d < -span / 2) return d + span; // wrapped the short way (positive)
+    if (d > span / 2) return d - span;
+    if (d < -span / 2) return d + span;
     return d;
   };
   const dx = step(b.x - a.x, GRID_W);
@@ -736,7 +400,6 @@ function wrapStep(a: Cell, b: Cell): Cell {
   return { x: Math.sign(dx), y: Math.sign(dy) };
 }
 
-/** What a single `step()` produced — drives the hook's setState. */
 export interface StepResult {
   dead: boolean;
   ate: boolean;
@@ -744,17 +407,10 @@ export interface StepResult {
   length: number;
 }
 
-/** What a rabbit IS: the plain-white bonus (+10), a red-striped penalty, or the
- *  lethal (solid-red) killer. */
 type RabbitKind = "positive" | "negative" | "killer";
 
-/**
- * One of the four live rabbits. `kind` drives behaviour + render; `value` is the
- * SIGNED score delta (`+10` for the positive, `−10/−20/−30` for a negative; 0 and
- * unused for the killer — eating it ends the run before any scoring); `rank` (0..2,
- * index into {@link RABBIT_VALUES}) drives the RED ear-stripe COUNT for a NEGATIVE
- * (unused for the positive, which has no stripes, and the killer, which has none).
- */
+/** One live rabbit. `value` = the SIGNED score delta (`+10` / `−10/−20/−30`; 0 &
+ *  unused for the killer). `rank` (0..2) drives a negative's stripe count. */
 interface Rabbit {
   cell: Cell;
   kind: RabbitKind;
@@ -762,12 +418,8 @@ interface Rabbit {
   rank: number;
 }
 
-/**
- * Parse a color string to `[r,g,b]`. Accepts BOTH `#rrggbb` and the
- * `rgb(r,g,b)` form that {@link lerpHex} itself emits — so a lerp result can be
- * fed straight back into another lerp (the body's `S` scale darkens the
- * already-lerped per-segment `g`, see {@link bodyColors}).
- */
+/** Parse `#rrggbb` OR `rgb(...)` (the form {@link lerpHex} itself emits) → `[r,g,b]`,
+ *  so a lerp result can be fed back into another lerp. */
 function parseColor(c: string): [number, number, number] {
   if (c[0] === "#") {
     const i = parseInt(c.slice(1), 16);
@@ -777,7 +429,6 @@ function parseColor(c: string): [number, number, number] {
   return m ? [Number(m[0]), Number(m[1]), Number(m[2])] : [0, 0, 0];
 }
 
-/** Linear-interpolate two colors (`#rrggbb` or `rgb(...)`); `t` in [0,1]. */
 function lerpHex(a: string, b: string, t: number): string {
   const [ar, ag, ab] = parseColor(a);
   const [br, bg, bb] = parseColor(b);
@@ -788,28 +439,10 @@ function lerpHex(a: string, b: string, t: number): string {
 }
 
 /**
- * The headless Snake engine — all mutable game state + the step + the canvas
- * draw, with NO React. The `useSnakeGame` hook owns one instance and drives it;
- * `<SnakeBoard>` only hosts the canvas. Keeping the simulation out of React
- * avoids per-frame re-renders (the canvas is imperative; React state changes
- * only on discrete events: eat / die / pause).
- *
- * The look is a minimal brutalist snake reskinned as a Matrix "sentinel": a
- * continuous lime pixel creature (a spiky-antennaed red-eyed HEAD over a
- * red-seamed BODY tube dimming gently toward a splaying multi-TENTACLE TAIL)
- * hunting rabbits. The board ALWAYS carries EXACTLY FOUR rabbits: ONE POSITIVE (a
- * PLAIN WHITE bunny, fixed +10, NO stripes) + TWO NEGATIVE penalties (white bunnies
- * with 1–3 RED ear stripes + RED eyes = −10/−20/−30; the two roll independently and may
- * match) + ONE always-present KILLER (the same bunny filled SOLID RED with BLACK eyes,
- * no stripes — INSTANT DEATH to eat). All four are the same silhouette + size; only the
- * colouring differs (white = good · red stripes 1–3 = penalty · solid red = death).
- * Eating ANY of the
- * four RE-GENERATES the WHOLE field (fresh cells for all four — the killer relocates
- * too — and fresh ranks for the two negatives; the +10 needs no roll). MOTION is the
- * subtler tell: the +10 TWITCHES about its axis (the nav-bar rabbit wobble), the
- * negatives BOB + laugh-SHAKE, the killer slowly MENACE-pulses. Score is clamped ≥0;
- * every non-lethal eat grows the snake by exactly +1. Death is a wall hit (when not
- * wrapping), a self-hit, OR the killer. ("Follow the white rabbit.")
+ * Headless Snake engine — all mutable game state + the step + the canvas draw, with
+ * NO React. `useSnakeGame` owns one instance. Kept out of React to avoid per-frame
+ * re-renders (the canvas is imperative; React state changes only on discrete events:
+ * eat / die / pause).
  */
 export class SnakeEngine {
   private snake: Cell[] = [];

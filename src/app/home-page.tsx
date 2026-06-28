@@ -5,15 +5,19 @@ import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { DisplayPostResponse } from "@/shared/api/openapi";
-import { ErrorMessage } from "@/shared/ui/error-message";
-import { Loading } from "@/shared/ui/feedback/loading";
 import { useAllPosts } from "@/features/post/model/use-all-posts";
 import { useHomeStats } from "@/features/post/model/use-home-stats";
 import {
+  Label,
+  Category,
+  Metric,
+  StatusBadge,
+  Dot,
+  Loading,
+  ErrorMessage,
   Sparkline,
   seriesFromMonths,
-} from "@/shared/ui/data-display/sparkline";
-import { Label, Category, Metric, StatusBadge, Dot } from "@/shared/ui";
+} from "@/shared/ui";
 import { MatrixText } from "@/shared/ui/effects";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
@@ -21,12 +25,8 @@ import { PostCard } from "@/features/post/ui/post-card";
 
 const catOf = (p: DisplayPostResponse) => p.tags?.[0]?.tag ?? "post";
 const hrefOf = (p: DisplayPostResponse) => `/${p.author.userName}/${p.slug}`;
-// First letter/digit of a title (skips punctuation like "(" so a placeholder
-// shows a real character).
 const firstLetter = (s?: string) =>
   (s?.match(/[\p{L}\p{N}]/u)?.[0] ?? "•").toUpperCase();
-// Current month, short + uppercase (JAN…DEC) — drives the live `// … · <MONTH>`
-// eyebrow so the highlight period never goes stale.
 const currentMonthLabel = () =>
   new Date().toLocaleDateString("en-US", { month: "short" }).toUpperCase();
 
@@ -53,10 +53,8 @@ function HeroCover({ post }: { post: DisplayPostResponse }) {
   );
 }
 
-/** Fixed 32px headline slot in the home stats band — pins a single-line
- *  `mono-title` (centered via `leading-8`) so the filled title-link and the
- *  empty MatrixText placeholder hold the same row height and the column never
- *  jumps between loading / empty / filled. */
+/** Fixed-height title slot so the filled / empty / loading states hold the same
+ *  row height and the column never jumps. */
 function StatTitle({ children }: { children: ReactNode }) {
   return (
     <div className="mono-title block h-8 truncate leading-8 transition-colors group-hover:text-[var(--m-accent)]">
@@ -76,29 +74,22 @@ export default function HomePage() {
     isFetching: query.isFetchingNextPage,
   });
 
-  // Only a true COLD start (no cached pages yet) — on a warm return the infinite
-  // query is non-pending, so the cached feed renders instantly with no fallback.
-  // One plain loader (no skeleton) so cold-load + navigation share a single
-  // spinner with no loader→skeleton→content flicker.
+  // Cold start only; one plain loader (no skeleton) avoids a loader→skeleton→content flicker.
   if (query.isLoading) return <Loading />;
   if (query.error) return <ErrorMessage error={query.error} />;
 
-  // Defensive: the public home feed only ever shows published posts (drafts are
-  // author-only). Guards against a stale cache / API edge surfacing a draft.
+  // Defensive: drafts are author-only — guard a stale cache / API edge surfacing one.
   const posts = (
     (query.data?.pages?.flat() ?? []) as DisplayPostResponse[]
   ).filter((p) => p.isPublished);
   const hero = posts[0];
   const rest = posts.slice(1);
-  // While more pages can still load, only render complete 3-column rows so the
-  // grid never shows a ragged trailing row before the next page arrives.
+  // While more pages can load, render only complete 3-col rows so the trailing row never reads ragged.
   const visibleGrid = query.hasNextPage
     ? rest.slice(0, Math.floor(rest.length / 3) * 3)
     : rest;
 
-  // Stats band data comes from the dedicated aggregate endpoint, NOT the feed.
-  // Highlights are null when the current UTC month has no data (backend reports
-  // the month truthfully — the FRONTEND owns the empty state, Option A).
+  // Highlights come from the aggregate endpoint (not the feed) and are null on an empty month.
   const topUser = stats.data?.mostActiveUser;
   const topPost = stats.data?.topPost;
   const series = seriesFromMonths(stats.data?.postsByMonth ?? []);
@@ -121,7 +112,6 @@ export default function HomePage() {
           </div>
         ) : (
           <>
-            {/* Stats — full-bleed band, filled like a post card (matches profile) */}
             <section className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
               <div className="mx-auto grid max-w-[1240px] gap-10 px-10 py-10 lg:grid-cols-3">
                 <div className="hidden lg:block">
@@ -206,17 +196,14 @@ export default function HomePage() {
               </div>
             </section>
 
-            {/* Section label — above the hero */}
             {rest.length > 0 && (
               <div className="flex items-center pt-10 pb-6">
                 <Label>PUBLICATIONS</Label>
               </div>
             )}
 
-            {/* Hero — bg-fill block, no border (Home 2) */}
             {hero && (
               <section className="group relative grid bg-[var(--m-card)] transition-colors hover:bg-[var(--m-panel)] lg:grid-cols-[1.05fr_1fr]">
-                {/* Status badge — pinned top-right (LATEST DROP / future PINNED) */}
                 <StatusBadge
                   status="LATEST DROP"
                   className="absolute top-5 right-5 z-[var(--m-z-content)]"
@@ -264,7 +251,6 @@ export default function HomePage() {
               </section>
             )}
 
-            {/* Grid feed — shared PostCard (bg-fill cards, no borders) */}
             {visibleGrid.length > 0 && (
               <section className="mt-10 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
                 {visibleGrid.map((p, index) => (

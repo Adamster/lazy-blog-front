@@ -7,7 +7,6 @@ export interface ProvidersProps {
   children: React.ReactNode;
 }
 
-/** The two themes. */
 export type Theme = "light" | "dark";
 
 const THEMES: readonly Theme[] = ["light", "dark"] as const;
@@ -15,9 +14,7 @@ const THEMES: readonly Theme[] = ["light", "dark"] as const;
 interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  /** light → dark → light. */
   cycleTheme: () => void;
-  /** Derived: the dark canvas. */
   isDarkTheme: boolean;
 }
 
@@ -31,19 +28,12 @@ export const useTheme = () => {
   return context;
 };
 
-/** Read the theme already applied to `<html>` (the pre-paint inline script +
- *  `ThemeProvider` both set the `.dark` class). SSR-safe: `"light"` when there's
- *  no document. */
 function readAppliedTheme(): Theme {
   if (typeof document === "undefined") return "light";
   return document.documentElement.classList.contains("dark") ? "dark" : "light";
 }
 
-/**
- * Like {@link useTheme} but NEVER throws — for fallback UIs that can render
- * ABOVE or OUTSIDE the `ThemeProvider` (the root `ErrorBoundary` fallback).
- * Returns the provider value when present, else reads the theme off `<html>`.
- */
+// Like useTheme but NEVER throws — for fallback UIs outside the ThemeProvider (root ErrorBoundary).
 export const useThemeSafe = (): Pick<
   ThemeContextType,
   "theme" | "isDarkTheme"
@@ -56,11 +46,7 @@ export const useThemeSafe = (): Pick<
   return { theme, isDarkTheme: theme === "dark" };
 };
 
-/**
- * Apply the theme to `<html>` — the single source the CSS tokens key off:
- * `data-theme` + the `.dark` class. light = neither; dark = `.dark`. The same is
- * done pre-paint by the inline script in the root layout (no flash).
- */
+// Same is done pre-paint by the inline script in the root layout (no flash).
 function applyTheme(theme: Theme) {
   const html = document.documentElement;
   html.setAttribute("data-theme", theme);
@@ -70,8 +56,7 @@ function applyTheme(theme: Theme) {
 export function ThemeProvider({ children }: ProvidersProps) {
   const [theme, setThemeState] = useState<Theme>("light");
 
-  // The inline script already resolved + applied the theme to <html> before
-  // paint; sync React state to it so consumers match without re-driving paint.
+  // Inline script already applied the theme pre-paint; sync React state to it.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setThemeState(readAppliedTheme());

@@ -5,14 +5,6 @@ interface SparklinePoint {
   count: number;
 }
 
-/**
- * Map a backend `PostsPerMonth[]` (`{ year, month, count }`, month is 1-based
- * like .NET `DateTime.Month`) onto a CONTINUOUS run of `months` consecutive
- * buckets (oldest → newest), zero-filling empty months and anchoring the window
- * at the CURRENT month — the rolling "last N months" view shared by the home
- * stats band and the profile activity chart. Replaces the old feed-derived
- * `buildMonthlySeries` for API-backed data.
- */
 export function seriesFromMonths(
   months: PostsPerMonth[],
   count = 6
@@ -35,17 +27,10 @@ export function seriesFromMonths(
   return series;
 }
 
-/**
- * Build a CONTINUOUS run of `months` consecutive monthly buckets (oldest →
- * newest), counting `dates` per month (0 for empty months) so the axis reads
- * e.g. "Jan Feb Mar Apr May Jun" with no gaps. The window is anchored at the
- * most recent date's month, falling back to the current month when empty.
- */
 export function buildMonthlySeries(
   dates: (string | Date)[],
   months = 6,
-  // Anchor the window at the current month (rolling "last N months") instead of
-  // the most recent data point — so an old last-post doesn't show a stale window.
+  // Anchor at current month (rolling window) so an old last-post doesn't show a stale window.
   anchorNow = false
 ): SparklinePoint[] {
   const counts = new Map<string, number>();
@@ -71,25 +56,20 @@ export function buildMonthlySeries(
   return series;
 }
 
-// The line + area SVG uses a 0..100 x viewBox with preserveAspectRatio="none"
-// so the curve+area STRETCH to the full container width edge-to-edge. The
-// stroke stays crisp via vector-effect="non-scaling-stroke". Dots can't live
-// inside a stretched SVG (circles become ovals), so they render as an HTML
-// overlay of perfectly round elements positioned in %.
+// preserveAspectRatio="none" stretches the curve full-width; dots can't live
+// inside a stretched SVG (circles become ovals) so they render as an HTML % overlay.
 const VB_W = 100;
 const VB_H = 52;
-const PAD_TOP = 4; // top breathing room inside the viewBox
-const PAD_BOTTOM = 8; // extra bottom room so low points + curve undershoot
-// (Catmull-Rom can dip slightly below the lowest data point) never touch the
-// baseline / get clipped by the box edge.
-const PLOT_H = 46; // rendered pixel height of the plot area (footprint stays ~46px)
+const PAD_TOP = 4;
+const PAD_BOTTOM = 8; // Catmull-Rom can dip below the lowest point — extra room to avoid clipping.
+const PLOT_H = 46;
 
 const px = (i: number, len: number) =>
   len > 1 ? (i / (len - 1)) * VB_W : VB_W / 2;
 const py = (count: number, max: number) =>
   PAD_TOP + (1 - count / max) * (VB_H - PAD_TOP - PAD_BOTTOM);
 
-// Catmull-Rom -> cubic bézier: a smooth curve through every data point.
+// Catmull-Rom → cubic bézier smoothing.
 function smoothPath(pts: { x: number; y: number }[]): string {
   if (pts.length === 0) return "";
   if (pts.length === 1) return `M ${pts[0].x} ${pts[0].y}`;
@@ -108,12 +88,6 @@ function smoothPath(pts: { x: number; y: number }[]): string {
   return d;
 }
 
-/**
- * Mono sparkline: smooth curve through monthly counts, soft accent gradient
- * fill stretched full-width, and round accent dots (HTML overlay) at each data
- * point. Owns its own month-label row so labels sit EXACTLY under their dots
- * (same `i/(n-1)*100%` x-coordinate system). Identical look on every page.
- */
 export function Sparkline({
   series,
   gradientId,
@@ -125,10 +99,7 @@ export function Sparkline({
   /** Unique per instance — two gradients with the same id collide in the DOM. */
   gradientId: string;
   ariaLabel: string;
-  /** Render the month labels row under the plot (centered under each dot). */
   showLabels?: boolean;
-  /** Color/tracking of the month labels — pass the same as the panel's other
-   *  columns' bottom rows so the whole row reads consistently. */
   labelClassName?: string;
 }) {
   const max = Math.max(1, ...series.map((s) => s.count));

@@ -13,10 +13,9 @@ import {
 
 const NO_TOASTS: readonly Toast[] = [];
 
-/** Auto-dismiss after this many ms (design spec). */
+// Auto-dismiss delay (design spec).
 const TIMEOUT_MS = 4000;
 
-/** Type-coloured 4px left stripe + icon colour. */
 const STRIPE: Record<Toast["tone"], string> = {
   success: "var(--m-accent)",
   error: "var(--m-error)",
@@ -35,39 +34,33 @@ function ToastCard({ toast }: { toast: Toast }) {
       type="button"
       onClick={() => dismissToast(toast.id)}
       aria-label="Dismiss notification"
-      className="mono-toast-enter pointer-events-auto flex w-[380px] max-w-[calc(100vw-2.5rem)] cursor-pointer items-center gap-3 bg-[var(--m-card)] px-5 py-3 text-left"
+      className="mono-toast-enter pointer-events-auto flex w-[380px] max-w-[calc(100vw-2.5rem)] cursor-pointer items-center gap-3 bg-[var(--m-card)] px-5 py-3 text-left backdrop-blur-xl"
       style={{ borderLeft: `2px solid ${STRIPE[toast.tone]}` }}
     >
-      {/* Content */}
       <div className="min-w-0 flex-1">
-        <p className="text-[14px] leading-none font-semibold text-[var(--m-fg)]">
-          {toast.title}
+        <p
+          className="text-[11px] leading-none font-semibold tracking-[0.12em] uppercase"
+          style={{ color: STRIPE[toast.tone] }}
+        >
+          {`// ${toast.title}`}
         </p>
         {toast.description ? (
-          <p className="mt-1 text-[12px] leading-[1.5] break-words text-[var(--m-muted)]">
+          <p className="mt-2 text-[12px] leading-[1.6] break-words text-[var(--m-muted)]">
             {toast.description}
           </p>
         ) : null}
       </div>
 
-      {/* Status icon — sits between the text and the right edge */}
       {isSuccess ? (
-        <CheckIcon className="size-5 flex-none text-[var(--m-accent)]" />
+        <CheckIcon className="size-4 flex-none text-[var(--m-accent)]" />
       ) : (
-        <ExclamationCircleIcon className="size-5 flex-none text-[var(--m-error)]" />
+        <ExclamationCircleIcon className="size-4 flex-none text-[var(--m-error)]" />
       )}
     </button>
   );
 }
 
-/**
- * Own toast renderer — subscribes to the module-level emitter in
- * `@/shared/lib/toasts` and renders a bottom-right stacked portal of
- * Brutalist-Mono toasts (2px type stripe · content · status icon on the right,
- * all on `--m-card`). The whole toast is the dismiss target (no close glyph);
- * they also auto-dismiss. Portals into a `.mono-portal` node so the tokens +
- * mono font resolve (mirrors `Modal`).
- */
+// Portals into a `.mono-portal` node so the tokens + mono font resolve (mirrors Modal).
 export function Toaster() {
   const mounted = useIsMounted();
   const toasts = useSyncExternalStore(

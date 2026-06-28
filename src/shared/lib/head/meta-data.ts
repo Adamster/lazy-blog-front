@@ -7,11 +7,6 @@ interface Props {
   type?: string;
   card?: string;
   url?: string;
-  /**
-   * Hide the page from search engines (`robots: noindex, nofollow`). Used for
-   * internal / non-content routes that shouldn't be indexed — the `/brand`
-   * design-system reference and the `/arcade` game.
-   */
   noindex?: boolean;
 }
 

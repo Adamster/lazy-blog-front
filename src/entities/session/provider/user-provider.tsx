@@ -6,12 +6,8 @@ import React, { createContext, useContext } from "react";
 
 interface UserContextType {
   user: UserResponse | undefined;
-  /**
-   * `true` once we have a definitive answer about the current user: either there
-   * is no `userId` to fetch (logged out → resolved as "no user"), or the query
-   * has settled (success/error). Guards read this so `IsAuthor` can tell
-   * "still resolving the user" apart from "resolved, not the author".
-   */
+  // `true` once the current user is definitively known (no userId to fetch, or
+  // the query settled) — lets `IsAuthor` tell "resolving" from "not the author".
   isUserResolved: boolean;
 }
 
@@ -33,14 +29,11 @@ export function UserProvider({
   children: React.ReactNode;
 }) {
   // Render children unconditionally (no blocking spinner) so the server tree
-  // reaches the HTML for crawlers. `user` is `undefined` until the query
-  // resolves on the client; consumers already treat it as optional and the
-  // interactive islands re-render once it lands.
+  // reaches the HTML for crawlers; `user` is `undefined` until the query lands.
   const { data: user, isLoading } = useUserById(userId || "");
 
-  // `isLoading` (= isPending && isFetching) is `false` for a disabled query (no
-  // userId), so "logged out" reads as resolved immediately; it's only `true`
-  // while an enabled query is in flight. → resolved unless actively fetching.
+  // `isLoading` is `false` for a disabled query (no userId), so "logged out"
+  // reads as resolved immediately — only an in-flight enabled query is loading.
   const isUserResolved = !isLoading;
 
   return (

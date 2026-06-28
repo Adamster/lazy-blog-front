@@ -4,12 +4,7 @@ import { CommentResponse, UserResponse } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { commentKeys } from "./comment-keys";
 
-/**
- * Build the placeholder comment shown optimistically while the POST is in
- * flight. The server owns the real id + timestamp; we mint a temporary id so the
- * row has a stable React key until `onSettled` invalidation swaps in the
- * server's record.
- */
+// Temp id gives the optimistic row a stable React key until onSettled swaps in the server record.
 function optimisticComment(
   body: string,
   user: UserResponse,
@@ -28,13 +23,6 @@ function optimisticComment(
   };
 }
 
-/**
- * Post a new comment with an optimistic append: `onMutate` snapshots the cached
- * thread and appends a placeholder so the comment shows instantly; `onError`
- * rolls back; `onSettled` invalidates so the server-confirmed record (real id +
- * timestamp) replaces the placeholder. Keyed by `postId`, matching
- * `useCommentsById`.
- */
 export const useAddComment = (
   postId: string,
   user: UserResponse | undefined

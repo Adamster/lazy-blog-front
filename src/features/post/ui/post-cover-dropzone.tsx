@@ -4,28 +4,17 @@ import { useRef } from "react";
 import Image from "next/image";
 import { TrashIcon, PhotoIcon } from "@heroicons/react/24/outline";
 
-/** Diagonal film-hatch fill — the empty drop-zone + the letterbox behind a
- *  centered 16:9 cover when the column is taller than the image. */
+// Film-hatch fill for the empty drop-zone + the letterbox behind a centered cover.
 const FILM_BG =
   "repeating-linear-gradient(135deg,var(--m-panel) 0 1px,transparent 1px 10px)";
 
 interface PostCoverDropzoneProps {
-  /** Current cover URL (empty string when unset). */
   coverUrl: string;
-  /** A file was picked → parent opens the crop modal with it. */
   onPick: (file: File) => void;
-  /** Clear the cover (no modal). */
   onRemove: () => void;
 }
 
-/**
- * Step-1 cover slot. On mobile it's a plain 16:9 tile; on desktop it stretches
- * to the form panel's height (`md:h-full`) and the 16:9 cover is centered
- * vertically, with the design's "film frame" hatch filling the letterbox so the
- * column never looks half-empty. Empty = the hatch + upload prompt. Clicking
- * opens the OS file picker and emits the chosen `File` up; the parent owns the
- * crop + upload modal (so cropping never blows up this block's height).
- */
+// The parent owns the crop + upload modal so cropping never changes this block's height.
 export function PostCoverDropzone({
   coverUrl,
   onPick,
@@ -56,7 +45,6 @@ export function PostCoverDropzone({
       >
         {hasCover ? (
           <>
-            {/* The 16:9 cover, centered in the (possibly taller) column. */}
             <span className="relative block aspect-[16/9] w-full">
               <Image
                 src={coverUrl}
@@ -74,7 +62,7 @@ export function PostCoverDropzone({
             </span>
           </>
         ) : (
-          <span className="flex flex-col items-center gap-3.5">
+          <span className="flex flex-col items-center gap-4">
             <PhotoIcon
               className="size-10 text-[var(--m-muted2)]"
               aria-hidden="true"
@@ -96,7 +84,7 @@ export function PostCoverDropzone({
           type="button"
           onClick={onRemove}
           aria-label="Remove cover image"
-          className={`mono-focus absolute top-3 right-3 z-[var(--m-z-content)] flex size-9 items-center justify-center border-2 border-[var(--m-dim)] bg-[var(--m-bg)] text-[var(--m-error)] opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 hover:border-[var(--m-error)]`}
+          className={`mono-icon-btn mono-focus absolute top-3 right-3 z-[var(--m-z-content)] size-9 bg-[var(--m-bg)] text-[var(--m-error)] opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 hover:border-[var(--m-error)] hover:text-[var(--m-error)]`}
         >
           <TrashIcon className="size-3.5" />
         </button>

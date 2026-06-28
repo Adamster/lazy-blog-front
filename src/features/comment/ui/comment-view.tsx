@@ -8,8 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import CommentForm from "@/features/comment/ui/comment-form";
 import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
-import ConfirmDeleteModal from "@/shared/ui/overlays/confirmation-modal";
-import { Avatar, Dot, Menu, type MenuItem } from "@/shared/ui";
+import { Avatar, Dot, Menu, ConfirmModal, type MenuItem } from "@/shared/ui";
 import { renderCommentMarkdown } from "@/features/comment/lib/comment-markdown";
 import {
   canEditComment,
@@ -34,10 +33,7 @@ const CommentView = ({ comment, postId }: IProps) => {
 
   const handle = comment.user.userName ?? "";
 
-  // The author may edit only within the 1-hour window after posting; once it
-  // closes the Edit affordance drops. Seed from the helper (no sync setState in
-  // an effect) and schedule the exact flip-off so it disappears live, not just
-  // on the next refresh. The backend is the authoritative gate.
+  // Seed the 1h edit window from the helper (no sync setState in an effect) and schedule the exact flip-off so it drops live.
   const createdAt = comment.createdAtUtc;
   const [canEdit, setCanEdit] = useState(() => canEditComment(createdAt));
   useEffect(() => {
@@ -49,11 +45,7 @@ const CommentView = ({ comment, postId }: IProps) => {
     return () => clearTimeout(timer);
   }, [canEdit, createdAt]);
 
-  // Render the whole body through the minimal inline-markdown subset — which now
-  // also renders inline GIF images (whitelisted KLIPY/Tenor only). This covers
-  // both NEW comments (GIFs are `![gif](url)` images anywhere) and OLD ones
-  // (trailing `![gif](url)` lines are just images at the end). Memoized on the
-  // raw body so re-renders (menu open, edit toggle) don't re-parse.
+  // Memoized on the raw body so re-renders (menu open, edit toggle) don't re-parse.
   const renderedBody = useMemo(
     () => (comment.body.trim() ? renderCommentMarkdown(comment.body) : null),
     [comment.body]
@@ -141,7 +133,7 @@ const CommentView = ({ comment, postId }: IProps) => {
         </div>
       )}
 
-      <ConfirmDeleteModal
+      <ConfirmModal
         title="Delete comment?"
         description="This comment will be permanently removed. This can't be undone."
         isOpen={isModalOpen}

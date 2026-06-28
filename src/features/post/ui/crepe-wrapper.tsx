@@ -1,11 +1,7 @@
 import dynamic from "next/dynamic";
-import { Loading } from "@/shared/ui/feedback/loading";
+import { Loading } from "@/shared/ui";
 
-/**
- * Client-only entry for the WYSIWYG editor. `ssr:false` is correct here: the
- * editor is create/edit-only (behind auth) and not on the SEO read path — the
- * public post body is server-rendered separately via `<PostBody>`.
- */
+// `ssr:false`: editor is create/edit-only (behind auth), not on the SEO read path.
 export const CrepeEditor = dynamic(() => import("./crepe"), {
   ssr: false,
   loading: () => <Loading inline />,

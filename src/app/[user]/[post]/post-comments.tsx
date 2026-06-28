@@ -8,11 +8,7 @@ interface IProps {
   isPostPublished: boolean;
 }
 
-/**
- * Client island for the comments thread + composer. The route is the
- * composition root joining the post (server-rendered) with its comments,
- * so neither feature reaches sideways into the other (FSD).
- */
+// The route is the composition root joining post + comments, so neither feature imports the other (FSD).
 export function PostComments({ postId, isPostPublished }: IProps) {
   const { data: postComments, isLoading } = useCommentsById(postId);
 

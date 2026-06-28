@@ -2,14 +2,12 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { UnderlineTabs } from "@/shared/ui";
-import { BrandTab } from "./brand-tab";
-import { ComponentsTab } from "./components-tab";
+import { DesignGuide } from "./design-guide";
 import { LabTab } from "./lab-tab";
 import { GlyphRainTab } from "./glyph-rain-lab";
 
 const TABS = [
-  { id: "brand", label: "Brand" },
-  { id: "components", label: "Components" },
+  { id: "guide", label: "Design Guide" },
   { id: "lab", label: "Lab" },
   { id: "glyph-rain", label: "Glyph Rain" },
 ] as const;
@@ -24,13 +22,12 @@ export default function BrandPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Active tab lives in the URL (`?tab=…`) so it survives refresh / back-forward.
   const requested = searchParams.get("tab");
-  const activeTab: TabId = isTabId(requested) ? requested : "brand";
+  const activeTab: TabId = isTabId(requested) ? requested : "guide";
 
   const selectTab = (tab: string) => {
     const params = new URLSearchParams(searchParams);
-    if (tab === "brand") params.delete("tab");
+    if (tab === "guide") params.delete("tab");
     else params.set("tab", tab);
     const query = params.toString();
     router.replace(query ? `${pathname}?${query}` : pathname, {
@@ -44,7 +41,6 @@ export default function BrandPage() {
       style={{ fontFamily: "var(--font-mono)" }}
     >
       <main className="mx-auto max-w-[1240px] px-10 pt-10 pb-10">
-        {/* Mono tab bar — 2px dim baseline, accent underline on the active tab. */}
         <UnderlineTabs
           className="mb-10"
           ariaLabel="Brand reference"
@@ -59,14 +55,12 @@ export default function BrandPage() {
           id={`panel-${activeTab}`}
           aria-labelledby={`tab-${activeTab}`}
         >
-          {activeTab === "components" ? (
-            <ComponentsTab />
-          ) : activeTab === "lab" ? (
+          {activeTab === "lab" ? (
             <LabTab />
           ) : activeTab === "glyph-rain" ? (
             <GlyphRainTab />
           ) : (
-            <BrandTab />
+            <DesignGuide />
           )}
         </div>
       </main>

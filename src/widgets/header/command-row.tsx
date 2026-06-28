@@ -3,13 +3,11 @@
 import Link from "next/link";
 import type { ComponentType, ReactNode, SVGProps } from "react";
 
-// Terminal command rows: a `>` prompt + the command, hover highlights the line.
 const cmdBase =
   "flex w-full items-center gap-2 px-4 py-2.5 text-left text-[12px] whitespace-nowrap transition-colors hover:bg-[var(--m-panel)]";
 const cmdTone = "text-[var(--m-fg)] hover:text-[var(--m-accent)]";
 const cmdDangerTone = "text-[var(--m-error)] hover:text-[var(--m-error)]";
 
-/** Accent `>` command prompt (muted to fg for destructive rows). */
 function Caret({ danger = false }: { danger?: boolean }) {
   return (
     <span aria-hidden className={danger ? "" : "text-[var(--m-accent)]"}>
@@ -18,10 +16,6 @@ function Caret({ danger = false }: { danger?: boolean }) {
   );
 }
 
-/**
- * Trailing `[ icon ]` on the account rows — bracketed like the toggles' `[ on ]`
- * so the whole right column reads uniformly; muted2 (same color as the icon).
- */
 export function BracketIcon({
   Icon,
 }: {
@@ -34,22 +28,26 @@ export function BracketIcon({
   );
 }
 
+export function MenuGroupLabel({ children }: { children: ReactNode }) {
+  return (
+    <div className="px-4 py-3 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)]">
+      {children}
+    </div>
+  );
+}
+
 interface CommandRowProps {
   children: ReactNode;
-  /** Trailing slot (e.g. a `BracketIcon` or a `[ on ]` toggle indicator). */
   trailing?: ReactNode;
-  /** Render the row in the error color (destructive actions like logout). */
   danger?: boolean;
   /** Tab-reachable only when the menu is open. */
   tabbable: boolean;
 }
 
-/** Shared terminal command line — used both as a link and as a button row. */
 function rowClass(danger: boolean) {
   return `${cmdBase} ${danger ? cmdDangerTone : cmdTone}`;
 }
 
-/** Command row rendered as an internal `next/link`. */
 export function CommandLink({
   href,
   onClick,
@@ -77,7 +75,6 @@ export function CommandLink({
   );
 }
 
-/** Command row rendered as a `button` (toggles, login, logout). */
 export function CommandButton({
   onClick,
   danger = false,
@@ -88,7 +85,6 @@ export function CommandButton({
   trailing,
 }: CommandRowProps & {
   onClick: () => void;
-  /** Non-interactive + muted (a locked / unavailable command row). */
   disabled?: boolean;
   title?: string;
 }) {

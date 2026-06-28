@@ -1,13 +1,7 @@
-import { ConsoleTitleBar } from "@/shared/ui/overlays/console";
+import { ConsoleTitleBar } from "@/shared/ui";
 
-/**
- * Title bar atop the header menu — faux terminal window chrome: two
- * close/minimise marks + a filename → `◼ ◻ menu.sh`. The burger is the RIGHT
- * cap of this row (rendered once by `Header` as a top-right overlay); we reserve
- * its 36px footprint here (`burgerSlot`) so the title never slides under it. The
- * row is pulled up+right by the panel's 2px border (`-mt-0.5 -mr-0.5`) so its
- * box coincides with the burger's `size-9` box — one clean 36px row.
- */
+// Reserves the overlaid burger's 36px footprint so the title never slides under
+// it; `-mt-0.5 -mr-0.5` pulls the row onto the burger's box for one clean row.
 export function PromptHeader({ burgerSlot }: { burgerSlot: number }) {
   return (
     <ConsoleTitleBar

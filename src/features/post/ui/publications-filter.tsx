@@ -2,8 +2,6 @@
 
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
-/** Which slice of the author's own posts the profile feed is showing.
- *  `all` = no filter (the default — published + drafts mixed). */
 export type PublicationsView = "all" | "published" | "drafts";
 
 interface PublicationsFilterProps {
@@ -11,16 +9,7 @@ interface PublicationsFilterProps {
   onChange: (view: PublicationsView) => void;
 }
 
-/**
- * Author-only filter for the profile `// PUBLICATIONS` feed: published
- * (`EyeIcon`) and drafts (`EyeSlashIcon`). Each button TOGGLES — clicking the
- * active one again clears it back to `all` (the default, both dim = everything
- * shown), so there are three states: all / published-only / drafts-only.
- * On-system icon buttons (`mono-icon-btn size-9`): the active slice reads in
- * accent (border + icon), inactive stays dim. Real buttons with `aria-pressed`.
- * Shown ONLY to the page owner — other visitors never see it (and only ever see
- * published posts).
- */
+// Author-only. Each button toggles — clicking the active one clears back to `all`.
 export function PublicationsFilter({
   view,
   onChange,

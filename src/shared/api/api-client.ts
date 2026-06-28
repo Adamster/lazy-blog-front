@@ -26,22 +26,10 @@ const withAuthHeader = (
   headers: { ...init.headers, Authorization: `Bearer ${accessToken}` },
 });
 
-/**
- * Methods we'll auto-retry after a 401-triggered refresh. Kept to the
- * idempotent verbs (default GET) so a retry can NEVER double-apply a
- * non-idempotent mutation.
- *
- * 401-RETRY INVARIANT — a retry is safe ONLY because an HTTP 401 means the
- * request was rejected at the AUTHORIZATION gate, i.e. the vote/comment/upload
- * handler NEVER RAN and produced no side effect. Replaying it therefore can't
- * double-vote / double-post. Do NOT relax this to 5xx or to ANY status that can
- * be returned AFTER the handler has begun processing — that breaks the
- * invariant and a replay could double-apply. As defence-in-depth, even under
- * the invariant we only retry idempotent methods, so a future mistake here
- * can't silently double-submit a mutation. (The proactive `pre` refresh already
- * covers the common stale-token-on-POST case, so excluding POST from retry
- * costs us nothing in practice.)
- */
+// 401-RETRY INVARIANT — a 401 is rejected at the auth gate, so the handler never
+// ran (no side effect) and a replay can't double-apply. Do NOT relax to 5xx or
+// any post-handler status. Restricted to idempotent verbs as defence-in-depth so
+// a future mistake still can't double-submit a mutation.
 const RETRIABLE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
 const isRetriableMethod = (init: RequestInit): boolean =>
@@ -51,11 +39,8 @@ const configuration = new Configuration({
   basePath: API_URL,
   middleware: [
     {
-      // PRIMARY FIX: proactively refresh BEFORE the request goes out. If the
-      // token is (about to be) expired and we hold a refresh token, swap it for
-      // a fresh one first so a request never leaves with a dead token. The
-      // refresh is concurrency-deduped, so a burst of simultaneous requests
-      // shares one refresh call.
+      // Proactively refresh BEFORE the request so it never leaves with a dead
+      // token; the refresh is concurrency-deduped across a burst of requests.
       async pre(context) {
         const auth = getAuthState();
 
@@ -74,15 +59,10 @@ const configuration = new Configuration({
           ).headers;
         }
       },
-      // SAFETY NET: if a request still comes back 401 (clock skew, a token
-      // revoked server-side mid-session, or the very first idle request that
-      // outran the proactive check), refresh ONCE and retry. The retry uses the
-      // global `fetch` — NOT `context.fetch`, which is the middleware-wrapped
-      // fetch and would re-enter this hook and loop. Single retry, no recursion.
-      //
-      // Scoped to idempotent methods (see `RETRIABLE_METHODS` + the 401-retry
-      // invariant above): a non-idempotent mutation is never auto-retried here,
-      // so even if the invariant were ever violated it could not double-submit.
+      // Safety net for a 401 that outran the proactive refresh: refresh ONCE and
+      // retry (idempotent methods only — see the invariant above). The retry uses
+      // the global `fetch`, NOT `context.fetch`, which would re-enter this hook
+      // and loop.
       async post(context) {
         if (context.response.status !== 401) return;
         if (!isRetriableMethod(context.init)) return;
@@ -91,7 +71,7 @@ const configuration = new Configuration({
         if (!auth.refreshToken) return;
 
         const fresh = await refreshAccessToken();
-        if (!fresh) return; // refresh failed → session over; surface the 401
+        if (!fresh) return;
 
         return fetch(context.url, withAuthHeader(context.init, fresh));
       },

@@ -9,23 +9,18 @@ interface IProps {
   postId: string;
   postSlug: string;
   voteDirection: VoteDirection | null;
-  /** REAL net rating from the API (upvotes − downvotes). */
   rating: number;
-  /** Total upvotes (likes) the post has received. */
   likes: number;
-  /** Total downvotes (dislikes) the post has received. */
   dislikes: number;
-  /** Cumulative-rating series over time (drives the sparkline). */
   ratingSeries: readonly number[];
-  /** Whether the current viewer is allowed to vote (auth'd & not the author). */
+  /** Auth'd & not the author. */
   canVote: boolean;
 }
 
-const fmt = (n: number) => n.toLocaleString("ru-RU");
+const fmt = (n: number) => n.toLocaleString("en-US");
 
-// Smooth Catmull-Rom curve through the rating series, baseline at 0. Mirrors the
-// design's inline math (viewBox 0..100 × 0..52, baseline at y=26) so negatives
-// dip below the mid-line. preserveAspectRatio="none" stretches it edge-to-edge.
+// Magic numbers mirror the design's inline math (viewBox 0..100 × 0..52,
+// baseline y=26) so negatives dip below the mid-line.
 function buildRatingPath(series: readonly number[]) {
   const maxA = Math.max(1, ...series.map((v) => Math.abs(v)));
   const n = series.length;
@@ -64,25 +59,20 @@ export const PostVote = ({
   const liked = voteDirection === VoteDirection.Up;
   const disliked = voteDirection === VoteDirection.Down;
 
-  // Send the clicked direction as-is; the backend toggles: no vote → set it,
-  // same direction again → clear it (reset to 0), other direction → switch.
-  // The optimistic `applyVote` mirrors that exact behaviour.
+  // Send the direction as-is; the backend toggles (set / clear / switch).
   const onVote = (direction: VoteDirection) => {
     if (!canVote || handleVote.isPending) return;
     handleVote.mutate({ direction });
   };
 
   const net = rating ?? 0;
-  // Pin the curve's endpoint to the LIVE net rating so the sparkline follows a
-  // vote without fabricating history: the server `ratingSeries` stays truthful;
-  // only its last point tracks the current (optimistic) net.
+  // Pin only the endpoint to the LIVE net so the sparkline follows a vote without
+  // fabricating history — the server `ratingSeries` stays truthful.
   const chartSeries = ratingSeries.length
     ? [...ratingSeries.slice(0, -1), net]
     : [net];
   const { d, dotLeft, dotTop } = buildRatingPath(chartSeries);
 
-  // Colour by sign: accent (positive) / error (negative) / muted (zero) — matches
-  // the Metric. The end dot sits on the net point, so it shares the net's colour.
   const signColor = (v: number) =>
     v > 0 ? "var(--m-accent)" : v < 0 ? "var(--m-error)" : "var(--m-muted)";
   const netColor = signColor(net);
@@ -96,7 +86,6 @@ export const PostVote = ({
   return (
     <section className="mx-[calc(50%-50vw)] mt-10 w-screen bg-[var(--m-card)]">
       <div className="mx-auto grid max-w-[780px] items-start gap-10 px-10 py-10 sm:grid-cols-3">
-        {/* // LOVE IT — upvote toggle + total likes (left) */}
         <div className="min-w-0">
           <div className={labelCls}>{"// love it"}</div>
           <button
@@ -106,7 +95,7 @@ export const PostVote = ({
             aria-label="Like this post"
             disabled={!canVote || handleVote.isPending}
             className={
-              "font-display mt-2 inline-flex items-center gap-2.5 bg-transparent p-0 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[var(--m-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--m-card)] disabled:opacity-100 " +
+              "mono-focus font-display mt-2 inline-flex items-center gap-2.5 bg-transparent p-0 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums transition-colors disabled:opacity-100 " +
               (liked
                 ? "text-[var(--m-accent)]"
                 : "text-[var(--m-muted2)] " +
@@ -122,7 +111,6 @@ export const PostVote = ({
           </div>
         </div>
 
-        {/* // HATE IT — downvote toggle + total dislikes (middle) */}
         <div className="min-w-0">
           <div className={labelCls}>{"// hate it"}</div>
           <button
@@ -132,7 +120,7 @@ export const PostVote = ({
             aria-label="Dislike this post"
             disabled={!canVote || handleVote.isPending}
             className={
-              "font-display mt-2 inline-flex items-center gap-2.5 bg-transparent p-0 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[var(--m-error)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--m-card)] disabled:opacity-100 " +
+              "mono-focus font-display mt-2 inline-flex items-center gap-2.5 bg-transparent p-0 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums transition-colors disabled:opacity-100 " +
               (disliked
                 ? "text-[var(--m-error)]"
                 : "text-[var(--m-muted2)] " +
@@ -148,7 +136,6 @@ export const PostVote = ({
           </div>
         </div>
 
-        {/* // RATING — cumulative-rating sparkline (green ≥0 / red <0) + net (right) */}
         <div className="min-w-0">
           <div className={labelCls}>{"// rating"}</div>
           <div className="relative mt-2 h-[46px] w-full overflow-visible">
@@ -186,7 +173,7 @@ export const PostVote = ({
             </svg>
             <span
               aria-hidden
-              className="absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
+              className="absolute size-1.5 -translate-x-1/2 -translate-y-1/2"
               style={{ left: dotLeft, top: dotTop, backgroundColor: dotColor }}
             />
           </div>

@@ -4,14 +4,9 @@ export type Status = "LATEST DROP" | "PINNED";
 
 interface StatusBadgeProps {
   status: Status;
-  /** Extra utilities (e.g. positioning) merged onto the badge. */
   className?: string;
 }
 
-/**
- * Accent-chip status badge (`LATEST DROP` / `PINNED`) with leading icon, shown
- * on the home hero and the post header. Same `--m-dim` chip treatment in both.
- */
 export function StatusBadge({ status, className = "" }: StatusBadgeProps) {
   const Icon = status === "PINNED" ? MapPinIcon : BoltIcon;
   return (

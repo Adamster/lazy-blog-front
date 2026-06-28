@@ -3,18 +3,14 @@
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/entities/session/model/use-auth";
-import { Loading } from "@/shared/ui/feedback/loading";
+import { Loading } from "@/shared/ui";
 
 interface ProtectedRouteProps {
   children: ReactNode;
 }
 
-/**
- * Route guard for auth-only pages. Loading-aware: it holds a neutral `<Loading />`
- * while `authStatus` resolves and only redirects once we KNOW the viewer is
- * unauthenticated — so a refresh of a protected route no longer kicks an authed
- * user to "/" during the localStorage-resolution beat.
- */
+// Redirects only once the viewer is KNOWN unauthenticated, so a refresh doesn't
+// kick an authed user to "/" during the localStorage-resolution beat.
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const router = useRouter();
   const { authStatus } = useAuth();

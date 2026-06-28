@@ -1,9 +1,7 @@
 "use client";
 
 import { PostDetailedResponse, UpdatePostRequest } from "@/shared/api/openapi";
-import { ErrorMessage } from "@/shared/ui/error-message";
-import { Loading } from "@/shared/ui/feedback/loading";
-import ConfirmDeleteModal from "@/shared/ui/overlays/confirmation-modal";
+import { ErrorMessage, Loading, ConfirmModal } from "@/shared/ui";
 import { PostForm } from "@/features/post/ui/post-form";
 import { IsAuthor, ProtectedRoute } from "@/entities/session";
 import { useParams } from "next/navigation";
@@ -36,9 +34,7 @@ const EditPage = () => {
             <ErrorMessage error={"Nice try, but this isn’t your playground!"} />
           }
         >
-          {/* Mounted only here, with `postData` guaranteed present, so the form
-              (and the mount-once Crepe editor inside it) seeds `defaultValues`
-              from the loaded post on its FIRST render — no effect-vs-mount race. */}
+          {/* Mounted only with `postData` present so the form seeds on first render — see EditForm. */}
           <EditForm postData={postData} />
         </IsAuthor>
       </div>
@@ -46,13 +42,8 @@ const EditPage = () => {
   );
 };
 
-/**
- * The edit composer, mounted only once `postData` is loaded. It initialises the
- * react-hook-form instance with `defaultValues` straight from `postData` (the
- * same seeding pattern as `create-page`), so the editor reads the real body on
- * mount instead of resetting into it via an effect after Crepe has already
- * captured an empty value.
- */
+// Seeds RHF `defaultValues` from `postData` on mount so the mount-once Crepe editor
+// reads the real body — an effect-based reset would land after Crepe captured an empty value.
 const EditForm = ({ postData }: { postData: PostDetailedResponse }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -89,13 +80,14 @@ const EditForm = ({ postData }: { postData: PostDetailedResponse }) => {
       <PostForm
         form={form}
         onSubmit={onSubmit}
+        isEdit
         isPending={updatePostMutation.isPending}
         onDelete={() => setIsModalOpen(true)}
         viewHref={`/${postData.author.userName}/${postData.slug}`}
       />
 
       {isModalOpen && (
-        <ConfirmDeleteModal
+        <ConfirmModal
           title="Delete post?"
           description="This post and all its comments will be permanently removed. This can't be undone."
           confirmLabel="Delete post"

@@ -10,15 +10,11 @@ import type { LoginResponse } from "@/shared/api/openapi";
 const isDev = process.env.NODE_ENV !== "production";
 
 /**
- * Google OAuth landing page. The external provider redirects here after the
- * backend's `api/auth/external-callback` route has set the external-auth COOKIE;
- * we then call that route to exchange the cookie for our token pair.
+ * Google OAuth landing page — exchanges the external-auth cookie for our token pair.
  *
- * LIVE-TEST REQUIRED: this path is correct in code but depends on runtime infra
- * that can't be exercised in a unit test — the prod reverse-proxy mapping the
- * same-origin `/api/...` path to the backend, and the cookie's domain / SameSite
- * so it's sent as a first-party credential on this fetch. Verify the full Google
- * round-trip on a deployed environment after any change here.
+ * LIVE-TEST REQUIRED: depends on runtime infra a unit test can't exercise — the
+ * prod reverse-proxy mapping `/api/...` to the backend and the cookie's
+ * domain / SameSite. Verify the full Google round-trip on a deployed env.
  */
 export default function ExternalCallbackPage() {
   const queryClient = useQueryClient();
@@ -26,11 +22,8 @@ export default function ExternalCallbackPage() {
   useEffect(() => {
     (async () => {
       try {
-        // Same-origin `/api/...` path (matches `loginWithGoogle`) so the
-        // external-auth cookie is first-party, and `credentials: "include"` so
-        // the browser actually sends it — the callback authenticates via that
-        // cookie, NOT a bearer token. (Was hitting `/auth/...` without `/api`
-        // and without credentials → the cookie never reached the backend.)
+        // Same-origin `/api/...` + `credentials: "include"` so the external-auth
+        // cookie is sent first-party — auth is via that cookie, not a bearer token.
         const res = await fetch("/api/auth/external-callback", {
           credentials: "include",
         });

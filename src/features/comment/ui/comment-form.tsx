@@ -4,7 +4,7 @@ import { CommentResponse } from "@/shared/api/openapi";
 import { useUser } from "@/entities/session";
 import { useAddComment } from "@/features/comment/model/use-add-comment";
 import { useUpdateComment } from "@/features/comment/model/use-update-comment";
-import { IconSubmitButton } from "@/shared/ui";
+import { IconSubmitButton, Button } from "@/shared/ui";
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import { useCallback, useState } from "react";
 import {
@@ -20,13 +20,10 @@ interface IProps {
 }
 
 function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
-  // `body` mirrors the editor's markdown (debounced) — it drives the empty
-  // guard + is the submit payload. The editor OWNS the document; we never push
-  // `body` back in (that would fight the cursor) — we remount to reset instead.
+  // The editor OWNS the doc; never push `body` back in (it would fight the cursor) — remount to reset instead.
   const [body, setBody] = useState(editComment?.body ?? "");
   const [api, setApi] = useState<CommentEditorApi | null>(null);
-  // Bumped after a successful add to remount the editor empty (the editor is
-  // mount-once / owns its doc, so a remount is the clean reset).
+  // Bumped to remount the mount-once editor empty — the clean reset.
   const [editorKey, setEditorKey] = useState(0);
   const [focused, setFocused] = useState(false);
   const { user } = useUser();
@@ -48,7 +45,7 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
       addComment.mutate(trimmed);
       setBody("");
       setApi(null);
-      setEditorKey((k) => k + 1); // remount empty
+      setEditorKey((k) => k + 1);
     }
   };
 
@@ -68,25 +65,20 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
 
   return (
     <form onSubmit={handleSubmit}>
-      {/* Material-style floating label — sits over the editor as a prompt, floats
-          up on focus/fill. Mirrors the auth/composer floating-label feel. */}
       <div className="relative">
         <span
-          className={`pointer-events-none absolute left-0 z-[var(--m-z-content)] text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-all duration-150 ${
+          className={`pointer-events-none absolute left-0 z-[var(--m-z-content)] text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-all duration-150 ${
             floated ? "top-0" : "top-5"
           }`}
         >
           {labelText}
         </span>
 
-        {/* The editor sits on a 2px bottom rule (the underline-field look),
-            turning accent on focus — same affordance as the old textarea. */}
         <div
           className={`border-b-2 pt-5 pb-2 transition-colors ${
             focused ? "border-[var(--m-accent)]" : "border-[var(--m-dim)]"
           }`}
-          // Milkdown's editable is the focus target; track focus on the wrapper
-          // so the label floats + the underline lights (capture phase = inside).
+          // Milkdown's editable is the real focus target — track focus on the wrapper (capture phase = inside).
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
         >
@@ -104,13 +96,9 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
         <CommentToolbar api={api} />
 
         {editComment && (
-          <button
-            type="button"
-            onClick={handleCancel}
-            className={`mono-btn-outline mono-focus ml-auto inline-flex h-9 items-center px-4 text-[14px] font-semibold tracking-[0.06em]`}
-          >
+          <Button variant="outline" onClick={handleCancel} className="ml-auto">
             Cancel
-          </button>
+          </Button>
         )}
 
         <IconSubmitButton

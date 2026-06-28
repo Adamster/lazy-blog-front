@@ -4,36 +4,17 @@ import { STEP_BOX, stepBoxClass } from "./step-box";
 type StepIcon = ComponentType<{ className?: string }>;
 
 interface StepperProps {
-  /** Step names — a11y labels only (the visible box content is the icon). */
   steps: string[];
-  /** Icon per step, rendered INSIDE the box (replaces the old number). Index-aligned with `steps`. */
   icons: StepIcon[];
-  /** 1-based active step. */
   current: number;
-  /** Jump to a step (navigation is unconditional; the parent decides). */
   onSelect: (step: number) => void;
-  /** 1-based steps that currently hold validation errors (error visual layer). */
   errorSteps?: number[];
-  /**
-   * 1-based steps whose required DATA is present (filled) — gets the accent
-   * OUTLINE "complete" layer when it's not the active step (active wins, filled).
-   */
   completeSteps?: number[];
   className?: string;
 }
 
-/**
- * Square step boxes joined by connectors — each box holds an ICON for its step
- * (setup / write). Active = filled accent with a bg-coloured icon; a COMPLETE
- * (data-present) but non-active step = accent OUTLINE (border + icon, no fill);
- * inactive + incomplete = dim border + muted2 icon that goes accent on hover.
- * The connector leading OUT of a COMPLETE step turns accent (Material/Ant style
- * — completion-based progress, not navigation position). Every box is clickable
- * (free jump). A step in `errorSteps` gets an additive `--m-error` border/icon
- * layer (highest precedence). Box precedence: error > active(filled) >
- * complete(outline) > dim. The step name is a11y-only (`aria-label`), so phones
- * and desktop look identical — just icons.
- */
+// Connectors fill on completion-based progress, NOT navigation position (Material/Ant
+// style). Box precedence: error > active(filled) > complete(outline) > dim.
 export function Stepper({
   steps,
   icons,
@@ -53,11 +34,6 @@ export function Stepper({
         const active = step === current;
         const hasError = errorSteps?.includes(step) ?? false;
         const isComplete = completeSteps?.includes(step) ?? false;
-        // Box precedence: error > active(filled) > complete(outline) > dim. The
-        // error layer overrides the shared box language with `--m-error`; an
-        // active step is the filled-accent box; a complete-but-not-active step
-        // is the accent OUTLINE (done, yet distinct from the filled active box);
-        // otherwise the canonical dim box (shared with TabNav).
         const boxClass = hasError
           ? active
             ? "border-[var(--m-error)] bg-[var(--m-error)] text-[var(--m-bg)]"
@@ -67,11 +43,8 @@ export function Stepper({
             : isComplete
               ? "border-[var(--m-accent)] bg-transparent text-[var(--m-accent)]"
               : stepBoxClass(false);
-        // Connector = the leg OUT of the PRECEDING step (Material/Ant style): it
-        // fills accent once THAT step is COMPLETE (its data is filled) — not
-        // merely "reached" by navigation — red if that step errors, dim
-        // otherwise. So a green segment means "that leg is done", consistent
-        // with the boxes' completion accent.
+        // Connector = leg OUT of the PRECEDING step: fills once THAT step is
+        // complete (data filled), not merely reached by navigation.
         const prevDone = completeSteps?.includes(step - 1) ?? false;
         const prevError = errorSteps?.includes(step - 1) ?? false;
         const connectorClass = prevError

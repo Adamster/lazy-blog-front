@@ -3,9 +3,10 @@
 import { ResponseError } from "@/shared/api/openapi";
 import { useEffect, useState } from "react";
 import { GlitchText } from "@/shared/ui/effects";
-import { Console } from "./overlays/console";
+import { Console } from "../overlays/console";
+import { Button } from "../forms/button";
 
-/** Narrows the `{ response: { status } }` shape some fetch errors carry. */
+// Narrows the `{ response: { status } }` shape some fetch errors carry.
 const statusOf = (error: unknown): number | undefined => {
   if (
     typeof error === "object" &&
@@ -21,21 +22,13 @@ const statusOf = (error: unknown): number | undefined => {
   return undefined;
 };
 
-/**
- * Full-screen error state — the "glitch in the Lazyverse" page used wherever a
- * query/boundary fails. Brutalist-Mono: a status line, a glitching headline
- * with a blinking caret, the real error in a `stacktrace.log` panel, and Try
- * again (when a `reset` is wired) + Go home actions.
- */
 export const ErrorMessage = ({
   error,
   status: statusProp,
 }: {
   error: unknown;
-  /** Accepted for API compat (error.tsx passes Next's reset) but unused — the
-   *  page only offers Go home now. */
+  // Accepted for API compat (error.tsx passes Next's reset) but unused.
   reset?: () => void;
-  /** Force the status line (e.g. 404 for the not-found page). */
   status?: number;
 }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -105,12 +98,7 @@ export const ErrorMessage = ({
         ) : null}
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <a
-            href="/"
-            className={`mono-cta mono-focus inline-flex h-9 items-center justify-center px-4 text-[14px] font-bold tracking-[0.06em]`}
-          >
-            Go home
-          </a>
+          <Button href="/">Go home</Button>
         </div>
       </div>
     </div>

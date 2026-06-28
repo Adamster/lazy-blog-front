@@ -1,27 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Modal, ModalHeader, useModalTitleId } from "@/shared/ui";
-import { ImageCropper } from "@/shared/ui/image-cropper-dynamic";
+import {
+  Modal,
+  ModalHeader,
+  useModalTitleId,
+  ImageCropper,
+  Button,
+} from "@/shared/ui";
 import { useCoverUpload } from "@/features/post/model/use-cover-upload";
 
 interface CoverCropModalProps {
-  /** Object URL of the picked file; empty when the modal is closed. */
   src: string;
   isOpen: boolean;
-  /** Close request (Esc / backdrop / Cancel). */
   onOpenChange: () => void;
-  /** Fires with the uploaded cover URL on success (parent sets it + closes). */
   onUploaded: (url: string) => void;
 }
 
-/**
- * Cover crop + upload modal. Locks the stencil to 16:9 (mirrors the read-page
- * cover) and owns the upload mutation INSIDE the modal so the page never
- * shifts while uploading. The Upload button drives the cropper via a bumped
- * signal (no ref across the `ssr:false` dynamic boundary); on success the
- * parent persists the URL and closes.
- */
+// Owns the upload INSIDE the modal so the page never shifts while uploading. The
+// Upload button drives the cropper via a bumped signal — no ref works across the
+// `ssr:false` dynamic boundary.
 export function CoverCropModal({
   src,
   isOpen,
@@ -68,21 +66,15 @@ export function CoverCropModal({
           </div>
 
           <div className="mt-6 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={close}
-              className={`mono-btn-outline mono-focus inline-flex h-9 items-center px-4 text-[14px] font-semibold tracking-[0.06em]`}
-            >
+            <Button variant="outline" onClick={close}>
               Cancel
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
               onClick={() => setCropSignal((n) => n + 1)}
               disabled={isUploading}
-              className={`mono-cta mono-focus inline-flex h-9 items-center px-4 text-[14px] font-bold tracking-[0.06em]`}
             >
               {isUploading ? "Uploading…" : "Upload"}
-            </button>
+            </Button>
           </div>
         </>
       )}

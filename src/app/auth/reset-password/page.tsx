@@ -7,9 +7,7 @@ export const metadata: Metadata = generateMeta({
   title: "Reset Password",
 });
 
-// `ResetPassword` reads `useSearchParams` (the reset token) — give it its own
-// Suspense boundary (Next's requirement) instead of leaning on a global
-// `loading.tsx`.
+// `ResetPassword` reads `useSearchParams`, so it needs its own Suspense boundary (Next requirement).
 export default function Page() {
   return (
     <Suspense fallback={null}>

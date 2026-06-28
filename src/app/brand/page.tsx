@@ -8,8 +8,7 @@ export const metadata: Metadata = generateMeta({
   noindex: true,
 });
 
-// `BrandPage` reads `useSearchParams` (the `?tab=`) — give it its own Suspense
-// boundary (Next's requirement) instead of leaning on a global `loading.tsx`.
+// `BrandPage` reads `useSearchParams`, so it needs its own Suspense boundary (Next requirement).
 export default function Page() {
   return (
     <Suspense fallback={null}>

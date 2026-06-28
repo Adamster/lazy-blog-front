@@ -4,12 +4,8 @@ import { useSyncExternalStore } from "react";
 
 const emptySubscribe = () => () => {};
 
-/**
- * SSR-safe "are we on the client yet" flag — `false` during server render and
- * the first client paint, `true` afterwards. Built on `useSyncExternalStore`
- * so it never calls setState inside an effect. Use to gate `createPortal`,
- * which needs a real `document`.
- */
+// SSR-safe client flag (false on server + first paint). `useSyncExternalStore`
+// so it never setStates in an effect; gates `createPortal` (needs `document`).
 export function useIsMounted() {
   return useSyncExternalStore(
     emptySubscribe,

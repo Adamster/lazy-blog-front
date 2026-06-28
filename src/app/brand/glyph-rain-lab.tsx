@@ -4,22 +4,15 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Section, Panel } from "./_helpers";
 
-/* ------------------------------------------------------------------ *
- * Experimental glyph-fade — LAB / preview ONLY. Horizontal LANES: each
- * row is a filled very-dark-grey track (height = `track`) separated by a
- * black `gap`. Inside each lane a line of bits blinks (fade in → hold →
- * fade at random cells, lane kept ~half-lit), bit-flipping + a faint glow.
- * Monospace digits sized to fill the lane, evenly spaced. Horizontal (vs
- * The Matrix's vertical columns). Not the effect's final home.
- * ------------------------------------------------------------------ */
+// Variant 1: glyph-fade — LAB/preview only, not the effect's final home. Horizontal
+// grey lanes; bits fade in → hold → fade at random cells, kept ~half-lit.
 
 type Surface = "black" | "theme";
 type ColorMode = "accent" | "dim";
 
 const FADE_FPS_MS = 1000 / 30;
 const REDUCED = "(prefers-reduced-motion: reduce)";
-/** Canvas can't read `var(--font-mono)`; use a real monospace family so the
- *  size + advance are honoured (equal-width = even spacing). */
+// Canvas can't read `var(--font-mono)`, so name a real monospace family for even spacing.
 const MONO = 'ui-monospace, "JetBrains Mono", "Courier New", monospace';
 
 function hexToRgb(hex: string): [number, number, number] {
@@ -87,7 +80,6 @@ function GlyphFade({
     if (!ctx) return;
 
     const pitch = track + gap;
-    // Glyph sized to fill the lane; centred.
     const fontSize = Math.round(track * 1.1);
     const font = `${fontSize}px ${MONO}`;
     let w = 0;
@@ -139,7 +131,7 @@ function GlyphFade({
       h = canvas.clientHeight || 200;
       canvas.width = w;
       canvas.height = h;
-      // Even spacing: column pitch = the monospace advance (+1px breathing).
+      // Column pitch = monospace advance + 1px breathing (even spacing).
       ctx.font = font;
       colW = Math.max(6, Math.round(ctx.measureText("0").width) + 1);
       cols = Math.max(1, Math.floor(w / colW));
@@ -288,10 +280,7 @@ function GlyphFade({
   );
 }
 
-/* ---- Variant 2: HORIZONTAL RAIN ---------------------------------- *
- * The Matrix rain turned 90°: in each grey lane a stream of glyphs flows
- * LEFT→RIGHT, a bright head with a fading trail behind it.
- * ------------------------------------------------------------------ */
+// Variant 2: horizontal rain — the Matrix turned 90°, a bright head + fading trail flowing left→right.
 
 interface RainHProps {
   glyphs: readonly string[];
@@ -314,7 +303,7 @@ interface RainHProps {
   className?: string;
 }
 
-/** Bright pale-lime leading head (vs the green trail) — the Matrix "white head". */
+// The Matrix "white head" — a bright pale-lime leading glyph vs the green trail.
 const HEAD = "#eaffc0";
 
 function GlyphRainH({
@@ -347,8 +336,7 @@ function GlyphRainH({
     let cols = 0;
     let rows = 0;
     let colW = 11;
-    // head = current head column (float); seen = last column already painted
-    // green; dir = +1 (flows right) or -1 (flows left).
+    // seen = last column already painted green; dir = +1 (right) / -1 (left).
     let lanes: { head: number; spd: number; seen: number; dir: number }[] = [];
     let accent = "#cdff48";
     let dim = "#cdff48";
@@ -394,8 +382,8 @@ function GlyphRainH({
     };
 
     const frame = () => {
-      // Trail fade — the Matrix technique: dim the whole frame toward black so
-      // older glyphs decay; we only paint the head + newly-passed cells.
+      // Matrix trail technique: dim the whole frame toward black each pass so older
+      // glyphs decay; only the head + newly-passed cells get repainted.
       ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
       ctx.fillStyle = `rgba(13,13,13,${fade})`;
@@ -409,7 +397,7 @@ function GlyphRainH({
         const yMid = r * pitch + track / 2;
         lane.head += lane.spd * lane.dir;
         const hc = Math.floor(lane.head);
-        // Paint the columns the head just passed in green (the trail behind it).
+        // Catch up the trail: paint every column the head just passed in green.
         if (lane.dir === 1) {
           while (lane.seen < hc - 1) {
             lane.seen++;
@@ -429,7 +417,6 @@ function GlyphRainH({
             }
           }
         }
-        // The bright head, redrawn each frame so it stays lit + glows.
         if (hc >= 0 && hc < cols) {
           ctx.globalAlpha = 1;
           ctx.fillStyle = HEAD;
@@ -440,7 +427,6 @@ function GlyphRainH({
           ctx.fillText(pick(), hc * colW, yMid);
           ctx.shadowBlur = 0;
         }
-        // Flicker a random trail glyph (behind the head) back to life.
         if (Math.random() < mutate) {
           const c = hc - lane.dir * (2 + Math.floor(Math.random() * 12));
           if (c >= 0 && c < cols) {
@@ -529,10 +515,7 @@ function GlyphRainH({
   );
 }
 
-/* ---- Variant 3: VERTICAL RAIN ------------------------------------ *
- * The same trick but falling TOP→BOTTOM — i.e. the classic Matrix rain,
- * with our 0/1 glyphs. Here to gauge how close it reads to the film.
- * ------------------------------------------------------------------ */
+// Variant 3: vertical rain — the classic Matrix fall (top→bottom) with our 0/1 glyphs.
 
 interface RainVProps {
   glyphs: readonly string[];
@@ -979,7 +962,6 @@ const VRAIN_VARIANTS: VRainVariant[] = [
   },
 ];
 
-/** Full-viewport takeover for a rain effect — Esc / click to exit. */
 function FullscreenRain({
   children,
   onClose,
@@ -1058,7 +1040,6 @@ export function GlyphRainVariantsSection() {
   );
 }
 
-/** The Glyph Rain tab — masthead + the experiments. */
 export function GlyphRainTab() {
   return (
     <>

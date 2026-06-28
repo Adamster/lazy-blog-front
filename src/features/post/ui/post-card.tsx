@@ -6,22 +6,18 @@ import { DraftOverlay } from "@/features/post/ui/draft-overlay";
 import { formatDate2 } from "@/shared/lib/utils";
 import { UNTAGGED_LABEL } from "../lib/untagged-label";
 
-/** Feed row shared by the home feed (`DisplayPostResponse`) and a user's
- *  profile feed (`UserPostItem`) — the two models share every card field. */
 type FeedPost = DisplayPostResponse | UserPostItem;
 
 interface PostCardMonoProps {
   post: FeedPost;
-  /** Post permalink (`/{author}/{slug}`). */
   href: string;
-  /** `@handle` to link above the meta row. Omitted on a user's own profile feed
-   *  where the author is implicit. */
+  // Omitted on a user's own profile feed where the author is implicit.
   authorHandle?: string;
 }
 
 const catOf = (p: FeedPost) => p.tags?.[0]?.tag ?? UNTAGGED_LABEL;
 
-// First letter/digit of a title (skips punctuation) for the no-cover fallback.
+// First letter/digit (skips punctuation) for the no-cover fallback.
 const firstLetter = (s?: string) =>
   (s?.match(/[\p{L}\p{N}]/u)?.[0] ?? "•").toUpperCase();
 
@@ -47,7 +43,6 @@ function Cover({ post }: { post: FeedPost }) {
   );
 }
 
-/** Author `@handle` link + the metrics cluster shown in the card footer. */
 function CardMeta({
   post,
   authorHandle,
@@ -76,20 +71,14 @@ function CardMeta({
   );
 }
 
-/**
- * The single source-of-truth feed card for the home + profile feeds. Built to
- * the Brutalist-Mono feed spec: flush cover, `p-5` (20px) content, `[ category ]`
- * → 18px `mono-title` (`mb-2`), and a Caption-12 meta footer using the shared
- * `Metric` / `Dot` primitives. Renders the vertical grid card.
- */
+// The single source-of-truth feed card for the home + profile feeds.
 export function PostCard({ post, href, authorHandle }: PostCardMonoProps) {
   return (
     <article className="group relative flex h-full flex-col bg-[var(--m-card)] transition-colors hover:bg-[var(--m-panel)]">
       <div className="relative aspect-[16/10] overflow-hidden bg-[var(--m-panel)]">
         <Cover post={post} />
-        {/* Draft cover overlay — only the author's own profile feed shows
-            drafts. `pointerThrough` lets clicks fall to the stretched title
-            link, so the cover stays a post link like a published card. */}
+        {/* pointerThrough lets clicks fall to the stretched title link, so the
+            cover stays a post link like a published card. */}
         {!post.isPublished && <DraftOverlay size="card" pointerThrough />}
       </div>
       <div className="flex flex-1 flex-col p-5">

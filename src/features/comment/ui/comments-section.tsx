@@ -24,8 +24,6 @@ export function CommentsSection({
 
   return (
     <section>
-      {/* Compose — straight to add comment (no header/line).
-          40px section rhythm: each block sits 40px from the band/each other. */}
       {isPostPublished && (
         <IsAuth>
           <div className="pt-10">
@@ -35,12 +33,9 @@ export function CommentsSection({
       )}
 
       {postCommentsLoading ? (
-        <div className="flex flex-col pt-10">
+        <div className="flex flex-col gap-7 pt-10">
           {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="grid grid-cols-[40px_1fr] gap-4 border-b-2 border-[var(--m-dim)] py-6"
-            >
+            <div key={i} className="grid grid-cols-[40px_1fr] gap-4">
               <div className="size-10 border-2 border-[var(--m-dim)] bg-[var(--m-panel)]" />
               <div className="space-y-2">
                 <div className="h-3 w-40 bg-[var(--m-panel)]" />
@@ -52,8 +47,7 @@ export function CommentsSection({
         </div>
       ) : (
         <>
-          {/* Eyebrow hugs the comment list below (pt-10 pb-6); when empty the
-              scramble IS the content, so it's a terminal section (py-10). */}
+          {/* When empty the scramble IS the content, so it's a terminal section (py-10) rather than hugging a list. */}
           <Label className={`mono-label ${count > 0 ? "pt-10 pb-6" : "py-10"}`}>
             {count > 0 ? (
               `${count} COMMENTS`

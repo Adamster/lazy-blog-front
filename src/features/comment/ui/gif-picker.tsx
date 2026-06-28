@@ -12,7 +12,6 @@ import {
   type MediaKind,
 } from "../lib/klipy";
 
-/** A bare status line in the brutalist label scale (loading / empty / error). */
 function StatusLine({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-40 items-center justify-center text-center text-[11px] font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase">
@@ -22,27 +21,16 @@ function StatusLine({ children }: { children: React.ReactNode }) {
 }
 
 interface GifPickerProps {
-  /** Fired with the validated GIF/sticker when a result is chosen. */
   onPick: (gif: GifResult) => void;
-  /** Which KLIPY media to browse — `gif` or `sticker`. */
   kind: MediaKind;
 }
 
-/**
- * GIF tab — a labelled debounced search input over the KLIPY CDN with a results
- * grid. Trending GIFs show by default; typing searches (300ms debounce). All
- * three async states are designed: a spinner while loading, an empty line when a
- * search returns nothing, and an error line on failure. Thumbnails lazy-load;
- * under reduced-motion the static first frame is shown instead of the animated
- * thumbnail.
- */
 export function GifPicker({ onPick, kind }: GifPickerProps) {
   const [query, setQuery] = useState("");
   const [debounced, setDebounced] = useState("");
   const reduced = useReducedMotion();
   const noun = kind === "sticker" ? "stickers" : "GIFs";
 
-  // Debounce the query → only the settled value drives the request.
   useEffect(() => {
     const id = setTimeout(() => setDebounced(query.trim()), 300);
     return () => clearTimeout(id);
@@ -60,15 +48,9 @@ export function GifPicker({ onPick, kind }: GifPickerProps) {
   });
 
   return (
-    // pt-4/pb-4 frame the panel (16px top gap from the tabs, matching the emoji
-    // grid + the px-4 side inset). The horizontal inset (px-4 — matching the
-    // tabs) is applied PER-ELEMENT (search wrapper + grid), NOT on this root, so
-    // the scroll area runs full-width and the brutalist scrollbar sits in its own
-    // right gutter OUTSIDE the GIF grid (no scrollbar-over-GIF overlap); the
-    // search + GIFs still align with the tab text at 16px.
+    // The px-4 inset is applied PER-ELEMENT (search + grid), NOT on this root, so the scroll area runs
+    // full-width and the scrollbar sits in its own right gutter, never overlapping the GIF grid.
     <div className="pt-4 pb-4">
-      {/* Search — a 36px underline field (no fill), inset px-4 to align with the
-          tabs + the GIF grid. */}
       <div className="px-4">
         <div className="flex h-9 items-center gap-2.5 border-b-2 border-[var(--m-dim)] transition-colors focus-within:border-[var(--m-accent)]">
           <MagnifyingGlassIcon
@@ -115,8 +97,7 @@ export function GifPicker({ onPick, kind }: GifPickerProps) {
                 onClick={() => onPick(gif)}
                 className={`group mono-focus relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-[var(--m-card)] transition-opacity hover:opacity-80`}
               >
-                {/* Plain <img>: KLIPY hosts aren't in next.config remotePatterns
-                    (owner can't edit Vercel config), and the GIF must animate. */}
+                {/* Plain <img> not next/image: KLIPY hosts aren't in next.config remotePatterns (owner can't edit Vercel config). */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={reduced ? gif.stillUrl : gif.thumbUrl}
@@ -133,7 +114,7 @@ export function GifPicker({ onPick, kind }: GifPickerProps) {
   );
 }
 
-/** Client-only reduced-motion flag (SSR-safe: starts `false`, syncs on mount). */
+// SSR-safe: starts false, syncs on mount.
 function useReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
   const raf = useRef<number | undefined>(undefined);

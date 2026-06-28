@@ -9,12 +9,7 @@ import {
   useSnakeArcade,
 } from "@/features/arcade/snake";
 
-/**
- * Snake Arcade route — LOGIN-ONLY (scores persist per user + the global high
- * score is per-account), so the whole page sits behind {@link ProtectedRoute};
- * the game engine hook only mounts once the viewer is known authenticated.
- * Open to any theme — sign in and play.
- */
+// Login-only — scores persist per user, so the whole page sits behind ProtectedRoute.
 export default function SnakePage() {
   return (
     <ProtectedRoute>
@@ -23,12 +18,6 @@ export default function SnakePage() {
   );
 }
 
-/**
- * The arcade itself: title block (eyebrow + title + full-width lead) → the stats
- * band (Score / Best / recent-runs chart in our profile/home stats-band format)
- * → the two-pane stage: the board on the LEFT, the `// HIGH SCORES` leaderboard
- * rail on the RIGHT, balanced on the 1240 grid.
- */
 function SnakeArcade() {
   const { game, board, statsLoading, boardLoading } = useSnakeArcade();
 
@@ -42,7 +31,6 @@ function SnakeArcade() {
           <ArcadeHeader />
         </div>
 
-        {/* Stats band — full-bleed, matches the profile/home stats band. */}
         <div className="mt-10">
           <SnakeStatsBand
             state={game.state}
@@ -51,8 +39,6 @@ function SnakeArcade() {
           />
         </div>
 
-        {/* Stage — board (left, fills the column) + leaderboard (right), a clean
-            40px gap (no trailing cap) between them. */}
         <div className="mt-10 grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
           <SnakeBoard api={game} />
           <SnakeLeaderboard board={board} loading={boardLoading} />

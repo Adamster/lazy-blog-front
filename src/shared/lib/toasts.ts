@@ -1,13 +1,7 @@
 import { ResponseError } from "@/shared/api/openapi";
 
-/**
- * Module-level toast emitter. `addToastSuccess`/`addToastError` are called
- * imperatively from hooks and other non-component code, so the toast queue
- * lives outside React: a tiny subscribe/emit store that the `<Toaster />`
- * provider subscribes to and renders. Keeps the exact public signatures the
- * app already depends on.
- */
-
+// Queue lives outside React so it can be pushed imperatively from non-component
+// code; `<Toaster />` subscribes and renders.
 export type ToastTone = "success" | "error";
 
 export interface Toast {
@@ -60,7 +54,7 @@ export const addToastError = async (message: string, error?: unknown) => {
         const errorBody = await error.response.json();
         message = errorBody.detail || errorBody.message || message;
       } catch {
-        // ignore parse error, keep default message
+        // keep the default message
       }
     }
   } else if (error instanceof Error) {

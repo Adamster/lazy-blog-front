@@ -8,8 +8,7 @@ import {
   EyeIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import { Menu, type MenuItem } from "@/shared/ui";
-import ConfirmDeleteModal from "@/shared/ui/overlays/confirmation-modal";
+import { Menu, ConfirmModal, type MenuItem } from "@/shared/ui";
 import { usePublishPost, useHidePost } from "../model/use-publish-post";
 import { useDeletePostMenu } from "../model/use-delete-post-menu";
 
@@ -20,11 +19,7 @@ interface IProps {
   isPublished: boolean;
 }
 
-/**
- * Owner-only kebab in the post title row. Holds Edit (→ edit page),
- * publish/unpublish (depending on `isPublished`), and Delete (→ `/` on success).
- * Render this inside an `IsAuthor` guard.
- */
+// Owner-only — render inside an `IsAuthor` guard.
 export const PostHeaderMenu = ({
   postId,
   postSlug,
@@ -38,8 +33,7 @@ export const PostHeaderMenu = ({
 
   const publishPost = usePublishPost(postId, postSlug, authorHandle);
   const hidePost = useHidePost(postId, postSlug, authorHandle);
-  // Local delete (optimistic remove-from-feed → home), distinct from the shared
-  // `useDeletePost` used by the edit page (routes to the author profile).
+  // Distinct from the edit page's `useDeletePost` — this one routes to home.
   const deletePost = useDeletePostMenu(postId);
 
   const iconCls = "size-3.5";
@@ -74,7 +68,7 @@ export const PostHeaderMenu = ({
   return (
     <>
       <Menu items={items} triggerLabel="Post options" />
-      <ConfirmDeleteModal
+      <ConfirmModal
         title="Delete post?"
         description="This post and all its comments will be permanently removed. This can't be undone."
         confirmLabel="Delete post"
@@ -85,7 +79,7 @@ export const PostHeaderMenu = ({
           deletePost.mutate();
         }}
       />
-      <ConfirmDeleteModal
+      <ConfirmModal
         tone="default"
         eyebrow="// Visibility"
         title="Unpublish post?"
@@ -98,7 +92,7 @@ export const PostHeaderMenu = ({
           hidePost.mutate();
         }}
       />
-      <ConfirmDeleteModal
+      <ConfirmModal
         tone="default"
         eyebrow="// Visibility"
         title="Publish post?"
