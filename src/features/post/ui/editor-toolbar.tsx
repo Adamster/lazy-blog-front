@@ -231,7 +231,7 @@ export function EditorToolbar({
     },
   ];
 
-  // TODO(block-fx): the BLOCK directives (`::divider`, `:::callout`, `:::poll`,
+  // TODO(block-fx): the BLOCK directives (`::divider`, `:::poll`,
   // `:::fold`) render in the read view but have NO editor authoring UI yet —
   // Crepe block nodes are non-trivial plumbing vs the 1:1 inline-mark pattern
   // here. Author them by typing the raw directive for now; wire nodes later.

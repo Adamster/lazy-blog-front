@@ -209,53 +209,6 @@
   color: var(--m-dim);
 }
 
-/* Callout (`Callout` component + the `:::callout` type=note|warn directive) — the
-   info-box recipe: a 2px left edge (accent for note, error for warn), `--m-card`
-   bg, 20px pad, a `// NOTE` / `// WARN` eyebrow over body (14/1.85). Used BOTH as
-   a standalone lib component (site info/warning box) and as the read-view
-   directive; the base box carries no margin (the caller owns it, like InfoBox). */
-.mono-prose .mono-callout,
-.mono-callout {
-  border-left: 2px solid var(--m-accent);
-  background: var(--m-card);
-  padding: 20px;
-}
-/* Article block rhythm — ONLY inside prose (the read view / editor preview); the
-   standalone component sits flush and lets its container own the spacing. */
-.mono-prose .mono-callout {
-  margin: 28px 0;
-}
-/* warn → red left edge. Scoped to match `.mono-prose .mono-callout`'s
-   specificity so the override wins inside the prose read view too (a bare
-   `.mono-callout--warn` loses the cascade to the prose-prefixed base rule). */
-.mono-prose .mono-callout--warn,
-.mono-callout--warn {
-  border-left-color: var(--m-error);
-}
-.mono-callout-eyebrow {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: 0.12em;
-  color: var(--m-accent);
-  margin-bottom: 24px;
-}
-.mono-callout--warn .mono-callout-eyebrow {
-  color: var(--m-error);
-}
-.mono-callout-body {
-  font-size: 14px;
-  line-height: 1.85;
-  color: var(--m-fg);
-}
-.mono-callout-body > :first-child {
-  margin-top: 0;
-}
-.mono-callout-body > :last-child {
-  margin-bottom: 0;
-}
-
 /* ───── Media embeds (YouTube / Spotify) — read view + editor preview share ─────
    On-system frame: full article measure, square corners, the same 2px `--m-dim`
    border the prose <img> uses. Sits on the block rhythm. The iframe fills the

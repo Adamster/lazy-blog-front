@@ -4,7 +4,7 @@ import remarkGfm from "remark-gfm";
 import remarkDirective from "remark-directive";
 import { GlitchText, MatrixText } from "@/shared/ui/effects";
 import { RevealMark } from "./reveal-mark";
-import { AsciiDivider, Callout } from "./prose-blocks";
+import { AsciiDivider } from "./prose-blocks";
 import { MediaEmbed } from "./media-embed";
 import { remarkMediaEmbeds, remarkIframeEmbeds } from "./remark-media-embeds";
 import type { SpotifyType } from "@/shared/lib/media-embed";
@@ -73,7 +73,6 @@ function remarkEffectDirectives() {
 
 // Directive ATTRIBUTES (`{variant}`/`{type}` braces) are forwarded as plain string props — never colours/styles.
 const LEAF_BLOCK_TAGS = new Set(["divider"]);
-const CONTAINER_BLOCK_TAGS = new Set(["callout"]);
 
 function remarkBlockDirectives() {
   return (tree: MdNode) => {
@@ -82,16 +81,6 @@ function remarkBlockDirectives() {
         node.type === "leafDirective" &&
         node.name &&
         LEAF_BLOCK_TAGS.has(node.name)
-      ) {
-        node.data = {
-          ...node.data,
-          hName: node.name,
-          hProperties: { ...node.attributes },
-        };
-      } else if (
-        node.type === "containerDirective" &&
-        node.name &&
-        CONTAINER_BLOCK_TAGS.has(node.name)
       ) {
         node.data = {
           ...node.data,
@@ -229,9 +218,6 @@ const components = {
   ),
   divider: ({ variant }: { variant?: string }) => (
     <AsciiDivider variant={variant === "slash" ? "slash" : "dots"} />
-  ),
-  callout: ({ children, type }: { children?: ReactNode; type?: string }) => (
-    <Callout type={type === "warn" ? "warn" : "note"}>{children}</Callout>
   ),
   // Forwards the VALIDATED kind/id/type as plain string props (never the raw URL); rebuild the descriptor for <MediaEmbed>.
   "media-embed": (props: {
