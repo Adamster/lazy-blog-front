@@ -64,6 +64,10 @@ export interface GlyphRainVProps {
    *  (rain directly on the page surface — no own panel). On a LIGHT theme bg
    *  the pale head would wash out, so it falls back to the trail colour. */
   surface?: "black" | "theme";
+  /** Scatter mode: each run spawns at the top OR a random row and dies out at
+   *  a random row (at most the bottom — never past the canvas edge), instead
+   *  of the classic full-length top→bottom fall. */
+  scatter?: boolean;
   className?: string;
 }
 
@@ -82,6 +86,7 @@ export function GlyphRainV({
   colorHex,
   color = "accent",
   surface = "black",
+  scatter = false,
   className = "",
 }: GlyphRainVProps) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -104,6 +109,11 @@ export function GlyphRainV({
       head: number;
       spd: number;
       active: boolean;
+      /** First row this run paints (0 unless scatter). */
+      start: number;
+      /** Last row this run paints — the head vanishes past it and the tail
+       *  fades out in place; ≤ rows - 1, so nothing ever crosses the bottom. */
+      end: number;
       /** The glyph frozen into each ROW as the head passes (trail chars). */
       chars: string[];
     }[] = [];
@@ -138,13 +148,30 @@ export function GlyphRainV({
       }
     };
 
-    const spawn = () => ({
-      head: -Math.random() * rows * 0.8 - 1,
-      // Per-stream jitter capped at 1.2× (was 1.8× — the fast tail read frantic).
-      spd: speed * (0.3 + Math.random() * 0.9),
-      active: Math.random() < density,
-      chars: [] as string[],
-    });
+    const spawn = () => {
+      // Scatter: ~60% of runs begin mid-field, the rest at the top edge; each
+      // dies at a random row, capped at the bottom row. Classic: full fall.
+      const start =
+        scatter && Math.random() < 0.6
+          ? Math.floor(Math.random() * rows * 0.75)
+          : 0;
+      const end = scatter
+        ? Math.min(
+            rows - 1,
+            start + 4 + Math.floor(Math.random() * Math.max(1, rows - start))
+          )
+        : rows - 1;
+      return {
+        // Negative offset below `start` = the spawn-delay stagger.
+        head: start - Math.random() * rows * 0.8 - 1,
+        // Per-stream jitter capped at 1.2× (was 1.8× — the fast tail read frantic).
+        spd: speed * (0.3 + Math.random() * 0.9),
+        active: Math.random() < density,
+        start,
+        end,
+        chars: [] as string[],
+      };
+    };
 
     const resize = () => {
       w = canvas.clientWidth || 800;
@@ -180,7 +207,8 @@ export function GlyphRainV({
         const s = streams[c];
         s.head += s.spd;
         const hr = Math.floor(s.head);
-        if (hr - trailLen > rows) {
+        // Respawn once the tail has fully faded past this run's end row.
+        if (hr - trailLen > s.end) {
           Object.assign(s, spawn());
           continue;
         }
@@ -189,12 +217,13 @@ export function GlyphRainV({
         // Occasional trail flicker (the Matrix mutate blip).
         if (Math.random() < mutate) {
           const r = hr - 2 - Math.floor(Math.random() * (trailLen - 2));
-          if (r >= 0 && r < rows) s.chars[r] = pick();
+          if (r >= s.start && r <= s.end && r < rows) s.chars[r] = pick();
         }
         for (let k = 0; k < trailLen; k++) {
           const r = hr - k;
-          if (r >= rows) continue;
-          if (r < 0) break;
+          // Past the end row the head is VIRTUAL — only the fading tail stays.
+          if (r > s.end || r >= rows) continue;
+          if (r < s.start || r < 0) break;
           s.chars[r] ??= pick();
           if (k === 0) {
             ctx.globalAlpha = opacity;
@@ -290,6 +319,7 @@ export function GlyphRainV({
     colorHex,
     color,
     surface,
+    scatter,
   ]);
 
   return (
