@@ -8,6 +8,8 @@ import {
   UserIcon,
   LockClosedIcon,
   CheckIcon,
+  StarIcon,
+  EyeIcon,
 } from "@heroicons/react/24/solid";
 import {
   EyeSlashIcon,
@@ -46,6 +48,7 @@ import {
   RadioGroup,
   Sparkline,
   buildMonthlySeries,
+  Stat,
   ConfirmModal,
   InfoBox,
   ErrorMessage,
@@ -219,13 +222,23 @@ const TYPE: {
     style: { fontSize: 12, fontWeight: 400, color: "var(--m-muted)" },
   },
   {
-    spec: "Label · 11 / 500 / 0.12em",
-    sample: "// MOST ACTIVE USER",
+    spec: "Section eyebrow · 11 / 500 / 0.12em · accent",
+    sample: "// POSTS — heads a section / page / modal",
     style: {
       fontSize: 11,
       fontWeight: 500,
       letterSpacing: "0.12em",
       color: "var(--m-accent)",
+    },
+  },
+  {
+    spec: "Data label · 11 / 500 / 0.12em · muted2",
+    sample: "// KARMA — names the value below it (fields · stats)",
+    style: {
+      fontSize: 11,
+      fontWeight: 500,
+      letterSpacing: "0.12em",
+      color: "var(--m-muted2)",
     },
   },
 ];
@@ -899,7 +912,7 @@ export function DesignGuide() {
             <Panel caption="// LABEL">
               <div className="grid grid-cols-2 gap-x-7 gap-y-7">
                 <State caption="default">
-                  <Label>PUBLICATIONS</Label>
+                  <Label>POSTS</Label>
                 </State>
                 <State caption="caret (blinking)">
                   <Label caret>MOST ACTIVE USER</Label>
@@ -1055,12 +1068,47 @@ export function DesignGuide() {
         <Section
           id="sparkline"
           index="16"
-          title="SPARKLINE"
-          intro="A monthly-series micro-chart — accent curve + dots over a gradient fill. Shown with a rolling 6-month series and with an all-zero (no-activity) series."
+          title="STAT · SPARKLINE"
+          intro="The stat block and its chart column — ONE color rule. The label is the muted data-label tier (it names the number; never the green section eyebrow). The 46px value is sign-colored: accent positive, error negative, muted zero. Sparkline follows the data — accent with any non-zero point, muted when the series is all zeros. The one exception lives on the post page: the like/dislike counters are buttons whose color encodes YOUR vote, not the count's sign."
         >
-          <div className="grid grid-cols-1 gap-7 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-7 lg:grid-cols-3">
+            <Panel caption="// STAT — positive">
+              <State caption="value > 0 · accent">
+                <Stat
+                  label="KARMA"
+                  value="1,240"
+                  signOf={1240}
+                  sub="net rating"
+                  subIcon={StarIcon}
+                />
+              </State>
+            </Panel>
+            <Panel caption="// STAT — negative">
+              <State caption="value < 0 · error">
+                <Stat
+                  label="KARMA"
+                  value="-12"
+                  signOf={-12}
+                  sub="net rating"
+                  subIcon={StarIcon}
+                />
+              </State>
+            </Panel>
+            <Panel caption="// STAT — zero">
+              <State caption="value = 0 · muted">
+                <Stat
+                  label="TOTAL VIEWS"
+                  value="0"
+                  signOf={0}
+                  sub="views total"
+                  subIcon={EyeIcon}
+                />
+              </State>
+            </Panel>
+          </div>
+          <div className="mt-7 grid grid-cols-1 gap-7 lg:grid-cols-2">
             <Panel caption="// SPARKLINE — with data">
-              <State caption="6-month rolling counts · accent curve + dots">
+              <State caption="any non-zero point · accent curve + dots + gradient">
                 <Sparkline
                   series={buildMonthlySeries(SPARK_DATES, 6)}
                   gradientId="cs-spark"
@@ -1069,7 +1117,7 @@ export function DesignGuide() {
               </State>
             </Panel>
             <Panel caption="// SPARKLINE — empty series">
-              <State caption="all-zero · flat baseline (no activity)">
+              <State caption="all-zero · muted flat baseline (no accent, no gradient)">
                 <Sparkline
                   series={buildMonthlySeries([], 6)}
                   gradientId="cs-spark-empty"

@@ -4,3 +4,4 @@ export { Category } from "./category";
 export { Dot } from "./dot";
 export { StatBar } from "./stat-bar";
 export { Sparkline, seriesFromMonths, buildMonthlySeries } from "./sparkline";
+export { Stat, signColor } from "./stat";

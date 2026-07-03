@@ -30,6 +30,7 @@ export {
   seriesFromMonths,
   buildMonthlySeries,
 } from "./data-display/sparkline";
+export { Stat, signColor } from "./data-display/stat";
 export { Stepper } from "./navigation/stepper";
 export { TabNav } from "./navigation/tab-nav";
 export type { TabItem } from "./navigation/tab-nav";
