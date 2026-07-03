@@ -2,23 +2,19 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { useAuth } from "@/entities/session";
 import { SnakeMark } from "@/features/arcade/snake-classic";
 import { Mark2048 } from "@/features/arcade/2048";
+import { SlothMark } from "@/features/arcade/stay-awake";
 import { RabbitChaseMark } from "./rabbit-chase-mark";
 import { Label } from "@/shared/ui";
-import {
-  rankTopPlayers,
-  useGameLeaderboard,
-  type TopPlayerRow,
-} from "../model/use-game-leaderboard";
 import { TetrominoMark } from "./tetromino-mark";
 
 interface GameEntry {
-  /** API game id (`GET /arcade/leaderboard?game=…`). */
-  game: string;
   href: string;
   title: string;
+  /** One deadpan muted line under the title — the SAME card for signed-in and
+   *  signed-out (the leaderboard block was cut: filled vs empty read uneven). */
+  description: string;
   mark: ReactNode;
   /** The mark's own pixel grid — cell size (px) + the cells the mark spans.
    *  Drives the CellField so the figure sits ON the field like a real render. */
@@ -38,30 +34,38 @@ const CELL = 20;
 const CELL_2048 = 28;
 const GAMES: GameEntry[] = [
   {
-    game: "snake",
     href: "/arcade/follow-the-rabbit",
     title: "The Rabbit",
+    description: "Follow the white rabbit. The striped ones bite.",
     mark: <RabbitChaseMark size={CELL * 2} />,
     field: { cell: CELL, spanX: 5, spanY: 2 },
   },
   {
-    game: "snake-classic",
-    href: "/arcade/snake",
-    title: "Snake",
-    mark: <SnakeMark size={CELL * 2} />,
-    field: { cell: CELL, spanX: 5, spanY: 2 },
+    href: "/arcade/stay-awake",
+    title: "Stay Awake",
+    description: "The floor is sleep. Keep hopping.",
+    mark: <SlothMark size={CELL * 4} />,
+    field: { cell: CELL, spanX: 5, spanY: 4 },
   },
   {
-    game: "tetris",
+    href: "/arcade/snake",
+    title: "Snake",
+    description: "The classic. You, your tail, and bad decisions.",
+    mark: <SnakeMark size={CELL * 2} />,
+    field: { cell: CELL, spanX: 5, spanY: 2 },
+    hidden: true,
+  },
+  {
     href: "/arcade/tetris",
     title: "Tetris",
+    description: "Blocks fall. Lines clear. Gravity always wins.",
     mark: <TetrominoMark size={CELL * 2} />,
     field: { cell: CELL, spanX: 3, spanY: 2 },
   },
   {
-    game: "2048",
     href: "/arcade/2048",
     title: "2048",
+    description: "Double the numbers until the board disagrees.",
     mark: <Mark2048 size={CELL_2048 * 2} />,
     field: { cell: CELL_2048, spanX: 2, spanY: 2 },
     hidden: true,
@@ -71,10 +75,12 @@ const GAMES: GameEntry[] = [
 /** The card is a THEME-FOLLOWING "screen" — the games themselves are
  *  theme-native (token-resolved palettes), so the hub preview follows the
  *  ambient theme too: `--m-bg` field + 2px `--m-line` frame, the same look as a
- *  bordered game canvas on the page. */
+ *  bordered game canvas on the page. `min-h-44` (176px): the card holds its
+ *  stature regardless of content height, so the preview field always has air
+ *  (owner call). */
 function ScreenCard({ children }: { children: ReactNode }) {
   return (
-    <article className="mono-scope group relative grid h-full grid-cols-3 border-2 border-[var(--m-line)] bg-[var(--m-bg)] text-[var(--m-fg)] transition-colors hover:border-[var(--m-accent)]">
+    <article className="mono-scope group relative grid h-full min-h-44 grid-cols-3 border-2 border-[var(--m-line)] bg-[var(--m-bg)] text-[var(--m-fg)] transition-colors hover:border-[var(--m-accent)]">
       {children}
     </article>
   );
@@ -117,36 +123,7 @@ function CellField({
   );
 }
 
-/** One podium line — the in-game leaderboard row language (rank / @handle / score).
- *  PLAIN TEXT on purpose: the card is a game preview, profile links live on the
- *  game page's own leaderboard. */
-function TopPlayerLine({ row }: { row: TopPlayerRow }) {
-  return (
-    <div className="grid grid-cols-[28px_1fr_auto] items-center gap-3 py-1">
-      <span className="text-[11px] text-[var(--m-muted2)] tabular-nums">
-        {row.rank}
-      </span>
-      <span className="overflow-hidden text-[11px] text-ellipsis whitespace-nowrap text-[var(--m-muted)]">
-        {row.name}
-      </span>
-      <span
-        className={`font-display text-[12px] font-bold tabular-nums ${
-          row.empty ? "text-[var(--m-muted2)]" : "text-[var(--m-fg)]"
-        }`}
-      >
-        {row.scoreLabel}
-      </span>
-    </div>
-  );
-}
-
 function GameCard({ game }: { game: GameEntry }) {
-  // Signed-out viewers get no leaderboard surfaces on the card at all (the GET
-  // is auth-only; play is fully local) — just the field + title (owner call).
-  const { isAuthenticated } = useAuth();
-  const { data } = useGameLeaderboard(game.game, isAuthenticated);
-  const rows = rankTopPlayers(data?.entries ?? []);
-
   return (
     <ScreenCard>
       <CellField field={game.field}>{game.mark}</CellField>
@@ -159,18 +136,9 @@ function GameCard({ game }: { game: GameEntry }) {
             {game.title}
           </Link>
         </h2>
-        {isAuthenticated && (
-          <>
-            <div className="mt-6 pb-3.5 text-[11px] tracking-[0.12em] text-[var(--m-accent)] uppercase">
-              {"// Top players"}
-            </div>
-            <div>
-              {rows.map((row) => (
-                <TopPlayerLine key={row.rank} row={row} />
-              ))}
-            </div>
-          </>
-        )}
+        <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
+          {game.description}
+        </p>
       </div>
     </ScreenCard>
   );
