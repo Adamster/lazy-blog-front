@@ -1,6 +1,7 @@
 "use client";
 
 import { HeartIcon, StarIcon } from "@heroicons/react/24/solid";
+import { Label } from "@/shared/ui";
 import { VoteDirection } from "@/shared/api/openapi";
 import { BrokenHeartIcon } from "@/features/post/ui/heart-icons";
 import { useVotePost } from "../model/use-vote-post";
@@ -78,8 +79,6 @@ export const PostVote = ({
   const netColor = signColor(net);
   const dotColor = netColor;
 
-  const labelCls =
-    "text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)] uppercase";
   const subRowCls =
     "mt-2 flex items-center gap-2.5 text-[11px] leading-none tracking-[0.12em] whitespace-nowrap text-[var(--m-muted2)]";
 
@@ -87,7 +86,9 @@ export const PostVote = ({
     <section className="mx-[calc(50%-50vw)] mt-10 w-screen bg-[var(--m-card)]">
       <div className="mx-auto grid max-w-[780px] items-start gap-10 px-10 py-10 sm:grid-cols-3">
         <div className="min-w-0">
-          <div className={labelCls}>{"// love it"}</div>
+          <Label tone="muted" uppercase>
+            love it
+          </Label>
           <button
             type="button"
             onClick={() => onVote(VoteDirection.Up)}
@@ -112,7 +113,9 @@ export const PostVote = ({
         </div>
 
         <div className="min-w-0">
-          <div className={labelCls}>{"// hate it"}</div>
+          <Label tone="muted" uppercase>
+            hate it
+          </Label>
           <button
             type="button"
             onClick={() => onVote(VoteDirection.Down)}
@@ -137,7 +140,9 @@ export const PostVote = ({
         </div>
 
         <div className="min-w-0">
-          <div className={labelCls}>{"// rating"}</div>
+          <Label tone="muted" uppercase>
+            rating
+          </Label>
           <div className="relative mt-2 h-[46px] w-full overflow-visible">
             <div className="absolute inset-x-0 top-1/2 h-0.5 bg-[var(--m-dim)]" />
             <svg

@@ -1,34 +1,27 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { DisplayPostResponse } from "@/shared/api/openapi";
 import { useAllPosts } from "@/features/post/model/use-all-posts";
-import { useHomeStats } from "@/features/post/model/use-home-stats";
 import {
-  Label,
   Category,
   Metric,
   StatusBadge,
   Dot,
+  Label,
   Loading,
   ErrorMessage,
-  Sparkline,
-  seriesFromMonths,
 } from "@/shared/ui";
-import { MatrixText } from "@/shared/ui/effects";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
-import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
+import { formatDate2 } from "@/shared/lib/utils";
 import { PostCard } from "@/features/post/ui/post-card";
 
 const catOf = (p: DisplayPostResponse) => p.tags?.[0]?.tag ?? "post";
 const hrefOf = (p: DisplayPostResponse) => `/${p.author.userName}/${p.slug}`;
 const firstLetter = (s?: string) =>
   (s?.match(/[\p{L}\p{N}]/u)?.[0] ?? "•").toUpperCase();
-const currentMonthLabel = () =>
-  new Date().toLocaleDateString("en-US", { month: "short" }).toUpperCase();
 
 function HeroCover({ post }: { post: DisplayPostResponse }) {
   if (post.coverUrl) {
@@ -53,19 +46,8 @@ function HeroCover({ post }: { post: DisplayPostResponse }) {
   );
 }
 
-/** Fixed-height title slot so the filled / empty / loading states hold the same
- *  row height and the column never jumps. */
-function StatTitle({ children }: { children: ReactNode }) {
-  return (
-    <div className="mono-title block h-8 truncate leading-8 transition-colors group-hover:text-[var(--m-accent)]">
-      {children}
-    </div>
-  );
-}
-
 export default function HomePage() {
   const query = useAllPosts();
-  const stats = useHomeStats();
   const reduceMotion = useReducedMotion();
 
   const sentinelRef = useInfiniteScroll({
@@ -89,12 +71,6 @@ export default function HomePage() {
     ? rest.slice(0, Math.floor(rest.length / 3) * 3)
     : rest;
 
-  // Highlights come from the aggregate endpoint (not the feed) and are null on an empty month.
-  const topUser = stats.data?.mostActiveUser;
-  const topPost = stats.data?.topPost;
-  const series = seriesFromMonths(stats.data?.postsByMonth ?? []);
-  const month = currentMonthLabel();
-
   return (
     <div
       className="mono-scope min-h-app mx-[calc(50%-50vw)] w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
@@ -111,97 +87,7 @@ export default function HomePage() {
             </p>
           </div>
         ) : (
-          <>
-            <section className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
-              <div className="mx-auto grid max-w-[1240px] gap-10 px-10 py-10 lg:grid-cols-3">
-                <div className="hidden lg:block">
-                  <Label className="mono-label mb-4">
-                    {`MOST ACTIVE USER · ${month}`}
-                  </Label>
-                  {!stats.isLoading &&
-                    (topUser ? (
-                      <div className="min-w-0">
-                        <Link
-                          href={`/${topUser.user.userName}`}
-                          className="group block"
-                        >
-                          <StatTitle>{displayNameOf(topUser.user)}</StatTitle>
-                        </Link>
-                        <div className="mt-4 flex items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
-                          <Link
-                            href={`/${topUser.user.userName}`}
-                            className="transition-colors hover:text-[var(--m-accent)]"
-                          >
-                            @{topUser.user.userName}
-                          </Link>
-                          <Dot />
-                          <span className="flex items-center gap-4">
-                            <Metric kind="posts" value={topUser.postCount} />
-                            <Metric kind="rating" value={topUser.netRating} />
-                          </span>
-                        </div>
-                      </div>
-                    ) : (
-                      <Label className="mono-label flex h-8 items-center text-[var(--m-muted2)]">
-                        <MatrixText text="NO LEADER YET" />
-                      </Label>
-                    ))}
-                </div>
-
-                <div className="hidden min-w-0 lg:block">
-                  <Label className="mono-label mb-4">
-                    {`TOP POST · ${month}`}
-                  </Label>
-                  {!stats.isLoading &&
-                    (topPost ? (
-                      <div className="min-w-0">
-                        <Link
-                          href={`/${topPost.userName}/${topPost.slug}`}
-                          className="group block"
-                        >
-                          <StatTitle>{topPost.title}</StatTitle>
-                        </Link>
-                        <div className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px] text-[var(--m-muted)]">
-                          <Link
-                            href={`/${topPost.userName}`}
-                            className="transition-colors hover:text-[var(--m-accent)]"
-                          >
-                            @{topPost.userName}
-                          </Link>
-                          <Dot />
-                          <span className="flex items-center gap-4">
-                            <Metric kind="views" value={topPost.views} />
-                            <Metric kind="rating" value={topPost.netRating} />
-                          </span>
-                        </div>
-                      </div>
-                    ) : (
-                      <Label className="mono-label flex h-8 items-center text-[var(--m-muted2)]">
-                        <MatrixText text="WARMING UP ..." />
-                      </Label>
-                    ))}
-                </div>
-
-                <div>
-                  <Label className="mono-label mb-2">POSTS BY MONTH</Label>
-                  <Sparkline
-                    series={series}
-                    gradientId="homeSparkGrad"
-                    labelClassName="text-[var(--m-muted)]"
-                    ariaLabel={`Posts by month: ${series
-                      .map((s) => `${s.label} ${s.count}`)
-                      .join(", ")}`}
-                  />
-                </div>
-              </div>
-            </section>
-
-            {rest.length > 0 && (
-              <div className="flex items-center pt-10 pb-6">
-                <Label>PUBLICATIONS</Label>
-              </div>
-            )}
-
+          <div className="pt-10">
             {hero && (
               <section className="group relative grid bg-[var(--m-card)] transition-colors hover:bg-[var(--m-panel)] lg:grid-cols-[1.05fr_1fr]">
                 <StatusBadge
@@ -252,33 +138,38 @@ export default function HomePage() {
             )}
 
             {visibleGrid.length > 0 && (
-              <section className="mt-10 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-                {visibleGrid.map((p, index) => (
-                  <motion.div
-                    key={p.id}
-                    initial={reduceMotion ? false : { opacity: 0, y: 8 }}
-                    whileInView={
-                      reduceMotion ? undefined : { opacity: 1, y: 0 }
-                    }
-                    viewport={{ once: true, margin: "-40px" }}
-                    transition={{
-                      duration: 0.16,
-                      delay: Math.min(index * 0.04, 0.32),
-                    }}
-                  >
-                    <PostCard
-                      post={p}
-                      href={hrefOf(p)}
-                      authorHandle={p.author.userName ?? undefined}
-                    />
-                  </motion.div>
-                ))}
-              </section>
+              <>
+                <div className="pt-10 pb-6">
+                  <Label>POSTS</Label>
+                </div>
+                <section className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+                  {visibleGrid.map((p, index) => (
+                    <motion.div
+                      key={p.id}
+                      initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+                      whileInView={
+                        reduceMotion ? undefined : { opacity: 1, y: 0 }
+                      }
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{
+                        duration: 0.16,
+                        delay: Math.min(index * 0.04, 0.32),
+                      }}
+                    >
+                      <PostCard
+                        post={p}
+                        href={hrefOf(p)}
+                        authorHandle={p.author.userName ?? undefined}
+                      />
+                    </motion.div>
+                  ))}
+                </section>
+              </>
             )}
 
             {query.isFetchingNextPage && <Loading inline section />}
             {query.hasNextPage && <div ref={sentinelRef} className="h-20" />}
-          </>
+          </div>
         )}
       </main>
     </div>
