@@ -35,6 +35,10 @@ export interface SnakeGameState {
   score: number;
   best: number;
   length: number;
+  /** Positive (+10) rabbits eaten this run — for the board eyebrow. */
+  eatenPositive: number;
+  /** Negative (striped) rabbits grabbed this run — for the board eyebrow. */
+  eatenNegative: number;
   isNewBest: boolean;
   /** 1-based rank on the board; 0 = off the board. */
   rank: number;

@@ -2,18 +2,15 @@
 
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
-export type PublicationsView = "all" | "published" | "drafts";
+export type PostsView = "all" | "published" | "drafts";
 
-interface PublicationsFilterProps {
-  view: PublicationsView;
-  onChange: (view: PublicationsView) => void;
+interface PostsFilterProps {
+  view: PostsView;
+  onChange: (view: PostsView) => void;
 }
 
 // Author-only. Each button toggles — clicking the active one clears back to `all`.
-export function PublicationsFilter({
-  view,
-  onChange,
-}: PublicationsFilterProps) {
+export function PostsFilter({ view, onChange }: PostsFilterProps) {
   return (
     <div
       className="flex items-center gap-3"

@@ -5,10 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { EyeIcon, StarIcon } from "@heroicons/react/24/solid";
 import { useUser } from "@/entities/session";
 import { usePostsByUserName } from "@/features/post/model/use-posts-by-username";
-import {
-  PublicationsFilter,
-  type PublicationsView,
-} from "@/features/post/ui/publications-filter";
+import { PostsFilter, type PostsView } from "@/features/post/ui/posts-filter";
 import {
   Label,
   Avatar,
@@ -18,6 +15,7 @@ import {
   ErrorMessage,
   Sparkline,
   seriesFromMonths,
+  Stat,
 } from "@/shared/ui";
 import { MatrixText } from "@/shared/ui/effects";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
@@ -31,7 +29,7 @@ export default function UserPage({ userName }: { userName: string }) {
   // The backend mixes the owner's drafts into `postItems` only when viewer === owner,
   // so the toggle is a client-side split of one stream, never a second fetch.
   const { user: viewer, isUserResolved } = useUser();
-  const [view, setView] = useState<PublicationsView>("all");
+  const [view, setView] = useState<PostsView>("all");
 
   const sentinelRef = useInfiniteScroll({
     hasNextPage: query.hasNextPage,
@@ -109,40 +107,24 @@ export default function UserPage({ userName }: { userName: string }) {
 
         <section className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
           <div className="mx-auto grid max-w-[1240px] gap-10 px-10 py-10 sm:grid-cols-3">
-            <div>
-              <Label>KARMA</Label>
-              <div
-                className="font-display mt-4 text-[46px] leading-none font-bold tracking-[-0.02em] tabular-nums"
-                style={{
-                  color:
-                    totalKarma > 0
-                      ? "var(--m-accent)"
-                      : totalKarma < 0
-                        ? "var(--m-error)"
-                        : "var(--m-muted)",
-                }}
-              >
-                {fmt(totalKarma)}
-              </div>
-              <div className="mt-2 flex items-center gap-2.5 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)]">
-                <StarIcon aria-hidden className="size-3.5" />
-                net rating
-              </div>
-            </div>
+            <Stat
+              label="KARMA"
+              value={fmt(totalKarma)}
+              signOf={totalKarma}
+              sub="net rating"
+              subIcon={StarIcon}
+            />
+
+            <Stat
+              label="TOTAL VIEWS"
+              value={fmt(totalViews)}
+              signOf={totalViews}
+              sub="views total"
+              subIcon={EyeIcon}
+            />
 
             <div>
-              <Label>TOTAL VIEWS</Label>
-              <div className="font-display mt-4 text-[46px] leading-none font-bold tracking-[-0.02em] text-[var(--m-accent)] tabular-nums">
-                {fmt(totalViews)}
-              </div>
-              <div className="mt-2 flex items-center gap-2.5 text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)]">
-                <EyeIcon className="size-3.5" />
-                views total
-              </div>
-            </div>
-
-            <div>
-              <Label>ACTIVITY · 6M</Label>
+              <Label tone="muted">ACTIVITY · 6M</Label>
               {/* Always draw the chart — an empty profile reads as a flat line of zeros, not "no data". */}
               <div className="mt-4">
                 <Sparkline
@@ -161,8 +143,8 @@ export default function UserPage({ userName }: { userName: string }) {
             (or a postless owner) gets the scramble in place of the label. */}
         {isOwner && allPosts.length > 0 ? (
           <div className="flex items-center justify-between pt-10 pb-6">
-            <Label className="mono-label">PUBLICATIONS</Label>
-            <PublicationsFilter view={view} onChange={setView} />
+            <Label className="mono-label">POSTS</Label>
+            <PostsFilter view={view} onChange={setView} />
           </div>
         ) : (
           <Label
@@ -173,7 +155,7 @@ export default function UserPage({ userName }: { userName: string }) {
                 text={`${handle} is still lost in procrastination`.toUpperCase()}
               />
             ) : (
-              "PUBLICATIONS"
+              "POSTS"
             )}
           </Label>
         )}

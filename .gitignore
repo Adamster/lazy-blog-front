@@ -42,3 +42,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+/lazy-cam-site
+
+# unlisted arcade prototype — parked out of history until it ships (or dies)
+/src/app/arcade/hollow-sloth
+/src/features/arcade/hollow-sloth

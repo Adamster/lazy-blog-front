@@ -2,7 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
-import { GRID_H, GRID_W, SnakeEngine } from "./engine";
+import {
+  GRID_H,
+  GRID_W,
+  lerpHex,
+  SnakeEngine,
+  type SnakePalette,
+} from "./engine";
 import { loadHistory, recentSeries, recordScore } from "./score-history";
 import type {
   HistoryPoint,
@@ -15,12 +21,49 @@ import type {
 const FALLBACK_MS = 120;
 const FALLBACK_GAP = 180;
 
+/** Parse `#rgb` / `#rrggbb` → `[r,g,b]`; falls back to a light gray on anything odd. */
+function parseHexRgb(hex: string): [number, number, number] {
+  let h = hex.trim().replace(/^#/, "");
+  if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+  const n = parseInt(h, 16);
+  if (h.length !== 6 || Number.isNaN(n)) return [220, 220, 220];
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+/**
+ * Resolve the theme-native draw palette from the live `--m-*` tokens on `el` (the
+ * classic-Snake pattern): field ← `--m-bg` · head ← `--m-accent` (tail = the accent
+ * pulled toward the field) · rabbit body ← `--m-fg` · red ← `--m-error` · grid/frame
+ * ← `--m-fg` at a low alpha (grid a hair higher when fg is dark — i.e. the light
+ * theme — so the dark hairline stays as subtle as the light one is on dark).
+ */
+function resolvePalette(el: Element): SnakePalette {
+  const cs = getComputedStyle(el);
+  const read = (name: string, fallback: string) =>
+    cs.getPropertyValue(name).trim() || fallback;
+  const accent = read("--m-accent", "#cdff48");
+  const bg = read("--m-bg", "#141414");
+  const [r, g, b] = parseHexRgb(read("--m-fg", "#e6e6e6"));
+  const gridAlpha = r + g + b < 384 ? 0.07 : 0.05; // dark fg ⇒ light theme ⇒ a touch more
+  return {
+    boardBg: bg,
+    snakeHead: accent,
+    snakeTail: lerpHex(accent, bg, 0.55),
+    rabbitBody: read("--m-fg", "#e6e6e6"),
+    rabbitRed: read("--m-error", "#ff6b6b"),
+    gridLine: `rgba(${r},${g},${b},${gridAlpha})`,
+    frameLine: `rgba(${r},${g},${b},0.22)`,
+  };
+}
+
 const INITIAL_STATE: SnakeGameState = {
   screen: "menu",
   paused: false,
   score: 0,
   best: 0,
   length: 3,
+  eatenPositive: 0,
+  eatenNegative: 0,
   isNewBest: false,
   rank: 0,
 };
@@ -114,6 +157,8 @@ export function useSnakeGame({
       paused: false,
       score: 0,
       length: 3,
+      eatenPositive: 0,
+      eatenNegative: 0,
       isNewBest: false,
       rank: 0,
     }));
@@ -170,6 +215,19 @@ export function useSnakeGame({
     };
     resize();
 
+    // THEME-NATIVE palette (the classic-Snake/Tetris pattern): resolve the concrete
+    // colours from the live `--m-*` tokens and re-resolve whenever the theme flips —
+    // `.dark` toggles on <html>, so watch its `class` attribute. No explicit repaint
+    // needed: the rAF loop below redraws every frame (menu included, via drawIdle).
+    engine.setPalette(resolvePalette(canvas));
+    const themeObserver = new MutationObserver(() => {
+      engine.setPalette(resolvePalette(canvas));
+    });
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
     const ro = new ResizeObserver(() => resize());
     ro.observe(canvas);
 
@@ -192,9 +250,18 @@ export function useSnakeGame({
             handleGameOver(result.score);
           } else {
             setState((s) =>
-              s.score === result.score && s.length === result.length
+              s.score === result.score &&
+              s.length === result.length &&
+              s.eatenPositive === result.eatenPositive &&
+              s.eatenNegative === result.eatenNegative
                 ? s
-                : { ...s, score: result.score, length: result.length }
+                : {
+                    ...s,
+                    score: result.score,
+                    length: result.length,
+                    eatenPositive: result.eatenPositive,
+                    eatenNegative: result.eatenNegative,
+                  }
             );
           }
         }
@@ -221,6 +288,7 @@ export function useSnakeGame({
       cancelAnimationFrame(rafId);
       window.clearInterval(fallback);
       ro.disconnect();
+      themeObserver.disconnect();
     };
     // getEngine is a stable closure over refs (intentionally omitted).
     // eslint-disable-next-line react-hooks/exhaustive-deps

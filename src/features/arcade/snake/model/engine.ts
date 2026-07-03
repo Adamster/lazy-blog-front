@@ -100,33 +100,55 @@ function sampleTwitch(p: number): number {
   return 0;
 }
 
-// Canvas palette — literal hex (the 2D context can't resolve CSS vars).
+// ---------- palette ----------
 
-/** Board field gray. (A transparent / theme-following canvas was tried and reverted —
- *  the game palette is dark-tuned, so the board just stays this gray everywhere.) */
-const BOARD_BG = "#141414";
-/** = `--m-accent` (dark). */
+// THEME-NATIVE (like Tetris / classic Snake): the board follows the ambient theme.
+// The 2D context can't resolve CSS vars, so the HOOK resolves the concrete colours
+// from the live `--m-*` tokens and calls {@link SnakeEngine.setPalette} on mount +
+// on every theme change; the engine reads every draw colour from this object.
+
+export interface SnakePalette {
+  /** Field fill ← `--m-bg`. */
+  boardBg: string;
+  /** Snake head ← `--m-accent`; the body lerps head → tail down its length. */
+  snakeHead: string;
+  /** Tail tint — the accent pulled toward the field (`lerpHex(accent, bg, 0.55)`). */
+  snakeTail: string;
+  /** Rabbit body ← `--m-fg` (white bunnies on the dark field, ink bunnies on light). */
+  rabbitBody: string;
+  /** Red/danger ← `--m-error`: ear stripes, red eyes, the killer body, the chips. */
+  rabbitRed: string;
+  /** Faint cell grid ← `--m-fg` at a low alpha. */
+  gridLine: string;
+  /** Board-edge frame — stronger than the inner grid so the rim always reads. */
+  frameLine: string;
+}
+
+/** Dark-theme reference colours. `RABBIT_WHITE` is exported for {@link RabbitMark} —
+ *  the hub card is an always-dark "screen", so the mark keys off the DARK palette;
+ *  they also seed {@link DEFAULT_PALETTE} so the first paint looks right before the
+ *  hook resolves the ambient tokens. */
+export const RABBIT_WHITE = "#e6e6e6";
 const ACCENT = "#cdff48";
-/** Dimmer accent for the tail tint. */
 const ACCENT_DIM = "#5f7a23";
-/** Sentinel grey (light head → dim tail) — deliberately not lime, kept distinctly
- *  greyer than the white rabbit so the two never blur. */
+const RABBIT_RED = "#ff6b6b";
+
+const DEFAULT_PALETTE: SnakePalette = {
+  boardBg: "#141414",
+  snakeHead: ACCENT,
+  snakeTail: ACCENT_DIM,
+  rabbitBody: RABBIT_WHITE,
+  rabbitRed: RABBIT_RED,
+  gridLine: "rgba(255,255,255,0.05)",
+  frameLine: "rgba(255,255,255,0.22)",
+};
+
+/** Sentinel grey (light head → dim tail) — the dormant sprite mode
+ *  (`SNAKE_RENDER === "sprite"`) only; deliberately NOT theme-mapped (that mode keeps
+ *  its dark-tuned greys), kept distinctly greyer than the white rabbit so the two
+ *  never blur. */
 const SENTINEL = "#a8acb2";
 const SENTINEL_DIM = "#565a60";
-/** White rabbit (food) = `--m-fg` (dark). Exported so {@link RabbitMark} uses the exact game colour. */
-export const RABBIT_WHITE = "#e6e6e6";
-/** Red/danger = `--m-error` (dark): the negatives' ear stripes, the solid killer body, the red chips. */
-const RABBIT_RED = "#ff6b6b";
-/** Faint cell grid — a semi-transparent white so it adapts to any theme bg showing
- *  through the canvas (a fixed `#333` only suited one field). */
-const GRID_LINE = "rgba(255,255,255,0.01)";
-/** Board-edge frame — stronger than the inner grid so the rim always reads. */
-const FRAME_LINE = "rgba(255,255,255,0.22)";
-
-/** Square-stream snake colours (lime `--m-accent` family). HEAD bright → tail dims +
- *  fades. (For a grey stream, swap to {@link SENTINEL}/{@link SENTINEL_DIM}.) */
-const GLYPH_BODY = ACCENT;
-const GLYPH_TAIL = ACCENT_DIM;
 /** Opacity floor at the tail end (head = 1). */
 const GLYPH_TAIL_ALPHA = 0.3;
 /** Per-side inset of each body SQUARE so segments read as distinct blocks, not one
@@ -231,15 +253,11 @@ export const RABBIT_PLAIN: readonly string[] = [
   ...RABBIT_FACE,
 ];
 
-function stripeColor(stripe: string): (ch: string) => string | null {
-  return (ch) =>
-    ch === "1"
-      ? RABBIT_WHITE
-      : ch === "C"
-        ? stripe
-        : ch === "E"
-          ? RABBIT_RED
-          : null;
+function stripeColor(
+  body: string,
+  stripe: string
+): (ch: string) => string | null {
+  return (ch) => (ch === "1" ? body : ch === "C" || ch === "E" ? stripe : null);
 }
 
 function solidColor(fill: string): (ch: string) => string | null {
@@ -256,8 +274,8 @@ const RABBIT_KILLER: readonly string[] = [
   ...RABBIT_FACE_EYES,
 ];
 
-function killerColor(ch: string): string | null {
-  return ch === "1" ? RABBIT_RED : ch === "E" ? KILLER_EYE : null;
+function killerColor(body: string): (ch: string) => string | null {
+  return (ch) => (ch === "1" ? body : ch === "E" ? KILLER_EYE : null);
 }
 
 /**
@@ -405,6 +423,10 @@ export interface StepResult {
   ate: boolean;
   score: number;
   length: number;
+  /** Positive (+10) rabbits eaten this run. */
+  eatenPositive: number;
+  /** Negative (striped) rabbits grabbed this run. */
+  eatenNegative: number;
 }
 
 type RabbitKind = "positive" | "negative" | "killer";
@@ -429,7 +451,8 @@ function parseColor(c: string): [number, number, number] {
   return m ? [Number(m[0]), Number(m[1]), Number(m[2])] : [0, 0, 0];
 }
 
-function lerpHex(a: string, b: string, t: number): string {
+/** Exported for the hook's palette resolution (the tail = accent pulled toward bg). */
+export function lerpHex(a: string, b: string, t: number): string {
   const [ar, ag, ab] = parseColor(a);
   const [br, bg, bb] = parseColor(b);
   const r = Math.round(ar + (br - ar) * t);
@@ -466,6 +489,15 @@ export class SnakeEngine {
 
   private score = 0;
 
+  /** Per-run eat tally — positive (+10) vs negative (striped) grabs, for the
+   *  board eyebrow. The killer never counts (the run just ends). */
+  private eatenPositive = 0;
+  private eatenNegative = 0;
+
+  /** Live theme palette; starts on the dark defaults until the hook resolves the
+   *  ambient `--m-*` tokens (see {@link setPalette}). */
+  private palette: SnakePalette = DEFAULT_PALETTE;
+
   /** Live red-spark chips. Empty unless a NEGATIVE grab or the KILLER death just
    *  fired the burst; they animate out + down and fade, then clear. The positive
    *  never seeds chips. */
@@ -495,6 +527,12 @@ export class SnakeEngine {
     this.wrapWalls = wrap;
   }
 
+  /** Swap the draw palette — the hook calls this on mount AND on every theme change
+   *  (the rAF loop repaints every frame, so the next frame picks it up). */
+  setPalette(palette: SnakePalette) {
+    this.palette = palette;
+  }
+
   /** Reset to a fresh run (centre snake + a fresh trio of rabbits). */
   reset() {
     const cx = Math.floor(GRID_W / 2);
@@ -508,6 +546,8 @@ export class SnakeEngine {
     this.dirQueue = [];
     this.stepMs = SPEED_MS[this.speed];
     this.score = 0;
+    this.eatenPositive = 0;
+    this.eatenNegative = 0;
     this.chips = [];
     this.explosionCell = null;
     this.explosionStart = 0;
@@ -709,10 +749,14 @@ export class SnakeEngine {
       // Apply the signed payload, clamped ≥0 (a penalty never underflows the floor).
       this.score = Math.max(SCORE_FLOOR, this.score + r.value);
       if (r.value > 0) {
+        this.eatenPositive++;
         // The POSITIVE is the reward → it ramps the step timer (the classic
         // per-pellet accel). Negatives give no speed reward (eating one is a mistake).
         this.stepMs = Math.max(STEP_FLOOR, this.stepMs - STEP_ACCEL);
-      } else if (animate) {
+      } else {
+        this.eatenNegative++;
+      }
+      if (r.value < 0 && animate) {
         // A NEGATIVE grab sparks a pure-red "ouch" whose chip COUNT scales with the
         // magnitude (the lone non-lethal thing that explodes).
         this.explodeAt({ x: nx, y: ny }, -r.value);
@@ -733,6 +777,8 @@ export class SnakeEngine {
       ate,
       score: this.score,
       length: this.snake.length,
+      eatenPositive: this.eatenPositive,
+      eatenNegative: this.eatenNegative,
     };
   }
 
@@ -761,7 +807,7 @@ export class SnakeEngine {
         vy: Math.sin(ang) * spd - 0.05, // a touch of initial lift
         // Bigger blasts throw slightly bigger chips too (colour stays red).
         size: (0.12 + Math.random() * 0.16) * (0.9 + 0.3 * intensity),
-        color: RABBIT_RED, // ALWAYS red — no accent/white mix (owner rule)
+        color: this.palette.rabbitRed, // ALWAYS red — no accent/white mix (owner rule)
       };
     });
   }
@@ -772,6 +818,8 @@ export class SnakeEngine {
       ate: false,
       score: this.score,
       length: this.snake.length,
+      eatenPositive: this.eatenPositive,
+      eatenNegative: this.eatenNegative,
     };
   }
 
@@ -781,7 +829,7 @@ export class SnakeEngine {
    *  Internal lines only (no outer frame — the board stays borderless). */
   private drawGrid(ctx: CanvasRenderingContext2D, cssW: number, cssH: number) {
     const cell = cssW / GRID_W; // === cssH / GRID_H (square cells, pinned aspect)
-    ctx.strokeStyle = GRID_LINE;
+    ctx.strokeStyle = this.palette.gridLine;
     ctx.lineWidth = 1;
     ctx.beginPath();
     for (let i = 1; i < GRID_W; i++) {
@@ -798,7 +846,7 @@ export class SnakeEngine {
     // Outer frame — the board edges (the lines above are internal only, so the
     // canvas rim would otherwise be unbordered). A stronger line than the inner
     // grid so the field boundary always reads, on any theme bg.
-    ctx.strokeStyle = FRAME_LINE;
+    ctx.strokeStyle = this.palette.frameLine;
     ctx.strokeRect(0.5, 0.5, cssW - 1, cssH - 1);
   }
 
@@ -969,7 +1017,7 @@ export class SnakeEngine {
       dpr,
       at,
       RABBIT_PLAIN,
-      solidColor(RABBIT_WHITE),
+      solidColor(this.palette.rabbitBody),
       RABBIT_BODY_SCALE,
       0,
       0,
@@ -1008,7 +1056,7 @@ export class SnakeEngine {
       dpr,
       at,
       stripedRabbit(rank),
-      stripeColor(RABBIT_RED),
+      stripeColor(this.palette.rabbitBody, this.palette.rabbitRed),
       RABBIT_BODY_SCALE,
       bob,
       0,
@@ -1046,7 +1094,7 @@ export class SnakeEngine {
       dpr,
       at,
       RABBIT_KILLER,
-      killerColor,
+      killerColor(this.palette.rabbitRed),
       RABBIT_BODY_SCALE * pulse
     );
   }
@@ -1069,7 +1117,7 @@ export class SnakeEngine {
   /**
    * Paint one snake-body SQUARE for cell `at`, in `color`, at full opacity. A
    * slightly inset square (a {@link GLYPH_BG_INSET}-cell margin each side) so the
-   * body reads as a stream of distinct squares on the dark {@link BOARD_BG}
+   * body reads as a stream of distinct squares on the board field
    * rather than one solid block; the inset + box are snapped to the device-pixel
    * grid so the fill stays crisp (no blur), matching the sprite rasteriser's
    * discipline. The size is floored to ≥1 device px so the square never rounds
@@ -1099,8 +1147,8 @@ export class SnakeEngine {
 
   /**
    * Draw the snake as a STREAM OF SQUARES that follows its body. The HEAD is a
-   * bright accent-green square ({@link GLYPH_BODY}) at full opacity; toward the
-   * tail the square BOTH dims in colour (lerps to {@link GLYPH_TAIL}, deep green)
+   * bright accent square (`palette.snakeHead`) at full opacity; toward the
+   * tail the square BOTH dims in colour (lerps to `palette.snakeTail`)
    * AND fades in opacity (down to {@link GLYPH_TAIL_ALPHA}), so the figure is
    * brightest where the creature is "now" and dissolves into its wake.
    *
@@ -1118,7 +1166,11 @@ export class SnakeEngine {
       const seg = this.snake[i];
       // `t` is 0 at the head, 1 at the tail.
       const t = len <= 1 ? 0 : i / (len - 1);
-      const color = lerpHex(GLYPH_BODY, GLYPH_TAIL, t * 0.9);
+      const color = lerpHex(
+        this.palette.snakeHead,
+        this.palette.snakeTail,
+        t * 0.9
+      );
       const alpha = 1 - (1 - GLYPH_TAIL_ALPHA) * t;
       this.drawSquare(ctx, cell, dpr, seg, color, alpha);
     }
@@ -1159,9 +1211,9 @@ export class SnakeEngine {
     ctx.globalAlpha = 1;
   }
 
-  /** Paint the opaque gray field + grid behind the overlay. */
+  /** Paint the opaque theme field + grid behind the overlay. */
   drawIdle(ctx: CanvasRenderingContext2D, cssW: number, cssH: number) {
-    ctx.fillStyle = BOARD_BG;
+    ctx.fillStyle = this.palette.boardBg;
     ctx.fillRect(0, 0, cssW, cssH);
     this.drawGrid(ctx, cssW, cssH);
   }
@@ -1180,8 +1232,8 @@ export class SnakeEngine {
   ) {
     const cell = cssW / GRID_W; // === cssH / GRID_H (square cells)
     this.frame++;
-    // Opaque gray field, repainted each frame, then the grid.
-    ctx.fillStyle = BOARD_BG;
+    // Opaque theme field, repainted each frame, then the grid.
+    ctx.fillStyle = this.palette.boardBg;
     ctx.fillRect(0, 0, cssW, cssH);
     this.drawGrid(ctx, cssW, cssH);
 

@@ -103,6 +103,10 @@ export function Sparkline({
   labelClassName?: string;
 }) {
   const max = Math.max(1, ...series.map((s) => s.count));
+  // All-zero series = "no data yet" — the chart goes muted so accent stays a
+  // data signal (the stat color rule). Any non-zero point flips it to accent.
+  const empty = series.every((s) => s.count === 0);
+  const tone = empty ? "var(--m-muted2)" : "var(--m-accent)";
   const pts = series.map((s, i) => ({
     x: px(i, series.length),
     y: py(s.count, max),
@@ -135,11 +139,11 @@ export function Sparkline({
               <stop offset="100%" stopColor="var(--m-accent)" stopOpacity="0" />
             </linearGradient>
           </defs>
-          <path d={area} fill={`url(#${gradientId})`} />
+          {!empty && <path d={area} fill={`url(#${gradientId})`} />}
           <path
             d={line}
             fill="none"
-            stroke="var(--m-accent)"
+            stroke={tone}
             strokeWidth={1.5}
             strokeLinejoin="round"
             strokeLinecap="round"
@@ -150,8 +154,12 @@ export function Sparkline({
           <span
             key={i}
             aria-hidden
-            className="absolute size-[5px] -translate-x-1/2 -translate-y-1/2 bg-[var(--m-accent)]"
-            style={{ left: `${p.x}%`, top: `${(p.y / VB_H) * 100}%` }}
+            className="absolute size-[5px] -translate-x-1/2 -translate-y-1/2"
+            style={{
+              left: `${p.x}%`,
+              top: `${(p.y / VB_H) * 100}%`,
+              backgroundColor: tone,
+            }}
           />
         ))}
       </div>
