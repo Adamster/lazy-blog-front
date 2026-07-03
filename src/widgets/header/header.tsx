@@ -37,8 +37,8 @@ export function Header() {
             <HeaderLockup />
             {isAuthenticated && (
               <Link
-                href="/arcade/follow-the-rabbit"
-                aria-label="Follow the white rabbit"
+                href="/arcade"
+                aria-label="Arcade"
                 className="mono-jiggle mono-focus ml-3 hidden shrink-0 opacity-80 transition-opacity hover:opacity-100 focus-visible:opacity-100 sm:inline-flex"
               >
                 <RabbitMark
