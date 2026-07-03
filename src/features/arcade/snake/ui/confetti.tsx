@@ -3,9 +3,24 @@
 import { useEffect, useRef } from "react";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 
-const CONFETTI_COLORS = ["#cdff48", "#e6e6e6", "#7d7d7d"] as const;
+/** Chip trio: accent + fg resolved from the AMBIENT `--m-*` tokens (the board is
+ *  theme-native, so a fixed white chip would vanish on the light field) + a mid
+ *  gray that reads on both themes. */
+const CONFETTI_FALLBACK = ["#cdff48", "#e6e6e6", "#7d7d7d"] as const;
+const CONFETTI_GRAY = "#7d7d7d";
 const PARTICLE_COUNT = 90;
 const DURATION_MS = 2600;
+
+function resolveConfettiColors(el: Element): string[] {
+  const cs = getComputedStyle(el);
+  const read = (name: string, fallback: string) =>
+    cs.getPropertyValue(name).trim() || fallback;
+  return [
+    read("--m-accent", CONFETTI_FALLBACK[0]),
+    read("--m-fg", CONFETTI_FALLBACK[1]),
+    CONFETTI_GRAY,
+  ];
+}
 
 interface Particle {
   x: number;
@@ -44,13 +59,14 @@ export function Confetti() {
     };
     size();
 
+    const colors = resolveConfettiColors(canvas);
     particles = Array.from({ length: PARTICLE_COUNT }, () => ({
       x: w * (0.35 + Math.random() * 0.3),
       y: h * (0.18 + Math.random() * 0.12),
       vx: (Math.random() - 0.5) * 7,
       vy: Math.random() * -5 - 2,
       size: 4 + Math.random() * 5,
-      color: CONFETTI_COLORS[(Math.random() * CONFETTI_COLORS.length) | 0],
+      color: colors[(Math.random() * colors.length) | 0],
       rot: Math.random() * Math.PI,
       vr: (Math.random() - 0.5) * 0.3,
     }));

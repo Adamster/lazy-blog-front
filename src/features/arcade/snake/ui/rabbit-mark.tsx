@@ -31,20 +31,20 @@ export function RabbitMark({
       style={{ display: "block" }}
     >
       {RABBIT_PLAIN.flatMap((row, y) =>
-        row
-          .split("")
-          .map((ch, x) =>
-            ch === "1" ? (
-              <rect
-                key={`${x}-${y}`}
-                x={x}
-                y={y}
-                width={1}
-                height={1}
-                fill={fill}
-              />
-            ) : null
-          )
+        row.split("").map((ch, x) =>
+          ch === "1" ? (
+            <rect
+              key={`${x}-${y}`}
+              x={x}
+              y={y}
+              width={1}
+              height={1}
+              // style, not the `fill` attribute — var(--m-*) fills don't
+              // resolve in an SVG presentation attribute.
+              style={{ fill }}
+            />
+          ) : null
+        )
       )}
     </svg>
   );
