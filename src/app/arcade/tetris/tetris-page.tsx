@@ -1,26 +1,22 @@
 "use client";
 
-import { ProtectedRoute } from "@/entities/session";
 import {
   HISTORY_RECENT,
   TetrisBoard,
   TetrisLeaderboard,
   useTetrisArcade,
 } from "@/features/arcade/tetris";
-import { BoardEyebrow, StatsBand } from "@/features/arcade/shared";
+import {
+  BOARD_GRID_RAIL,
+  BoardEyebrow,
+  BoardSignInTeaser,
+  StatsBand,
+} from "@/features/arcade/shared";
 
-// Login-only — scores persist per user, so the whole page sits behind ProtectedRoute
-// (same as the Snake arcade).
+// Public — signed-out play is local-only (the arcade hook gates submit/stats on auth).
 export default function TetrisPage() {
-  return (
-    <ProtectedRoute>
-      <TetrisArcade />
-    </ProtectedRoute>
-  );
-}
-
-function TetrisArcade() {
-  const { game, board, statsLoading, boardLoading } = useTetrisArcade();
+  const { game, board, statsLoading, boardLoading, showBoard } =
+    useTetrisArcade();
   const { state } = game;
 
   return (
@@ -38,7 +34,7 @@ function TetrisArcade() {
           gradientId="tetrisScoreSparkGrad"
         />
 
-        <div className="mt-10 grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className={BOARD_GRID_RAIL}>
           <div>
             <BoardEyebrow
               stats={[
@@ -46,9 +42,13 @@ function TetrisArcade() {
                 { label: "Level", value: state.level },
               ]}
             />
-            <TetrisBoard api={game} />
+            <TetrisBoard api={game} canRank={showBoard} />
           </div>
-          <TetrisLeaderboard board={board} loading={boardLoading} />
+          {showBoard ? (
+            <TetrisLeaderboard board={board} loading={boardLoading} />
+          ) : (
+            <BoardSignInTeaser />
+          )}
         </div>
       </main>
     </div>

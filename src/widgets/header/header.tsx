@@ -35,19 +35,17 @@ export function Header() {
         <div className="flex h-full items-center justify-between px-5">
           <div className="flex items-center">
             <HeaderLockup />
-            {isAuthenticated && (
-              <Link
-                href="/arcade"
-                aria-label="Arcade"
-                className="mono-jiggle mono-focus ml-3 hidden shrink-0 opacity-80 transition-opacity hover:opacity-100 focus-visible:opacity-100 sm:inline-flex"
-              >
-                <RabbitMark
-                  size={16}
-                  fill={theme === "light" ? "var(--m-error)" : undefined}
-                  className="mono-jiggle__mark"
-                />
-              </Link>
-            )}
+            <Link
+              href="/arcade"
+              aria-label="Arcade"
+              className="mono-jiggle mono-focus ml-3 hidden shrink-0 opacity-80 transition-opacity hover:opacity-100 focus-visible:opacity-100 sm:inline-flex"
+            >
+              <RabbitMark
+                size={16}
+                fill={theme === "light" ? "var(--m-error)" : undefined}
+                className="mono-jiggle__mark"
+              />
+            </Link>
           </div>
 
           {/* The `@handle` lives OUTSIDE `menuRef` so it doesn't trip the

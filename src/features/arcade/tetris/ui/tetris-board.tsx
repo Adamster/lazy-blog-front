@@ -5,6 +5,7 @@ import {
   GameOverOverlay,
   MenuOverlay,
   PauseOverlay,
+  rankLine,
 } from "@/features/arcade/shared";
 import type { TetrisGameApi } from "../model/types";
 
@@ -27,13 +28,17 @@ const KEY_HINTS: [string, string][] = [
  * AMBIENT `--m-*` tokens, and the canvas palette is resolved from those same
  * tokens in the hook.
  */
-export function TetrisBoard({ api }: { api: TetrisGameApi }) {
+export function TetrisBoard({
+  api,
+  canRank = true,
+}: {
+  api: TetrisGameApi;
+  /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
+  canRank?: boolean;
+}) {
   const { canvasRef, nextCanvasRef, panelRef, start, state } = api;
 
-  const rankLine =
-    state.rank > 0
-      ? `Ranked #${state.rank} on the board`
-      : "Off the board — clear more lines";
+  const rankClause = rankLine(state.rank, canRank, "clear more lines");
 
   // The play surface is BARE (owner call: no `--m-card` band, no inner padding) —
   // the bordered well IS the stage, full height of the board footprint; the menu /
@@ -61,9 +66,10 @@ export function TetrisBoard({ api }: { api: TetrisGameApi }) {
         {/* Beside the well only the gameplay-critical NEXT preview remains — run
             stats (Score/Lines/Level) live in the top stats band (owner call: no
             duplicated HUD next to the game). Unlabelled by owner call: the preview
-            cube is self-explanatory, top-aligned with the well. Its cells are 1:1
-            with the well's — the hook sizes the canvas to NEXT_COLS·cell; `size-16`
-            is only the pre-hydration fallback, so the panel is width-auto. */}
+            cube is self-explanatory, top-aligned with the well. Its cells track
+            the well's at NEXT_CELL_SCALE — the hook sizes the canvas to
+            NEXT_COLS·cell·scale; `size-16` is only the pre-hydration fallback,
+            so the panel is width-auto. */}
         <div ref={panelRef} className="shrink-0">
           <canvas
             ref={nextCanvasRef}
@@ -88,7 +94,7 @@ export function TetrisBoard({ api }: { api: TetrisGameApi }) {
         <GameOverOverlay
           isNewBest={state.isNewBest}
           score={state.score}
-          detail={`${state.lines} lines · level ${state.level} · ${rankLine}`}
+          detail={`${state.lines} lines · level ${state.level} · ${rankClause}`}
           onRestart={start}
         />
       )}

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { ProtectedRoute } from "@/entities/session";
+import { useAuth } from "@/entities/session";
 import { SnakeMark } from "@/features/arcade/snake-classic";
 import { Mark2048 } from "@/features/arcade/2048";
 import { RabbitChaseMark } from "./rabbit-chase-mark";
@@ -23,6 +23,9 @@ interface GameEntry {
   /** The mark's own pixel grid — cell size (px) + the cells the mark spans.
    *  Drives the CellField so the figure sits ON the field like a real render. */
   field: { cell: number; spanX: number; spanY: number };
+  /** Temporarily delisted from the hub (owner call) — the route stays live;
+   *  drop the flag to relist. */
+  hidden?: boolean;
 }
 
 // Hollow Sloth is an unlisted prototype — deliberately absent here.
@@ -61,6 +64,7 @@ const GAMES: GameEntry[] = [
     title: "2048",
     mark: <Mark2048 size={CELL_2048 * 2} />,
     field: { cell: CELL_2048, spanX: 2, spanY: 2 },
+    hidden: true,
   },
 ];
 
@@ -137,7 +141,10 @@ function TopPlayerLine({ row }: { row: TopPlayerRow }) {
 }
 
 function GameCard({ game }: { game: GameEntry }) {
-  const { data } = useGameLeaderboard(game.game);
+  // Signed-out viewers get no leaderboard surfaces on the card at all (the GET
+  // is auth-only; play is fully local) — just the field + title (owner call).
+  const { isAuthenticated } = useAuth();
+  const { data } = useGameLeaderboard(game.game, isAuthenticated);
   const rows = rankTopPlayers(data?.entries ?? []);
 
   return (
@@ -152,14 +159,18 @@ function GameCard({ game }: { game: GameEntry }) {
             {game.title}
           </Link>
         </h2>
-        <div className="mt-6 pb-3.5 text-[11px] tracking-[0.12em] text-[var(--m-accent)] uppercase">
-          {"// Top players"}
-        </div>
-        <div>
-          {rows.map((row) => (
-            <TopPlayerLine key={row.rank} row={row} />
-          ))}
-        </div>
+        {isAuthenticated && (
+          <>
+            <div className="mt-6 pb-3.5 text-[11px] tracking-[0.12em] text-[var(--m-accent)] uppercase">
+              {"// Top players"}
+            </div>
+            <div>
+              {rows.map((row) => (
+                <TopPlayerLine key={row.rank} row={row} />
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </ScreenCard>
   );
@@ -167,17 +178,9 @@ function GameCard({ game }: { game: GameEntry }) {
 
 /** The `/arcade` hub — lists the playable arcade titles. Layout mirrors the game
  *  pages' shell (full-bleed mono scope, 1240 max column, 40px gutter).
- *  Login-only like every game page (scores are per-user) — the hub itself sits
- *  behind the same ProtectedRoute so the whole arcade area is one gate. */
+ *  Public like every game page — signed-out visitors play local-only (the game
+ *  hooks gate submit/stats/leaderboard on auth; no board surfaces signed out). */
 export function ArcadePage() {
-  return (
-    <ProtectedRoute>
-      <ArcadeHub />
-    </ProtectedRoute>
-  );
-}
-
-function ArcadeHub() {
   return (
     <div
       className="mono-scope min-h-app mx-[calc(50%-50vw)] w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
@@ -190,7 +193,7 @@ function ArcadeHub() {
         </div>
 
         <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
-          {GAMES.map((game) => (
+          {GAMES.filter((game) => !game.hidden).map((game) => (
             <GameCard key={game.href} game={game} />
           ))}
         </div>

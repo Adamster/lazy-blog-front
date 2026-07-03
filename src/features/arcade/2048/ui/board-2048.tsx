@@ -9,6 +9,7 @@ import {
   OverlayDetail,
   OverlayHeading,
   OverlayRail,
+  rankLine,
 } from "@/features/arcade/shared";
 import { Button } from "@/shared/ui";
 import type { Game2048Api } from "../model/types";
@@ -29,13 +30,17 @@ const KEY_HINTS: [string, string][] = [
  * THEME-NATIVE (like Tetris): NO forced `dark` scope — board, HUD and overlays read
  * the AMBIENT `--m-*` tokens; the canvas palette is resolved from them in the hook.
  */
-export function Board2048({ api }: { api: Game2048Api }) {
+export function Board2048({
+  api,
+  canRank = true,
+}: {
+  api: Game2048Api;
+  /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
+  canRank?: boolean;
+}) {
   const { state, canvasRef, start, continueRun } = api;
 
-  const rankLine =
-    state.rank > 0
-      ? `Ranked #${state.rank} on the board`
-      : "Off the board — merge higher";
+  const rankClause = rankLine(state.rank, canRank, "merge higher");
 
   return (
     // BARE play surface (owner call: no `--m-card` band, no inner padding) — the
@@ -85,7 +90,7 @@ export function Board2048({ api }: { api: Game2048Api }) {
         <GameOverOverlay
           isNewBest={state.isNewBest}
           score={state.score}
-          detail={`${state.moves} moves · ${rankLine}`}
+          detail={`${state.moves} moves · ${rankClause}`}
           onRestart={start}
         />
       )}

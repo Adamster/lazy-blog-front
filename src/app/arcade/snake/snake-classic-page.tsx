@@ -1,25 +1,22 @@
 "use client";
 
-import { ProtectedRoute } from "@/entities/session";
 import {
   HISTORY_RECENT,
   SnakeClassicBoard,
   SnakeClassicLeaderboard,
   useSnakeClassicArcade,
 } from "@/features/arcade/snake-classic";
-import { BoardEyebrow, StatsBand } from "@/features/arcade/shared";
+import {
+  BOARD_GRID_RAIL,
+  BoardEyebrow,
+  BoardSignInTeaser,
+  StatsBand,
+} from "@/features/arcade/shared";
 
-// Login-only — scores persist per user, so the whole page sits behind ProtectedRoute.
+// Public — signed-out play is local-only (the arcade hook gates submit/stats on auth).
 export default function SnakeClassicPage() {
-  return (
-    <ProtectedRoute>
-      <SnakeClassicArcade />
-    </ProtectedRoute>
-  );
-}
-
-function SnakeClassicArcade() {
-  const { game, board, statsLoading, boardLoading } = useSnakeClassicArcade();
+  const { game, board, statsLoading, boardLoading, showBoard } =
+    useSnakeClassicArcade();
   const { state } = game;
 
   return (
@@ -37,12 +34,16 @@ function SnakeClassicArcade() {
           gradientId="snakeClassicScoreSparkGrad"
         />
 
-        <div className="mt-10 grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className={BOARD_GRID_RAIL}>
           <div>
             <BoardEyebrow stats={[{ label: "Eaten", value: state.eaten }]} />
-            <SnakeClassicBoard api={game} />
+            <SnakeClassicBoard api={game} canRank={showBoard} />
           </div>
-          <SnakeClassicLeaderboard board={board} loading={boardLoading} />
+          {showBoard ? (
+            <SnakeClassicLeaderboard board={board} loading={boardLoading} />
+          ) : (
+            <BoardSignInTeaser />
+          )}
         </div>
       </main>
     </div>

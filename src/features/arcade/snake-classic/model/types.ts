@@ -58,4 +58,6 @@ export interface UseSnakeClassicGameOptions {
   best?: number;
   /** Fired ONCE per finished run with its final score. */
   onGameOver?: (score: number) => void;
+  /** localStorage identity scope for the run log — username or guest bucket. */
+  historyScope?: string;
 }

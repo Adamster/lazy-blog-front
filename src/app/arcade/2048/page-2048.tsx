@@ -1,26 +1,22 @@
 "use client";
 
-import { ProtectedRoute } from "@/entities/session";
 import {
   Board2048,
   HISTORY_RECENT,
   Leaderboard2048,
   use2048Arcade,
 } from "@/features/arcade/2048";
-import { BoardEyebrow, StatsBand } from "@/features/arcade/shared";
+import {
+  BOARD_GRID_RAIL,
+  BoardEyebrow,
+  BoardSignInTeaser,
+  StatsBand,
+} from "@/features/arcade/shared";
 
-// Login-only — scores persist per user, so the whole page sits behind ProtectedRoute
-// (same as the Tetris arcade).
+// Public — signed-out play is local-only (the arcade hook gates submit/stats on auth).
 export default function Page2048() {
-  return (
-    <ProtectedRoute>
-      <Arcade2048 />
-    </ProtectedRoute>
-  );
-}
-
-function Arcade2048() {
-  const { game, board, statsLoading, boardLoading } = use2048Arcade();
+  const { game, board, statsLoading, boardLoading, showBoard } =
+    use2048Arcade();
   const { state } = game;
 
   return (
@@ -38,12 +34,16 @@ function Arcade2048() {
           gradientId="score2048SparkGrad"
         />
 
-        <div className="mt-10 grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className={BOARD_GRID_RAIL}>
           <div>
             <BoardEyebrow stats={[{ label: "Moves", value: state.moves }]} />
-            <Board2048 api={game} />
+            <Board2048 api={game} canRank={showBoard} />
           </div>
-          <Leaderboard2048 board={board} loading={boardLoading} />
+          {showBoard ? (
+            <Leaderboard2048 board={board} loading={boardLoading} />
+          ) : (
+            <BoardSignInTeaser />
+          )}
         </div>
       </main>
     </div>

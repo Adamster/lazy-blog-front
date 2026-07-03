@@ -1,6 +1,5 @@
 "use client";
 
-import { ProtectedRoute } from "@/entities/session";
 import {
   HISTORY_RECENT,
   ScorePops,
@@ -8,19 +7,17 @@ import {
   SnakeLeaderboard,
   useSnakeArcade,
 } from "@/features/arcade/snake";
-import { BoardEyebrow, StatsBand } from "@/features/arcade/shared";
+import {
+  BOARD_GRID_RAIL,
+  BoardEyebrow,
+  BoardSignInTeaser,
+  StatsBand,
+} from "@/features/arcade/shared";
 
-// Login-only — scores persist per user, so the whole page sits behind ProtectedRoute.
+// Public — signed-out play is local-only (the arcade hook gates submit/stats on auth).
 export default function SnakePage() {
-  return (
-    <ProtectedRoute>
-      <SnakeArcade />
-    </ProtectedRoute>
-  );
-}
-
-function SnakeArcade() {
-  const { game, board, statsLoading, boardLoading } = useSnakeArcade();
+  const { game, board, statsLoading, boardLoading, showBoard } =
+    useSnakeArcade();
   const { state } = game;
 
   return (
@@ -43,7 +40,7 @@ function SnakeArcade() {
           }
         />
 
-        <div className="mt-10 grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className={BOARD_GRID_RAIL}>
           <div>
             <BoardEyebrow
               stats={[
@@ -51,9 +48,13 @@ function SnakeArcade() {
                 { label: "Penalties", value: state.eatenNegative },
               ]}
             />
-            <SnakeBoard api={game} />
+            <SnakeBoard api={game} canRank={showBoard} />
           </div>
-          <SnakeLeaderboard board={board} loading={boardLoading} />
+          {showBoard ? (
+            <SnakeLeaderboard board={board} loading={boardLoading} />
+          ) : (
+            <BoardSignInTeaser />
+          )}
         </div>
       </main>
     </div>

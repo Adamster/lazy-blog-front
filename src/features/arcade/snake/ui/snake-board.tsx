@@ -5,6 +5,7 @@ import {
   GameOverOverlay,
   MenuOverlay,
   PauseOverlay,
+  rankLine,
 } from "@/features/arcade/shared";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 import { useTheme } from "@/shared/ui/theme";
@@ -23,7 +24,14 @@ const KEY_HINTS: [string, string][] = [
  *  THEME-NATIVE (the classic-Snake/Tetris pattern): NO forced `dark` scope — the
  *  board and overlays read the AMBIENT `--m-*` tokens, and the canvas palette is
  *  resolved from those same tokens in the hook. */
-export function SnakeBoard({ api }: { api: SnakeGameApi }) {
+export function SnakeBoard({
+  api,
+  canRank = true,
+}: {
+  api: SnakeGameApi;
+  /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
+  canRank?: boolean;
+}) {
   const { state, canvasRef, start } = api;
   const reduce = prefersReducedMotion();
   // The prize rabbit is `--m-fg`-tinted — white on the dark field, ink on light —
@@ -33,10 +41,7 @@ export function SnakeBoard({ api }: { api: SnakeGameApi }) {
     ? "Follow the White Rabbit"
     : "Follow the Black Rabbit";
 
-  const rankLine =
-    state.rank > 0
-      ? `Ranked #${state.rank} on the board`
-      : "Off the board — eat more, grow longer";
+  const rankClause = rankLine(state.rank, canRank, "eat more, grow longer");
 
   return (
     <div className="mono-scope relative aspect-[30/18] w-full bg-[var(--m-bg)]">
@@ -63,7 +68,7 @@ export function SnakeBoard({ api }: { api: SnakeGameApi }) {
         <GameOverOverlay
           isNewBest={state.isNewBest}
           score={state.score}
-          detail={rankLine}
+          detail={rankClause}
           onRestart={start}
         />
       )}

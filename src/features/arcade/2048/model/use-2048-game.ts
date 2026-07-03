@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 import { Engine2048, GRID, parseHexRgb, type Palette2048 } from "./engine";
+import { GUEST_SCOPE } from "@/features/arcade/shared";
 import { loadHistory, recentSeries, recordScore } from "./score-history";
 import type {
   Direction,
@@ -77,6 +78,7 @@ export function use2048Game({
   best = 0,
   onGameOver,
   onWin,
+  historyScope = GUEST_SCOPE,
 }: Use2048GameOptions = {}): Game2048Api {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const engineRef = useRef<Engine2048 | null>(null);
@@ -94,6 +96,7 @@ export function use2048Game({
   const screenRef = useRef(state.screen);
   const bestRef = useRef(best);
   const onGameOverRef = useRef(onGameOver);
+  const historyScopeRef = useRef(historyScope);
   const onWinRef = useRef(onWin);
   // Single score-log source the game-over handler appends to (no double-count on re-render).
   const historyRef = useRef<number[]>([]);
@@ -110,7 +113,8 @@ export function use2048Game({
     bestRef.current = best;
     onGameOverRef.current = onGameOver;
     onWinRef.current = onWin;
-  }, [best, onGameOver, onWin]);
+    historyScopeRef.current = historyScope;
+  }, [best, onGameOver, onWin, historyScope]);
 
   // Reflect the incoming server best into state. Deferred via rAF — repo lint rule:
   // no synchronous setState inside an effect.
@@ -121,15 +125,16 @@ export function use2048Game({
     return () => cancelAnimationFrame(raf);
   }, [best]);
 
-  // Hydrate the log from localStorage on mount; deferred via rAF (repo lint rule).
+  // Hydrate the log from localStorage on mount + whenever the identity scope
+  // changes (login/logout swaps in that identity's log); rAF-deferred (lint rule).
   useEffect(() => {
     const raf = requestAnimationFrame(() => {
-      const log = loadHistory();
+      const log = loadHistory(historyScope);
       historyRef.current = log;
       setHistory(recentSeries(log));
     });
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [historyScope]);
 
   // One-shot direction edge the loop feeds the engine (consumed there).
   const inputRef = useRef<Input2048>({ dir: null });
@@ -160,7 +165,7 @@ export function use2048Game({
 
   // Fires exactly ONCE per run (see endedRef).
   const handleGameOver = useCallback((score: number) => {
-    const log = recordScore(historyRef.current, score);
+    const log = recordScore(historyScopeRef.current, historyRef.current, score);
     historyRef.current = log;
     setHistory(recentSeries(log));
     onGameOverRef.current?.(score);

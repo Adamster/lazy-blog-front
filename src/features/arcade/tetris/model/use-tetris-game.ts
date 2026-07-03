@@ -5,11 +5,13 @@ import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 import {
   COLS,
   ROWS,
+  NEXT_CELL_SCALE,
   NEXT_COLS,
   NEXT_ROWS,
   TetrisEngine,
   type TetrisPalette,
 } from "./engine";
+import { GUEST_SCOPE } from "@/features/arcade/shared";
 import { loadHistory, recentSeries, recordScore } from "./score-history";
 import type {
   HistoryPoint,
@@ -81,6 +83,7 @@ function resolvePalette(el: Element): TetrisPalette {
 export function useTetrisGame({
   best = 0,
   onGameOver,
+  historyScope = GUEST_SCOPE,
 }: UseTetrisGameOptions = {}): TetrisGameApi {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const nextCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -101,6 +104,7 @@ export function useTetrisGame({
   const pausedRef = useRef(state.paused);
   const bestRef = useRef(best);
   const onGameOverRef = useRef(onGameOver);
+  const historyScopeRef = useRef(historyScope);
   // Single score-log source the game-over handler appends to (no double-count on re-render).
   const historyRef = useRef<number[]>([]);
   // Guards handleGameOver to fire ONCE per run: `update` keeps returning dead every
@@ -116,7 +120,8 @@ export function useTetrisGame({
   useEffect(() => {
     bestRef.current = best;
     onGameOverRef.current = onGameOver;
-  }, [best, onGameOver]);
+    historyScopeRef.current = historyScope;
+  }, [best, onGameOver, historyScope]);
 
   // Reflect the incoming server best into state. Deferred via rAF — repo lint rule:
   // no synchronous setState inside an effect.
@@ -127,15 +132,16 @@ export function useTetrisGame({
     return () => cancelAnimationFrame(raf);
   }, [best]);
 
-  // Hydrate the log from localStorage on mount; deferred via rAF (repo lint rule).
+  // Hydrate the log from localStorage on mount + whenever the identity scope
+  // changes (login/logout swaps in that identity's log); rAF-deferred (lint rule).
   useEffect(() => {
     const raf = requestAnimationFrame(() => {
-      const log = loadHistory();
+      const log = loadHistory(historyScope);
       historyRef.current = log;
       setHistory(recentSeries(log));
     });
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [historyScope]);
 
   // Live input the loop feeds the engine. Rotate edges are consumed (cleared) by the engine.
   const inputRef = useRef<TetrisInput>({
@@ -184,7 +190,7 @@ export function useTetrisGame({
   // Fires exactly ONCE per run: the engine reports `dead`, the screen flips to "over"
   // so the sim no longer advances — the append + submit happen once.
   const handleGameOver = useCallback((score: number) => {
-    const log = recordScore(historyRef.current, score);
+    const log = recordScore(historyScopeRef.current, historyRef.current, score);
     historyRef.current = log;
     setHistory(recentSeries(log));
     onGameOverRef.current?.(score);
@@ -254,16 +260,17 @@ export function useTetrisGame({
       canvas.height = Math.round(cssH * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // NEXT cells are 1:1 with the WELL's (owner call): the square preview canvas
-      // is sized to `NEXT_COLS·cell`, so the piece renders at true in-game scale.
+      // NEXT cells track the WELL's at NEXT_CELL_SCALE (owner call: 1:1 read too
+      // big) — the square preview canvas is sized to `NEXT_COLS·cell·scale`.
       // JS-driven like the well; the CSS `size-16` is only the pre-hydration
       // fallback. (The panel is measured BEFORE this write; the ResizeObserver on
       // the canvas re-runs resize once after the change, and the height-bound cell
       // math converges immediately.)
       const nc = nextCanvasRef.current;
       if (nc && nextCtx) {
-        const nw = cell * NEXT_COLS;
-        const nh = cell * NEXT_ROWS;
+        const nCell = cell * NEXT_CELL_SCALE;
+        const nw = nCell * NEXT_COLS;
+        const nh = nCell * NEXT_ROWS;
         nc.style.width = `${nw}px`;
         nc.style.height = `${nh}px`;
         nc.width = Math.round(nw * dpr);

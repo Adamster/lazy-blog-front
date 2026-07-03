@@ -5,7 +5,7 @@ import { arcadeKeys, LEADERBOARD_TAKE, SNAKE_GAME } from "./arcade-keys";
 /** Global Snake high-score board (top {@link LEADERBOARD_TAKE}, cross-user). Long
  *  `staleTime`; a finished run invalidates it (`useSubmitScore`) — refreshes when
  *  it changes, not on a timer. */
-export function useSnakeLeaderboard() {
+export function useSnakeLeaderboard(enabled = true) {
   return useQuery({
     queryKey: arcadeKeys.leaderboard(SNAKE_GAME, LEADERBOARD_TAKE),
     queryFn: () =>
@@ -14,5 +14,6 @@ export function useSnakeLeaderboard() {
         take: LEADERBOARD_TAKE,
       }),
     staleTime: 60_000,
+    enabled,
   });
 }

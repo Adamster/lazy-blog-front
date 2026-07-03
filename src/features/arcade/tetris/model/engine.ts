@@ -25,6 +25,9 @@ export const ROWS = 20;
  *  square, so `cssW / NEXT_COLS === cssH / NEXT_ROWS`. */
 export const NEXT_COLS = 4;
 export const NEXT_ROWS = 4;
+/** NEXT-preview cell = well cell × this — a notch under in-game scale (owner
+ *  call: the 1:1 preview read too big beside the well). */
+export const NEXT_CELL_SCALE = 0.75;
 
 // ---------- timing (ms) ----------
 
@@ -675,8 +678,8 @@ export class TetrisEngine {
     const bh = maxR - minR + 1;
     // Centre the BOUNDING BOX optically on both axes: a FRACTIONAL cell offset (e.g.
     // a 3-wide piece in the 4-wide box → 0.5-cell margins). Fine because the preview
-    // is GRIDLESS (owner call — a grid was tried and removed; the cells still match
-    // the well's 1:1, so the piece is at true in-game scale); `fillCell` pixel-snaps
+    // is GRIDLESS (owner call — a grid was tried and removed; the cells track the
+    // well's at NEXT_CELL_SCALE, a notch under in-game scale); `fillCell` pixel-snaps
     // each edge, so the fractional offset stays crisp.
     const offX = (NEXT_COLS - bw) / 2 - minC;
     const offY = (NEXT_ROWS - bh) / 2 - minR;

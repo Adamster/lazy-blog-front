@@ -5,6 +5,7 @@ import {
   GameOverOverlay,
   MenuOverlay,
   PauseOverlay,
+  rankLine,
 } from "@/features/arcade/shared";
 import type { SnakeClassicGameApi } from "../model/types";
 
@@ -20,13 +21,17 @@ const KEY_HINTS: [string, string][] = [
  *  THEME-NATIVE (the Tetris pattern): NO forced `dark` scope — the board and
  *  overlays read the AMBIENT `--m-*` tokens, and the canvas palette is resolved
  *  from those same tokens in the hook. */
-export function SnakeClassicBoard({ api }: { api: SnakeClassicGameApi }) {
+export function SnakeClassicBoard({
+  api,
+  canRank = true,
+}: {
+  api: SnakeClassicGameApi;
+  /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
+  canRank?: boolean;
+}) {
   const { state, canvasRef, start } = api;
 
-  const rankLine =
-    state.rank > 0
-      ? `Ranked #${state.rank} on the board`
-      : "Off the board — eat more, grow longer";
+  const rankClause = rankLine(state.rank, canRank, "eat more, grow longer");
 
   return (
     <div className="mono-scope relative aspect-[30/18] w-full bg-[var(--m-bg)]">
@@ -51,7 +56,7 @@ export function SnakeClassicBoard({ api }: { api: SnakeClassicGameApi }) {
         <GameOverOverlay
           isNewBest={state.isNewBest}
           score={state.score}
-          detail={rankLine}
+          detail={rankClause}
           onRestart={start}
         />
       )}

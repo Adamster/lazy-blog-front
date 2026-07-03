@@ -39,11 +39,13 @@ export function rankTopPlayers(
   return rows;
 }
 
-/** Key shape matches the game features' `arcadeKeys.leaderboard(game, take)`. */
-export function useGameLeaderboard(game: string) {
+/** Key shape matches the game features' `arcadeKeys.leaderboard(game, take)`.
+ *  Pass `enabled=false` for a signed-out viewer — no leaderboard surfaces there. */
+export function useGameLeaderboard(game: string, enabled = true) {
   return useQuery({
     queryKey: ["arcade", "leaderboard", game, TOP_TAKE] as const,
     queryFn: () => apiClient.arcade.getLeaderboard({ game, take: TOP_TAKE }),
     staleTime: 60_000,
+    enabled,
   });
 }
