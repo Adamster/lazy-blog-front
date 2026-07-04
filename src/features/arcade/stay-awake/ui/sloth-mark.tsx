@@ -78,18 +78,18 @@ export function SlothMark({
       className={className}
       style={{ display: "block" }}
     >
-      {/* cactus @ [1,2] */}
+      {/* cactus @ [1,1] */}
       <Sprite
         cellX={1}
-        cellY={2}
+        cellY={1}
         sprite={CACTUS_SPRITE}
         scale={CELL_SCALE}
         colorFor={(ch) => (ch === "1" ? "var(--m-error)" : null)}
       />
-      {/* sloth @ [2,3] — the engine's char→colour mapping (body fg, face bg) */}
+      {/* sloth @ [2,2] — the engine's char→colour mapping (body fg, face bg) */}
       <Sprite
         cellX={2}
-        cellY={3}
+        cellY={2}
         sprite={SLOTH_SIT}
         scale={SLOTH_SCALE}
         colorFor={(ch) =>
@@ -100,10 +100,10 @@ export function SlothMark({
               : null
         }
       />
-      {/* coffee @ [3,2] — up and ahead */}
+      {/* coffee @ [3,1] — up and ahead */}
       <Sprite
         cellX={3}
-        cellY={2}
+        cellY={1}
         sprite={COFFEE_SPRITE}
         scale={CELL_SCALE}
         colorFor={(ch) =>

@@ -75,12 +75,13 @@ const GAMES: GameEntry[] = [
 /** The card is a THEME-FOLLOWING "screen" — the games themselves are
  *  theme-native (token-resolved palettes), so the hub preview follows the
  *  ambient theme too: `--m-bg` field + 2px `--m-line` frame, the same look as a
- *  bordered game canvas on the page. `min-h-44` (176px): the card holds its
- *  stature regardless of content height, so the preview field always has air
- *  (owner call). */
+ *  bordered game canvas on the page. `min-h-36` (144px = p-5 pair + title +
+ *  title→body 16 + THREE 14px/1.6 description lines): the card holds a stable
+ *  stature but hugs its content — the 176 take left a dead band below the
+ *  text (owner call). */
 function ScreenCard({ children }: { children: ReactNode }) {
   return (
-    <article className="mono-scope group relative grid h-full min-h-44 grid-cols-3 border-2 border-[var(--m-line)] bg-[var(--m-bg)] text-[var(--m-fg)] transition-colors hover:border-[var(--m-accent)]">
+    <article className="mono-scope group relative grid h-full min-h-36 grid-cols-3 border-2 border-[var(--m-line)] bg-[var(--m-bg)] text-[var(--m-fg)] transition-colors hover:border-[var(--m-accent)]">
       {children}
     </article>
   );
