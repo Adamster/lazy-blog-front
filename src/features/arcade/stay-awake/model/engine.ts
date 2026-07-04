@@ -20,14 +20,14 @@ import type {
  * purely visual replay (`animate=false` — reduced motion — lands instantly).
  */
 
-/** Well: 5 wide × 12 tall visible cells (owner playtest retunes: width
- *  13 → 10 → 11 → 9 → 7 → 5, height 20 → 15 → 12 — big readable cells, tight
- *  tower). Odd width on purpose — a true centre column, so the start is
- *  symmetric: both LETHAL walls sit exactly START_COL hops away. */
+/** Well: 5 wide × 15 tall visible cells (owner playtest retunes: width
+ *  13 → 10 → 11 → 9 → 7 → 5, height 20 → 15 → 12 → 15 — more look-ahead came
+ *  back 2026-07-04). Odd width on purpose — a true centre column, so the
+ *  start is symmetric: both LETHAL walls sit exactly START_COL hops away. */
 export const COLS = 5;
-export const ROWS = 12;
-/** The sloth's fixed screen row (~3/4 down the well — owner retune, was ~2/3). */
-export const PLAYER_ROW = 9;
+export const ROWS = 15;
+/** The sloth's fixed screen row (~3/4 down the well). */
+export const PLAYER_ROW = 11;
 export const START_COL = 2;
 
 export const COFFEE_VALUE = 25;
@@ -265,15 +265,14 @@ const SHOT_SPRITE = [
   ".GGGGG.",
 ] as const;
 
-/** Figure box as a fraction of the cell — deliberately well under 1 so the
- *  figures sit IN their big cells with air around them, the way the rabbit
- *  board reads (owner call 2026-07-03; was 0.86). */
+/** Figure box as a fraction of the cell — the ONE size knob (owner call
+ *  2026-07-04: per-figure multipliers reset to 1; this alone sets how much
+ *  air the figures keep, the way the rabbit board reads). */
 export const SPRITE_FILL = 0.7;
-/** The sloth renders a hair smaller than the cell sprites (owner call). */
-export const SLOTH_SCALE = 0.85;
-/** Every CELL figure (cactus / coffee / chamomile / shot) shrinks a hair too
- *  (owner retune, one figure at a time until all four landed on 0.9). */
-export const CELL_SCALE = 0.9;
+/** Per-figure multipliers on top of {@link SPRITE_FILL} — kept as knobs,
+ *  both at the neutral default (owner call). */
+export const SLOTH_SCALE = 1;
+export const CELL_SCALE = 1;
 
 // Death burst — pixel debris when the sloth hits something (cactus / wall),
 // so the run visibly ENDS instead of just stopping. Draw-only state, advanced

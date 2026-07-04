@@ -203,7 +203,7 @@ export function useStayAwakeGame({
     if (!ctx) return;
     const engine = getEngine();
 
-    // DPR-aware backing store; the well is JS-sized to an EXACT 5×12 multiple
+    // DPR-aware backing store; the well is JS-sized to an EXACT 5×15 multiple
     // of a square cell (the Tetris discipline). Measured from the flex ROW minus
     // its padding, the two column gaps and both side panels' widths.
     let cssW = 0;
