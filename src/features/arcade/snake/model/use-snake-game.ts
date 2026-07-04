@@ -80,7 +80,8 @@ const INITIAL_STATE: SnakeGameState = {
  */
 export function useSnakeGame({
   speed = "classic",
-  wrapWalls = true,
+  // Lethal walls by default (owner call — the classic read; wrap = opt-in).
+  wrapWalls = false,
   best = 0,
   onGameOver,
   historyScope = GUEST_SCOPE,
