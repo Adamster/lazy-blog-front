@@ -87,7 +87,7 @@ export function TetrisBoard({
           ref={canvasRef}
           aria-label="Tetris well. Arrow keys or A/D to move, Up or X to rotate, Down to soft drop."
           role="img"
-          className="block [aspect-ratio:1/2] h-full self-center border-2 border-[var(--m-dim)]"
+          className="block [aspect-ratio:1/2] h-full touch-none self-center border-2 border-[var(--m-dim)]"
         />
 
         {/* Beside the well: the NEXT preview + the run readouts (owner call

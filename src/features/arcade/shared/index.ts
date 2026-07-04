@@ -28,6 +28,8 @@ export { BoardSignInTeaser } from "./ui/board-signin-teaser";
 export { PanelLabel, PanelReadout } from "./ui/panel-readout";
 export { StatsBand } from "./ui/stats-band";
 export type { StatsBandProps } from "./ui/stats-band";
+export { attachSwipe, SWIPE_MIN_PX } from "./model/swipe";
+export type { SwipeDir } from "./model/swipe";
 export { formatScore } from "./model/format-score";
 export { GUEST_SCOPE, identityScope } from "./model/history-scope";
 export { rankLine } from "./model/rank-line";

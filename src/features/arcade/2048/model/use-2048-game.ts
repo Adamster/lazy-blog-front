@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 import { Engine2048, GRID, parseHexRgb, type Palette2048 } from "./engine";
-import { GUEST_SCOPE } from "@/features/arcade/shared";
+import { attachSwipe, GUEST_SCOPE } from "@/features/arcade/shared";
 import { loadHistory, recentSeries, recordScore } from "./score-history";
 import type {
   Direction,
@@ -17,8 +17,6 @@ import type {
 /** rAF is throttled in background tabs; this ticker keeps the anim finishing (like Tetris). */
 const FALLBACK_MS = 120;
 const FALLBACK_GAP = 180;
-/** Minimum swipe travel (CSS px) before a touch counts as a slide. */
-const SWIPE_MIN_PX = 24;
 
 const INITIAL_STATE: Game2048State = {
   screen: "menu",
@@ -341,46 +339,17 @@ export function use2048Game({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [start, continueRun]);
 
-  // ---------- touch (swipe on the canvas; CSS `touch-none` stops page scroll) ----------
+  // ---------- touch (swipe on the canvas = slide; the shared arcade helper;
+  // CSS `touch-none` stops page scroll) ----------
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    let sx = 0;
-    let sy = 0;
-    let active = false;
-
-    const onTouchStart = (e: TouchEvent) => {
-      const t = e.touches[0];
-      if (!t) return;
-      sx = t.clientX;
-      sy = t.clientY;
-      active = true;
-    };
-    const onTouchEnd = (e: TouchEvent) => {
-      if (!active) return;
-      active = false;
-      const t = e.changedTouches[0];
-      if (!t) return;
-      const dx = t.clientX - sx;
-      const dy = t.clientY - sy;
-      if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_MIN_PX) return;
-      if (screenRef.current !== "playing") return;
-      inputRef.current.dir =
-        Math.abs(dx) >= Math.abs(dy)
-          ? dx > 0
-            ? "right"
-            : "left"
-          : dy > 0
-            ? "down"
-            : "up";
-    };
-
-    canvas.addEventListener("touchstart", onTouchStart, { passive: true });
-    canvas.addEventListener("touchend", onTouchEnd);
-    return () => {
-      canvas.removeEventListener("touchstart", onTouchStart);
-      canvas.removeEventListener("touchend", onTouchEnd);
-    };
+    return attachSwipe(canvas, {
+      onSwipe: (dir) => {
+        if (screenRef.current !== "playing") return;
+        inputRef.current.dir = dir;
+      },
+    });
   }, []);
 
   return { state, canvasRef, history, start, continueRun };

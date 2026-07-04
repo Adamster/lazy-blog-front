@@ -73,7 +73,7 @@ export function SnakeBoard({
         ref={canvasRef}
         aria-label="Snake game board. Use the arrow keys to steer, Space to pause. Walls are lethal."
         role="img"
-        className={`mx-auto block aspect-[30/18] h-full border-2 border-[var(--m-error)] [image-rendering:pixelated] ${FULLSCREEN_CANVAS}`}
+        className={`mx-auto block aspect-[30/18] h-full touch-none border-2 border-[var(--m-error)] [image-rendering:pixelated] ${FULLSCREEN_CANVAS}`}
       />
 
       <CornerBrackets />
