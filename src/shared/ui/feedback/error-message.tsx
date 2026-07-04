@@ -8,7 +8,8 @@ import { Button } from "../forms/button";
 
 /** The error pages' shared deadpan lead (also the global-error fallback) —
  *  "Motivation to fix it: pending" retired by owner call. */
-export const ERROR_LEAD = "Something broke. The blame is still compiling.";
+export const ERROR_LEAD =
+  "Something broke. A sloth has been notified and hit snooze.";
 
 // Narrows the `{ response: { status } }` shape some fetch errors carry.
 const statusOf = (error: unknown): number | undefined => {
