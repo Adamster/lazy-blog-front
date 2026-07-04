@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import Link from "next/link";
 import { useAuth } from "@/entities/session";
 import { Dot } from "@/shared/ui";
@@ -69,14 +70,29 @@ const CROWN_ICONS: Record<string, CrownIconDef> = {
 
 /** One engine bitmap as a pixel SVG, contain-fit into its own `size` box —
  *  eye/mouth chars stay transparent, so the faces read as punched holes.
- *  The trophy GLOW is the `.mono-crown-glow` pulse (tailwind.css) — a slow
- *  breathing double drop-shadow in the icon's own colour, static under
- *  reduced motion. */
-function CrownIcon({ bitmap, solid, color, size }: CrownIconDef) {
+ *  Trophy treatment (tailwind.css): the `.mono-crown-shine` GLINT — a
+ *  diagonal light band sweeping across the icon, clipped to the pixel
+ *  silhouette (hidden under reduced motion; the glow was cut — owner call).
+ *  `shineDelay` staggers the sweep so it runs through the row L→R. */
+function CrownIcon({
+  bitmap,
+  solid,
+  color,
+  size,
+  shineDelay = 0,
+}: CrownIconDef & { shineDelay?: number }) {
   const h = bitmap.length;
   const w = bitmap[0].length;
   const scale = size / Math.max(w, h);
-  const halo = `color-mix(in srgb, ${color} 45%, transparent)`;
+  // useId carries colons — strip them, they break `url(#…)` references.
+  const uid = useId().replace(/:/g, "");
+  const cells = bitmap.flatMap((row, r) =>
+    [...row].map((ch, c) =>
+      solid.includes(ch) ? (
+        <rect key={`${r}-${c}`} x={c} y={r} width={1} height={1} />
+      ) : null
+    )
+  );
   return (
     <svg
       width={w * scale}
@@ -84,23 +100,50 @@ function CrownIcon({ bitmap, solid, color, size }: CrownIconDef) {
       viewBox={`0 0 ${w} ${h}`}
       shapeRendering="crispEdges"
       aria-hidden="true"
-      className="mono-crown-glow"
-      style={{ "--crown-halo": halo } as React.CSSProperties}
     >
-      {bitmap.flatMap((row, r) =>
-        [...row].map((ch, c) =>
-          solid.includes(ch) ? (
-            <rect
-              key={`${r}-${c}`}
-              x={c}
-              y={r}
-              width={1}
-              height={1}
-              style={{ fill: color }}
-            />
-          ) : null
-        )
-      )}
+      <defs>
+        {/* Glint colour = --m-bg, NOT white: the dark theme's accent is a
+            near-white lime, so a white band vanished on it. The bg token is
+            contrast-guaranteed against accent in BOTH themes (dark: a dark
+            streak over lime; light: a white flash over olive). */}
+        <linearGradient
+          id={`crown-shine-${uid}`}
+          x1="0"
+          y1="0"
+          x2="1"
+          y2="0"
+          gradientTransform="rotate(18)"
+        >
+          <stop
+            offset="0.35"
+            style={{ stopColor: "var(--m-bg)" }}
+            stopOpacity="0"
+          />
+          <stop
+            offset="0.5"
+            style={{ stopColor: "var(--m-bg)" }}
+            stopOpacity="0.85"
+          />
+          <stop
+            offset="0.65"
+            style={{ stopColor: "var(--m-bg)" }}
+            stopOpacity="0"
+          />
+        </linearGradient>
+        <clipPath id={`crown-clip-${uid}`}>{cells}</clipPath>
+      </defs>
+      <g style={{ fill: color }}>{cells}</g>
+      <g clipPath={`url(#crown-clip-${uid})`}>
+        <rect
+          x={0}
+          y={0}
+          width={w}
+          height={h}
+          fill={`url(#crown-shine-${uid})`}
+          className="mono-crown-shine"
+          style={{ animationDelay: `${shineDelay}ms` }}
+        />
+      </g>
     </svg>
   );
 }
@@ -118,7 +161,7 @@ export function ArcadeCrowns({ userName }: { userName?: string }) {
       {/* CROWN_GAP between chips; each crown centres in its OWN size-square
           slot (no shared cap — per-icon sizes are free). */}
       <span className="flex items-center" style={{ gap: CROWN_GAP }}>
-        {crowns.map(({ game, title, href }) => {
+        {crowns.map(({ game, title, href }, i) => {
           const def = CROWN_ICONS[game];
           return (
             <Link
@@ -133,7 +176,8 @@ export function ArcadeCrowns({ userName }: { userName?: string }) {
                 marginInline: def.gap ?? 0,
               }}
             >
-              <CrownIcon {...def} />
+              {/* 150ms stagger — the glint runs through the row L→R. */}
+              <CrownIcon {...def} shineDelay={i * 150} />
             </Link>
           );
         })}
