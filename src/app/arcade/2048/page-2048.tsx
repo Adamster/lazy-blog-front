@@ -8,7 +8,6 @@ import {
 } from "@/features/arcade/2048";
 import {
   BOARD_GRID_RAIL,
-  BoardEyebrow,
   BoardSignInTeaser,
   StatsBand,
 } from "@/features/arcade/shared";
@@ -36,7 +35,6 @@ export default function Page2048() {
 
         <div className={BOARD_GRID_RAIL}>
           <div>
-            <BoardEyebrow stats={[{ label: "Moves", value: state.moves }]} />
             <Board2048 api={game} canRank={showBoard} />
           </div>
           {showBoard ? (

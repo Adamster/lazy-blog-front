@@ -2,11 +2,17 @@
 
 import type { PointerEvent } from "react";
 import {
+  BoardFullscreenButton,
   CornerBrackets,
+  FULLSCREEN_ROOT,
+  FULLSCREEN_STAGE,
   GameOverOverlay,
   MenuOverlay,
+  PanelLabel,
+  PanelReadout,
   PauseOverlay,
   rankLine,
+  useBoardFullscreen,
 } from "@/features/arcade/shared";
 import { RUSH_EVERY, WAVE_MAX_GAP } from "../model/engine";
 import type { StayAwakeGameApi, StayAwakeState } from "../model/types";
@@ -27,16 +33,6 @@ const CAUSE_LINES = {
   sleep: "CAUGHT NAPPING",
   wall: "HUGGED THE WALL",
 } as const;
-
-/** Side-panel label — the 11px/0.12em data-label tier (muted2, like the field
- *  labels and every stat-block label). */
-function PanelLabel({ children }: { children: string }) {
-  return (
-    <div className="text-[11px] leading-[1.2] tracking-[0.12em] text-[var(--m-muted2)] uppercase">
-      {children}
-    </div>
-  );
-}
 
 /** One square panel pip — accent when lit, dim outline otherwise. */
 function Pip({ on }: { on: boolean }) {
@@ -109,7 +105,7 @@ function WaveMeter({ state }: { state: StayAwakeState }) {
     ? "border-[var(--m-accent)]"
     : "border-[var(--m-dim)]";
   return (
-    <div className="flex h-full flex-col items-center gap-2 py-5">
+    <div className="flex h-full flex-col items-center gap-2">
       <PanelLabel>ZZZ</PanelLabel>
       <div className={`relative w-4 flex-1 border-2 ${track}`}>
         <div
@@ -122,11 +118,12 @@ function WaveMeter({ state }: { state: StayAwakeState }) {
 }
 
 /**
- * The STAY AWAKE play surface — the DPR-crisp 11×15 well canvas centred in the
- * shared aspect-[30/18] board footprint, flanked by the coffee pips (left) and
- * the sleep-wave meter (right), + the DOM overlays. Tap zones: pointer-down on
- * either half of the board = a hop that way (tap, not swipe — zero gesture
- * latency). Pure presentation: the hook owns all logic.
+ * The STAY AWAKE play surface — the DPR-crisp 5×15 well canvas centred in the
+ * shared aspect-[30/18] board footprint, flanked by the sleep-wave ZZZ meter
+ * (left) and the run readout — SCORE over the coffee/shot meters — (right),
+ * + the DOM overlays. Tap zones: pointer-down on either half of the board = a
+ * hop that way (tap, not swipe — zero gesture latency). Pure presentation:
+ * the hook owns all logic.
  *
  * THEME-NATIVE: NO forced `dark` scope — board, panels and overlays read the
  * AMBIENT `--m-*` tokens; the canvas palette is resolved in the hook.
@@ -140,9 +137,18 @@ export function StayAwakeBoard({
   canRank?: boolean;
 }) {
   const { state, canvasRef, leftPanelRef, rightPanelRef, start, hop } = api;
+  const {
+    rootRef: fullscreenRootRef,
+    isFullscreen,
+    toggle: toggleFullscreen,
+  } = useBoardFullscreen();
 
   const rankClause = rankLine(state.rank, canRank, "climb higher");
   const causeLine = state.cause ? CAUSE_LINES[state.cause] : "";
+  // Fullscreen toggle lives on the OVERLAY screens only (menu / pause — owner
+  // call): never a floating control over live gameplay.
+  const showFullscreenToggle =
+    state.screen === "menu" || (state.screen === "playing" && state.paused);
 
   const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
     if (state.screen !== "playing" || state.paused) return;
@@ -151,24 +157,35 @@ export function StayAwakeBoard({
   };
 
   return (
-    <div className="mono-scope relative w-full overflow-hidden">
+    <div
+      ref={fullscreenRootRef}
+      className={`mono-scope relative w-full overflow-hidden ${FULLSCREEN_ROOT}`}
+    >
       {/* aspect-[30/18] = the shared arcade board footprint; p-5 stages the well
           inside the CornerBrackets; gap-10 = the Tetris panel separation. */}
+      {/* min-h-0 is LOAD-BEARING for the fullscreen round-trip: aspect-ratio
+          boxes get a content-based automatic minimum height, so after exiting
+          fullscreen the still-large canvas would prop the stage open and the
+          ResizeObserver would re-measure the propped size forever. min-h-0
+          lets the aspect win; the observer then shrinks the canvas back. */}
       <div
-        className="flex aspect-[30/18] w-full touch-none items-stretch justify-center gap-10 p-5"
+        className={`flex aspect-[30/18] min-h-0 w-full touch-none items-stretch justify-center gap-10 p-5 ${FULLSCREEN_STAGE}`}
         onPointerDown={onPointerDown}
       >
-        {/* Fixed w-14: the widest label (COFFEE) fits, so the RUSH↔COFFEE swap
-            can't change the panel width and re-size the well mid-run. */}
+        {/* Panels swapped (owner call 2026-07-04): ZZZ went LEFT so the RIGHT
+            column could become the run readout — SCORE above the coffee/shot
+            meters — visible in fullscreen, where the top stats band isn't.
+            h-52 (208px) ≈ the right stack's height, and the SAME fixed w-20
+            with centred content — the two flanks mirror each other, so the
+            well-to-panel insets match on both sides (owner call). */}
         <div
           ref={leftPanelRef}
-          className="flex w-14 shrink-0 flex-col items-center gap-6 self-center"
+          className="flex h-52 w-20 shrink-0 justify-center self-center"
         >
-          <CoffeePips state={state} />
-          <ShotTimer state={state} />
+          <WaveMeter state={state} />
         </div>
 
-        {/* The well: JS-sized to an EXACT 5×12 cell multiple (odd width — a
+        {/* The well: JS-sized to an EXACT 5×15 cell multiple (odd width — a
             true centre start column); aspect/h-full are only the pre-hydration
             fallback — inline w/h override them. The side borders are the LETHAL
             walls, so they carry the danger colour (`--m-error`); top/bottom stay
@@ -177,11 +194,18 @@ export function StayAwakeBoard({
           ref={canvasRef}
           aria-label="Stay Awake board. Left and Right arrows or A/D to hop; on touch, tap either side. Space to pause. Walls are lethal. Don't let the sleep wave catch the sloth."
           role="img"
-          className="block [aspect-ratio:5/12] h-full self-center border-2 border-[var(--m-dim)] border-x-[var(--m-error)]"
+          className="block [aspect-ratio:5/15] h-full self-center border-2 border-[var(--m-dim)] border-x-[var(--m-error)]"
         />
 
-        <div ref={rightPanelRef} className="shrink-0 self-stretch">
-          <WaveMeter state={state} />
+        {/* Fixed w-20: room for a 6-digit score, so growing digits never
+            change the panel width and re-size the well mid-run. */}
+        <div
+          ref={rightPanelRef}
+          className="flex w-20 shrink-0 flex-col items-center gap-6 self-center"
+        >
+          <PanelReadout label="SCORE" value={state.score} />
+          <CoffeePips state={state} />
+          <ShotTimer state={state} />
         </div>
       </div>
 
@@ -201,6 +225,13 @@ export function StayAwakeBoard({
           score={state.score}
           detail={`${causeLine} · ${state.altitude} rows · ${rankClause}`}
           onRestart={start}
+        />
+      )}
+
+      {showFullscreenToggle && (
+        <BoardFullscreenButton
+          isFullscreen={isFullscreen}
+          onToggle={toggleFullscreen}
         />
       )}
     </div>

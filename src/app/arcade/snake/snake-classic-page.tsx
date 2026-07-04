@@ -8,7 +8,6 @@ import {
 } from "@/features/arcade/snake-classic";
 import {
   BOARD_GRID_RAIL,
-  BoardEyebrow,
   BoardSignInTeaser,
   StatsBand,
 } from "@/features/arcade/shared";
@@ -36,7 +35,6 @@ export default function SnakeClassicPage() {
 
         <div className={BOARD_GRID_RAIL}>
           <div>
-            <BoardEyebrow stats={[{ label: "Eaten", value: state.eaten }]} />
             <SnakeClassicBoard api={game} canRank={showBoard} />
           </div>
           {showBoard ? (

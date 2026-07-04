@@ -48,8 +48,9 @@ function ScoreHistoryChart({
 }
 
 /** Score / Best / recent-runs — the canonical 3-column stats band shared by every
- *  arcade game. Per-game overflow stats (Moves, Lines+Level, Eaten) live in the
- *  BoardEyebrow above the board instead of here. */
+ *  arcade game. Per-game overflow stats (Lines+Level etc.) live in the boards'
+ *  own side panels (the BoardEyebrow strip was retired 2026-07-04 — the
+ *  on-board readouts made it a duplicate). */
 export function StatsBand({
   score,
   best,

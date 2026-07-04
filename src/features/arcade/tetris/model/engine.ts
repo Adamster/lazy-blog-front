@@ -24,10 +24,19 @@ export const ROWS = 20;
 /** NEXT-preview grid — a 4×4 tile area (fits the widest piece, I); its canvas is a
  *  square, so `cssW / NEXT_COLS === cssH / NEXT_ROWS`. */
 export const NEXT_COLS = 4;
-export const NEXT_ROWS = 4;
+/** 2, not 4 (owner call 2026-07-04): every piece is ≤ 2 rows tall in spawn
+ *  orientation, and the empty rows of a square canvas read as phantom margin
+ *  around the preview — the panel's gap-6 rhythm looked broken. */
+export const NEXT_ROWS = 2;
 /** NEXT-preview cell = well cell × this — a notch under in-game scale (owner
  *  call: the 1:1 preview read too big beside the well). */
-export const NEXT_CELL_SCALE = 0.75;
+/** Owner retune 2026-07-04: 0.75 → 0.6 — the preview shrank when it gained
+ *  the NEXT label and joined the readout column. */
+export const NEXT_CELL_SCALE = 0.6;
+/** Cap on the preview cell (px). The readout column is fixed-size type, so
+ *  the NEXT piece must not balloon with the well cell in FULLSCREEN — it
+ *  tracks the well only up to this ceiling (≈ its normal-page size). */
+export const NEXT_CELL_MAX = 14;
 
 // ---------- timing (ms) ----------
 

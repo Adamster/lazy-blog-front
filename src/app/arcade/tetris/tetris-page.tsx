@@ -8,7 +8,6 @@ import {
 } from "@/features/arcade/tetris";
 import {
   BOARD_GRID_RAIL,
-  BoardEyebrow,
   BoardSignInTeaser,
   StatsBand,
 } from "@/features/arcade/shared";
@@ -36,12 +35,6 @@ export default function TetrisPage() {
 
         <div className={BOARD_GRID_RAIL}>
           <div>
-            <BoardEyebrow
-              stats={[
-                { label: "Lines", value: state.lines },
-                { label: "Level", value: state.level },
-              ]}
-            />
             <TetrisBoard api={game} canRank={showBoard} />
           </div>
           {showBoard ? (

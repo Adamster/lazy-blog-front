@@ -17,11 +17,17 @@ export {
   PauseOverlay,
 } from "./ui/board-overlay";
 export { BOARD_GRID_RAIL } from "./ui/board-layout";
+export {
+  BoardFullscreenButton,
+  FULLSCREEN_CANVAS,
+  FULLSCREEN_ROOT,
+  FULLSCREEN_STAGE,
+  useBoardFullscreen,
+} from "./ui/board-fullscreen";
 export { BoardSignInTeaser } from "./ui/board-signin-teaser";
+export { PanelLabel, PanelReadout } from "./ui/panel-readout";
 export { StatsBand } from "./ui/stats-band";
 export type { StatsBandProps } from "./ui/stats-band";
-export { BoardEyebrow } from "./ui/board-eyebrow";
-export type { BoardEyebrowStat } from "./ui/board-eyebrow";
 export { formatScore } from "./model/format-score";
 export { GUEST_SCOPE, identityScope } from "./model/history-scope";
 export { rankLine } from "./model/rank-line";

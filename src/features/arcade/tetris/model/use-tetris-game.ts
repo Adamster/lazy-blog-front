@@ -5,6 +5,7 @@ import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 import {
   COLS,
   ROWS,
+  NEXT_CELL_MAX,
   NEXT_CELL_SCALE,
   NEXT_COLS,
   NEXT_ROWS,
@@ -268,7 +269,7 @@ export function useTetrisGame({
       // math converges immediately.)
       const nc = nextCanvasRef.current;
       if (nc && nextCtx) {
-        const nCell = cell * NEXT_CELL_SCALE;
+        const nCell = Math.min(cell * NEXT_CELL_SCALE, NEXT_CELL_MAX);
         const nw = nCell * NEXT_COLS;
         const nh = nCell * NEXT_ROWS;
         nc.style.width = `${nw}px`;

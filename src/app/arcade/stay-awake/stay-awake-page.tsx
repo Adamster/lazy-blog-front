@@ -8,7 +8,6 @@ import {
 } from "@/features/arcade/stay-awake";
 import {
   BOARD_GRID_RAIL,
-  BoardEyebrow,
   BoardSignInTeaser,
   StatsBand,
 } from "@/features/arcade/shared";
@@ -36,12 +35,6 @@ export default function StayAwakePage() {
 
         <div className={BOARD_GRID_RAIL}>
           <div>
-            <BoardEyebrow
-              stats={[
-                { label: "Alt", value: state.altitude },
-                { label: "Coffee", value: state.coffees },
-              ]}
-            />
             <StayAwakeBoard api={game} canRank={showBoard} />
           </div>
           {showBoard ? (

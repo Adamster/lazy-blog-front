@@ -9,7 +9,6 @@ import {
 } from "@/features/arcade/snake";
 import {
   BOARD_GRID_RAIL,
-  BoardEyebrow,
   BoardSignInTeaser,
   StatsBand,
 } from "@/features/arcade/shared";
@@ -42,12 +41,6 @@ export default function SnakePage() {
 
         <div className={BOARD_GRID_RAIL}>
           <div>
-            <BoardEyebrow
-              stats={[
-                { label: "Caught", value: state.eatenPositive },
-                { label: "Penalties", value: state.eatenNegative },
-              ]}
-            />
             <SnakeBoard api={game} canRank={showBoard} />
           </div>
           {showBoard ? (
