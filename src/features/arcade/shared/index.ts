@@ -24,6 +24,7 @@ export {
   FULLSCREEN_STAGE,
   useBoardFullscreen,
 } from "./ui/board-fullscreen";
+export { BoardPauseButton } from "./ui/board-pause-button";
 export { BoardSignInTeaser } from "./ui/board-signin-teaser";
 export { PanelLabel, PanelReadout } from "./ui/panel-readout";
 export { StatsBand } from "./ui/stats-band";

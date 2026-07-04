@@ -84,7 +84,9 @@ export const PostVote = ({
 
   return (
     <section className="mx-[calc(50%-50vw)] mt-10 w-screen bg-[var(--m-card)]">
-      <div className="mx-auto grid max-w-[780px] items-start gap-10 px-10 py-10 sm:grid-cols-3">
+      {/* Mobile: LOVE IT + HATE IT side by side (owner call — matches the
+          profile band), the RATING chart full-width below. */}
+      <div className="mx-auto grid max-w-[780px] grid-cols-2 items-start gap-10 px-5 py-10 sm:grid-cols-3 sm:px-10">
         <div className="min-w-0">
           <Label tone="muted" uppercase>
             love it
@@ -139,7 +141,7 @@ export const PostVote = ({
           </div>
         </div>
 
-        <div className="min-w-0">
+        <div className="col-span-2 min-w-0 sm:col-span-1">
           <Label tone="muted" uppercase>
             rating
           </Label>

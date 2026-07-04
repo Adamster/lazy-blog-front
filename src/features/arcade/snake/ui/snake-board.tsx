@@ -2,6 +2,7 @@
 
 import {
   BoardFullscreenButton,
+  BoardPauseButton,
   CornerBrackets,
   FULLSCREEN_CANVAS,
   FULLSCREEN_ROOT,
@@ -36,7 +37,7 @@ export function SnakeBoard({
   /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
   canRank?: boolean;
 }) {
-  const { state, canvasRef, start } = api;
+  const { state, canvasRef, start, togglePause } = api;
   const {
     rootRef: fullscreenRootRef,
     isFullscreen,
@@ -95,6 +96,10 @@ export function SnakeBoard({
           detail={rankClause}
           onRestart={start}
         />
+      )}
+
+      {state.screen === "playing" && (
+        <BoardPauseButton paused={state.paused} onToggle={togglePause} />
       )}
 
       {showFullscreenToggle && (

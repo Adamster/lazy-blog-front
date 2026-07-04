@@ -382,5 +382,6 @@ export function useStayAwakeGame({
     history,
     start,
     hop,
+    togglePause,
   };
 }

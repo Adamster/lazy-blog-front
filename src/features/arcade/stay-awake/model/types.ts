@@ -85,6 +85,8 @@ export interface StayAwakeGameApi {
   start: () => void;
   /** One hop (keyboard and the board's tap zones both call this). */
   hop: (dir: HopDir) => void;
+  /** Space and the mobile pause button both call this. */
+  togglePause: () => void;
 }
 
 export interface UseStayAwakeGameOptions {

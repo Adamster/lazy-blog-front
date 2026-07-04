@@ -2,6 +2,7 @@
 
 import {
   BoardFullscreenButton,
+  BoardPauseButton,
   CornerBrackets,
   FULLSCREEN_ROOT,
   FULLSCREEN_STAGE,
@@ -42,7 +43,7 @@ export function TetrisBoard({
   /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
   canRank?: boolean;
 }) {
-  const { canvasRef, nextCanvasRef, panelRef, start, state } = api;
+  const { canvasRef, nextCanvasRef, panelRef, start, state, togglePause } = api;
   const {
     rootRef: fullscreenRootRef,
     isFullscreen,
@@ -135,6 +136,10 @@ export function TetrisBoard({
           detail={`${state.lines} lines · level ${state.level} · ${rankClause}`}
           onRestart={start}
         />
+      )}
+
+      {state.screen === "playing" && (
+        <BoardPauseButton paused={state.paused} onToggle={togglePause} />
       )}
 
       {showFullscreenToggle && (
