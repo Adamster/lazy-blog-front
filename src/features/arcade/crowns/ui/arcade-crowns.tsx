@@ -17,8 +17,9 @@ import { useArcadeCrowns } from "../model/use-arcade-crowns";
  * tops, rendered in the meta row after the post count — the ORIGINAL engine
  * bitmaps (plain white rabbit, sitting sloth, the T tetromino), scaled to
  * sit beside 12px meta text. Trophy exception to the muted-icon meta rule:
- * crowns render in the figure's own game colour (fg / fg / accent) — they're
- * standings, not metadata. Hover = `TOP 1 · <GAME>` (native title for now).
+ * crowns render ACCENT with a matching breathing glow (gold was tried and
+ * reverted) — they're standings, not metadata. Hover = `TOP 1 · <GAME>`
+ * (native title for now); click = the game page.
  */
 
 type CrownIconDef = {
@@ -40,24 +41,30 @@ type CrownIconDef = {
  *  tried first — owner picked the Z). */
 const TET_Z = SHAPES.Z.filter((row) => row.includes("X"));
 
-/** Trophy gold (owner call — crowns read as trophies, not fg glyphs). ONE
- *  deliberate off-token colour: mid-luminance goldenrod that survives both
- *  themes; tokenize as --m-gold if it spreads beyond the crowns. */
-const CROWN_GOLD = "#d4a017";
-
 /** Gap (px) between crowns — the same tuning surface as the per-icon sizes
  *  (started at the meta rows' 16px between-metrics gap). */
 const CROWN_GAP = 16;
 
 const CROWN_ICONS: Record<string, CrownIconDef> = {
-  snake: { bitmap: RABBIT_PLAIN, solid: ["1"], color: CROWN_GOLD, size: 16 },
+  snake: {
+    bitmap: RABBIT_PLAIN,
+    solid: ["1"],
+    color: "var(--m-accent)",
+    size: 16,
+  },
   "stay-awake": {
     bitmap: SLOTH_SIT,
     solid: ["1", "P"],
-    color: CROWN_GOLD,
+    color: "var(--m-accent)",
     size: 12,
   },
-  tetris: { bitmap: TET_Z, solid: ["X"], color: CROWN_GOLD, size: 16, gap: 4 },
+  tetris: {
+    bitmap: TET_Z,
+    solid: ["X"],
+    color: "var(--m-accent)",
+    size: 14,
+    gap: 4,
+  },
 };
 
 /** One engine bitmap as a pixel SVG, contain-fit into its own `size` box —
