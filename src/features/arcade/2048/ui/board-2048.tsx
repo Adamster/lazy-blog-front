@@ -21,7 +21,6 @@ import type { Game2048Api } from "../model/types";
 /** Control reference — shown in the menu overlay. */
 const KEY_HINTS: [string, string][] = [
   ["MOVE", "← ↑ ↓ →  /  WASD"],
-  ["SWIPE", "slide the tiles"],
   ["GOAL", "Merge to 2048"],
   ["START", "Enter / Space"],
 ];

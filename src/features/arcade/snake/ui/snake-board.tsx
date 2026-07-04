@@ -19,7 +19,6 @@ import { Confetti } from "./confetti";
 /** Control reference — shown in the menu overlay. */
 const KEY_HINTS: [string, string][] = [
   ["STEER", "↑ ↓ ← →  ·  W A S D"],
-  ["SWIPE", "swipe the board to steer"],
   ["PAUSE", "SPACE"],
 ];
 

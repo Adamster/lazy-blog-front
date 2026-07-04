@@ -21,7 +21,6 @@ const KEY_HINTS: [string, string][] = [
   ["MOVE", "← →  /  A D"],
   ["ROTATE", "↑ / X  ·  Z"],
   ["SOFT DROP", "↓ / S"],
-  ["SWIPE", "← → move  ·  ↓ drop  ·  tap = rotate"],
   ["PAUSE", "SPACE"],
 ];
 

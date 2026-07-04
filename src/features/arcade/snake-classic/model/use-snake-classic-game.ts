@@ -10,11 +10,7 @@ import {
   SnakeClassicEngine,
   type SnakeClassicPalette,
 } from "./engine";
-import {
-  attachSwipe,
-  GUEST_SCOPE,
-  type SwipeDir,
-} from "@/features/arcade/shared";
+import { GUEST_SCOPE } from "@/features/arcade/shared";
 import { loadHistory, recentSeries, recordScore } from "./score-history";
 import type {
   HistoryPoint,
@@ -358,22 +354,6 @@ export function useSnakeClassicGame({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [start, togglePause, steer]);
-
-  // ---------- touch (swipe on the canvas = steer; `touch-none` stops scroll) ----------
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const STEER: Record<SwipeDir, [number, number]> = {
-      up: [0, -1],
-      down: [0, 1],
-      left: [-1, 0],
-      right: [1, 0],
-    };
-    // `steer` already guards on screen/pause, so a stray swipe is a no-op.
-    return attachSwipe(canvas, {
-      onSwipe: (dir) => steer(...STEER[dir]),
-    });
-  }, [steer]);
 
   return {
     state,
