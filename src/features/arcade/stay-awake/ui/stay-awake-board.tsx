@@ -22,7 +22,8 @@ import type { StayAwakeGameApi, StayAwakeState } from "../model/types";
  *  approved menu subtitle (owner copy). */
 const KEY_HINTS: [string, string][] = [
   ["GOAL", "The floor is sleep. Keep hopping."],
-  ["HOP", "← →  /  A D  ·  tap a side"],
+  ["HOP", "← →  /  A D"],
+  ["TAP", "left half = hop left · right half = hop right"],
   ["PAUSE", "SPACE"],
 ];
 

@@ -75,12 +75,13 @@ export function TetrisBoard({
             boxes get a content-based automatic minimum height, so after exiting
             fullscreen the still-large canvas would prop the stage open forever. */}
       <div
-        className={`flex aspect-[30/18] min-h-0 w-full items-stretch justify-center gap-10 p-5 ${FULLSCREEN_STAGE}`}
+        className={`flex aspect-[30/18] min-h-0 w-full items-stretch justify-center gap-5 p-5 sm:gap-10 ${FULLSCREEN_STAGE}`}
       >
         {/* Invisible w-20 mirror of the readout panel (the Stay Awake pattern):
             with equal flanks the well sits dead-centre and the well→stats
-            inset matches Stay Awake's. */}
-        <div className="w-20 shrink-0" />
+            inset matches Stay Awake's. DESKTOP-ONLY — on a phone (esp.
+            portrait fullscreen) it pushed the readout column off-screen. */}
+        <div className="hidden w-20 shrink-0 sm:block" />
         {/* The well: JS-sized to an EXACT 10×20 cell multiple (no leftover strip);
               `h-full`/aspect are only the pre-hydration fallback — inline w/h override
               them. `self-center` centres it if the height-fit leaves side margin. */}
