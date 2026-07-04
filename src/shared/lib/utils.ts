@@ -26,3 +26,10 @@ export function formatDate2(date: string | Date) {
   if (!isValid(parsedDate)) return "Invalid date";
   return format(parsedDate, "d MMM yyyy", { locale: enUS });
 }
+
+/** Compact numeric date for tight card chrome — `12.02.25`. */
+export function formatDateShort(date: string | Date) {
+  const parsedDate = date instanceof Date ? date : new Date(date);
+  if (!isValid(parsedDate)) return "—";
+  return format(parsedDate, "d MMM yy", { locale: enUS });
+}

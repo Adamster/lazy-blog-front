@@ -3,7 +3,7 @@ import Link from "next/link";
 import { DisplayPostResponse, UserPostItem } from "@/shared/api/openapi";
 import { Category, Metric } from "@/shared/ui";
 import { DraftOverlay } from "@/features/post/ui/draft-overlay";
-import { formatDate2 } from "@/shared/lib/utils";
+import { formatDateShort } from "@/shared/lib/utils";
 import { UNTAGGED_LABEL } from "../lib/untagged-label";
 
 type FeedPost = DisplayPostResponse | UserPostItem;
@@ -52,18 +52,21 @@ function CardMeta({
 }) {
   return (
     <>
-      {authorHandle ? (
+      {authorHandle && (
         <Link
           href={`/${authorHandle}`}
           className="relative z-[var(--m-z-content)] truncate text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
         >
           @{authorHandle}
         </Link>
-      ) : (
-        <span className="truncate">{formatDate2(post.createdAtUtc)}</span>
       )}
+      {/* The date rides the metric group WHERE VIEWS USED TO BE (owner call —
+          views dropped from the card; full metrics live on the post page):
+          calendar icon + compact numeric date, the metric icon/gap language. */}
       <span className="ml-auto flex items-center gap-4">
-        <Metric kind="views" value={post.views} />
+        <span className="flex items-center gap-1 whitespace-nowrap tabular-nums">
+          {formatDateShort(post.createdAtUtc)}
+        </span>
         <Metric kind="comments" value={post.comments} />
         <Metric kind="rating" value={post.rating} />
       </span>
@@ -90,7 +93,10 @@ export function PostCard({ post, href, authorHandle }: PostCardMonoProps) {
             {post.title}
           </Link>
         </h3>
-        <div className="mt-auto flex items-center gap-4 pt-6 text-[12px] text-[var(--m-muted)]">
+        {/* flex-wrap: when the card is too narrow for handle + stats in one
+            line, the WHOLE stat group drops to its own right-aligned row (the
+            hero card's behaviour) instead of mid-breaking the date. */}
+        <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-6 text-[12px] text-[var(--m-muted)]">
           <CardMeta post={post} authorHandle={authorHandle} />
         </div>
       </div>

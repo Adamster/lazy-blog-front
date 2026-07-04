@@ -31,7 +31,7 @@ function ScoreHistoryChart({
   gradientId: string;
 }) {
   return (
-    <div>
+    <div className="col-span-2 sm:col-span-1">
       <Label tone="muted">{`SCORES · LAST ${historyWindow}`}</Label>
       <div className="mt-4">
         <Sparkline
@@ -62,7 +62,9 @@ export function StatsBand({
 }: StatsBandProps) {
   return (
     <section className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
-      <div className="mx-auto grid max-w-[1240px] gap-10 px-10 py-10 sm:grid-cols-3">
+      {/* Mobile: SCORE + BEST side by side (owner call — matches the profile
+          band), the SCORES chart full-width below. */}
+      <div className="mx-auto grid max-w-[1240px] grid-cols-2 gap-10 px-5 py-10 sm:grid-cols-3 sm:px-10">
         <Stat
           label="SCORE"
           value={formatScore(score)}

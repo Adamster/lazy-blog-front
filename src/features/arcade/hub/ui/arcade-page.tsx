@@ -155,7 +155,7 @@ export function ArcadePage() {
       className="mono-scope min-h-app mx-[calc(50%-50vw)] w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <main className="mx-auto max-w-[1240px] px-10 pb-10">
+      <main className="mx-auto max-w-[1240px] px-5 pb-10 sm:px-10">
         {/* Bare eyebrow first → pt-10 (section rhythm + flush-avoidance), pb-6 binds it down. */}
         <div className="flex items-center pt-10 pb-6">
           <Label>ARCADE</Label>

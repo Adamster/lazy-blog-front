@@ -49,7 +49,7 @@ export default function Profile() {
 
         {/* Both steps share one two-panel card so switching tabs never jumps the
             frame width; the form measures the right panel, not the full 1240. */}
-        <section className="mx-auto max-w-[1240px] px-6 pt-10 pb-10 md:px-10">
+        <section className="mx-auto max-w-[1240px] px-5 pt-10 pb-10 sm:px-10">
           <div className="grid grid-cols-1 md:grid-cols-2">
             {activeTab === "security" ? (
               <ProfileSecurityIntro />

@@ -147,7 +147,7 @@ export const PostForm = ({
       />
 
       <section
-        className={`mx-auto max-w-[1240px] px-6 pt-10 pb-10 md:px-10 ${
+        className={`mx-auto max-w-[1240px] px-5 pt-10 pb-10 sm:px-10 ${
           step === 1 ? "" : "hidden"
         }`}
       >
@@ -277,7 +277,7 @@ export const PostForm = ({
       {/* The editable text carries its OWN fixed 700 measure (in
           `crepe-overrides.scss`), staying 1:1 with the read view's 700. */}
       <section
-        className={`mx-auto max-w-[1240px] px-6 py-10 md:px-10 ${
+        className={`mx-auto max-w-[1240px] px-5 py-10 sm:px-10 ${
           step === 2 ? "" : "hidden"
         }`}
       >

@@ -3,6 +3,7 @@
 import type { PointerEvent } from "react";
 import {
   BoardFullscreenButton,
+  BoardPauseButton,
   CornerBrackets,
   FULLSCREEN_ROOT,
   FULLSCREEN_STAGE,
@@ -136,7 +137,15 @@ export function StayAwakeBoard({
   /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
   canRank?: boolean;
 }) {
-  const { state, canvasRef, leftPanelRef, rightPanelRef, start, hop } = api;
+  const {
+    state,
+    canvasRef,
+    leftPanelRef,
+    rightPanelRef,
+    start,
+    hop,
+    togglePause,
+  } = api;
   const {
     rootRef: fullscreenRootRef,
     isFullscreen,
@@ -226,6 +235,10 @@ export function StayAwakeBoard({
           detail={`${causeLine} · ${state.altitude} rows · ${rankClause}`}
           onRestart={start}
         />
+      )}
+
+      {state.screen === "playing" && (
+        <BoardPauseButton paused={state.paused} onToggle={togglePause} />
       )}
 
       {showFullscreenToggle && (

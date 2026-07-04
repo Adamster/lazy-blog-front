@@ -2,6 +2,7 @@
 
 import {
   BoardFullscreenButton,
+  BoardPauseButton,
   CornerBrackets,
   FULLSCREEN_CANVAS,
   FULLSCREEN_ROOT,
@@ -36,7 +37,7 @@ export function SnakeBoard({
   /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
   canRank?: boolean;
 }) {
-  const { state, canvasRef, start } = api;
+  const { state, canvasRef, start, togglePause } = api;
   const {
     rootRef: fullscreenRootRef,
     isFullscreen,
@@ -59,7 +60,7 @@ export function SnakeBoard({
   return (
     <div
       ref={fullscreenRootRef}
-      className={`mono-scope relative aspect-[30/18] w-full bg-[var(--m-bg)] p-5 ${FULLSCREEN_ROOT}`}
+      className={`mono-scope relative aspect-[30/18] w-full overflow-hidden bg-[var(--m-bg)] p-5 ${FULLSCREEN_ROOT}`}
     >
       {/* p-5 = the same stage inset the other boards keep between the frame
           and the play field (owner call). The canvas holds its OWN 30/18 —
@@ -95,6 +96,10 @@ export function SnakeBoard({
           detail={rankClause}
           onRestart={start}
         />
+      )}
+
+      {state.screen === "playing" && (
+        <BoardPauseButton paused={state.paused} onToggle={togglePause} />
       )}
 
       {showFullscreenToggle && (

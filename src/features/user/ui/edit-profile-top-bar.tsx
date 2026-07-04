@@ -26,7 +26,7 @@ export function EditProfileTopBar({
 }: EditProfileTopBarProps) {
   return (
     <div className="mx-[calc(50%-50vw)] w-screen bg-[var(--m-card)]">
-      <div className="mx-auto flex max-w-[1240px] items-center px-6 py-5 md:px-10">
+      <div className="mx-auto flex max-w-[1240px] items-center px-5 py-5 sm:px-10">
         <TabNav
           tabs={TABS}
           current={current}
