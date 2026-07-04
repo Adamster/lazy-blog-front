@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { ERROR_LEAD } from "@/shared/ui/feedback/error-message";
 
 type GlobalErrorProps = {
   error: Error & { digest?: string };
@@ -77,7 +78,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               color: "#9a9a9a",
             }}
           >
-            {error?.message || "Error detected. Motivation to fix it: pending."}
+            {error?.message || ERROR_LEAD}
           </p>
 
           <div
