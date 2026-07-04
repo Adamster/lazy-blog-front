@@ -2,7 +2,6 @@
 
 import {
   BoardFullscreenButton,
-  BoardPauseButton,
   CornerBrackets,
   FULLSCREEN_ROOT,
   GameOverOverlay,
@@ -36,7 +35,7 @@ export function SnakeBoard({
   /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
   canRank?: boolean;
 }) {
-  const { state, canvasRef, start, togglePause } = api;
+  const { state, canvasRef, start } = api;
   const {
     rootRef: fullscreenRootRef,
     isFullscreen,
@@ -71,7 +70,7 @@ export function SnakeBoard({
         ref={canvasRef}
         aria-label="Snake game board. Use the arrow keys to steer, Space to pause. Walls are lethal."
         role="img"
-        className="block touch-none border-2 border-[var(--m-error)] [image-rendering:pixelated]"
+        className="block border-2 border-[var(--m-error)] [image-rendering:pixelated]"
       />
 
       <CornerBrackets />
@@ -93,10 +92,6 @@ export function SnakeBoard({
           detail={rankClause}
           onRestart={start}
         />
-      )}
-
-      {state.screen === "playing" && (
-        <BoardPauseButton paused={state.paused} onToggle={togglePause} />
       )}
 
       {showFullscreenToggle && (

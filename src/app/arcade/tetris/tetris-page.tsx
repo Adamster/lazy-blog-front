@@ -8,6 +8,7 @@ import {
 } from "@/features/arcade/tetris";
 import {
   BOARD_GRID_RAIL,
+  BoardUnsupported,
   BoardSignInTeaser,
   StatsBand,
 } from "@/features/arcade/shared";
@@ -24,18 +25,25 @@ export default function TetrisPage() {
       style={{ fontFamily: "var(--font-mono)" }}
     >
       <main className="mx-auto max-w-[1240px] px-5 pb-10 sm:px-10">
-        <StatsBand
-          score={state.score}
-          best={state.best}
-          statsLoading={statsLoading}
-          history={game.history}
-          historyWindow={HISTORY_RECENT}
-          gradientId="tetrisScoreSparkGrad"
-        />
+        {/* The game (stats + board) is DESKTOP-ONLY (owner call): touch and
+            small screens get the notice + the high-score rail instead. */}
+        <div className="desktop-game-only">
+          <StatsBand
+            score={state.score}
+            best={state.best}
+            statsLoading={statsLoading}
+            history={game.history}
+            historyWindow={HISTORY_RECENT}
+            gradientId="tetrisScoreSparkGrad"
+          />
+        </div>
 
         <div className={BOARD_GRID_RAIL}>
           <div>
-            <TetrisBoard api={game} canRank={showBoard} />
+            <div className="desktop-game-only">
+              <TetrisBoard api={game} canRank={showBoard} />
+            </div>
+            <BoardUnsupported />
           </div>
           {showBoard ? (
             <TetrisLeaderboard board={board} loading={boardLoading} />

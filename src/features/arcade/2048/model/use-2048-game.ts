@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 import { Engine2048, GRID, parseHexRgb, type Palette2048 } from "./engine";
-import { attachSwipe, GUEST_SCOPE } from "@/features/arcade/shared";
+import { GUEST_SCOPE } from "@/features/arcade/shared";
 import { loadHistory, recentSeries, recordScore } from "./score-history";
 import type {
   Direction,
@@ -338,19 +338,6 @@ export function use2048Game({
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [start, continueRun]);
-
-  // ---------- touch (swipe on the canvas = slide; the shared arcade helper;
-  // CSS `touch-none` stops page scroll) ----------
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    return attachSwipe(canvas, {
-      onSwipe: (dir) => {
-        if (screenRef.current !== "playing") return;
-        inputRef.current.dir = dir;
-      },
-    });
-  }, []);
 
   return { state, canvasRef, history, start, continueRun };
 }

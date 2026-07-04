@@ -2,7 +2,6 @@
 
 import {
   BoardFullscreenButton,
-  BoardPauseButton,
   CornerBrackets,
   FULLSCREEN_ROOT,
   FULLSCREEN_STAGE,
@@ -43,7 +42,7 @@ export function TetrisBoard({
   /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
   canRank?: boolean;
 }) {
-  const { canvasRef, nextCanvasRef, panelRef, start, state, togglePause } = api;
+  const { canvasRef, nextCanvasRef, panelRef, start, state } = api;
   const {
     rootRef: fullscreenRootRef,
     isFullscreen,
@@ -89,7 +88,7 @@ export function TetrisBoard({
           ref={canvasRef}
           aria-label="Tetris well. Arrow keys or A/D to move, Up or X to rotate, Down to soft drop."
           role="img"
-          className="block [aspect-ratio:1/2] h-full touch-none self-center border-2 border-[var(--m-dim)]"
+          className="block [aspect-ratio:1/2] h-full self-center border-2 border-[var(--m-dim)]"
         />
 
         {/* Beside the well: the NEXT preview + the run readouts (owner call
@@ -137,10 +136,6 @@ export function TetrisBoard({
           detail={`${state.lines} lines · level ${state.level} · ${rankClause}`}
           onRestart={start}
         />
-      )}
-
-      {state.screen === "playing" && (
-        <BoardPauseButton paused={state.paused} onToggle={togglePause} />
       )}
 
       {showFullscreenToggle && (
