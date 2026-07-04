@@ -23,9 +23,10 @@ export const overlayScrim = "bg-[var(--m-card)]/40";
 export const overlayScrimOver = "bg-[var(--m-card)]/80";
 // Layout-only base — each overlay appends its scrim (no duplicate `bg-*` with
 // ambiguous Tailwind ordering). `backdrop-blur` (8px) frosts the field behind the
-// overlay; the 15% left inset is the shared anchor for the rail block.
+// overlay; the 15% left inset is the shared anchor for the rail block (mobile
+// drops to the p-5 stage inset — 15% of a phone board is nothing).
 export const overlayLayout =
-  "absolute inset-0 z-[1] flex flex-col items-start justify-center pr-10 pl-[15%] backdrop-blur";
+  "absolute inset-0 z-[1] flex flex-col items-start justify-center pr-5 pl-5 backdrop-blur sm:pr-10 sm:pl-[15%]";
 export const overlayBase = `${overlayLayout} ${overlayScrim}`;
 export const overlayBaseOver = `${overlayLayout} ${overlayScrimOver}`;
 
@@ -53,12 +54,14 @@ export function CornerBrackets() {
   );
 }
 
-/** Left accent rail + 40px gap; content stacks at a uniform 24px rhythm. */
+/** Left accent rail + 40px gap; content stacks at a uniform 24px rhythm.
+ *  Mobile compacts to the 16px rhythm + 20px rail gap — the phone-width board
+ *  is ~210px tall, the desktop scale overflowed it (owner catch). */
 export function OverlayRail({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-stretch">
       <div className="w-0.5 shrink-0 bg-[var(--m-accent)]" aria-hidden />
-      <div className="flex flex-col items-start gap-6 pl-10 text-left">
+      <div className="flex flex-col items-start gap-4 pl-5 text-left sm:gap-6 sm:pl-10">
         {children}
       </div>
     </div>
@@ -100,10 +103,11 @@ export function OverlayEyebrow({
 }
 
 /** Menu headline — the page's H1, moved into the overlay with the arcade glitch.
- *  32px display, `leading-none`. */
+ *  32px display, `leading-none`; the H3 18 on mobile (both endpoints in-set —
+ *  the responsive-step pattern). */
 export function OverlayTitle({ children }: { children: string }) {
   return (
-    <GlitchText className="font-display text-[32px] leading-none font-bold tracking-[-0.02em] text-[var(--m-fg)]">
+    <GlitchText className="font-display text-[18px] leading-none font-bold tracking-[-0.02em] text-[var(--m-fg)] sm:text-[32px]">
       {children}
     </GlitchText>
   );
@@ -132,10 +136,10 @@ export function KeyHints({
 }
 
 /** Static overlay heading (pause / won screens) — the same 32px display line as
- *  {@link OverlayTitle}, without the glitch. */
+ *  {@link OverlayTitle}, without the glitch (18 on mobile, same step). */
 export function OverlayHeading({ children }: { children: React.ReactNode }) {
   return (
-    <div className="font-display text-[32px] leading-none font-bold tracking-[-0.02em] text-[var(--m-fg)]">
+    <div className="font-display text-[18px] leading-none font-bold tracking-[-0.02em] text-[var(--m-fg)] sm:text-[32px]">
       {children}
     </div>
   );
@@ -219,7 +223,8 @@ export function GameOverOverlay({
         <OverlayHeading>
           {isNewBest ? "New record" : "Game over"}
         </OverlayHeading>
-        <div className="font-display text-[46px] leading-none font-bold text-[var(--m-accent)] tabular-nums">
+        {/* 32 on mobile / the 46 stat size from sm — both in-set endpoints. */}
+        <div className="font-display text-[32px] leading-none font-bold text-[var(--m-accent)] tabular-nums sm:text-[46px]">
           {formatScore(score)}
         </div>
         <OverlayDetail>{detail}</OverlayDetail>

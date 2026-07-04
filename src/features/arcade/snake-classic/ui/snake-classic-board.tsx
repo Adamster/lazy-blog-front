@@ -49,7 +49,7 @@ export function SnakeClassicBoard({
   return (
     <div
       ref={fullscreenRootRef}
-      className={`mono-scope relative aspect-[30/18] w-full bg-[var(--m-bg)] p-5 ${FULLSCREEN_ROOT}`}
+      className={`mono-scope relative aspect-[30/18] w-full overflow-hidden bg-[var(--m-bg)] p-5 ${FULLSCREEN_ROOT}`}
     >
       {/* p-5 = the same stage inset the other boards keep between the frame
           and the play field (owner call). The canvas holds its OWN 30/18 —
