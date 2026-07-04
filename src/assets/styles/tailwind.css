@@ -81,6 +81,31 @@
 }
 
 /* Toast slide-in — Brutalist Mono. From the right, short + linear-ish. */
+/* Arcade crown glow — the profile TOP-1 trophies breathe: a slow pulse between
+   a tight and a wide gold halo (`--crown-halo` is set inline by the icon).
+   Reduced motion: the static mid-strength glow, no pulse. */
+@keyframes mono-crown-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 1px var(--crown-halo))
+      drop-shadow(0 0 3px var(--crown-halo));
+  }
+  50% {
+    filter: drop-shadow(0 0 2px var(--crown-halo))
+      drop-shadow(0 0 6px var(--crown-halo));
+  }
+}
+.mono-crown-glow {
+  animation: mono-crown-glow 1.8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-crown-glow {
+    animation: none;
+    filter: drop-shadow(0 0 2px var(--crown-halo))
+      drop-shadow(0 0 6px var(--crown-halo));
+  }
+}
+
 @keyframes mono-toast-in {
   from {
     opacity: 0;

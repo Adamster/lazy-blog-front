@@ -143,7 +143,7 @@ export const PIECE_TYPES: readonly PieceType[] = [
 /** Spawn matrices (standard orientations). Each is square; rotation states are
  *  derived by rotating the MATRIX (keeps every cell on an integer grid — the classic
  *  "simple rotation"). */
-const SHAPES: Record<PieceType, string[]> = {
+export const SHAPES: Record<PieceType, string[]> = {
   I: ["....", "XXXX", "....", "...."],
   O: ["XX", "XX"],
   T: [".X.", "XXX", "..."],
