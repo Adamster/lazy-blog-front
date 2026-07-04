@@ -126,7 +126,6 @@ export interface SnakePalette {
   /** Faint cell grid ← `--m-fg` at a low alpha. */
   gridLine: string;
   /** Board-edge frame — stronger than the inner grid so the rim always reads. */
-  frameLine: string;
 }
 
 /** Dark-theme reference colours. `RABBIT_WHITE` is exported for {@link RabbitMark} —
@@ -145,7 +144,6 @@ const DEFAULT_PALETTE: SnakePalette = {
   rabbitBody: RABBIT_WHITE,
   rabbitRed: RABBIT_RED,
   gridLine: "rgba(255,255,255,0.05)",
-  frameLine: "rgba(255,255,255,0.22)",
 };
 
 /** Sentinel grey (light head → dim tail) — the dormant sprite mode
@@ -848,11 +846,9 @@ export class SnakeEngine {
       ctx.lineTo(cssW, p);
     }
     ctx.stroke();
-    // Outer frame — the board edges (the lines above are internal only, so the
-    // canvas rim would otherwise be unbordered). A stronger line than the inner
-    // grid so the field boundary always reads, on any theme bg.
-    ctx.strokeStyle = this.palette.frameLine;
-    ctx.strokeRect(0.5, 0.5, cssW - 1, cssH - 1);
+    // No canvas-drawn outer frame: the board edge is the CSS `border-2`
+    // `--m-error` (lethal walls, the Stay Awake language) — the old grey
+    // frameLine doubled it into grey+red stripes (owner catch).
   }
 
   /**

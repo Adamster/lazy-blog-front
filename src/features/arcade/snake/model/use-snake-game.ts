@@ -53,7 +53,6 @@ function resolvePalette(el: Element): SnakePalette {
     rabbitBody: read("--m-fg", "#e6e6e6"),
     rabbitRed: read("--m-error", "#ff6b6b"),
     gridLine: `rgba(${r},${g},${b},${gridAlpha})`,
-    frameLine: `rgba(${r},${g},${b},0.22)`,
   };
 }
 
