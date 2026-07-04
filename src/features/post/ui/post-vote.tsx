@@ -151,30 +151,37 @@ export const PostVote = ({
               className="absolute inset-0 h-full w-full overflow-visible"
               aria-hidden
             >
+              {/* Sign-split via CLIP RECTS, not a gradient stroke: WebKit
+                  mis-places userSpaceOnUse stroke gradients when
+                  `non-scaling-stroke` is on (iOS rendered the whole positive
+                  line error-red). Same path twice, clipped at the y=26
+                  baseline — accent above, error below, seam at the line. */}
               <defs>
-                <linearGradient
-                  id="ratingSignGrad"
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="52"
-                  gradientUnits="userSpaceOnUse"
-                >
-                  <stop offset="0" stopColor="var(--m-accent)" />
-                  <stop offset="0.5" stopColor="var(--m-accent)" />
-                  <stop offset="0.5" stopColor="var(--m-error)" />
-                  <stop offset="1" stopColor="var(--m-error)" />
-                </linearGradient>
+                <clipPath id="ratingClipAbove">
+                  <rect x="-10" y="-30" width="120" height="56" />
+                </clipPath>
+                <clipPath id="ratingClipBelow">
+                  <rect x="-10" y="26" width="120" height="56" />
+                </clipPath>
               </defs>
-              <path
-                d={d}
-                fill="none"
-                stroke="url(#ratingSignGrad)"
-                strokeWidth={1.5}
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                vectorEffect="non-scaling-stroke"
-              />
+              {(
+                [
+                  ["ratingClipAbove", "var(--m-accent)"],
+                  ["ratingClipBelow", "var(--m-error)"],
+                ] as const
+              ).map(([clipId, stroke]) => (
+                <path
+                  key={clipId}
+                  d={d}
+                  fill="none"
+                  stroke={stroke}
+                  strokeWidth={1.5}
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                  clipPath={`url(#${clipId})`}
+                />
+              ))}
             </svg>
             <span
               aria-hidden
