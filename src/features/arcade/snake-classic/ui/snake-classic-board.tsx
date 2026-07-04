@@ -16,6 +16,7 @@ import type { SnakeClassicGameApi } from "../model/types";
 /** Control reference — shown in the menu overlay. */
 const KEY_HINTS: [string, string][] = [
   ["STEER", "↑ ↓ ← →  ·  W A S D"],
+  ["SWIPE", "swipe the board to steer"],
   ["PAUSE", "SPACE"],
 ];
 
@@ -59,7 +60,7 @@ export function SnakeClassicBoard({
         ref={canvasRef}
         aria-label="Classic Snake game board. Use the arrow keys to steer, Space to pause. Walls are lethal."
         role="img"
-        className="block [image-rendering:pixelated]"
+        className="block touch-none [image-rendering:pixelated]"
       />
 
       <CornerBrackets />
