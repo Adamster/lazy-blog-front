@@ -9,7 +9,7 @@ import {
 /** Global classic-Snake high-score board (top {@link LEADERBOARD_TAKE}, cross-user).
  *  Long `staleTime`; a finished run invalidates it (`useSubmitScore`) — refreshes
  *  when it changes, not on a timer. */
-export function useSnakeClassicLeaderboard() {
+export function useSnakeClassicLeaderboard(enabled = true) {
   return useQuery({
     queryKey: arcadeKeys.leaderboard(SNAKE_CLASSIC_GAME, LEADERBOARD_TAKE),
     queryFn: () =>
@@ -18,5 +18,6 @@ export function useSnakeClassicLeaderboard() {
         take: LEADERBOARD_TAKE,
       }),
     staleTime: 60_000,
+    enabled,
   });
 }

@@ -10,13 +10,18 @@ const SNAKE_RENDER: "glyph" | "sprite" = "glyph";
 
 /** Play-field grid (cells). Cells stay SQUARE because the board's aspect is pinned
  *  to `GRID_W / GRID_H`, so `cssW / GRID_W === cssH / GRID_H`. */
+/** 30×18 — exact 5:3, the shared board-footprint ratio. (A 33×20 take was
+ *  tried and reverted same-day; 25×15 / 35×21 are the neighbouring exact-5:3
+ *  steps if a resize ever comes up again.) */
 export const GRID_W = 30;
 export const GRID_H = 18;
 
-/** Per-preset step interval (ms). */
+/** Per-preset step interval (ms). Classic retuned 125 → 140 (owner call
+ *  2026-07-04): a gentler opening to offset the new LETHAL walls — the
+ *  per-rabbit accel still runs it down to the same {@link STEP_FLOOR}. */
 export const SPEED_MS: Record<Speed, number> = {
   chill: 165,
-  classic: 125,
+  classic: 140,
   fast: 90,
 };
 const STEP_ACCEL = 1.5;
@@ -509,11 +514,11 @@ export class SnakeEngine {
 
   constructor(
     private speed: Speed = "classic",
-    // Wrap-walls is the ACTIVE behavior: edges are pass-through (exit one edge,
-    // re-enter the opposite). With wrapping the run ends from a self-hit OR eating
-    // the lethal KILLER rabbit — never from a wall. The outer frame stays as the
-    // visual board edge.
-    private wrapWalls = true
+    // LETHAL walls are the ACTIVE behavior (owner call 2026-07-04 — the wrap
+    // tunnel was cut for the classic read): hitting an edge ends the run, same
+    // as a self-hit or the KILLER rabbit. The board carries the danger-red
+    // border to announce it. Wrap stays available behind the flag.
+    private wrapWalls = false
   ) {}
 
   get stepInterval(): number {

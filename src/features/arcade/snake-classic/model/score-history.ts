@@ -9,6 +9,10 @@ import type { HistoryPoint } from "./types";
 
 const KEY_HISTORY = "notlazy_snake_classic_history_v1";
 
+/** Per-identity storage key — the log is scoped to the signed-in username (or
+ *  the guest bucket) so identities on a shared device never mix stats. */
+const storageKey = (scope: string) => `${KEY_HISTORY}:${scope}`;
+
 export const HISTORY_CAP = 50;
 
 export const HISTORY_RECENT = 20;
@@ -29,9 +33,9 @@ function parseHistory(raw: string | null): number[] {
 }
 
 /** Read the persisted score log (oldest → newest); empty when nothing is stored. */
-export function loadHistory(): number[] {
+export function loadHistory(scope: string): number[] {
   try {
-    return parseHistory(localStorage.getItem(KEY_HISTORY));
+    return parseHistory(localStorage.getItem(storageKey(scope)));
   } catch {
     return [];
   }
@@ -39,10 +43,14 @@ export function loadHistory(): number[] {
 
 /** Append a run's score, cap to {@link HISTORY_CAP}, persist (best-effort).
  *  Pass the PREVIOUS log (we never re-read here) so a re-render can't double-count. */
-export function recordScore(prev: number[], score: number): number[] {
+export function recordScore(
+  scope: string,
+  prev: number[],
+  score: number
+): number[] {
   const next = [...prev, score].slice(-HISTORY_CAP);
   try {
-    localStorage.setItem(KEY_HISTORY, JSON.stringify(next));
+    localStorage.setItem(storageKey(scope), JSON.stringify(next));
   } catch {
     // ignore — log stays in memory for this session
   }

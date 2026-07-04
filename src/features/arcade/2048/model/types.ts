@@ -69,4 +69,6 @@ export interface Use2048GameOptions {
   /** Fired ONCE per run when 2048 is first reached (score submitted early so a
    *  player who walks away after winning still lands on the board). */
   onWin?: (score: number) => void;
+  /** localStorage identity scope for the run log — username or guest bucket. */
+  historyScope?: string;
 }

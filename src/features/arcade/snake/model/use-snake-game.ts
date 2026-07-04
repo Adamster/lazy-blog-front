@@ -9,6 +9,11 @@ import {
   SnakeEngine,
   type SnakePalette,
 } from "./engine";
+import {
+  attachSwipe,
+  GUEST_SCOPE,
+  type SwipeDir,
+} from "@/features/arcade/shared";
 import { loadHistory, recentSeries, recordScore } from "./score-history";
 import type {
   HistoryPoint,
@@ -79,9 +84,11 @@ const INITIAL_STATE: SnakeGameState = {
  */
 export function useSnakeGame({
   speed = "classic",
-  wrapWalls = true,
+  // Lethal walls by default (owner call — the classic read; wrap = opt-in).
+  wrapWalls = false,
   best = 0,
   onGameOver,
+  historyScope = GUEST_SCOPE,
 }: UseSnakeGameOptions = {}): SnakeGameApi {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   // Lazy getter keeps engine creation out of the render body (the compiler forbids
@@ -103,6 +110,7 @@ export function useSnakeGame({
   const pausedRef = useRef(state.paused);
   const bestRef = useRef(best);
   const onGameOverRef = useRef(onGameOver);
+  const historyScopeRef = useRef(historyScope);
   // The single score-log source the game-over handler appends to, so a re-render can't double-count.
   const historyRef = useRef<number[]>([]);
   useEffect(() => {
@@ -113,7 +121,8 @@ export function useSnakeGame({
   useEffect(() => {
     bestRef.current = best;
     onGameOverRef.current = onGameOver;
-  }, [best, onGameOver]);
+    historyScopeRef.current = historyScope;
+  }, [best, onGameOver, historyScope]);
 
   // Reflect the incoming server best into state. Deferred via rAF — repo lint rule:
   // no synchronous setState inside an effect.
@@ -132,16 +141,17 @@ export function useSnakeGame({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speed, wrapWalls]);
 
-  // Hydrate the log from localStorage on mount; deferred via rAF (repo lint rule).
+  // Hydrate the log from localStorage on mount + whenever the identity scope
+  // changes (login/logout swaps in that identity's log); rAF-deferred (lint rule).
   useEffect(() => {
     let raf = 0;
     raf = requestAnimationFrame(() => {
-      const log = loadHistory();
+      const log = loadHistory(historyScope);
       historyRef.current = log;
       setHistory(recentSeries(log));
     });
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [historyScope]);
 
   const steer = useCallback((x: number, y: number) => {
     if (screenRef.current !== "playing" || pausedRef.current) return;
@@ -173,7 +183,7 @@ export function useSnakeGame({
   // Fires exactly ONCE per run: the engine reports `dead` on one step, then `screen`
   // flips to "over" so `engine.step` no longer runs — the append + submit happen once.
   const handleGameOver = useCallback((score: number) => {
-    const log = recordScore(historyRef.current, score);
+    const log = recordScore(historyScopeRef.current, historyRef.current, score);
     historyRef.current = log;
     setHistory(recentSeries(log));
     onGameOverRef.current?.(score);
@@ -335,6 +345,22 @@ export function useSnakeGame({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [start, togglePause, steer]);
+
+  // ---------- touch (swipe on the canvas = steer; `touch-none` stops scroll) ----------
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const STEER: Record<SwipeDir, [number, number]> = {
+      up: [0, -1],
+      down: [0, 1],
+      left: [-1, 0],
+      right: [1, 0],
+    };
+    // `steer` already guards on screen/pause, so a stray swipe is a no-op.
+    return attachSwipe(canvas, {
+      onSwipe: (dir) => steer(...STEER[dir]),
+    });
+  }, [steer]);
 
   return {
     state,

@@ -3,6 +3,11 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Section, Panel } from "./_helpers";
+import {
+  BIN_GLYPHS as BIN,
+  GlyphRainV,
+  type GlyphRainVProps,
+} from "@/shared/ui/effects";
 
 // Variant 1: glyph-fade — LAB/preview only, not the effect's final home. Horizontal
 // grey lanes; bits fade in → hold → fade at random cells, kept ~half-lit.
@@ -515,234 +520,6 @@ function GlyphRainH({
   );
 }
 
-// Variant 3: vertical rain — the classic Matrix fall (top→bottom) with our 0/1 glyphs.
-
-interface RainVProps {
-  glyphs: readonly string[];
-  /** Glyph size in px. */
-  track?: number;
-  /** Extra px between glyph COLUMNS (on top of the monospace advance). */
-  colGap?: number;
-  /** Extra px between glyph ROWS (line spacing). */
-  rowGap?: number;
-  /** Fall speed (cols/frame base, with wide per-stream jitter). */
-  speed?: number;
-  /** TRAIL length — the per-frame fade-to-black alpha. LOWER = longer trail. */
-  fade?: number;
-  /** Per-frame chance a trail glyph flickers to a new char (brighter blip). */
-  mutate?: number;
-  /** shadowBlur glow on the head. */
-  glow?: number;
-  /** Overall opacity of the whole rain (0–1). */
-  opacity?: number;
-  /** Fraction of columns carrying a stream (0–1; lower = sparser). */
-  density?: number;
-  /** Head (leading glyph) colour — the bright tip. */
-  headHex?: string;
-  /** Trail colour override (else the live accent). */
-  colorHex?: string;
-  color?: ColorMode;
-  className?: string;
-}
-
-function GlyphRainV({
-  glyphs,
-  track = 11,
-  colGap = 8,
-  rowGap = 3,
-  speed = 1.15,
-  fade = 0.13,
-  mutate = 0.45,
-  glow = 2,
-  opacity = 1,
-  density = 1,
-  headHex = HEAD,
-  colorHex,
-  color = "accent",
-  className = "",
-}: RainVProps) {
-  const ref = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = ref.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const fontSize = Math.round(track * 1.1);
-    const font = `${fontSize}px ${MONO}`;
-    const rowH = track + rowGap;
-    let w = 0;
-    let h = 0;
-    let cols = 0;
-    let rows = 0;
-    let colW = 11;
-    let streams: {
-      head: number;
-      spd: number;
-      seen: number;
-      active: boolean;
-    }[] = [];
-    let accent = "#cdff48";
-    let dim = "#cdff48";
-    const pick = () => glyphs[Math.floor(Math.random() * glyphs.length)];
-    const trail = () => colorHex || (color === "dim" ? dim : accent);
-
-    const read = () => {
-      const cs = getComputedStyle(canvas);
-      const a = cs.getPropertyValue("--m-accent").trim();
-      if (a) accent = a;
-      const m = cs.getPropertyValue("--m-muted2").trim();
-      dim = m || accent;
-    };
-
-    const spawn = () => {
-      const head = -Math.random() * rows * 0.8 - 1;
-      return {
-        head,
-        spd: speed * (0.3 + Math.random() * 1.5),
-        seen: Math.floor(head) - 1,
-        active: Math.random() < density,
-      };
-    };
-
-    const resize = () => {
-      w = canvas.clientWidth || 800;
-      h = canvas.clientHeight || 200;
-      canvas.width = w;
-      canvas.height = h;
-      ctx.font = font;
-      colW = Math.max(6, Math.round(ctx.measureText("0").width) + colGap);
-      cols = Math.max(1, Math.floor(w / colW));
-      rows = Math.max(1, Math.floor(h / rowH));
-      streams = Array.from({ length: cols }, spawn);
-      read();
-      ctx.fillStyle = "rgb(13,13,13)";
-      ctx.fillRect(0, 0, w, h);
-    };
-
-    const frame = () => {
-      ctx.shadowBlur = 0;
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = `rgba(13,13,13,${fade})`;
-      ctx.fillRect(0, 0, w, h);
-      ctx.font = font;
-      ctx.textBaseline = "top";
-      const green = trail();
-
-      for (let c = 0; c < cols; c++) {
-        const s = streams[c];
-        s.head += s.spd;
-        const hr = Math.floor(s.head);
-        if (hr - 1 > rows + 14) {
-          Object.assign(s, spawn());
-          continue;
-        }
-        if (!s.active) continue;
-        const x = c * colW;
-        while (s.seen < hr - 1) {
-          s.seen++;
-          if (s.seen >= 0 && s.seen < rows) {
-            ctx.globalAlpha = opacity;
-            ctx.fillStyle = green;
-            ctx.fillText(pick(), x, s.seen * rowH);
-          }
-        }
-        if (hr >= 0 && hr < rows) {
-          ctx.globalAlpha = opacity;
-          ctx.fillStyle = headHex;
-          if (glow > 0) {
-            ctx.shadowColor = green;
-            ctx.shadowBlur = glow;
-          }
-          ctx.fillText(pick(), x, hr * rowH);
-          ctx.shadowBlur = 0;
-        }
-        if (Math.random() < mutate) {
-          const r = hr - 2 - Math.floor(Math.random() * 12);
-          if (r >= 0 && r < rows) {
-            ctx.globalAlpha = 0.85 * opacity;
-            ctx.fillStyle = green;
-            ctx.fillText(pick(), x, r * rowH);
-          }
-        }
-      }
-      ctx.globalAlpha = 1;
-    };
-
-    resize();
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvas);
-    const mq = window.matchMedia(REDUCED);
-    let raf = 0;
-    let last = 0;
-    const loop = (now: number) => {
-      raf = requestAnimationFrame(loop);
-      if (now - last < FADE_FPS_MS) return;
-      last = now;
-      frame();
-    };
-    const start = () => {
-      if (mq.matches) {
-        ctx.shadowBlur = 0;
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = "rgb(13,13,13)";
-        ctx.fillRect(0, 0, w, h);
-        ctx.font = font;
-        ctx.textBaseline = "top";
-        ctx.fillStyle = trail();
-        for (let c = 0; c < cols; c++) {
-          for (let r = 0; r < rows; r++) {
-            if (Math.random() < 0.12) {
-              ctx.globalAlpha = 0.8;
-              ctx.fillText(pick(), c * colW, r * rowH);
-            }
-          }
-        }
-        ctx.globalAlpha = 1;
-        return;
-      }
-      raf = requestAnimationFrame(loop);
-    };
-    const onMq = () => {
-      cancelAnimationFrame(raf);
-      raf = 0;
-      start();
-    };
-    mq.addEventListener("change", onMq);
-    start();
-
-    return () => {
-      cancelAnimationFrame(raf);
-      ro.disconnect();
-      mq.removeEventListener("change", onMq);
-    };
-  }, [
-    glyphs,
-    track,
-    colGap,
-    rowGap,
-    speed,
-    fade,
-    mutate,
-    glow,
-    opacity,
-    density,
-    headHex,
-    colorHex,
-    color,
-  ]);
-
-  return (
-    <canvas
-      ref={ref}
-      aria-hidden="true"
-      className={`pointer-events-none block size-full ${className}`}
-    />
-  );
-}
-
-const BIN = ["0", "1"] as const;
 const DIGITS = "0123456789".split("");
 /** Classic Nixie neon-orange. */
 const NIXIE = "#ff7e29";
@@ -925,7 +702,7 @@ const HRAIN_VARIANTS: HRainVariant[] = [
 type VRainVariant = {
   key: string;
   note: string;
-  props: Omit<RainVProps, "className">;
+  props: Omit<GlyphRainVProps, "className">;
 };
 
 const VRAIN_VARIANTS: VRainVariant[] = [

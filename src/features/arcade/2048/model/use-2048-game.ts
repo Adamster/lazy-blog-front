@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 import { Engine2048, GRID, parseHexRgb, type Palette2048 } from "./engine";
+import { attachSwipe, GUEST_SCOPE } from "@/features/arcade/shared";
 import { loadHistory, recentSeries, recordScore } from "./score-history";
 import type {
   Direction,
@@ -16,8 +17,6 @@ import type {
 /** rAF is throttled in background tabs; this ticker keeps the anim finishing (like Tetris). */
 const FALLBACK_MS = 120;
 const FALLBACK_GAP = 180;
-/** Minimum swipe travel (CSS px) before a touch counts as a slide. */
-const SWIPE_MIN_PX = 24;
 
 const INITIAL_STATE: Game2048State = {
   screen: "menu",
@@ -77,6 +76,7 @@ export function use2048Game({
   best = 0,
   onGameOver,
   onWin,
+  historyScope = GUEST_SCOPE,
 }: Use2048GameOptions = {}): Game2048Api {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const engineRef = useRef<Engine2048 | null>(null);
@@ -94,6 +94,7 @@ export function use2048Game({
   const screenRef = useRef(state.screen);
   const bestRef = useRef(best);
   const onGameOverRef = useRef(onGameOver);
+  const historyScopeRef = useRef(historyScope);
   const onWinRef = useRef(onWin);
   // Single score-log source the game-over handler appends to (no double-count on re-render).
   const historyRef = useRef<number[]>([]);
@@ -110,7 +111,8 @@ export function use2048Game({
     bestRef.current = best;
     onGameOverRef.current = onGameOver;
     onWinRef.current = onWin;
-  }, [best, onGameOver, onWin]);
+    historyScopeRef.current = historyScope;
+  }, [best, onGameOver, onWin, historyScope]);
 
   // Reflect the incoming server best into state. Deferred via rAF — repo lint rule:
   // no synchronous setState inside an effect.
@@ -121,15 +123,16 @@ export function use2048Game({
     return () => cancelAnimationFrame(raf);
   }, [best]);
 
-  // Hydrate the log from localStorage on mount; deferred via rAF (repo lint rule).
+  // Hydrate the log from localStorage on mount + whenever the identity scope
+  // changes (login/logout swaps in that identity's log); rAF-deferred (lint rule).
   useEffect(() => {
     const raf = requestAnimationFrame(() => {
-      const log = loadHistory();
+      const log = loadHistory(historyScope);
       historyRef.current = log;
       setHistory(recentSeries(log));
     });
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [historyScope]);
 
   // One-shot direction edge the loop feeds the engine (consumed there).
   const inputRef = useRef<Input2048>({ dir: null });
@@ -160,7 +163,7 @@ export function use2048Game({
 
   // Fires exactly ONCE per run (see endedRef).
   const handleGameOver = useCallback((score: number) => {
-    const log = recordScore(historyRef.current, score);
+    const log = recordScore(historyScopeRef.current, historyRef.current, score);
     historyRef.current = log;
     setHistory(recentSeries(log));
     onGameOverRef.current?.(score);
@@ -336,46 +339,17 @@ export function use2048Game({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [start, continueRun]);
 
-  // ---------- touch (swipe on the canvas; CSS `touch-none` stops page scroll) ----------
+  // ---------- touch (swipe on the canvas = slide; the shared arcade helper;
+  // CSS `touch-none` stops page scroll) ----------
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    let sx = 0;
-    let sy = 0;
-    let active = false;
-
-    const onTouchStart = (e: TouchEvent) => {
-      const t = e.touches[0];
-      if (!t) return;
-      sx = t.clientX;
-      sy = t.clientY;
-      active = true;
-    };
-    const onTouchEnd = (e: TouchEvent) => {
-      if (!active) return;
-      active = false;
-      const t = e.changedTouches[0];
-      if (!t) return;
-      const dx = t.clientX - sx;
-      const dy = t.clientY - sy;
-      if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_MIN_PX) return;
-      if (screenRef.current !== "playing") return;
-      inputRef.current.dir =
-        Math.abs(dx) >= Math.abs(dy)
-          ? dx > 0
-            ? "right"
-            : "left"
-          : dy > 0
-            ? "down"
-            : "up";
-    };
-
-    canvas.addEventListener("touchstart", onTouchStart, { passive: true });
-    canvas.addEventListener("touchend", onTouchEnd);
-    return () => {
-      canvas.removeEventListener("touchstart", onTouchStart);
-      canvas.removeEventListener("touchend", onTouchEnd);
-    };
+    return attachSwipe(canvas, {
+      onSwipe: (dir) => {
+        if (screenRef.current !== "playing") return;
+        inputRef.current.dir = dir;
+      },
+    });
   }, []);
 
   return { state, canvasRef, history, start, continueRun };
