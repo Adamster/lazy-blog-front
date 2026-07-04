@@ -17,7 +17,7 @@ function BoardRow({ row }: { row: RankedRow }) {
       ? "var(--m-muted2)"
       : "var(--m-fg)";
   return (
-    <div className="grid grid-cols-[28px_1fr_auto] items-center gap-3 py-3">
+    <div className="grid grid-cols-[28px_1fr_auto] items-center gap-3 py-2.5">
       <span className="text-[12px] tabular-nums" style={{ color: rankColor }}>
         {row.rank}
       </span>
@@ -58,7 +58,7 @@ export function SnakeClassicLeaderboard({
   className?: string;
 }) {
   return (
-    <div className={className}>
+    <div className={`flex flex-col self-stretch ${className}`}>
       <div className="flex items-center justify-between pb-3.5">
         <span className="text-[11px] tracking-[0.12em] text-[var(--m-accent)] uppercase">
           {"// High scores"}
@@ -73,7 +73,7 @@ export function SnakeClassicLeaderboard({
           <Spinner className="text-[20px] text-[var(--m-accent)]" />
         </div>
       ) : (
-        <div>
+        <div className="flex flex-1 flex-col justify-between">
           {board.map((row) => (
             <BoardRow key={`${row.name}-${row.rank}`} row={row} />
           ))}

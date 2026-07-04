@@ -4,7 +4,6 @@ import {
   BoardFullscreenButton,
   BoardPauseButton,
   CornerBrackets,
-  FULLSCREEN_CANVAS,
   FULLSCREEN_ROOT,
   GameOverOverlay,
   MenuOverlay,
@@ -50,19 +49,17 @@ export function SnakeClassicBoard({
   return (
     <div
       ref={fullscreenRootRef}
-      className={`mono-scope relative aspect-[30/18] w-full overflow-hidden bg-[var(--m-bg)] p-5 ${FULLSCREEN_ROOT}`}
+      className={`mono-scope relative flex aspect-[30/18] w-full items-center justify-center overflow-hidden bg-[var(--m-bg)] p-5 ${FULLSCREEN_ROOT}`}
     >
-      {/* p-5 = the same stage inset the other boards keep between the frame
-          and the play field (owner call). The canvas holds its OWN 30/18 —
-          height-fit + centred, NOT size-full — because the padded content box
-          isn't 5:3 anymore and stretched cells would distort the sprites.
-          In fullscreen the ROOT is viewport-sized (its aspect no longer
-          rules), so the canvas contain-fits the screen instead. */}
+      {/* The canvas is JS-SIZED (inline px from the hook, contain-fit 5:3 in
+          the host's content box) — the CSS takes kept breaking (iOS % heights,
+          then the absolute/aspect variant on desktop). The root just flex-
+          centres whatever size the hook writes, fullscreen included. */}
       <canvas
         ref={canvasRef}
         aria-label="Classic Snake game board. Use the arrow keys to steer, Space to pause. Walls are lethal."
         role="img"
-        className={`mx-auto block aspect-[30/18] h-full [image-rendering:pixelated] ${FULLSCREEN_CANVAS}`}
+        className="block [image-rendering:pixelated]"
       />
 
       <CornerBrackets />

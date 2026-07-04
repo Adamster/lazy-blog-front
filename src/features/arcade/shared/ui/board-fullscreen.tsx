@@ -7,59 +7,90 @@ import {
 } from "@heroicons/react/24/outline";
 
 /**
- * Native-fullscreen support for an arcade board. The BOARD ROOT (not the page)
- * goes fullscreen: attach `rootRef` to the board's `relative` wrapper and give
- * it the fullscreen layout classes (see {@link FULLSCREEN_ROOT} /
- * {@link FULLSCREEN_STAGE}) so the 30/18 stage centres on the viewport. The
- * game hooks already ResizeObserve their host, so the canvas re-sizes itself
- * on enter/exit; Esc exits natively and `isFullscreen` tracks it via
- * `fullscreenchange`.
+ * Fullscreen support for an arcade board, in TWO modes behind one toggle:
+ *
+ * - NATIVE `requestFullscreen` on the board root where the API exists;
+ * - a PSEUDO-fullscreen OVERLAY (fixed inset-0 at the modal z, page scroll
+ *   locked, Esc exits) where it doesn't — iOS Safari has no element
+ *   fullscreen at all, so the button used to silently do nothing on phones.
+ *
+ * Both modes stamp `data-board-fs` on the root (`"native"` / `"overlay"`),
+ * and ALL fullscreen styling keys off that attribute — never off the
+ * `:fullscreen` pseudo-class — so the two modes share one look. The game
+ * hooks already ResizeObserve their host, so the canvas re-sizes itself on
+ * enter/exit either way.
  */
+
+const FS_ATTR = "data-board-fs";
+
+type FsMode = "off" | "native" | "overlay";
+
 export function useBoardFullscreen() {
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [mode, setMode] = useState<FsMode>("off");
 
+  // Native path: the attribute + state follow the fullscreenchange event
+  // (covers Esc and system exits, not just our button).
   useEffect(() => {
-    const onChange = () =>
-      setIsFullscreen(
-        rootRef.current !== null &&
-          document.fullscreenElement === rootRef.current
-      );
+    const onChange = () => {
+      const el = rootRef.current;
+      if (!el) return;
+      const on = document.fullscreenElement === el;
+      if (on) el.setAttribute(FS_ATTR, "native");
+      else if (el.getAttribute(FS_ATTR) === "native")
+        el.removeAttribute(FS_ATTR);
+      setMode((m) => (on ? "native" : m === "native" ? "off" : m));
+    };
     document.addEventListener("fullscreenchange", onChange);
     return () => document.removeEventListener("fullscreenchange", onChange);
   }, []);
 
+  // Overlay path: stamp the attribute, lock the page scroll, exit on Esc.
+  useEffect(() => {
+    if (mode !== "overlay") return;
+    const el = rootRef.current;
+    if (!el) return;
+    el.setAttribute(FS_ATTR, "overlay");
+    const prevOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMode("off");
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      el.removeAttribute(FS_ATTR);
+      document.documentElement.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [mode]);
+
   const toggle = useCallback(() => {
     const el = rootRef.current;
     if (!el) return;
-    if (document.fullscreenElement) {
-      void document.exitFullscreen();
+    if (el.requestFullscreen) {
+      if (document.fullscreenElement) void document.exitFullscreen();
+      else void el.requestFullscreen();
     } else {
-      void el.requestFullscreen?.();
+      // iOS Safari: no element-fullscreen API — pseudo-fullscreen instead.
+      setMode((m) => (m === "overlay" ? "off" : "overlay"));
     }
   }, []);
 
-  return { rootRef, isFullscreen, toggle };
+  return { rootRef, isFullscreen: mode !== "off", toggle };
 }
 
 /** Fullscreen layout for the board ROOT: centre the stage on the viewport on
- *  the board's own bg (the UA default is black). */
+ *  the board's own bg; in OVERLAY mode the root itself becomes the viewport
+ *  (fixed inset-0 at the modal layer). */
 export const FULLSCREEN_ROOT =
-  "[&:fullscreen]:flex [&:fullscreen]:items-center [&:fullscreen]:justify-center [&:fullscreen]:bg-[var(--m-bg)]";
+  "[&[data-board-fs]]:flex [&[data-board-fs]]:items-center [&[data-board-fs]]:justify-center [&[data-board-fs]]:bg-[var(--m-bg)] [&[data-board-fs=overlay]]:fixed [&[data-board-fs=overlay]]:inset-0 [&[data-board-fs=overlay]]:z-[var(--m-z-modal)]";
 
 /** Fullscreen layout for a flex STAGE container inside the root: become the
- *  viewport (aspect off — keeping 30/18 overflowed 16:10 screens, whose
- *  viewport is NARROWER than 5:3); the height-fit canvas inside keeps its own
- *  ratio and the stage's `p-5` becomes the screen-edge inset. */
+ *  viewport (dvh — mobile URL bars lie about vh; aspect off, since keeping
+ *  30/18 overflowed 16:10 screens); the height-fit canvas inside keeps its
+ *  own ratio and the stage's `p-5` becomes the screen-edge inset. */
 export const FULLSCREEN_STAGE =
-  "[:fullscreen_&]:h-screen [:fullscreen_&]:aspect-auto";
-
-/** Fullscreen layout for a CANVAS that itself fills the 30/18 footprint (the
- *  snakes): contain-fit the viewport with a 20px inset on the binding axis —
- *  `min()` picks whichever of width/height runs out first, so the 5/3 ratio
- *  survives 16:9, 16:10 and ultrawide alike. */
-export const FULLSCREEN_CANVAS =
-  "[:fullscreen_&]:h-auto [:fullscreen_&]:w-[min(calc(100vw-40px),calc((100vh-40px)*5/3))] [:fullscreen_&]:aspect-[30/18]";
+  "[[data-board-fs]_&]:h-dvh [[data-board-fs]_&]:aspect-auto";
 
 /**
  * The fullscreen toggle — a `mono-icon-btn` pinned to the stage's top-right.
