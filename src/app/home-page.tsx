@@ -9,13 +9,12 @@ import {
   Category,
   Metric,
   StatusBadge,
-  Dot,
   Label,
   Loading,
   ErrorMessage,
 } from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
-import { formatDate2 } from "@/shared/lib/utils";
+import { formatDateShort } from "@/shared/lib/utils";
 import { PostCard } from "@/features/post/ui/post-card";
 
 const catOf = (p: DisplayPostResponse) => p.tags?.[0]?.tag ?? "post";
@@ -76,7 +75,7 @@ export default function HomePage() {
       className="mono-scope min-h-app mx-[calc(50%-50vw)] w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
-      <main className="mx-auto max-w-[1240px] px-10 pb-10">
+      <main className="mx-auto max-w-[1240px] px-5 pb-10 sm:px-10">
         {posts.length === 0 ? (
           <div className="border-2 border-[var(--m-line)] py-24 text-center">
             <p className="font-display text-[32px] leading-none font-bold tracking-[-0.02em]">
@@ -117,18 +116,20 @@ export default function HomePage() {
                       {hero.summary}
                     </p>
                   )}
-                  <div className="mt-6 flex flex-wrap items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
+                  {/* Same meta anatomy as the feed cards (owner call): handle
+                      left, [short date · comments · rating] pushed RIGHT — no
+                      dots, no views, ml-auto keeps the split on mobile too. */}
+                  <div className="mt-6 flex flex-wrap items-center gap-4 text-[12px] text-[var(--m-muted)]">
                     <Link
                       href={`/${hero.author.userName}`}
                       className="relative z-[var(--m-z-content)] text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
                     >
                       @{hero.author.userName}
                     </Link>
-                    <Dot />
-                    <span>{formatDate2(hero.createdAtUtc)}</span>
-                    <Dot />
-                    <span className="flex items-center gap-4">
-                      <Metric kind="views" value={hero.views} />
+                    <span className="ml-auto flex items-center gap-4">
+                      <span className="flex items-center gap-1 tabular-nums">
+                        {formatDateShort(hero.createdAtUtc)}
+                      </span>
                       <Metric kind="comments" value={hero.comments} />
                       <Metric kind="rating" value={hero.rating} />
                     </span>

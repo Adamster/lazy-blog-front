@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/solid";
 import { PostDetailedResponse } from "@/shared/api/openapi";
 import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
-import { Avatar, Category, Dot, Metric, StatusBadge } from "@/shared/ui";
+import { Avatar, Category, Metric, StatusBadge } from "@/shared/ui";
 import { PostBody } from "@/shared/ui/prose";
 import { DraftOverlay } from "@/features/post/ui/draft-overlay";
 import type { Status } from "@/shared/ui";
@@ -31,7 +31,7 @@ function PostByline({
 
   return (
     <section className="mx-[calc(50%-50vw)] mt-10 w-screen bg-[var(--m-card)]">
-      <div className="mx-auto flex max-w-[780px] flex-wrap items-end gap-x-4 gap-y-4 px-10 py-10">
+      <div className="mx-auto flex max-w-[780px] flex-wrap items-end gap-x-4 gap-y-4 px-5 py-10 sm:px-10">
         <Link
           href={`/${authorHandle}`}
           aria-label={`${displayNameOf(post.author)} profile`}
@@ -53,14 +53,17 @@ function PostByline({
             >
               @{authorHandle}
             </Link>
-            <Dot />
-            <span className="tabular-nums">
-              {formatDate2(post.createdAtUtc)}
-            </span>
           </span>
         </div>
 
-        <div className="flex items-center gap-4 text-[12px] text-[var(--m-muted)] sm:ml-auto">
+        {/* Date rides IN the metric row (a stacked date-over-icons take was
+            tried and reverted); on a narrow screen the byline's flex-wrap
+            drops this WHOLE right group to its own line, still right-pinned
+            via ml-auto — the feed-card behaviour. */}
+        <div className="ml-auto flex items-center gap-4 text-[12px] text-[var(--m-muted)]">
+          <span className="whitespace-nowrap tabular-nums">
+            {formatDate2(post.createdAtUtc)}
+          </span>
           <Metric kind="views" value={post.views ?? 0} />
           {/* Hand-rolled to match the Metric primitive (the count is a live island). */}
           <span
@@ -93,7 +96,7 @@ export const PostView = ({
 
   return (
     <>
-      <div className="mx-auto max-w-[780px] px-10 pt-10">
+      <div className="mx-auto max-w-[780px] px-5 pt-10 sm:px-10">
         <div className="mb-2 flex flex-wrap items-center gap-3">
           <Category>{cat}</Category>
           {status && <StatusBadge status={status} className="ml-auto" />}
@@ -113,7 +116,7 @@ export const PostView = ({
 
       <PostByline post={post} commentsCount={commentsCount} />
 
-      <article className="mx-auto max-w-[780px] px-10 pt-10">
+      <article className="mx-auto max-w-[780px] px-5 pt-10 sm:px-10">
         {post.coverUrl && (
           <div className="relative aspect-[16/9] w-full overflow-hidden border-2 border-[var(--m-dim)] bg-[var(--m-panel)]">
             <Image
@@ -140,7 +143,9 @@ export const PostView = ({
           horizontal scroll. */}
       {vote}
 
-      <div className="mx-auto max-w-[780px] px-10 pb-10">{comments}</div>
+      <div className="mx-auto max-w-[780px] px-5 pb-10 sm:px-10">
+        {comments}
+      </div>
     </>
   );
 };
