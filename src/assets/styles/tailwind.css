@@ -82,20 +82,20 @@
 
 /* Toast slide-in — Brutalist Mono. From the right, short + linear-ish. */
 /* Arcade DESKTOP-ONLY gate (owner call: touch/mobile play retired). A game —
-   its stats band + board — renders ONLY on a ≥800px screen with a fine
-   pointer (800 — owner retune: a half-screen window on a Mac lands at ~800
-   and change, and the 900 gate was cutting it off); everywhere else the pages
+   its stats band + board — renders ONLY on a ≥600px screen with a fine
+   pointer (owner retunes: 1024 → 900 → 800 → 600 — keep half-screen Mac
+   windows and small laptops in); everywhere else the pages
    show the high-score rail plus the `touch-game-notice` line instead. Both
    media terms matter: a phone fails the width, an iPad Pro fails the
    pointer. */
 @utility desktop-game-only {
   display: none;
-  @media (min-width: 800px) and (pointer: fine) {
+  @media (min-width: 600px) and (pointer: fine) {
     display: block;
   }
 }
 @utility touch-game-notice {
-  @media (min-width: 800px) and (pointer: fine) {
+  @media (min-width: 600px) and (pointer: fine) {
     display: none;
   }
 }
