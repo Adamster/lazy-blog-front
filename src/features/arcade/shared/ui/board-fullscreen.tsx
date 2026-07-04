@@ -81,9 +81,12 @@ export function useBoardFullscreen() {
 
 /** Fullscreen layout for the board ROOT: centre the stage on the viewport on
  *  the board's own bg; in OVERLAY mode the root itself becomes the viewport
- *  (fixed inset-0 at the modal layer). */
+ *  (fixed inset-0 at the modal layer). aspect-auto is LOAD-BEARING: iOS lets
+ *  aspect-ratio beat the fixed insets, so the rabbit's 30/18 root stayed a
+ *  strip instead of going fullscreen. select-none + touch-manipulation kill
+ *  the double-tap text selection / zoom while playing fullscreen. */
 export const FULLSCREEN_ROOT =
-  "[&[data-board-fs]]:flex [&[data-board-fs]]:items-center [&[data-board-fs]]:justify-center [&[data-board-fs]]:bg-[var(--m-bg)] [&[data-board-fs=overlay]]:fixed [&[data-board-fs=overlay]]:inset-0 [&[data-board-fs=overlay]]:z-[var(--m-z-modal)]";
+  "[&[data-board-fs]]:flex [&[data-board-fs]]:items-center [&[data-board-fs]]:justify-center [&[data-board-fs]]:bg-[var(--m-bg)] [&[data-board-fs]]:aspect-auto [&[data-board-fs]]:select-none [&[data-board-fs]]:touch-manipulation [&[data-board-fs=overlay]]:fixed [&[data-board-fs=overlay]]:inset-0 [&[data-board-fs=overlay]]:z-[var(--m-z-modal)]";
 
 /** Fullscreen layout for a flex STAGE container inside the root: become the
  *  viewport (dvh — mobile URL bars lie about vh; aspect off, since keeping

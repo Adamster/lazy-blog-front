@@ -8,6 +8,7 @@ import {
 } from "@/features/arcade/2048";
 import {
   BOARD_GRID_RAIL,
+  BoardUnsupported,
   BoardSignInTeaser,
   StatsBand,
 } from "@/features/arcade/shared";
@@ -24,18 +25,25 @@ export default function Page2048() {
       style={{ fontFamily: "var(--font-mono)" }}
     >
       <main className="mx-auto max-w-[1240px] px-5 pb-10 sm:px-10">
-        <StatsBand
-          score={state.score}
-          best={state.best}
-          statsLoading={statsLoading}
-          history={game.history}
-          historyWindow={HISTORY_RECENT}
-          gradientId="score2048SparkGrad"
-        />
+        {/* The game (stats + board) is DESKTOP-ONLY (owner call): touch and
+            small screens get the notice + the high-score rail instead. */}
+        <div className="desktop-game-only">
+          <StatsBand
+            score={state.score}
+            best={state.best}
+            statsLoading={statsLoading}
+            history={game.history}
+            historyWindow={HISTORY_RECENT}
+            gradientId="score2048SparkGrad"
+          />
+        </div>
 
         <div className={BOARD_GRID_RAIL}>
           <div>
-            <Board2048 api={game} canRank={showBoard} />
+            <div className="desktop-game-only">
+              <Board2048 api={game} canRank={showBoard} />
+            </div>
+            <BoardUnsupported />
           </div>
           {showBoard ? (
             <Leaderboard2048 board={board} loading={boardLoading} />

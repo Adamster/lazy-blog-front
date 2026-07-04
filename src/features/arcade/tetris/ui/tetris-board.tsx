@@ -2,7 +2,6 @@
 
 import {
   BoardFullscreenButton,
-  BoardPauseButton,
   CornerBrackets,
   FULLSCREEN_ROOT,
   FULLSCREEN_STAGE,
@@ -43,7 +42,7 @@ export function TetrisBoard({
   /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
   canRank?: boolean;
 }) {
-  const { canvasRef, nextCanvasRef, panelRef, start, state, togglePause } = api;
+  const { canvasRef, nextCanvasRef, panelRef, start, state } = api;
   const {
     rootRef: fullscreenRootRef,
     isFullscreen,
@@ -75,12 +74,13 @@ export function TetrisBoard({
             boxes get a content-based automatic minimum height, so after exiting
             fullscreen the still-large canvas would prop the stage open forever. */}
       <div
-        className={`flex aspect-[30/18] min-h-0 w-full items-stretch justify-center gap-10 p-5 ${FULLSCREEN_STAGE}`}
+        className={`flex aspect-[30/18] min-h-0 w-full items-stretch justify-center gap-5 p-5 sm:gap-10 ${FULLSCREEN_STAGE}`}
       >
         {/* Invisible w-20 mirror of the readout panel (the Stay Awake pattern):
             with equal flanks the well sits dead-centre and the well→stats
-            inset matches Stay Awake's. */}
-        <div className="w-20 shrink-0" />
+            inset matches Stay Awake's. DESKTOP-ONLY — on a phone (esp.
+            portrait fullscreen) it pushed the readout column off-screen. */}
+        <div className="hidden w-20 shrink-0 sm:block" />
         {/* The well: JS-sized to an EXACT 10×20 cell multiple (no leftover strip);
               `h-full`/aspect are only the pre-hydration fallback — inline w/h override
               them. `self-center` centres it if the height-fit leaves side margin. */}
@@ -88,7 +88,7 @@ export function TetrisBoard({
           ref={canvasRef}
           aria-label="Tetris well. Arrow keys or A/D to move, Up or X to rotate, Down to soft drop."
           role="img"
-          className="block [aspect-ratio:1/2] h-full touch-none self-center border-2 border-[var(--m-dim)]"
+          className="block [aspect-ratio:1/2] h-full self-center border-2 border-[var(--m-dim)]"
         />
 
         {/* Beside the well: the NEXT preview + the run readouts (owner call
@@ -136,10 +136,6 @@ export function TetrisBoard({
           detail={`${state.lines} lines · level ${state.level} · ${rankClause}`}
           onRestart={start}
         />
-      )}
-
-      {state.screen === "playing" && (
-        <BoardPauseButton paused={state.paused} onToggle={togglePause} />
       )}
 
       {showFullscreenToggle && (

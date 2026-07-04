@@ -3,7 +3,6 @@
 import type { PointerEvent } from "react";
 import {
   BoardFullscreenButton,
-  BoardPauseButton,
   CornerBrackets,
   FULLSCREEN_ROOT,
   FULLSCREEN_STAGE,
@@ -22,7 +21,8 @@ import type { StayAwakeGameApi, StayAwakeState } from "../model/types";
  *  approved menu subtitle (owner copy). */
 const KEY_HINTS: [string, string][] = [
   ["GOAL", "The floor is sleep. Keep hopping."],
-  ["HOP", "← →  /  A D  ·  tap a side"],
+  ["HOP", "← →  /  A D"],
+  ["TAP", "left half = hop left · right half = hop right"],
   ["PAUSE", "SPACE"],
 ];
 
@@ -137,15 +137,7 @@ export function StayAwakeBoard({
   /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
   canRank?: boolean;
 }) {
-  const {
-    state,
-    canvasRef,
-    leftPanelRef,
-    rightPanelRef,
-    start,
-    hop,
-    togglePause,
-  } = api;
+  const { state, canvasRef, leftPanelRef, rightPanelRef, start, hop } = api;
   const {
     rootRef: fullscreenRootRef,
     isFullscreen,
@@ -235,10 +227,6 @@ export function StayAwakeBoard({
           detail={`${causeLine} · ${state.altitude} rows · ${rankClause}`}
           onRestart={start}
         />
-      )}
-
-      {state.screen === "playing" && (
-        <BoardPauseButton paused={state.paused} onToggle={togglePause} />
       )}
 
       {showFullscreenToggle && (

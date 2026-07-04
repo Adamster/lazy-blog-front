@@ -6,6 +6,11 @@ import { GlitchText } from "@/shared/ui/effects";
 import { Console } from "../overlays/console";
 import { Button } from "../forms/button";
 
+/** The error pages' shared deadpan lead (also the global-error fallback) —
+ *  "Motivation to fix it: pending" retired by owner call. */
+export const ERROR_LEAD =
+  "Something broke. A sloth has been notified and hit snooze.";
+
 // Narrows the `{ response: { status } }` shape some fetch errors carry.
 const statusOf = (error: unknown): number | undefined => {
   if (
@@ -65,7 +70,7 @@ export const ErrorMessage = ({
 
   const eyebrowText = statusLine;
   const headline = "A glitch in the Lazyverse";
-  const lead = "Error detected. Motivation to fix it: pending.";
+  const lead = ERROR_LEAD;
 
   return (
     <div

@@ -81,6 +81,25 @@
 }
 
 /* Toast slide-in — Brutalist Mono. From the right, short + linear-ish. */
+/* Arcade DESKTOP-ONLY gate (owner call: touch/mobile play retired). A game —
+   its stats band + board — renders ONLY on a ≥600px screen with a fine
+   pointer (owner retunes: 1024 → 900 → 800 → 600 — keep half-screen Mac
+   windows and small laptops in); everywhere else the pages
+   show the high-score rail plus the `touch-game-notice` line instead. Both
+   media terms matter: a phone fails the width, an iPad Pro fails the
+   pointer. */
+@utility desktop-game-only {
+  display: none;
+  @media (min-width: 600px) and (pointer: fine) {
+    display: block;
+  }
+}
+@utility touch-game-notice {
+  @media (min-width: 600px) and (pointer: fine) {
+    display: none;
+  }
+}
+
 /* Arcade crowns — the profile TOP-1 trophies: a periodic diagonal GLINT that
    runs across the icon, clipped to the pixel silhouette (the halo/pulse takes
    were both cut — owner call: the glint alone is the trophy). The sweep is

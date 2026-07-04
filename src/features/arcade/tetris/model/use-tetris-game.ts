@@ -12,7 +12,7 @@ import {
   TetrisEngine,
   type TetrisPalette,
 } from "./engine";
-import { attachSwipe, GUEST_SCOPE } from "@/features/arcade/shared";
+import { GUEST_SCOPE } from "@/features/arcade/shared";
 import { loadHistory, recentSeries, recordScore } from "./score-history";
 import type {
   HistoryPoint,
@@ -438,46 +438,6 @@ export function useTetrisGame({
       window.removeEventListener("keyup", onKeyUp);
     };
   }, [start, togglePause]);
-
-  // ---------- touch (the mobile classic: swipe ←/→ = one move, TAP = rotate,
-  // swipe ↓ = a soft-drop burst; `touch-none` on the canvas stops page scroll).
-  // The held-key input flags are PULSED — set, then cleared after one DAS-safe
-  // beat — so a swipe reads as a single step, not an auto-repeat hold. ----------
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const MOVE_PULSE_MS = 80;
-    const SOFT_DROP_PULSE_MS = 300;
-    const timers: number[] = [];
-    const pulse = (flag: "left" | "right" | "softDrop", ms: number) => {
-      inputRef.current[flag] = true;
-      timers.push(
-        window.setTimeout(() => {
-          inputRef.current[flag] = false;
-        }, ms)
-      );
-    };
-    const playing = () => screenRef.current === "playing" && !pausedRef.current;
-
-    const cleanupSwipe = attachSwipe(canvas, {
-      onSwipe: (dir) => {
-        if (!playing()) return;
-        if (dir === "left") pulse("left", MOVE_PULSE_MS);
-        else if (dir === "right") pulse("right", MOVE_PULSE_MS);
-        else if (dir === "down") pulse("softDrop", SOFT_DROP_PULSE_MS);
-        else inputRef.current.rotateCW = true; // swipe up = rotate too
-      },
-      onTap: () => {
-        if (!playing()) return;
-        inputRef.current.rotateCW = true;
-      },
-    });
-    return () => {
-      cleanupSwipe();
-      for (const t of timers) window.clearTimeout(t);
-    };
-  }, []);
 
   return {
     state,

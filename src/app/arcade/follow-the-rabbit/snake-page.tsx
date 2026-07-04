@@ -9,6 +9,7 @@ import {
 } from "@/features/arcade/snake";
 import {
   BOARD_GRID_RAIL,
+  BoardUnsupported,
   BoardSignInTeaser,
   StatsBand,
 } from "@/features/arcade/shared";
@@ -25,23 +26,30 @@ export default function SnakePage() {
       style={{ fontFamily: "var(--font-mono)" }}
     >
       <main className="mx-auto max-w-[1240px] px-5 pb-10 sm:px-10">
-        <StatsBand
-          score={state.score}
-          best={state.best}
-          statsLoading={statsLoading}
-          history={game.history}
-          historyWindow={HISTORY_RECENT}
-          gradientId="snakeScoreSparkGrad"
-          scoreExtra={
-            state.screen === "playing" ? (
-              <ScorePops score={state.score} />
-            ) : null
-          }
-        />
+        {/* The game (stats + board) is DESKTOP-ONLY (owner call): touch and
+            small screens get the notice + the high-score rail instead. */}
+        <div className="desktop-game-only">
+          <StatsBand
+            score={state.score}
+            best={state.best}
+            statsLoading={statsLoading}
+            history={game.history}
+            historyWindow={HISTORY_RECENT}
+            gradientId="snakeScoreSparkGrad"
+            scoreExtra={
+              state.screen === "playing" ? (
+                <ScorePops score={state.score} />
+              ) : null
+            }
+          />
+        </div>
 
         <div className={BOARD_GRID_RAIL}>
           <div>
-            <SnakeBoard api={game} canRank={showBoard} />
+            <div className="desktop-game-only">
+              <SnakeBoard api={game} canRank={showBoard} />
+            </div>
+            <BoardUnsupported />
           </div>
           {showBoard ? (
             <SnakeLeaderboard board={board} loading={boardLoading} />
