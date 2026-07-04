@@ -2,7 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
-import { lerpHex, SnakeEngine, type SnakePalette } from "./engine";
+import {
+  GRID_H,
+  GRID_W,
+  lerpHex,
+  SnakeEngine,
+  type SnakePalette,
+} from "./engine";
 import {
   attachSwipe,
   GUEST_SCOPE,
@@ -19,13 +25,6 @@ import type {
 /** rAF can be throttled in background tabs — this ticker keeps the sim alive. */
 const FALLBACK_MS = 120;
 const FALLBACK_GAP = 180;
-
-/** Phones get the TRANSPOSED 18×30 grid (owner call — the same game, a board
- *  that fits a portrait screen). Decided once per engine instance at creation
- *  (matches the `sm` breakpoint the board's aspect flips on). */
-const isPortraitViewport = () =>
-  typeof window !== "undefined" &&
-  window.matchMedia("(max-width: 639px)").matches;
 
 /** Parse `#rgb` / `#rrggbb` → `[r,g,b]`; falls back to a light gray on anything odd. */
 function parseHexRgb(hex: string): [number, number, number] {
@@ -96,11 +95,7 @@ export function useSnakeGame({
   // reading/writing refs during render).
   const engineRef = useRef<SnakeEngine | null>(null);
   const getEngine = () => {
-    engineRef.current ??= new SnakeEngine(
-      speed,
-      wrapWalls,
-      isPortraitViewport()
-    );
+    engineRef.current ??= new SnakeEngine(speed, wrapWalls);
     return engineRef.current;
   };
 
@@ -226,7 +221,7 @@ export function useSnakeGame({
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       let availW = 760;
-      let availH = (availW * engine.gh) / engine.gw;
+      let availH = (availW * GRID_H) / GRID_W;
       if (host) {
         const cs = getComputedStyle(host);
         const padX =
@@ -238,8 +233,8 @@ export function useSnakeGame({
         availW = Math.max(0, host.clientWidth - padX) || availW;
         availH = Math.max(0, host.clientHeight - padY) || availH;
       }
-      const w = Math.min(availW, (availH * engine.gw) / engine.gh);
-      const h = (w * engine.gh) / engine.gw;
+      const w = Math.min(availW, (availH * GRID_W) / GRID_H);
+      const h = (w * GRID_H) / GRID_W;
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
       canvas.width = Math.round(w * dpr);
