@@ -60,7 +60,7 @@ export function SnakeBoard({
   return (
     <div
       ref={fullscreenRootRef}
-      className={`mono-scope relative flex aspect-[18/30] w-full items-center justify-center overflow-hidden bg-[var(--m-bg)] p-5 sm:aspect-[30/18] ${FULLSCREEN_ROOT}`}
+      className={`mono-scope relative flex aspect-[30/18] w-full items-center justify-center overflow-hidden bg-[var(--m-bg)] p-5 ${FULLSCREEN_ROOT}`}
     >
       {/* The canvas is JS-SIZED (inline px from the hook, contain-fit 5:3 in
           the host's content box) — the CSS takes kept breaking (iOS % heights,

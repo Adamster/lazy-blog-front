@@ -412,14 +412,14 @@ function headQuarters(dir: Cell): number {
  * segments sit on OPPOSITE edges, so the raw delta is a huge wrong vector. If
  * `|delta|` > half the grid the move went the SHORT way, so the sign is flipped.
  */
-function wrapStep(a: Cell, b: Cell, gw: number, gh: number): Cell {
+function wrapStep(a: Cell, b: Cell): Cell {
   const step = (d: number, span: number) => {
     if (d > span / 2) return d - span;
     if (d < -span / 2) return d + span;
     return d;
   };
-  const dx = step(b.x - a.x, gw);
-  const dy = step(b.y - a.y, gh);
+  const dx = step(b.x - a.x, GRID_W);
+  const dy = step(b.y - a.y, GRID_H);
   return { x: Math.sign(dx), y: Math.sign(dy) };
 }
 
@@ -518,19 +518,8 @@ export class SnakeEngine {
     // tunnel was cut for the classic read): hitting an edge ends the run, same
     // as a self-hit or the KILLER rabbit. The board carries the danger-red
     // border to announce it. Wrap stays available behind the flag.
-    private wrapWalls = false,
-    // PORTRAIT mode (owner call, phones): the SAME game on a transposed
-    // 18×30 grid — a real board size, not a render rotate. Fixed per engine
-    // instance; the hook picks it from the viewport at mount.
-    portrait = false
-  ) {
-    this.gw = portrait ? GRID_H : GRID_W;
-    this.gh = portrait ? GRID_W : GRID_H;
-  }
-
-  /** Live grid dims — landscape 30×18 or portrait 18×30. */
-  readonly gw: number;
-  readonly gh: number;
+    private wrapWalls = false
+  ) {}
 
   get stepInterval(): number {
     return this.stepMs;
@@ -551,8 +540,8 @@ export class SnakeEngine {
 
   /** Reset to a fresh run (centre snake + a fresh trio of rabbits). */
   reset() {
-    const cx = Math.floor(this.gw / 2);
-    const cy = Math.floor(this.gh / 2);
+    const cx = Math.floor(GRID_W / 2);
+    const cy = Math.floor(GRID_H / 2);
     this.snake = [
       { x: cx, y: cy },
       { x: cx - 1, y: cy },
@@ -649,8 +638,8 @@ export class SnakeEngine {
     let y = 0;
     let guard = 0;
     do {
-      x = (Math.random() * this.gw) | 0;
-      y = (Math.random() * this.gh) | 0;
+      x = (Math.random() * GRID_W) | 0;
+      y = (Math.random() * GRID_H) | 0;
       guard++;
     } while (
       (occupied.has(`${x},${y}`) || blocked?.has(`${x},${y}`)) &&
@@ -678,8 +667,8 @@ export class SnakeEngine {
     const head = this.snake[0];
     const blocked = new Set<string>();
     const add = (x: number, y: number) => {
-      const wx = ((x % this.gw) + this.gw) % this.gw;
-      const wy = ((y % this.gh) + this.gh) % this.gh;
+      const wx = ((x % GRID_W) + GRID_W) % GRID_W;
+      const wy = ((y % GRID_H) + GRID_H) % GRID_H;
       blocked.add(`${wx},${wy}`);
     };
     // Small radius around the head (includes the head itself).
@@ -709,11 +698,11 @@ export class SnakeEngine {
     let nx = head.x + this.dir.x;
     let ny = head.y + this.dir.y;
 
-    const out = nx < 0 || ny < 0 || nx >= this.gw || ny >= this.gh;
+    const out = nx < 0 || ny < 0 || nx >= GRID_W || ny >= GRID_H;
     if (out) {
       if (this.wrapWalls) {
-        nx = (nx + this.gw) % this.gw;
-        ny = (ny + this.gh) % this.gh;
+        nx = (nx + GRID_W) % GRID_W;
+        ny = (ny + GRID_H) % GRID_H;
       } else {
         return this.dead();
       }
@@ -844,16 +833,16 @@ export class SnakeEngine {
   /** Faint muted cell grid so the player can gauge distance / line up moves.
    *  Internal lines only (no outer frame — the board stays borderless). */
   private drawGrid(ctx: CanvasRenderingContext2D, cssW: number, cssH: number) {
-    const cell = cssW / this.gw; // === cssH / this.gh (square cells, pinned aspect)
+    const cell = cssW / GRID_W; // === cssH / GRID_H (square cells, pinned aspect)
     ctx.strokeStyle = this.palette.gridLine;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    for (let i = 1; i < this.gw; i++) {
+    for (let i = 1; i < GRID_W; i++) {
       const p = Math.round(i * cell) + 0.5; // +0.5 → crisp 1px line
       ctx.moveTo(p, 0);
       ctx.lineTo(p, cssH);
     }
-    for (let i = 1; i < this.gh; i++) {
+    for (let i = 1; i < GRID_H; i++) {
       const p = Math.round(i * cell) + 0.5;
       ctx.moveTo(0, p);
       ctx.lineTo(cssW, p);
@@ -1246,7 +1235,7 @@ export class SnakeEngine {
     dpr: number,
     animate: boolean
   ) {
-    const cell = cssW / this.gw; // === cssH / this.gh (square cells)
+    const cell = cssW / GRID_W; // === cssH / GRID_H (square cells)
     this.frame++;
     // Opaque theme field, repainted each frame, then the grid.
     ctx.fillStyle = this.palette.boardBg;
@@ -1304,7 +1293,7 @@ export class SnakeEngine {
       if (j === bodyLen) {
         // Trailing direction: from the previous segment toward the tail tip
         // (wrap-corrected so a seam-crossing pair doesn't read as a huge jump).
-        const trail = wrapStep(this.snake[j - 1], seg, this.gw, this.gh);
+        const trail = wrapStep(this.snake[j - 1], seg);
         const tailSprite = rotateSprite(TAIL_SPRITE, tailQuarters(trail));
         // The tail draws in `fillToCell` (its wide cap fills the cell, the
         // tentacles splay off the trailing edge) and is nudged BODYWARD by
@@ -1332,7 +1321,7 @@ export class SnakeEngine {
         // end-to-end into one continuous tube; the seam bands across the flow.
         // On a turn the perpendicular neighbour overlaps at the corner cell,
         // minimising the inner seam.
-        const flow = wrapStep(seg, this.snake[j - 1], this.gw, this.gh);
+        const flow = wrapStep(seg, this.snake[j - 1]);
         const bodySprite = rotateSprite(BODY_SPRITE, bodyQuarters(flow));
         this.drawSprite(
           ctx,
