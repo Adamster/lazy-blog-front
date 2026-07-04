@@ -22,7 +22,6 @@ import type { StayAwakeGameApi, StayAwakeState } from "../model/types";
 const KEY_HINTS: [string, string][] = [
   ["GOAL", "The floor is sleep. Keep hopping."],
   ["HOP", "← →  /  A D"],
-  ["TAP", "left half = hop left · right half = hop right"],
   ["PAUSE", "SPACE"],
 ];
 
