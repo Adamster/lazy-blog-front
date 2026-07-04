@@ -4,7 +4,6 @@ import {
   BoardFullscreenButton,
   BoardPauseButton,
   CornerBrackets,
-  FULLSCREEN_CANVAS,
   FULLSCREEN_ROOT,
   GameOverOverlay,
   MenuOverlay,
@@ -60,21 +59,19 @@ export function SnakeBoard({
   return (
     <div
       ref={fullscreenRootRef}
-      className={`mono-scope relative aspect-[30/18] w-full overflow-hidden bg-[var(--m-bg)] p-5 ${FULLSCREEN_ROOT}`}
+      className={`mono-scope relative flex aspect-[30/18] w-full items-center justify-center overflow-hidden bg-[var(--m-bg)] p-5 ${FULLSCREEN_ROOT}`}
     >
-      {/* The canvas holds its OWN 30/18 inside the p-5 stage inset — but via
-          ABSOLUTE top/bottom pins, not `h-full`: iOS Safari fails to resolve a
-          percentage height against an aspect-ratio parent, which let the
-          canvas balloon to its backing-store size (owner-caught on iPhone).
-          Pinned insets are definite everywhere; width follows the aspect,
-          centred by the translate. In fullscreen it contain-fits instead. */}
+      {/* The canvas is JS-SIZED (inline px from the hook, contain-fit 5:3 in
+          the host's content box) — the CSS takes kept breaking (iOS % heights,
+          then the absolute/aspect variant on desktop). The root just flex-
+          centres whatever size the hook writes, fullscreen included. */}
       {/* border-2 --m-error: ALL four walls are lethal (the stay-awake wall
           language) — the tunnel-wrap was cut, so the frame reads as danger. */}
       <canvas
         ref={canvasRef}
         aria-label="Snake game board. Use the arrow keys to steer, Space to pause. Walls are lethal."
         role="img"
-        className={`absolute top-5 bottom-5 left-1/2 block aspect-[30/18] -translate-x-1/2 touch-none border-2 border-[var(--m-error)] [image-rendering:pixelated] ${FULLSCREEN_CANVAS}`}
+        className="block touch-none border-2 border-[var(--m-error)] [image-rendering:pixelated]"
       />
 
       <CornerBrackets />

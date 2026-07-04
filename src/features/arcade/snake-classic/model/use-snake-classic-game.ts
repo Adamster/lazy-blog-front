@@ -202,12 +202,32 @@ export function useSnakeClassicGame({
     let lastFrame = 0;
     let rafId = 0;
 
+    // JS-SIZED like the Tetris well (owner-caught regressions killed the CSS
+    // takes: iOS can't resolve % heights against an aspect-ratio parent, and
+    // the absolute/aspect variant broke desktop): measure the HOST's content
+    // box, contain-fit the 5:3 grid, write INLINE px — deterministic in
+    // normal mode and fullscreen alike (in fullscreen the host IS the
+    // viewport, so this also replaces the old CSS min() clamp).
+    const host = canvas.parentElement;
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = canvas.clientWidth || 760;
-      // Aspect is pinned to GRID_W/GRID_H, so derive height from width — square cells
-      // even mid-layout, before the element has settled its measured height.
-      const h = canvas.clientHeight || Math.round((w * GRID_H) / GRID_W);
+      let availW = 760;
+      let availH = (availW * GRID_H) / GRID_W;
+      if (host) {
+        const cs = getComputedStyle(host);
+        const padX =
+          (parseFloat(cs.paddingLeft) || 0) +
+          (parseFloat(cs.paddingRight) || 0);
+        const padY =
+          (parseFloat(cs.paddingTop) || 0) +
+          (parseFloat(cs.paddingBottom) || 0);
+        availW = Math.max(0, host.clientWidth - padX) || availW;
+        availH = Math.max(0, host.clientHeight - padY) || availH;
+      }
+      const w = Math.min(availW, (availH * GRID_W) / GRID_H);
+      const h = (w * GRID_H) / GRID_W;
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -230,7 +250,7 @@ export function useSnakeClassicGame({
     });
 
     const ro = new ResizeObserver(() => resize());
-    ro.observe(canvas);
+    ro.observe(host ?? canvas);
 
     const tick = (now: number) => {
       lastFrame = now;

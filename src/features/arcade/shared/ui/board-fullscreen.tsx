@@ -92,14 +92,6 @@ export const FULLSCREEN_ROOT =
 export const FULLSCREEN_STAGE =
   "[[data-board-fs]_&]:h-dvh [[data-board-fs]_&]:aspect-auto";
 
-/** Fullscreen layout for a CANVAS that itself fills the 30/18 footprint (the
- *  snakes; positioned absolutely in normal mode): back to static flow,
- *  contain-fit the viewport with a 20px inset on the binding axis — `min()`
- *  picks whichever of width/height runs out first, so the 5/3 ratio survives
- *  16:9, 16:10, ultrawide and portrait phones alike. */
-export const FULLSCREEN_CANVAS =
-  "[[data-board-fs]_&]:static [[data-board-fs]_&]:translate-x-0 [[data-board-fs]_&]:h-auto [[data-board-fs]_&]:w-[min(calc(100dvw-40px),calc((100dvh-40px)*5/3))] [[data-board-fs]_&]:aspect-[30/18]";
-
 /**
  * The fullscreen toggle — a `mono-icon-btn` pinned to the stage's top-right.
  * Render it AFTER the overlays and ONLY on overlay screens (menu / pause —
