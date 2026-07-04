@@ -52,21 +52,28 @@ function CardMeta({
 }) {
   return (
     <>
-      {authorHandle && (
+      {/* WITH an author (home feed): handle left, [date · comments · rating]
+          right. WITHOUT one (own profile): the date anchors LEFT instead —
+          an all-right group left the row lopsided (owner catch). Views are
+          dropped either way; full metrics live on the post page. */}
+      {authorHandle ? (
         <Link
           href={`/${authorHandle}`}
           className="relative z-[var(--m-z-content)] truncate text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
         >
           @{authorHandle}
         </Link>
-      )}
-      {/* The date rides the metric group WHERE VIEWS USED TO BE (owner call —
-          views dropped from the card; full metrics live on the post page):
-          calendar icon + compact numeric date, the metric icon/gap language. */}
-      <span className="ml-auto flex items-center gap-4">
-        <span className="flex items-center gap-1 whitespace-nowrap tabular-nums">
+      ) : (
+        <span className="whitespace-nowrap tabular-nums">
           {formatDateShort(post.createdAtUtc)}
         </span>
+      )}
+      <span className="ml-auto flex items-center gap-4">
+        {authorHandle && (
+          <span className="flex items-center gap-1 whitespace-nowrap tabular-nums">
+            {formatDateShort(post.createdAtUtc)}
+          </span>
+        )}
         <Metric kind="comments" value={post.comments} />
         <Metric kind="rating" value={post.rating} />
       </span>
