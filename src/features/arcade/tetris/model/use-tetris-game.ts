@@ -17,6 +17,7 @@ import {
   loadBindings,
   saveBindings,
   type BindingMap,
+  createGamepadPoller,
 } from "@/features/arcade/shared";
 import {
   TETRIS_ACTION_IDS,
@@ -131,6 +132,7 @@ export function useTetrisGame({
   const holdCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const engineRef = useRef<TetrisEngine | null>(null);
+  const pollPadRef = useRef(createGamepadPoller());
   const getEngine = () => {
     engineRef.current ??= new TetrisEngine();
     return engineRef.current;
@@ -408,12 +410,25 @@ export function useTetrisGame({
       const animate = !prefersReducedMotion();
       const screen = screenRef.current;
 
+      const pad = pollPadRef.current();
+      if (!keysSuspendedRef.current) {
+        if (screenRef.current !== "playing") {
+          if (pad.anyPress) start();
+        } else if (pad.pause) {
+          togglePause();
+        }
+      }
+
       if (screen === "playing" && !pausedRef.current && !endedRef.current) {
         const input = inputRef.current;
         const kb = kbHeldRef.current;
-        input.left = kb.left;
-        input.right = kb.right;
-        input.softDrop = kb.softDrop;
+        input.left = kb.left || pad.left;
+        input.right = kb.right || pad.right;
+        input.softDrop = kb.softDrop || pad.softDrop;
+        if (pad.rotateCW) input.rotateCW = true;
+        if (pad.rotateCCW) input.rotateCCW = true;
+        if (pad.hardDrop) input.hardDrop = true;
+        if (pad.hold) input.hold = true;
         const res = engine.update(dt, input, animate);
         if (res.dead) {
           endedRef.current = true;
@@ -464,7 +479,7 @@ export function useTetrisGame({
       ro.disconnect();
       themeObserver.disconnect();
     };
-  }, [handleGameOver]);
+  }, [handleGameOver, start, togglePause]);
 
   // ---------- keyboard ----------
   useEffect(() => {

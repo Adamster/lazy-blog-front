@@ -42,3 +42,5 @@ export { rankLine } from "./model/rank-line";
 export { useLocalBest } from "./model/use-local-best";
 export type { LocalBest } from "./model/use-local-best";
 export type { HistoryPoint } from "./model/types";
+export { createGamepadPoller } from "./model/gamepad";
+export type { PadFrame } from "./model/gamepad";
