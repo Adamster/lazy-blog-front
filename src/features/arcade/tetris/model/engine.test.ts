@@ -85,3 +85,56 @@ describe("SRS kicks", () => {
     expect(p.x).toBe(3);
   });
 });
+
+const filledCells = (e: TetrisEngine) =>
+  e
+    .debugGrid()
+    .flat()
+    .filter((v) => v !== 0).length;
+
+describe("lock delay (guideline move-reset)", () => {
+  // NOTE: a single update() is capped at MAX_DT=100ms — timing tests must step
+  // in ≤100ms ticks, never one big dt.
+  it("a resting piece locks after 500ms", () => {
+    const e = new TetrisEngine(() => 0.5);
+    e.reset();
+    e.debugSetPiece("O", 0, 4, 18); // resting on the floor
+    for (let i = 0; i < 4; i++) step(e, 100); // 400ms — still in grace
+    expect(filledCells(e)).toBe(0);
+    step(e, 100); // 500ms — locks
+    expect(filledCells(e)).toBe(4);
+  });
+
+  it("a successful move resets the timer; after 15 resets it locks anyway", () => {
+    const e = new TetrisEngine(() => 0.5);
+    e.reset();
+    e.debugSetPiece("O", 0, 4, 18);
+    // Alternating wiggle: each direction flip is a fresh immediate DAS move that
+    // resets the lock timer (≤ 15 times), so the piece far outlives 500ms.
+    for (let i = 0; i < 16; i++) {
+      step(e, 100, i % 2 === 0 ? { left: true } : { right: true });
+    }
+    expect(filledCells(e)).toBe(0); // >1.5s alive — resets clearly worked
+    // Budget exhausted: keep wiggling, the timer now runs through → locks.
+    for (let i = 0; i < 5; i++) {
+      step(e, 100, i % 2 === 0 ? { left: true } : { right: true });
+    }
+    expect(filledCells(e)).toBe(4);
+  });
+});
+
+describe("DAS", () => {
+  it("moves once on press, then repeats after 133ms every 25ms", () => {
+    const e = new TetrisEngine(() => 0.5);
+    e.reset();
+    e.debugSetPiece("O", 0, 4, 0);
+    step(e, 1, { right: true });
+    expect(e.debugPiece()!.x).toBe(5); // fresh press moves immediately
+    for (let i = 0; i < 4; i++) step(e, 33, { right: true }); // 132ms held
+    expect(e.debugPiece()!.x).toBe(5); // DAS delay (133) not elapsed
+    step(e, 2, { right: true });
+    expect(e.debugPiece()!.x).toBe(6); // first auto-repeat
+    step(e, 25, { right: true });
+    expect(e.debugPiece()!.x).toBe(7); // repeat cadence
+  });
+});

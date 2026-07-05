@@ -59,15 +59,16 @@ const GRAVITY_FLOOR_MS = 50;
  *  point per cell (classic). Faster than gravity until the high-level floor. */
 const SOFT_DROP_MS = 40;
 
-/** DAS (Delayed Auto-Shift): first held-move fires immediately, then the auto-repeat
- *  waits {@link DAS_DELAY} and repeats every {@link DAS_REPEAT} — the classic feel. */
-const DAS_DELAY = 170;
-const DAS_REPEAT = 50;
+/** DAS (Delayed Auto-Shift): first held-move fires immediately, then auto-repeat
+ *  waits {@link DAS_DELAY} and repeats every {@link DAS_REPEAT} — modern-tuned. */
+const DAS_DELAY = 133;
+const DAS_REPEAT = 25;
 
-/** Lock delay: a piece that has landed locks after this grace period. It is NOT
- *  reset by moves/rotations (the timer runs from the FIRST landing), so there is no
- *  infinite-spin — minimal and classic-feeling, just enough web fairness. */
-const LOCK_DELAY = 120;
+/** Lock delay (guideline move-reset): a landed piece locks after this grace, but a
+ *  successful move/rotate restarts the timer — at most {@link LOCK_RESETS_MAX}
+ *  times per piece, so there's no infinite stalling. */
+const LOCK_DELAY = 500;
+const LOCK_RESETS_MAX = 15;
 
 /** Line-clear freeze: the completed rows flash for this long before they collapse
  *  (classic). Under reduced motion the hook passes `animate=false` → instant clear. */
@@ -365,6 +366,7 @@ export class TetrisEngine {
   // Timers (ms).
   private dropTimer = 0;
   private lockTimer = 0;
+  private lockResets = 0;
   /** Previous frame's softDrop — detects the press EDGE (see the gravity clamp). */
   private prevSoft = false;
   private dasDir = 0;
@@ -413,6 +415,7 @@ export class TetrisEngine {
     this.gravityMs = this.gravityMsFor(0);
     this.dropTimer = 0;
     this.lockTimer = 0;
+    this.lockResets = 0;
     this.prevSoft = false;
     this.dasDir = 0;
     this.dasTimer = 0;
@@ -453,6 +456,7 @@ export class TetrisEngine {
     this.piece = piece;
     this.dropTimer = 0;
     this.lockTimer = 0;
+    this.lockResets = 0;
     return true;
   }
 
@@ -497,9 +501,15 @@ export class TetrisEngine {
     return false;
   }
 
-  /** Record a successful move/rotate: it becomes the "last action" (T-spin detection). */
+  /** Record a successful move/rotate: it becomes the "last action" (T-spin detection)
+   *  and, if the piece is inside its lock-delay grace, restarts the timer — at most
+   *  {@link LOCK_RESETS_MAX} times per piece (guideline move-reset). */
   private noteShift(action: "move" | "rotate") {
     this.lastAction = action;
+    if (this.lockTimer > 0 && this.lockResets < LOCK_RESETS_MAX) {
+      this.lockTimer = 0;
+      this.lockResets += 1;
+    }
   }
 
   /** SRS rotation: try the target state at each kick offset from the wiki tables
@@ -595,9 +605,9 @@ export class TetrisEngine {
       }
     }
 
-    // Lock delay — the timer runs from the FIRST landing and is NOT reset by
-    // moves/rotations (no infinite spin). If the piece can fall again (moved over a
-    // gap) the timer clears and it keeps dropping.
+    // Lock delay — guideline move-reset: the timer runs from landing; a successful
+    // move/rotate restarts it via noteShift (≤ LOCK_RESETS_MAX per piece). If the
+    // piece can fall again (moved over a gap) the timer clears and it keeps dropping.
     if (!this.canMoveDown()) {
       this.lockTimer += dt;
       if (this.lockTimer >= LOCK_DELAY) {
