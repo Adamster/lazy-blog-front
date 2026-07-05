@@ -25,6 +25,7 @@ export {
 } from "./ui/board-fullscreen";
 export { BoardSignInTeaser } from "./ui/board-signin-teaser";
 export { BoardUnsupported } from "./ui/board-unsupported";
+export { ControlsModal } from "./ui/controls-modal";
 export { PanelLabel, PanelReadout } from "./ui/panel-readout";
 export { StatsBand } from "./ui/stats-band";
 export type { StatsBandProps } from "./ui/stats-band";

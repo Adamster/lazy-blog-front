@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import {
   bindingLabel,
   BoardFullscreenButton,
+  ControlsModal,
   CornerBrackets,
   FULLSCREEN_ROOT,
   FULLSCREEN_STAGE,
@@ -15,6 +17,7 @@ import {
   rankLine,
   useBoardFullscreen,
 } from "@/features/arcade/shared";
+import { TETRIS_ACTIONS, TETRIS_DEFAULT_BINDINGS } from "../model/bindings";
 import type { TetrisGameApi } from "../model/types";
 
 /**
@@ -43,6 +46,16 @@ export function TetrisBoard({
     isFullscreen,
     toggle: toggleFullscreen,
   } = useBoardFullscreen();
+
+  const [controlsOpen, setControlsOpen] = useState(false);
+  const openControls = () => {
+    setControlsOpen(true);
+    api.setKeysSuspended(true);
+  };
+  const closeControls = () => {
+    setControlsOpen(false);
+    api.setKeysSuspended(false);
+  };
 
   const b = api.bindings;
   const hints: [string, string][] = [
@@ -148,7 +161,20 @@ export function TetrisBoard({
       <CornerBrackets />
 
       {state.screen === "menu" && (
-        <MenuOverlay title="Tetris" onStart={start} hints={hints} />
+        <MenuOverlay
+          title="Tetris"
+          onStart={start}
+          hints={hints}
+          extra={
+            <button
+              type="button"
+              onClick={openControls}
+              className="mono-focus text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)]"
+            >
+              Controls
+            </button>
+          }
+        />
       )}
 
       {state.screen === "playing" && state.paused && (
@@ -170,6 +196,15 @@ export function TetrisBoard({
           onToggle={toggleFullscreen}
         />
       )}
+
+      <ControlsModal
+        isOpen={controlsOpen}
+        onOpenChange={closeControls}
+        actions={TETRIS_ACTIONS}
+        value={api.bindings}
+        defaults={TETRIS_DEFAULT_BINDINGS}
+        onChange={api.setBindings}
+      />
     </div>
   );
 }
