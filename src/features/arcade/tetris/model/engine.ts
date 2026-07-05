@@ -182,6 +182,33 @@ const ROTATIONS: Record<PieceType, Matrix[]> = (() => {
   return out;
 })();
 
+/** 7-bag randomizer: shuffle all seven piece indices, deal in order, refill when
+ *  empty — the guideline randomizer (no droughts, no floods). RNG is injectable
+ *  for tests (mirrors Engine2048). */
+export class SevenBag {
+  private bag: number[] = [];
+
+  constructor(private rng: () => number = Math.random) {}
+
+  next(): number {
+    if (this.bag.length === 0) this.refill();
+    return this.bag.pop()!;
+  }
+
+  reset() {
+    this.bag = [];
+  }
+
+  private refill() {
+    const b = PIECE_TYPES.map((_, i) => i);
+    for (let i = b.length - 1; i > 0; i--) {
+      const j = (this.rng() * (i + 1)) | 0;
+      [b[i], b[j]] = [b[j], b[i]];
+    }
+    this.bag = b;
+  }
+}
+
 interface Piece {
   type: PieceType;
   rot: number;
@@ -197,8 +224,7 @@ export class TetrisEngine {
 
   private piece: Piece | null = null;
   private nextIndex = 0;
-  /** Last piece rolled — the NES randomizer rerolls ONCE if a roll repeats it. */
-  private prevPieceIndex = -1;
+  private bag: SevenBag;
 
   private phase: Phase = "falling";
 
@@ -221,8 +247,9 @@ export class TetrisEngine {
    *  ambient `--m-*` tokens (see {@link setPalette}). */
   private palette: TetrisPalette = DEFAULT_PALETTE;
 
-  constructor() {
+  constructor(rng: () => number = Math.random) {
     this.grid = TetrisEngine.emptyGrid();
+    this.bag = new SevenBag(rng);
   }
 
   /** Swap the draw palette — the hook calls this on mount AND on every theme change,
@@ -256,28 +283,16 @@ export class TetrisEngine {
     this.dasTimer = 0;
     this.clearTimer = 0;
     this.clearingRows = [];
-    this.prevPieceIndex = -1;
+    this.bag.reset();
     // First piece has no reroll bias; queue up the following one.
-    const first = this.rollType();
-    this.nextIndex = this.rollType();
+    const first = this.bag.next();
+    this.nextIndex = this.bag.next();
     this.spawn(first);
   }
 
   private gravityMsFor(level: number): number {
     const f = GRAVITY_FRAMES[Math.min(level, GRAVITY_FRAMES.length - 1)];
     return Math.max(GRAVITY_FLOOR_MS, Math.round(f * MS_PER_FRAME));
-  }
-
-  /** NES-style randomizer: uniform roll with ONE reroll if it repeats the previous
-   *  piece (the reroll is final — it may still repeat). Cuts obvious streaks without
-   *  the modern 7-bag. */
-  private rollType(): number {
-    let idx = (Math.random() * PIECE_TYPES.length) | 0;
-    if (idx === this.prevPieceIndex) {
-      idx = (Math.random() * PIECE_TYPES.length) | 0;
-    }
-    this.prevPieceIndex = idx;
-    return idx;
   }
 
   /** Place `index`'s piece at the classic top-centre. Returns false (→ top-out /
@@ -304,7 +319,7 @@ export class TetrisEngine {
 
   private spawnNext(): boolean {
     const index = this.nextIndex;
-    this.nextIndex = this.rollType();
+    this.nextIndex = this.bag.next();
     return this.spawn(index);
   }
 
@@ -530,6 +545,38 @@ export class TetrisEngine {
       score: this.score,
       lines: this.lines,
       level: this.level,
+    };
+  }
+
+  // ---------- test-only debug surface ----------
+
+  debugSetGrid(grid: number[][]) {
+    this.grid = grid.map((r) => [...r]);
+  }
+
+  debugSetPiece(type: PieceType, rot: number, x: number, y: number) {
+    this.piece = { type, rot, x, y };
+    this.phase = "falling";
+    this.dropTimer = 0;
+    this.lockTimer = 0;
+  }
+
+  debugPiece() {
+    return this.piece ? { ...this.piece } : null;
+  }
+
+  debugGrid(): number[][] {
+    return this.grid.map((r) => [...r]);
+  }
+
+  debugInspect() {
+    return {
+      score: this.score,
+      lines: this.lines,
+      level: this.level,
+      holdType: null as PieceType | null, // real value lands with hold (Task 5)
+      holdUsed: false,
+      nextType: PIECE_TYPES[this.nextIndex],
     };
   }
 

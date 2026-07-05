@@ -3,14 +3,17 @@ export type PieceType = "I" | "O" | "T" | "S" | "Z" | "J" | "L";
 export type Screen = "menu" | "playing" | "over";
 
 /** Live input the loop feeds the engine each frame. `left`/`right`/`softDrop` are HELD
- *  booleans (the engine runs DAS off them); `rotateCW`/`rotateCCW` are one-shot press
- *  EDGES the engine consumes (clears) so a held key rotates once per press. */
+ *  booleans (the engine runs DAS off them); `rotateCW`/`rotateCCW`/`hardDrop`/`hold`
+ *  are one-shot press EDGES the engine consumes (clears) so a held key triggers once
+ *  per press. */
 export interface TetrisInput {
   left: boolean;
   right: boolean;
   softDrop: boolean;
   rotateCW: boolean;
   rotateCCW: boolean;
+  hardDrop: boolean;
+  hold: boolean;
 }
 
 /** One sim-tick outcome, projected to React state on change. */

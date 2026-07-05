@@ -151,6 +151,8 @@ export function useTetrisGame({
     softDrop: false,
     rotateCW: false,
     rotateCCW: false,
+    hardDrop: false,
+    hold: false,
   });
   // Physical keys held — to emit clean press EDGES (ignore native auto-repeat).
   const heldRef = useRef<Set<string>>(new Set());
@@ -162,6 +164,8 @@ export function useTetrisGame({
       input.softDrop =
       input.rotateCW =
       input.rotateCCW =
+      input.hardDrop =
+      input.hold =
         false;
     heldRef.current.clear();
   };
