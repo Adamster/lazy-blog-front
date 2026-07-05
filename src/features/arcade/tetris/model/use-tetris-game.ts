@@ -507,6 +507,7 @@ export function useTetrisGame({
         return;
       }
       if (keysSuspendedRef.current) return; // CONTROLS modal owns the keyboard
+      if (e.repeat) return; // native auto-repeat: holds are latched, edges are one-shot, DAS is engine-side
       const c = e.code;
       const action = actionOf(c);
       // Any bound key + Space (page scroll) get swallowed while the board is up.
