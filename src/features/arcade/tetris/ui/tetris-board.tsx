@@ -1,11 +1,13 @@
 "use client";
 
 import {
+  bindingLabel,
   BoardFullscreenButton,
   CornerBrackets,
   FULLSCREEN_ROOT,
   FULLSCREEN_STAGE,
   GameOverOverlay,
+  keyLabel,
   MenuOverlay,
   PanelLabel,
   PanelReadout,
@@ -14,14 +16,6 @@ import {
   useBoardFullscreen,
 } from "@/features/arcade/shared";
 import type { TetrisGameApi } from "../model/types";
-
-/** Control reference — shown in the menu overlay (the classic "key-hint line"). */
-const KEY_HINTS: [string, string][] = [
-  ["MOVE", "← →  /  A D"],
-  ["ROTATE", "↑ / X  ·  Z"],
-  ["SOFT DROP", "↓ / S"],
-  ["PAUSE", "SPACE"],
-];
 
 /**
  * The CLASSIC TETRIS play surface — the DPR-crisp 10×20 well canvas (solid cells +
@@ -42,12 +36,23 @@ export function TetrisBoard({
   /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
   canRank?: boolean;
 }) {
-  const { canvasRef, nextCanvasRef, panelRef, start, state } = api;
+  const { canvasRef, nextCanvasRef, holdCanvasRef, panelRef, start, state } =
+    api;
   const {
     rootRef: fullscreenRootRef,
     isFullscreen,
     toggle: toggleFullscreen,
   } = useBoardFullscreen();
+
+  const b = api.bindings;
+  const hints: [string, string][] = [
+    ["MOVE", `${bindingLabel(b.moveLeft)} · ${bindingLabel(b.moveRight)}`],
+    ["ROTATE", `${bindingLabel(b.rotateCW)} · ${bindingLabel(b.rotateCCW)}`],
+    ["SOFT DROP", bindingLabel(b.softDrop)],
+    ["HARD DROP", bindingLabel(b.hardDrop)],
+    ["HOLD", bindingLabel(b.hold)],
+    ["PAUSE", bindingLabel(b.pause)],
+  ];
 
   const rankClause = rankLine(state.rank, canRank, "clear more lines");
   // Fullscreen toggle lives on the OVERLAY screens only (menu / pause — owner
@@ -86,7 +91,11 @@ export function TetrisBoard({
               them. `self-center` centres it if the height-fit leaves side margin. */}
         <canvas
           ref={canvasRef}
-          aria-label="Tetris well. Arrow keys or A/D to move, Up or X to rotate, Down to soft drop."
+          aria-label={`Tetris well. ${bindingLabel(b.moveLeft)} and ${bindingLabel(
+            b.moveRight
+          )} to move, ${bindingLabel(b.rotateCW)} to rotate, ${bindingLabel(
+            b.hardDrop
+          )} to hard drop.`}
           role="img"
           className="block [aspect-ratio:1/2] h-full self-center border-2 border-[var(--m-dim)]"
         />
@@ -105,6 +114,15 @@ export function TetrisBoard({
           className="flex w-20 shrink-0 flex-col items-center gap-6 self-center"
         >
           <div className="flex flex-col items-center gap-2">
+            <PanelLabel>HOLD</PanelLabel>
+            <canvas
+              ref={holdCanvasRef}
+              aria-label="Hold piece"
+              role="img"
+              className="block h-6 w-12"
+            />
+          </div>
+          <div className="flex flex-col items-center gap-2">
             <PanelLabel>NEXT</PanelLabel>
             <canvas
               ref={nextCanvasRef}
@@ -116,17 +134,25 @@ export function TetrisBoard({
           <PanelReadout label="SCORE" value={state.score} />
           <PanelReadout label="LINES" value={state.lines} />
           <PanelReadout label="LEVEL" value={state.level} />
+          {state.eventLabel && (
+            <div
+              aria-live="polite"
+              className="text-center text-[11px] leading-[1.2] font-medium tracking-[0.12em] text-[var(--m-accent)] uppercase"
+            >
+              {state.eventLabel}
+            </div>
+          )}
         </div>
       </div>
 
       <CornerBrackets />
 
       {state.screen === "menu" && (
-        <MenuOverlay title="Tetris" onStart={start} hints={KEY_HINTS} />
+        <MenuOverlay title="Tetris" onStart={start} hints={hints} />
       )}
 
       {state.screen === "playing" && state.paused && (
-        <PauseOverlay hint="Space to resume" />
+        <PauseOverlay hint={`${keyLabel(b.pause[0] ?? "KeyP")} to resume`} />
       )}
 
       {state.screen === "over" && (
