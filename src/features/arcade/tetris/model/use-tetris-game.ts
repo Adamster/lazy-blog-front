@@ -12,9 +12,21 @@ import {
   TetrisEngine,
   type TetrisPalette,
 } from "./engine";
-import { GUEST_SCOPE } from "@/features/arcade/shared";
+import {
+  GUEST_SCOPE,
+  loadBindings,
+  saveBindings,
+  type BindingMap,
+} from "@/features/arcade/shared";
+import {
+  TETRIS_ACTION_IDS,
+  TETRIS_DEFAULT_BINDINGS,
+  TETRIS_KEYS_STORAGE,
+  type TetrisAction,
+} from "./bindings";
 import { loadHistory, recentSeries, recordScore } from "./score-history";
 import type {
+  ClearEvent,
   HistoryPoint,
   TetrisGameApi,
   TetrisGameState,
@@ -35,6 +47,7 @@ const INITIAL_STATE: TetrisGameState = {
   best: 0,
   isNewBest: false,
   rank: 0,
+  eventLabel: null,
 };
 
 /** Parse `#rgb` / `#rrggbb` → `[r,g,b]`; falls back to a light gray on anything odd. */
@@ -72,6 +85,31 @@ function resolvePalette(el: Element): TetrisPalette {
   };
 }
 
+/** How long the clear-event caption stays up. */
+const EVENT_LABEL_MS = 1600;
+
+/** Caption for a noteworthy lock outcome (plain clears stay silent). */
+function clearEventLabel(e: ClearEvent): string | null {
+  const noteworthy =
+    e.kind === "tetris" || e.kind.startsWith("tspin") || e.b2b || e.combo >= 1;
+  if (!noteworthy) return null;
+  const KIND: Record<ClearEvent["kind"], string> = {
+    single: "SINGLE",
+    double: "DOUBLE",
+    triple: "TRIPLE",
+    tetris: "TETRIS",
+    tspin: "T-SPIN",
+    "tspin-mini": "T-SPIN MINI",
+  };
+  const name =
+    e.kind.startsWith("tspin") && e.lines > 0
+      ? `${KIND[e.kind]} ${["", "SINGLE", "DOUBLE", "TRIPLE"][e.lines]}`
+      : KIND[e.kind];
+  return [e.b2b ? "B2B" : null, name, e.combo >= 1 ? `COMBO ×${e.combo}` : null]
+    .filter(Boolean)
+    .join(" · ");
+}
+
 /**
  * CLASSIC TETRIS as a React hook. Owns one {@link TetrisEngine}, drives it with a
  * wall-clock delta over rAF (+ a throttled-tab `setInterval` fallback), wires the
@@ -90,6 +128,7 @@ export function useTetrisGame({
 }: UseTetrisGameOptions = {}): TetrisGameApi {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const nextCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const holdCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const engineRef = useRef<TetrisEngine | null>(null);
   const getEngine = () => {
@@ -114,6 +153,8 @@ export function useTetrisGame({
   // frame once over, but `screenRef` only flips after a React commit (a frame or two
   // later), so without this the append + submit would fire on each of those frames.
   const endedRef = useRef(false);
+  // Timer clearing the transient clear-event caption; re-armed on each new event.
+  const eventTimerRef = useRef(0);
 
   useEffect(() => {
     screenRef.current = state.screen;
@@ -146,7 +187,31 @@ export function useTetrisGame({
     return () => cancelAnimationFrame(raf);
   }, [historyScope]);
 
-  // Live input the loop feeds the engine. Rotate edges are consumed (cleared) by the engine.
+  const [bindings, setBindingsState] = useState<BindingMap<TetrisAction>>(
+    TETRIS_DEFAULT_BINDINGS
+  );
+  const bindingsRef = useRef(bindings);
+  useEffect(() => {
+    bindingsRef.current = bindings;
+  }, [bindings]);
+  // Hydrate persisted bindings on mount; rAF-deferred (lint rule).
+  useEffect(() => {
+    const raf = requestAnimationFrame(() =>
+      setBindingsState(
+        loadBindings(TETRIS_KEYS_STORAGE, TETRIS_DEFAULT_BINDINGS)
+      )
+    );
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  const setBindings = useCallback((next: BindingMap<TetrisAction>) => {
+    setBindingsState(next);
+    saveBindings(TETRIS_KEYS_STORAGE, next);
+  }, []);
+
+  /** True while the CONTROLS modal owns the keyboard — game keys go inert. */
+  const keysSuspendedRef = useRef(false);
+
+  // Engine input (edges are consumed/cleared by the engine each tick).
   const inputRef = useRef<TetrisInput>({
     left: false,
     right: false,
@@ -156,7 +221,8 @@ export function useTetrisGame({
     hardDrop: false,
     hold: false,
   });
-  // Physical keys held — to emit clean press EDGES (ignore native auto-repeat).
+  // Keyboard HELD directions — composed into inputRef each tick (gamepad ORs in).
+  const kbHeldRef = useRef({ left: false, right: false, softDrop: false });
   const heldRef = useRef<Set<string>>(new Set());
 
   const resetInput = () => {
@@ -169,8 +235,15 @@ export function useTetrisGame({
       input.hardDrop =
       input.hold =
         false;
+    const kb = kbHeldRef.current;
+    kb.left = kb.right = kb.softDrop = false;
     heldRef.current.clear();
   };
+
+  const setKeysSuspended = useCallback((suspended: boolean) => {
+    keysSuspendedRef.current = suspended;
+    resetInput();
+  }, []);
 
   const start = useCallback(() => {
     getEngine().reset();
@@ -185,6 +258,7 @@ export function useTetrisGame({
       level: 0,
       isNewBest: false,
       rank: 0,
+      eventLabel: null,
     }));
   }, []);
 
@@ -217,6 +291,7 @@ export function useTetrisGame({
     if (!ctx) return;
     const engine = getEngine();
     const nextCtx = nextCanvasRef.current?.getContext("2d") ?? null;
+    const holdCtx = holdCanvasRef.current?.getContext("2d") ?? null;
 
     // DPR-aware backing stores (crisp solid cells + a true 1px grid; NO pixelated
     // upscale). We reason in CSS px and pre-scale each ctx by `dpr`.
@@ -267,33 +342,36 @@ export function useTetrisGame({
       canvas.height = Math.round(cssH * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // NEXT cells track the WELL's at NEXT_CELL_SCALE (owner call: 1:1 read too
-      // big) — the square preview canvas is sized to `NEXT_COLS·cell·scale`.
-      // JS-driven like the well; the CSS `size-16` is only the pre-hydration
-      // fallback. (The panel is measured BEFORE this write; the ResizeObserver on
-      // the canvas re-runs resize once after the change, and the height-bound cell
-      // math converges immediately.)
-      const nc = nextCanvasRef.current;
-      if (nc && nextCtx) {
-        const nCell = Math.min(cell * NEXT_CELL_SCALE, NEXT_CELL_MAX);
-        const nw = nCell * NEXT_COLS;
-        const nh = nCell * NEXT_ROWS;
+      // NEXT + HOLD cells track the WELL's at NEXT_CELL_SCALE (owner call: 1:1 read
+      // too big) — both square preview canvases are sized to `NEXT_COLS·cell·scale`,
+      // identically. JS-driven like the well; the CSS `size-16` is only the
+      // pre-hydration fallback. (The panel is measured BEFORE this write; the
+      // ResizeObserver on the canvases re-runs resize once after the change, and the
+      // height-bound cell math converges immediately.)
+      const nCell = Math.min(cell * NEXT_CELL_SCALE, NEXT_CELL_MAX);
+      const nw = nCell * NEXT_COLS;
+      const nh = nCell * NEXT_ROWS;
+      for (const nc of [nextCanvasRef.current, holdCanvasRef.current]) {
+        const nctx = nc?.getContext("2d");
+        if (!nc || !nctx) continue;
         nc.style.width = `${nw}px`;
         nc.style.height = `${nh}px`;
         nc.width = Math.round(nw * dpr);
         nc.height = Math.round(nh * dpr);
-        nextCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        nCssW = nw;
-        nCssH = nh;
+        nctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
+      nCssW = nw;
+      nCssH = nh;
     };
     resize();
 
-    // Repaint both canvases with the current engine state + palette. Shared so a theme
-    // change can force an immediate repaint of the static menu/paused/over screens.
+    // Repaint both preview canvases + the well with the current engine state +
+    // palette. Shared so a theme change can force an immediate repaint of the
+    // static menu/paused/over screens.
     const paint = () => {
       engine.drawWell(ctx, cssW, cssH, dpr);
       if (nextCtx) engine.drawNext(nextCtx, nCssW, nCssH, dpr);
+      if (holdCtx) engine.drawHold(holdCtx, nCssW, nCssH, dpr);
     };
 
     // THEME-NATIVE palette: resolve the concrete colours from the live `--m-*` tokens
@@ -314,6 +392,7 @@ export function useTetrisGame({
     const ro = new ResizeObserver(() => resize());
     if (host) ro.observe(host);
     if (nextCanvasRef.current) ro.observe(nextCanvasRef.current);
+    if (holdCanvasRef.current) ro.observe(holdCanvasRef.current);
 
     let last = performance.now();
     let lastFrame = last;
@@ -327,11 +406,30 @@ export function useTetrisGame({
       const screen = screenRef.current;
 
       if (screen === "playing" && !pausedRef.current && !endedRef.current) {
-        const res = engine.update(dt, inputRef.current, animate);
+        const input = inputRef.current;
+        const kb = kbHeldRef.current;
+        input.left = kb.left;
+        input.right = kb.right;
+        input.softDrop = kb.softDrop;
+        const res = engine.update(dt, input, animate);
         if (res.dead) {
           endedRef.current = true;
           handleGameOver(res.score);
         } else {
+          if (res.event) {
+            const label = clearEventLabel(res.event);
+            if (label) {
+              window.clearTimeout(eventTimerRef.current);
+              eventTimerRef.current = window.setTimeout(
+                () =>
+                  setState((s) =>
+                    s.eventLabel === label ? { ...s, eventLabel: null } : s
+                  ),
+                EVENT_LABEL_MS
+              );
+              setState((s) => ({ ...s, eventLabel: label }));
+            }
+          }
           setState((s) =>
             s.score === res.score &&
             s.lines === res.lines &&
@@ -359,6 +457,7 @@ export function useTetrisGame({
     return () => {
       cancelAnimationFrame(rafId);
       window.clearInterval(fallback);
+      window.clearTimeout(eventTimerRef.current);
       ro.disconnect();
       themeObserver.disconnect();
     };
@@ -366,22 +465,15 @@ export function useTetrisGame({
 
   // ---------- keyboard ----------
   useEffect(() => {
-    const isLeft = (c: string, k: string) => c === "KeyA" || k === "ArrowLeft";
-    const isRight = (c: string, k: string) =>
-      c === "KeyD" || k === "ArrowRight";
-    const isSoft = (c: string, k: string) => c === "KeyS" || k === "ArrowDown";
-    const isRotateCW = (c: string, k: string) =>
-      c === "KeyX" || k === "ArrowUp";
-    const isRotateCCW = (c: string) => c === "KeyZ";
-    // Space is THE pause key (parity with both snakes — one pause key across the
-    // arcade; ESC/P removed by owner call). On menu/over it still starts —
-    // isStart runs first there.
-    const isPause = (c: string, k: string) => c === "Space" || k === " ";
-    const isStart = (c: string, k: string) =>
-      c === "Enter" || c === "Space" || k === " ";
+    const actionOf = (code: string): TetrisAction | null => {
+      const map = bindingsRef.current;
+      for (const a of TETRIS_ACTION_IDS) {
+        if (map[a].includes(code)) return a;
+      }
+      return null;
+    };
 
     const onKeyDown = (e: KeyboardEvent) => {
-      // Never hijack typing in a field (defensive — no inputs on the page).
       const el = e.target as HTMLElement | null;
       if (
         el &&
@@ -391,50 +483,60 @@ export function useTetrisGame({
       ) {
         return;
       }
+      if (keysSuspendedRef.current) return; // CONTROLS modal owns the keyboard
       const c = e.code;
-      const k = e.key;
-      const input = inputRef.current;
+      const action = actionOf(c);
+      // Any bound key + Space (page scroll) get swallowed while the board is up.
+      if (action || c === "Space") e.preventDefault();
 
-      if (
-        isLeft(c, k) ||
-        isRight(c, k) ||
-        isSoft(c, k) ||
-        isRotateCW(c, k) ||
-        k === " "
-      ) {
-        e.preventDefault();
-      }
-
-      // Menu / over → start.
+      // Menu / over → start (fixed keys, independent of the bindings).
       if (screenRef.current !== "playing") {
-        if (isStart(c, k)) start();
+        if (c === "Enter" || c === "Space") start();
         return;
       }
-      if (isPause(c, k)) {
+      if (action === "pause") {
         togglePause();
         return;
       }
-      if (pausedRef.current) return; // paused: only Esc/P above reacts
+      if (pausedRef.current) return;
 
       const fresh = !heldRef.current.has(c);
       heldRef.current.add(c);
-
-      if (isLeft(c, k)) input.left = true;
-      if (isRight(c, k)) input.right = true;
-      if (isSoft(c, k)) input.softDrop = true;
-      // Rotations are edge-only — one per physical press (suppress native repeat).
-      if (fresh && isRotateCW(c, k)) input.rotateCW = true;
-      if (fresh && isRotateCCW(c)) input.rotateCCW = true;
+      const kb = kbHeldRef.current;
+      const input = inputRef.current;
+      switch (action) {
+        case "moveLeft":
+          kb.left = true;
+          break;
+        case "moveRight":
+          kb.right = true;
+          break;
+        case "softDrop":
+          kb.softDrop = true;
+          break;
+        // One-shot edges — one per physical press (native repeat suppressed).
+        case "rotateCW":
+          if (fresh) input.rotateCW = true;
+          break;
+        case "rotateCCW":
+          if (fresh) input.rotateCCW = true;
+          break;
+        case "hardDrop":
+          if (fresh) input.hardDrop = true;
+          break;
+        case "hold":
+          if (fresh) input.hold = true;
+          break;
+      }
     };
 
     const onKeyUp = (e: KeyboardEvent) => {
-      const c = e.code;
-      const k = e.key;
-      heldRef.current.delete(c);
-      const input = inputRef.current;
-      if (isLeft(c, k)) input.left = false;
-      if (isRight(c, k)) input.right = false;
-      if (isSoft(c, k)) input.softDrop = false;
+      heldRef.current.delete(e.code);
+      const action = actionOf(e.code);
+      const kb = kbHeldRef.current;
+      if (action === "moveLeft") kb.left = false;
+      if (action === "moveRight") kb.right = false;
+      if (action === "softDrop") kb.softDrop = false;
     };
 
     window.addEventListener("keydown", onKeyDown);
@@ -449,9 +551,13 @@ export function useTetrisGame({
     state,
     canvasRef,
     nextCanvasRef,
+    holdCanvasRef,
     panelRef,
     history,
     start,
     togglePause,
+    bindings,
+    setBindings,
+    setKeysSuspended,
   };
 }

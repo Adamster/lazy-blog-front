@@ -1,3 +1,6 @@
+import type { BindingMap } from "@/features/arcade/shared";
+import type { TetrisAction } from "./bindings";
+
 export type PieceType = "I" | "O" | "T" | "S" | "Z" | "J" | "L";
 
 export type Screen = "menu" | "playing" | "over";
@@ -74,6 +77,8 @@ export interface TetrisGameState {
   isNewBest: boolean;
   /** 1-based board rank; 0 = off the board. */
   rank: number;
+  /** Transient clear-event caption (e.g. "TETRIS", "B2B · T-SPIN DOUBLE"). */
+  eventLabel: string | null;
 }
 
 export interface TetrisGameApi {
@@ -82,11 +87,18 @@ export interface TetrisGameApi {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   /** The NEXT-piece preview canvas. */
   nextCanvasRef: React.RefObject<HTMLCanvasElement | null>;
+  /** The HOLD-piece preview canvas. */
+  holdCanvasRef: React.RefObject<HTMLCanvasElement | null>;
   /** The stats side-panel — measured so the well is sized to fit the leftover width. */
   panelRef: React.RefObject<HTMLDivElement | null>;
   history: HistoryPoint[];
   start: () => void;
   togglePause: () => void;
+  /** Live remappable-key map — read by the keyboard handler, edited by CONTROLS. */
+  bindings: BindingMap<TetrisAction>;
+  setBindings: (next: BindingMap<TetrisAction>) => void;
+  /** True while a modal (e.g. CONTROLS) owns the keyboard — game keys go inert. */
+  setKeysSuspended: (suspended: boolean) => void;
 }
 
 export interface UseTetrisGameOptions {
