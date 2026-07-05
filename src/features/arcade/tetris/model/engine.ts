@@ -7,11 +7,11 @@ import type { PieceType, TetrisInput, TetrisStep } from "./types";
  * rAF loop; the canvas is imperative so React never re-renders per frame — state
  * flows out only on discrete changes: score / lines / level / game-over).
  *
- * Ruleset is the PUREST classic (NES / Game Boy era) — see the constants: 10×20
- * well, seven tetrominoes, 7-bag randomizer, simple
- * rotate-if-it-fits (NRS-style, NO wall-kicks), ONE next preview, soft drop only
- * (NO hold / ghost / hard drop), classic 40/100/300/1200 scoring, per-level gravity
- * from the NES frame table.
+ * Ruleset is modernizing toward the Tetris Guideline — see the constants: 10×20
+ * well, seven tetrominoes, 7-bag randomizer, SRS rotation with full wall/floor
+ * kicks (see the kick tables below), ONE next preview, soft drop only
+ * (NO hold / ghost / hard drop — later tasks), classic 40/100/300/1200 scoring,
+ * per-level gravity from the NES frame table.
  */
 
 // ---------- well geometry ----------
