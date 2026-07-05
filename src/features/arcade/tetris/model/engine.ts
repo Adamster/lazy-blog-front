@@ -8,7 +8,7 @@ import type { PieceType, TetrisInput, TetrisStep } from "./types";
  * flows out only on discrete changes: score / lines / level / game-over).
  *
  * Ruleset is the PUREST classic (NES / Game Boy era) — see the constants: 10×20
- * well, seven tetrominoes, NES-style single-reroll randomizer, simple
+ * well, seven tetrominoes, 7-bag randomizer, simple
  * rotate-if-it-fits (NRS-style, NO wall-kicks), ONE next preview, soft drop only
  * (NO hold / ghost / hard drop), classic 40/100/300/1200 scoring, per-level gravity
  * from the NES frame table.
@@ -284,7 +284,7 @@ export class TetrisEngine {
     this.clearTimer = 0;
     this.clearingRows = [];
     this.bag.reset();
-    // First piece has no reroll bias; queue up the following one.
+    // Draw the first piece and queue the next from the bag.
     const first = this.bag.next();
     this.nextIndex = this.bag.next();
     this.spawn(first);
