@@ -42,6 +42,13 @@ describe("load/save", () => {
     expect(loadBindings(KEY, DEFAULTS)).toEqual(DEFAULTS);
   });
 
+  it("a key-less action survives a save/load round-trip", () => {
+    const next = rebind(DEFAULTS, "left", "Space") as BindingMap<Act>; // fire loses its only key
+    expect(next.fire).toEqual([]);
+    saveBindings(KEY, next);
+    expect(loadBindings(KEY, DEFAULTS).fire).toEqual([]);
+  });
+
   it("ignores unknown actions and non-string junk in stored data", () => {
     window.localStorage.setItem(
       KEY,

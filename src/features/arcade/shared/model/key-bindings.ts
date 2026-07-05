@@ -22,11 +22,7 @@ export function loadBindings<A extends string>(
     const out = { ...defaults };
     for (const action of Object.keys(defaults) as A[]) {
       const v = (parsed as Record<string, unknown>)[action];
-      if (
-        Array.isArray(v) &&
-        v.length > 0 &&
-        v.every((k) => typeof k === "string")
-      ) {
+      if (Array.isArray(v) && v.every((k) => typeof k === "string")) {
         out[action] = v as string[];
       }
     }
