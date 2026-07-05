@@ -59,12 +59,14 @@ function resolvePalette(el: Element): TetrisPalette {
   const read = (name: string, fallback: string) =>
     cs.getPropertyValue(name).trim() || fallback;
   const accent = read("--m-accent", "#cdff48");
+  const [ar, ag, ab] = parseHexRgb(accent);
   const [r, g, b] = parseHexRgb(read("--m-fg", "#dcdcdc"));
   const alpha = r + g + b < 384 ? 0.07 : 0.05; // dark fg ⇒ light theme ⇒ a touch more
   return {
     boardBg: read("--m-bg", "#181818"),
     pieceFill: accent,
     flashAccent: accent,
+    ghostFill: `rgba(${ar},${ag},${ab},0.28)`,
     lockedFill: read("--m-muted2", "#7a7a7a"),
     gridLine: `rgba(${r},${g},${b},${alpha})`,
   };

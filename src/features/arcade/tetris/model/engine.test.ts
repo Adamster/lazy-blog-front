@@ -138,3 +138,25 @@ describe("DAS", () => {
     expect(e.debugPiece()!.x).toBe(7); // repeat cadence
   });
 });
+
+describe("hard drop", () => {
+  it("locks instantly at the drop position and scores 2/cell", () => {
+    const e = new TetrisEngine(() => 0.5);
+    e.reset();
+    e.debugSetPiece("O", 0, 4, 0);
+    step(e, 16, { hardDrop: true });
+    // O at y=0 occupies rows 0-1; floor rest y=18 → distance 18.
+    expect(filledCells(e)).toBe(4);
+    expect(e.debugGrid()[19].filter((v) => v !== 0).length).toBe(2);
+    expect(e.debugInspect().score).toBe(36);
+  });
+
+  it("a hard drop from rest (distance 0) still locks immediately", () => {
+    const e = new TetrisEngine(() => 0.5);
+    e.reset();
+    e.debugSetPiece("O", 0, 4, 18);
+    step(e, 1, { hardDrop: true });
+    expect(filledCells(e)).toBe(4);
+    expect(e.debugInspect().score).toBe(0);
+  });
+});

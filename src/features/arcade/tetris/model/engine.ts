@@ -105,6 +105,8 @@ export interface TetrisPalette {
   /** Settled stack ← `--m-muted2` (light `#8c8c8c` / dark `#7a7a7a`) — a mid gray that
    *  stays clearly distinct from BOTH the bg and the accent piece on either theme. */
   lockedFill: string;
+  /** Ghost (drop-preview) silhouette ← `--m-accent` at low alpha. */
+  ghostFill: string;
 }
 
 /** Dark-theme defaults (mirror the dark `--m-*` values) so the first paint / SSR looks
@@ -115,6 +117,7 @@ const DEFAULT_PALETTE: TetrisPalette = {
   pieceFill: "#cdff48",
   flashAccent: "#cdff48",
   lockedFill: "#7a7a7a",
+  ghostFill: "rgba(205,255,72,0.28)",
 };
 
 /**
@@ -490,6 +493,14 @@ export class TetrisEngine {
     return !!p && this.fits(p.type, p.rot, p.x, p.y + 1);
   }
 
+  /** How many rows the piece can fall before resting — the ghost/hard-drop distance. */
+  private dropDistance(): number {
+    const p = this.piece!;
+    let d = 0;
+    while (this.fits(p.type, p.rot, p.x, p.y + d + 1)) d++;
+    return d;
+  }
+
   private tryMove(dx: number): boolean {
     const p = this.piece;
     if (!p) return false;
@@ -574,6 +585,20 @@ export class TetrisEngine {
     if (input.rotateCCW) {
       this.tryRotate(-1);
       input.rotateCCW = false;
+    }
+
+    // Hard drop (one-shot edge): teleport to the drop position and lock NOW — zero
+    // frames, no lock-delay grace. +2 points per cell. A drop of 0 keeps the last
+    // action (a rotate stays a T-spin); any fall overwrites it.
+    if (input.hardDrop) {
+      input.hardDrop = false;
+      const d = this.dropDistance();
+      if (d > 0) {
+        this.piece!.y += d;
+        this.score += d * 2;
+        this.lastAction = "drop";
+      }
+      return this.lockPiece();
     }
 
     // Gravity + soft drop.
@@ -837,6 +862,25 @@ export class TetrisEngine {
     // Falling piece (never during the clear freeze — it's already merged).
     if (this.piece && this.phase !== "clearing") {
       const m = ROTATIONS[this.piece.type][this.piece.rot];
+      // Ghost silhouette at the drop position (skipped when resting on it).
+      const ghostD = this.dropDistance();
+      if (ghostD > 0) {
+        for (let r = 0; r < m.length; r++) {
+          for (let c = 0; c < m.length; c++) {
+            if (!m[r][c]) continue;
+            const gy = this.piece.y + r + ghostD;
+            if (gy < 0) continue;
+            this.fillCell(
+              ctx,
+              cell,
+              dpr,
+              this.piece.x + c,
+              gy,
+              this.palette.ghostFill
+            );
+          }
+        }
+      }
       for (let r = 0; r < m.length; r++) {
         for (let c = 0; c < m.length; c++) {
           if (!m[r][c]) continue;
