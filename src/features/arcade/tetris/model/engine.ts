@@ -357,6 +357,9 @@ export class TetrisEngine {
 
   private piece: Piece | null = null;
   private nextIndex = 0;
+  /** Held piece index (−1 = empty box) + the one-swap-per-piece latch. */
+  private holdIndex = -1;
+  private holdUsed = false;
   private bag: SevenBag;
 
   private phase: Phase = "falling";
@@ -426,6 +429,8 @@ export class TetrisEngine {
     this.clearingRows = [];
     this.lastAction = "none";
     this.lastKickIndex = -1;
+    this.holdIndex = -1;
+    this.holdUsed = false;
     this.bag.reset();
     // Draw the first piece and queue the next from the bag.
     const first = this.bag.next();
@@ -574,6 +579,19 @@ export class TetrisEngine {
       return this.snapshot(false);
     }
 
+    // Hold (one-shot edge): swap the falling piece with the box, once per piece.
+    if (input.hold) {
+      input.hold = false;
+      if (!this.holdUsed && this.piece) {
+        const cur = PIECE_TYPES.indexOf(this.piece.type);
+        const stored = this.holdIndex;
+        this.holdIndex = cur;
+        this.holdUsed = true;
+        const alive = stored >= 0 ? this.spawn(stored) : this.spawnNext();
+        if (!alive) return this.snapshot(true);
+      }
+    }
+
     // Horizontal DAS.
     this.handleHorizontal(dt, input);
 
@@ -695,6 +713,8 @@ export class TetrisEngine {
       if (this.grid[r].every((v) => v !== 0)) full.push(r);
     }
 
+    this.holdUsed = false;
+
     if (full.length > 0) {
       // Classic scoring at the CURRENT level, then advance lines/level/gravity.
       this.score += LINE_SCORES[full.length] * (this.level + 1);
@@ -765,8 +785,8 @@ export class TetrisEngine {
       score: this.score,
       lines: this.lines,
       level: this.level,
-      holdType: null as PieceType | null, // real value lands with hold (Task 5)
-      holdUsed: false,
+      holdType: this.holdIndex >= 0 ? PIECE_TYPES[this.holdIndex] : null,
+      holdUsed: this.holdUsed,
       nextType: PIECE_TYPES[this.nextIndex],
     };
   }
@@ -912,9 +932,14 @@ export class TetrisEngine {
     }
   }
 
-  /** Paint the ONE next piece, centred in the (square) preview canvas. */
-  drawNext(
+  /**
+   * Paint a piece centred in a (square) preview canvas. Used by drawNext and drawHold.
+   * If type is null, fills the bg and returns (empty hold box).
+   */
+  private drawPreviewCanvas(
     ctx: CanvasRenderingContext2D,
+    type: PieceType | null,
+    fill: string,
     cssW: number,
     cssH: number,
     dpr: number
@@ -923,7 +948,8 @@ export class TetrisEngine {
     ctx.fillStyle = this.palette.boardBg;
     ctx.fillRect(0, 0, cssW, cssH);
 
-    const type = PIECE_TYPES[this.nextIndex];
+    if (!type) return;
+
     const m = ROTATIONS[type][0];
     // Occupied-cell bounding box.
     let minR = m.length;
@@ -953,15 +979,39 @@ export class TetrisEngine {
     for (let r = 0; r < m.length; r++) {
       for (let c = 0; c < m.length; c++) {
         if (!m[r][c]) continue;
-        this.fillCell(
-          ctx,
-          cell,
-          dpr,
-          c + offX,
-          r + offY,
-          this.palette.pieceFill
-        );
+        this.fillCell(ctx, cell, dpr, c + offX, r + offY, fill);
       }
     }
+  }
+
+  /** Paint the ONE next piece, centred in the preview canvas. */
+  drawNext(
+    ctx: CanvasRenderingContext2D,
+    cssW: number,
+    cssH: number,
+    dpr: number
+  ) {
+    this.drawPreviewCanvas(
+      ctx,
+      PIECE_TYPES[this.nextIndex],
+      this.palette.pieceFill,
+      cssW,
+      cssH,
+      dpr
+    );
+  }
+
+  /** Paint the HOLD box: empty bg when nothing held; dimmed once used this piece. */
+  drawHold(
+    ctx: CanvasRenderingContext2D,
+    cssW: number,
+    cssH: number,
+    dpr: number
+  ) {
+    const type = this.holdIndex >= 0 ? PIECE_TYPES[this.holdIndex] : null;
+    const fill = this.holdUsed
+      ? this.palette.lockedFill
+      : this.palette.pieceFill;
+    this.drawPreviewCanvas(ctx, type, fill, cssW, cssH, dpr);
   }
 }

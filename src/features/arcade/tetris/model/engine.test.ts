@@ -160,3 +160,30 @@ describe("hard drop", () => {
     expect(e.debugInspect().score).toBe(0);
   });
 });
+
+describe("hold", () => {
+  it("first hold stores the piece and spawns the NEXT one", () => {
+    const e = new TetrisEngine(() => 0.5);
+    e.reset();
+    const current = e.debugPiece()!.type;
+    const next = e.debugInspect().nextType;
+    step(e, 1, { hold: true });
+    expect(e.debugInspect().holdType).toBe(current);
+    expect(e.debugInspect().holdUsed).toBe(true);
+    expect(e.debugPiece()!.type).toBe(next);
+  });
+
+  it("a second hold before locking is refused; after lock it swaps back", () => {
+    const e = new TetrisEngine(() => 0.5);
+    e.reset();
+    const first = e.debugPiece()!.type;
+    step(e, 1, { hold: true });
+    const second = e.debugPiece()!.type;
+    step(e, 1, { hold: true }); // refused — holdUsed
+    expect(e.debugPiece()!.type).toBe(second);
+    step(e, 1, { hardDrop: true }); // lock → hold re-arms
+    step(e, 1, { hold: true }); // swaps with the stored piece
+    expect(e.debugPiece()!.type).toBe(first);
+    expect(e.debugInspect().holdUsed).toBe(true);
+  });
+});
