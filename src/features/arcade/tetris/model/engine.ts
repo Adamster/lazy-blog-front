@@ -182,6 +182,135 @@ const ROTATIONS: Record<PieceType, Matrix[]> = (() => {
   return out;
 })();
 
+// ---------- SRS kick tables ----------
+//
+// tetris.wiki/Super_Rotation_System tables VERBATIM: offsets are (x, y) with +y UP,
+// applied as `x + dx, y - dy` (our grid's +y is down). Rotation states: 0 spawn,
+// 1 = R (one CW), 2 = two rotations, 3 = L (one CCW). Key = "from>to". First
+// offset that fits wins. O never kicks (its rotation is the identity).
+
+type Kick = readonly [number, number];
+
+const kickKey = (from: number, to: number) => `${from}>${to}`;
+
+const JLSTZ_KICKS: Record<string, readonly Kick[]> = {
+  "0>1": [
+    [0, 0],
+    [-1, 0],
+    [-1, 1],
+    [0, -2],
+    [-1, -2],
+  ],
+  "1>0": [
+    [0, 0],
+    [1, 0],
+    [1, -1],
+    [0, 2],
+    [1, 2],
+  ],
+  "1>2": [
+    [0, 0],
+    [1, 0],
+    [1, -1],
+    [0, 2],
+    [1, 2],
+  ],
+  "2>1": [
+    [0, 0],
+    [-1, 0],
+    [-1, 1],
+    [0, -2],
+    [-1, -2],
+  ],
+  "2>3": [
+    [0, 0],
+    [1, 0],
+    [1, 1],
+    [0, -2],
+    [1, -2],
+  ],
+  "3>2": [
+    [0, 0],
+    [-1, 0],
+    [-1, -1],
+    [0, 2],
+    [-1, 2],
+  ],
+  "3>0": [
+    [0, 0],
+    [-1, 0],
+    [-1, -1],
+    [0, 2],
+    [-1, 2],
+  ],
+  "0>3": [
+    [0, 0],
+    [1, 0],
+    [1, 1],
+    [0, -2],
+    [1, -2],
+  ],
+};
+
+const I_KICKS: Record<string, readonly Kick[]> = {
+  "0>1": [
+    [0, 0],
+    [-2, 0],
+    [1, 0],
+    [-2, -1],
+    [1, 2],
+  ],
+  "1>0": [
+    [0, 0],
+    [2, 0],
+    [-1, 0],
+    [2, 1],
+    [-1, -2],
+  ],
+  "1>2": [
+    [0, 0],
+    [-1, 0],
+    [2, 0],
+    [-1, 2],
+    [2, -1],
+  ],
+  "2>1": [
+    [0, 0],
+    [1, 0],
+    [-2, 0],
+    [1, -2],
+    [-2, 1],
+  ],
+  "2>3": [
+    [0, 0],
+    [2, 0],
+    [-1, 0],
+    [2, 1],
+    [-1, -2],
+  ],
+  "3>2": [
+    [0, 0],
+    [-2, 0],
+    [1, 0],
+    [-2, -1],
+    [1, 2],
+  ],
+  "3>0": [
+    [0, 0],
+    [1, 0],
+    [-2, 0],
+    [1, -2],
+    [-2, 1],
+  ],
+  "0>3": [
+    [0, 0],
+    [-1, 0],
+    [2, 0],
+    [-1, 2],
+    [2, -1],
+  ],
+};
+
 /** 7-bag randomizer: shuffle all seven piece indices, deal in order, refill when
  *  empty — the guideline randomizer (no droughts, no floods). RNG is injectable
  *  for tests (mirrors Engine2048). */
@@ -243,6 +372,12 @@ export class TetrisEngine {
   private clearTimer = 0;
   private clearingRows: number[] = [];
 
+  /** Last successful action — T-spin detection needs "was the final maneuver a rotate". */
+  private lastAction: "none" | "move" | "rotate" | "drop" = "none";
+  /** Kick-table index of the applied rotation offset (−1 = none) — the 5th (index 4)
+   *  upgrades a mini T-spin to full. */
+  private lastKickIndex = -1;
+
   /** Live theme palette; starts on the dark defaults until the hook resolves the
    *  ambient `--m-*` tokens (see {@link setPalette}). */
   private palette: TetrisPalette = DEFAULT_PALETTE;
@@ -283,6 +418,8 @@ export class TetrisEngine {
     this.dasTimer = 0;
     this.clearTimer = 0;
     this.clearingRows = [];
+    this.lastAction = "none";
+    this.lastKickIndex = -1;
     this.bag.reset();
     // Draw the first piece and queue the next from the bag.
     const first = this.bag.next();
@@ -306,6 +443,8 @@ export class TetrisEngine {
       x: Math.floor((COLS - n) / 2),
       y: 0,
     };
+    this.lastAction = "none";
+    this.lastKickIndex = -1;
     if (!this.fits(piece.type, piece.rot, piece.x, piece.y)) {
       this.piece = piece; // keep it visible on the game-over frame
       this.phase = "over";
@@ -352,20 +491,36 @@ export class TetrisEngine {
     if (!p) return false;
     if (this.fits(p.type, p.rot, p.x + dx, p.y)) {
       p.x += dx;
+      this.noteShift("move");
       return true;
     }
     return false;
   }
 
-  /** Simple classic rotation: rotate if the rotated cells fit as-is, otherwise DON'T
-   *  (no SRS wall-kicks). `dir` +1 = clockwise, −1 = counter-clockwise. */
+  /** Record a successful move/rotate: it becomes the "last action" (T-spin detection). */
+  private noteShift(action: "move" | "rotate") {
+    this.lastAction = action;
+  }
+
+  /** SRS rotation: try the target state at each kick offset from the wiki tables
+   *  (first fit wins — includes wall AND floor kicks). `dir` +1 = CW, −1 = CCW. */
   private tryRotate(dir: number): boolean {
     const p = this.piece;
-    if (!p) return false;
-    const rot = (p.rot + dir + 4) % 4;
-    if (this.fits(p.type, rot, p.x, p.y)) {
-      p.rot = rot;
-      return true;
+    if (!p || p.type === "O") return false;
+    const to = (p.rot + dir + 4) % 4;
+    const kicks = (p.type === "I" ? I_KICKS : JLSTZ_KICKS)[kickKey(p.rot, to)];
+    for (let i = 0; i < kicks.length; i++) {
+      const [dx, dy] = kicks[i];
+      const nx = p.x + dx;
+      const ny = p.y - dy; // wiki +y is up; our +y is down
+      if (this.fits(p.type, to, nx, ny)) {
+        p.rot = to;
+        p.x = nx;
+        p.y = ny;
+        this.lastKickIndex = i;
+        this.noteShift("rotate");
+        return true;
+      }
     }
     return false;
   }
@@ -432,6 +587,7 @@ export class TetrisEngine {
       this.dropTimer -= interval;
       if (this.canMoveDown()) {
         this.piece!.y += 1;
+        this.lastAction = "drop";
         if (soft) this.score += 1; // classic soft-drop point per cell
       } else {
         this.dropTimer = 0; // landed — don't bank gravity while resting

@@ -46,3 +46,42 @@ describe("TetrisEngine — reset", () => {
     expect(e.debugInspect().score).toBe(0);
   });
 });
+
+describe("SRS kicks", () => {
+  it("wall-kicks a vertical I off the left wall (1>0 second offset, +2)", () => {
+    const e = new TetrisEngine(() => 0.5);
+    e.reset();
+    e.debugSetPiece("I", 1, -2, 5); // occupied column = x+2 = 0, flush left
+    step(e, 16, { rotateCCW: true }); // 1>0
+    const p = e.debugPiece()!;
+    expect(p.rot).toBe(0);
+    expect(p.x).toBe(0); // kicked +2 off the wall
+  });
+
+  it("floor-kicks a T resting on the floor (0>1 offset (-1,+1) → up one row)", () => {
+    const e = new TetrisEngine(() => 0.5);
+    e.reset();
+    e.debugSetPiece("T", 0, 3, 18); // bar row = 19 (floor)
+    step(e, 16, { rotateCW: true }); // 0>1: rot1 needs rows y..y+2 → kicks
+    const p = e.debugPiece()!;
+    expect(p.rot).toBe(1);
+    expect(p.y).toBe(17); // lifted one row (wiki dy +1 = our y-1)
+    expect(p.x).toBe(2); // offset dx -1
+  });
+
+  it("rotation fails (piece unchanged) when no kick offset fits", () => {
+    const e = new TetrisEngine(() => 0.5);
+    e.reset();
+    // Box the T in completely: full grid except the T's own cells.
+    const grid = Array.from({ length: 20 }, () => Array(10).fill(1));
+    // T rot0 at (3,17): nose (4,17), bar (3..5,18) — carve exactly those.
+    grid[17][4] = 0;
+    grid[18][3] = grid[18][4] = grid[18][5] = 0;
+    e.debugSetGrid(grid);
+    e.debugSetPiece("T", 0, 3, 17);
+    step(e, 16, { rotateCW: true });
+    const p = e.debugPiece()!;
+    expect(p.rot).toBe(0);
+    expect(p.x).toBe(3);
+  });
+});
