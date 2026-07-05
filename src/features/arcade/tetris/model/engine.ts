@@ -92,7 +92,9 @@ const MAX_DT = 100;
 const LINE_SCORES = [0, 100, 300, 500, 800];
 /** T-spin base points by lines cleared (0 = the no-line spin itself). */
 const TSPIN_SCORES = [400, 800, 1200, 1600];
-/** Mini T-spin base points by lines cleared. */
+/** Mini T-spin base points by lines cleared. Tops out at a double — anything beyond
+ *  falls back to the full T-spin table in lockPiece (defensive: a legal mini triple
+ *  shouldn't exist, but NaN must be impossible). */
 const TSPIN_MINI_SCORES = [100, 200, 400];
 /** Back-to-back bonus on "difficult" clears (Tetris / any T-spin clear). */
 const B2B_MULT = 1.5;
@@ -773,7 +775,7 @@ export class TetrisEngine {
       tspin === "full"
         ? TSPIN_SCORES[n]
         : tspin === "mini"
-          ? TSPIN_MINI_SCORES[n]
+          ? (TSPIN_MINI_SCORES[n] ?? TSPIN_SCORES[n])
           : LINE_SCORES[n];
     const difficult = n > 0 && (tspin !== "none" || n === 4);
     const b2b = difficult && this.b2bArmed;
