@@ -203,11 +203,6 @@ export function useTetrisGame({
     );
     return () => cancelAnimationFrame(raf);
   }, []);
-  const setBindings = useCallback((next: BindingMap<TetrisAction>) => {
-    setBindingsState(next);
-    saveBindings(TETRIS_KEYS_STORAGE, next);
-  }, []);
-
   /** True while the CONTROLS modal owns the keyboard — game keys go inert. */
   const keysSuspendedRef = useRef(false);
 
@@ -239,6 +234,14 @@ export function useTetrisGame({
     kb.left = kb.right = kb.softDrop = false;
     heldRef.current.clear();
   };
+
+  const setBindings = useCallback((next: BindingMap<TetrisAction>) => {
+    setBindingsState(next);
+    saveBindings(TETRIS_KEYS_STORAGE, next);
+    // Drop any in-flight holds — a key physically held across a remap would
+    // otherwise resolve to a different/no action on keyup and stick forever.
+    resetInput();
+  }, []);
 
   const setKeysSuspended = useCallback((suspended: boolean) => {
     keysSuspendedRef.current = suspended;
@@ -473,6 +476,11 @@ export function useTetrisGame({
       return null;
     };
 
+    // A held action stays on while ANY of its bound keys is physically down
+    // (defaults bind two keys per direction — ← + A etc.).
+    const stillHeld = (a: TetrisAction) =>
+      bindingsRef.current[a].some((code) => heldRef.current.has(code));
+
     const onKeyDown = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement | null;
       if (
@@ -534,9 +542,9 @@ export function useTetrisGame({
       heldRef.current.delete(e.code);
       const action = actionOf(e.code);
       const kb = kbHeldRef.current;
-      if (action === "moveLeft") kb.left = false;
-      if (action === "moveRight") kb.right = false;
-      if (action === "softDrop") kb.softDrop = false;
+      if (action === "moveLeft") kb.left = stillHeld("moveLeft");
+      if (action === "moveRight") kb.right = stillHeld("moveRight");
+      if (action === "softDrop") kb.softDrop = stillHeld("softDrop");
     };
 
     window.addEventListener("keydown", onKeyDown);
