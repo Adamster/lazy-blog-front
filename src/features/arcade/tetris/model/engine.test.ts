@@ -187,3 +187,68 @@ describe("hold", () => {
     expect(e.debugInspect().holdUsed).toBe(true);
   });
 });
+
+/** Empty 20×10 grid to hand-fill. */
+const emptyGrid = () => Array.from({ length: 20 }, () => Array(10).fill(0));
+
+describe("guideline scoring", () => {
+  it("scores a T-spin double 1200 (rotate in place, then hard drop from rest)", () => {
+    const e = new TetrisEngine(() => 0.5);
+    e.reset();
+    const grid = emptyGrid();
+    // Slot: row 18 full except cols 3,4,5 (the T bar); row 19 full except col 4
+    // (the nose); plus a block at (3,17) → 3 occupied corners of the box at (3,17).
+    for (let c = 0; c < 10; c++) if (c < 3 || c > 5) grid[18][c] = 1;
+    for (let c = 0; c < 10; c++) if (c !== 4) grid[19][c] = 1;
+    grid[17][3] = 1;
+    e.debugSetGrid(grid);
+    // T rot1 fits at (3,17); CW to rot2 fits in place → lastAction = rotate.
+    e.debugSetPiece("T", 1, 3, 17);
+    step(e, 1, { rotateCW: true });
+    step(e, 1, { hardDrop: true }); // distance 0 → the rotate survives as last action
+    // T-spin double: 1200 × (level 0 + 1); combo 0 pays nothing; no B2B armed yet.
+    expect(e.debugInspect().score).toBe(1200);
+    expect(e.debugInspect().lines).toBe(2);
+  });
+
+  it("scores a mini T-spin (no lines) 100 when the front corners aren't both filled", () => {
+    const e = new TetrisEngine(() => 0.5);
+    e.reset();
+    const grid = emptyGrid();
+    grid[19][0] = grid[19][2] = 1; // both back (bottom) corners
+    grid[17][0] = 1; // ONE front (top) corner → mini
+    e.debugSetGrid(grid);
+    // T rot3 fits at (0,17); CW to rot0 fits in place.
+    e.debugSetPiece("T", 3, 0, 17);
+    step(e, 1, { rotateCW: true });
+    step(e, 1, { hardDrop: true });
+    expect(e.debugInspect().score).toBe(100);
+  });
+
+  it("pays back-to-back ×1.5 and combo on consecutive Tetrises", () => {
+    const e = new TetrisEngine(() => 0.5);
+    e.reset();
+    const tetrisSetup = () => {
+      const grid = emptyGrid();
+      for (let r = 16; r < 20; r++) for (let c = 0; c < 9; c++) grid[r][c] = 1; // col 9 open
+      e.debugSetGrid(grid);
+      e.debugSetPiece("I", 1, 7, 16); // vertical I occupying col 9, rows 16-19
+    };
+    tetrisSetup();
+    step(e, 1, { hardDrop: true });
+    step(e, 1); // flash disabled (animate=false) → collapse + respawn
+    expect(e.debugInspect().score).toBe(800); // first Tetris, no B2B, combo 0
+    tetrisSetup();
+    step(e, 1, { hardDrop: true });
+    // 800 × 1.5 (B2B) + 50 × combo 1 = 1250; running total 2050.
+    expect(e.debugInspect().score).toBe(2050);
+  });
+
+  it("a lock without a clear resets the combo but not the B2B chain", () => {
+    const e = new TetrisEngine(() => 0.5);
+    e.reset();
+    e.debugSetPiece("O", 0, 0, 18);
+    step(e, 1, { hardDrop: true });
+    expect(e.debugInspect().score).toBe(0); // no clear, no points, combo reset
+  });
+});

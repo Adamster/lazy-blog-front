@@ -16,12 +16,30 @@ export interface TetrisInput {
   hold: boolean;
 }
 
+export type ClearKind =
+  | "single"
+  | "double"
+  | "triple"
+  | "tetris"
+  | "tspin"
+  | "tspin-mini";
+
+/** Reported once, on the lock tick that cleared lines or scored a T-spin. */
+export interface ClearEvent {
+  kind: ClearKind;
+  lines: number;
+  b2b: boolean;
+  /** Combo count (≥1 means a combo bonus was paid). */
+  combo: number;
+}
+
 /** One sim-tick outcome, projected to React state on change. */
 export interface TetrisStep {
   dead: boolean;
   score: number;
   lines: number;
   level: number;
+  event: ClearEvent | null;
 }
 
 export interface HistoryPoint {

@@ -1,17 +1,24 @@
-import type { PieceType, TetrisInput, TetrisStep } from "./types";
+import type {
+  ClearEvent,
+  ClearKind,
+  PieceType,
+  TetrisInput,
+  TetrisStep,
+} from "./types";
 
 /**
- * Headless CLASSIC TETRIS engine — all mutable state + the fixed-timestep sim
- * (gravity / DAS / lock / line-clear) + the imperative canvas draw, with NO React
+ * Headless MODERN-GUIDELINE TETRIS engine — all mutable state + the fixed-timestep
+ * sim (gravity / DAS / lock / line-clear) + the imperative canvas draw, with NO React
  * (mirrors the Snake/Hollow-Sloth split: `useTetrisGame` owns one instance and the
- * rAF loop; the canvas is imperative so React never re-renders per frame — state
- * flows out only on discrete changes: score / lines / level / game-over).
+ * rAF loop; state flows out only on discrete changes).
  *
- * Ruleset is modernizing toward the Tetris Guideline — see the constants: 10×20
- * well, seven tetrominoes, 7-bag randomizer, SRS rotation with full wall/floor
- * kicks (see the kick tables below), ONE next preview, soft drop only
- * (NO hold / ghost / hard drop — later tasks), classic 40/100/300/1200 scoring,
- * per-level gravity from the NES frame table.
+ * Ruleset is the MODERN GUIDELINE (spec: docs/superpowers/specs/
+ * 2026-07-05-tetris-modern-guideline-design.md): 10×20 well, SRS rotation with the
+ * full tetris.wiki kick tables, 7-bag randomizer, hard drop (instant lock) + ghost,
+ * hold (one swap per piece), 500ms move-reset lock delay (15-reset cap), 133/25 DAS,
+ * T-spins (3-corner rule, mini + 5th-kick upgrade), guideline scoring (100/300/500/
+ * 800, T-spin 400–1600, B2B ×1.5, combos, 1/2 pts per soft/hard-drop cell) — on the
+ * web-tuned NES gravity curve (50ms floor). ONE next preview.
  */
 
 // ---------- well geometry ----------
@@ -79,10 +86,18 @@ const FLASH_BLINK_MS = 70;
 /** Cap a single sim advance (a backgrounded tab hands us a huge dt on resume). */
 const MAX_DT = 100;
 
-// ---------- scoring ----------
+// ---------- scoring (guideline) ----------
 
-/** Classic line-clear base points by lines cleared (× (level + 1)). Index 4 = a Tetris. */
-const LINE_SCORES = [0, 40, 100, 300, 1200];
+/** Guideline line-clear base points by lines cleared (× (level + 1)). */
+const LINE_SCORES = [0, 100, 300, 500, 800];
+/** T-spin base points by lines cleared (0 = the no-line spin itself). */
+const TSPIN_SCORES = [400, 800, 1200, 1600];
+/** Mini T-spin base points by lines cleared. */
+const TSPIN_MINI_SCORES = [100, 200, 400];
+/** Back-to-back bonus on "difficult" clears (Tetris / any T-spin clear). */
+const B2B_MULT = 1.5;
+/** Per-combo-step bonus (× combo count × (level + 1)). */
+const COMBO_POINTS = 50;
 
 // ---------- palette ----------
 //
@@ -386,6 +401,11 @@ export class TetrisEngine {
    *  upgrades a mini T-spin to full. */
   private lastKickIndex = -1;
 
+  /** Combo counter: −1 idle; each consecutive clearing lock increments (bonus from 1). */
+  private combo = -1;
+  /** Last clearing lock was "difficult" (Tetris / T-spin) — arms the B2B bonus. */
+  private b2bArmed = false;
+
   /** Live theme palette; starts on the dark defaults until the hook resolves the
    *  ambient `--m-*` tokens (see {@link setPalette}). */
   private palette: TetrisPalette = DEFAULT_PALETTE;
@@ -429,6 +449,8 @@ export class TetrisEngine {
     this.clearingRows = [];
     this.lastAction = "none";
     this.lastKickIndex = -1;
+    this.combo = -1;
+    this.b2bArmed = false;
     this.holdIndex = -1;
     this.holdUsed = false;
     this.bag.reset();
@@ -687,14 +709,46 @@ export class TetrisEngine {
     }
   }
 
+  /** 3-corner T-spin test at lock time: T piece, last action a rotate, ≥3 of the
+   *  piece box's diagonal corners occupied (walls/floor count). Mini when the two
+   *  FRONT corners (the side the nose points to) aren't both filled — unless the
+   *  rotation used the 5th kick offset, which upgrades to a full T-spin. */
+  private tSpinKind(): "none" | "mini" | "full" {
+    const p = this.piece!;
+    if (p.type !== "T" || this.lastAction !== "rotate") return "none";
+    const occupied = (gx: number, gy: number) =>
+      gx < 0 ||
+      gx >= COLS ||
+      gy >= ROWS ||
+      (gy >= 0 && this.grid[gy][gx] !== 0);
+    const corners = [
+      occupied(p.x, p.y), // 0 top-left
+      occupied(p.x + 2, p.y), // 1 top-right
+      occupied(p.x, p.y + 2), // 2 bottom-left
+      occupied(p.x + 2, p.y + 2), // 3 bottom-right
+    ];
+    if (corners.filter(Boolean).length < 3) return "none";
+    // Front corner pair by rotation state (0 nose-up, 1 right, 2 down, 3 left).
+    const FRONT = [
+      [0, 1],
+      [1, 3],
+      [2, 3],
+      [0, 2],
+    ][p.rot];
+    if (corners[FRONT[0]] && corners[FRONT[1]]) return "full";
+    return this.lastKickIndex === 4 ? "full" : "mini";
+  }
+
   /**
    * Merge the landed piece into the stack, score/clear any completed rows, and either
    * enter the line-clear freeze (rows to flash) or spawn the next piece immediately.
    * Score + lines + level update NOW (at lock) so the HUD reflects it instantly; the
-   * visual collapse follows the flash.
+   * visual collapse follows the flash. The T-spin test runs BEFORE the merge — the
+   * corner probe must not read the piece's own (about-to-be-placed) cells.
    */
   private lockPiece(): TetrisStep {
     const p = this.piece!;
+    const tspin = this.tSpinKind();
     const m = ROTATIONS[p.type][p.rot];
     const typeVal = PIECE_TYPES.indexOf(p.type) + 1;
     for (let r = 0; r < m.length; r++) {
@@ -712,13 +766,43 @@ export class TetrisEngine {
     for (let r = 0; r < ROWS; r++) {
       if (this.grid[r].every((v) => v !== 0)) full.push(r);
     }
+    const n = full.length;
+
+    // Guideline scoring at the CURRENT level; lines/level advance after.
+    const base =
+      tspin === "full"
+        ? TSPIN_SCORES[n]
+        : tspin === "mini"
+          ? TSPIN_MINI_SCORES[n]
+          : LINE_SCORES[n];
+    const difficult = n > 0 && (tspin !== "none" || n === 4);
+    const b2b = difficult && this.b2bArmed;
+    let pts = base * (this.level + 1);
+    if (b2b) pts = Math.floor(pts * B2B_MULT);
+    if (n > 0) {
+      this.combo += 1;
+      if (this.combo >= 1) pts += COMBO_POINTS * this.combo * (this.level + 1);
+      this.b2bArmed = difficult; // a non-difficult clear breaks the chain
+    } else {
+      this.combo = -1; // a dry lock breaks the combo (B2B survives)
+    }
+    this.score += pts;
+
+    let event: ClearEvent | null = null;
+    if (n > 0 || tspin !== "none") {
+      const kind: ClearKind =
+        tspin === "full"
+          ? "tspin"
+          : tspin === "mini"
+            ? "tspin-mini"
+            : (["single", "double", "triple", "tetris"] as const)[n - 1];
+      event = { kind, lines: n, b2b, combo: Math.max(this.combo, 0) };
+    }
 
     this.holdUsed = false;
 
-    if (full.length > 0) {
-      // Classic scoring at the CURRENT level, then advance lines/level/gravity.
-      this.score += LINE_SCORES[full.length] * (this.level + 1);
-      this.lines += full.length;
+    if (n > 0) {
+      this.lines += n;
       const newLevel = Math.floor(this.lines / 10);
       if (newLevel !== this.level) {
         this.level = newLevel;
@@ -731,13 +815,13 @@ export class TetrisEngine {
       // The collapse + next spawn happen when the freeze elapses (see the "clearing"
       // branch of update). Under reduced motion the freeze is 0ms → the row clears
       // on the next tick with no flash. No piece is falling meanwhile (not dead yet).
-      return this.snapshot(false);
+      return this.snapshot(false, event);
     }
 
     // No clear — spawn immediately (may top out → dead).
     this.piece = null;
     const alive = this.spawnNext();
-    return this.snapshot(!alive);
+    return this.snapshot(!alive, event);
   }
 
   /** Remove the flagged full rows and drop everything above them down. */
@@ -750,12 +834,13 @@ export class TetrisEngine {
     this.grid = kept;
   }
 
-  private snapshot(dead: boolean): TetrisStep {
+  private snapshot(dead: boolean, event: ClearEvent | null = null): TetrisStep {
     return {
       dead,
       score: this.score,
       lines: this.lines,
       level: this.level,
+      event,
     };
   }
 
