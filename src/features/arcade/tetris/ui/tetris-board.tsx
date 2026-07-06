@@ -18,6 +18,7 @@ import {
   useBoardFullscreen,
 } from "@/features/arcade/shared";
 import { TETRIS_ACTIONS, TETRIS_DEFAULT_BINDINGS } from "../model/bindings";
+import { TETRIS_DEFAULT_GAMEPAD_BINDINGS } from "../model/gamepad-bindings";
 import type { TetrisGameApi } from "../model/types";
 
 /**
@@ -212,6 +213,9 @@ export function TetrisBoard({
         value={api.bindings}
         defaults={TETRIS_DEFAULT_BINDINGS}
         onChange={api.setBindings}
+        padValue={api.padBindings}
+        padDefaults={TETRIS_DEFAULT_GAMEPAD_BINDINGS}
+        onPadChange={api.setPadBindings}
       />
     </div>
   );
