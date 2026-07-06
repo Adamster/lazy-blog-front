@@ -17,14 +17,6 @@ import {
 import { RUSH_EVERY, WAVE_MAX_GAP } from "../model/engine";
 import type { StayAwakeGameApi, StayAwakeState } from "../model/types";
 
-/** Control reference — shown in the menu overlay. The GOAL row doubles as the
- *  approved menu subtitle (owner copy). */
-const KEY_HINTS: [string, string][] = [
-  ["GOAL", "The floor is sleep. Keep hopping."],
-  ["HOP", "← →  /  A D"],
-  ["PAUSE", "SPACE"],
-];
-
 /** Approved game-over lines (owner copy, 2026-07-03; wall added with the
  *  lethal-walls retune). No trailing period — the detail row joins its parts
  *  with middle dots (owner call), so the cause reads as the first segment. */
@@ -212,7 +204,7 @@ export function StayAwakeBoard({
       <CornerBrackets />
 
       {state.screen === "menu" && (
-        <MenuOverlay title="Stay Awake" onStart={start} hints={KEY_HINTS} />
+        <MenuOverlay title="Stay Awake" onStart={start} />
       )}
 
       {state.screen === "playing" && state.paused && (

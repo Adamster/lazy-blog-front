@@ -12,12 +12,6 @@ import {
 } from "@/features/arcade/shared";
 import type { SnakeClassicGameApi } from "../model/types";
 
-/** Control reference — shown in the menu overlay. */
-const KEY_HINTS: [string, string][] = [
-  ["STEER", "↑ ↓ ← →  ·  W A S D"],
-  ["PAUSE", "SPACE"],
-];
-
 /** The canvas play-field + its overlays (menu / pause / game-over). Pure
  *  presentation — the hook owns all logic; the board only renders `api`.
  *
@@ -63,9 +57,7 @@ export function SnakeClassicBoard({
 
       <CornerBrackets />
 
-      {state.screen === "menu" && (
-        <MenuOverlay title="Snake" onStart={start} hints={KEY_HINTS} />
-      )}
+      {state.screen === "menu" && <MenuOverlay title="Snake" onStart={start} />}
 
       {state.screen === "playing" && state.paused && (
         <PauseOverlay hint="Space to resume" />

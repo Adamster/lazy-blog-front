@@ -1,22 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Button, Modal, ModalHeader } from "@/shared/ui";
 import { bindingLabel, rebind, type BindingMap } from "../model/key-bindings";
+import { codeGlyph, KbdBadge } from "./board-overlay";
 
 /** One capture chip (keyboard OR gamepad) inside a `ControlsModal` action row —
- * shows the current binding, or the "press…" placeholder while armed. */
+ * a fixed 36px (`h-9`) TRANSPARENT outline button (no own fill — the raised fill
+ * lives on the inner key-caps, below), its border revealing accent on hover
+ * (`hover:border-[var(--m-accent)]`, the shared `.mono-btn-outline` treatment) and
+ * pinned accent while armed. Renders the current binding as `filled` icon-glyph
+ * key-caps (the {@link KbdBadge} language shared with the menu key-hint rows, here
+ * carrying the `--m-card` keycap fill so each key reads as a raised cap against the
+ * transparent chip), or the plain "press…" placeholder while armed. Each bound code
+ * becomes its own COMPACT keycap (`codeGlyph(code, true)` — `size-3` icons a notch
+ * down from the menu's `size-3.5`) on the shared 20px square floor, sitting `gap-1`
+ * apart (a chip only ever holds ONE action's alternates, so no `·` separator); an
+ * unbound action shows the plain "—" mark. `aria-label` keeps the spelled-out
+ * binding text for screen readers even though the visible chip is icons. */
 function CaptureChip({
   active,
   ariaLabel,
   placeholder,
-  valueLabel,
+  codes,
   onClick,
 }: {
   active: boolean;
   ariaLabel: string;
   placeholder: string;
-  valueLabel: string;
+  codes: readonly string[];
   onClick: () => void;
 }) {
   return (
@@ -24,17 +36,29 @@ function CaptureChip({
       type="button"
       aria-label={ariaLabel}
       onClick={onClick}
-      className={`mono-focus flex h-9 flex-1 items-center justify-center border-2 px-4 ${
-        active ? "border-[var(--m-accent)]" : "border-[var(--m-dim)]"
+      className={`mono-focus flex h-9 w-full items-center justify-center border-2 px-4 transition-colors ${
+        active
+          ? "border-[var(--m-accent)]"
+          : "border-[var(--m-dim)] hover:border-[var(--m-accent)]"
       }`}
     >
-      <span
-        className={`text-[11px] leading-none tracking-[0.12em] uppercase ${
-          active ? "text-[var(--m-accent)]" : "text-[var(--m-fg)]"
-        }`}
-      >
-        {active ? placeholder : valueLabel}
-      </span>
+      {active ? (
+        <span className="text-[11px] leading-none tracking-[0.12em] text-[var(--m-accent)] uppercase">
+          {placeholder}
+        </span>
+      ) : codes.length === 0 ? (
+        <span className="text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)] uppercase">
+          —
+        </span>
+      ) : (
+        <span className="flex items-center gap-1">
+          {codes.map((code, i) => (
+            <KbdBadge key={i} size="h-5 min-w-5 px-0.5" filled>
+              {codeGlyph(code, true)}
+            </KbdBadge>
+          ))}
+        </span>
+      )}
     </button>
   );
 }
@@ -150,49 +174,52 @@ export function ControlsModal<A extends string>({
             subtitle="Click a slot, then press its new key or button. Esc cancels."
             onClose={closeModal}
           />
-          <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-[auto_1fr_1fr] items-center gap-x-3 gap-y-4">
             {actions.map(({ id, label }) => {
               const keyActive =
                 capturing?.action === id && capturing.kind === "key";
               const padActive =
                 capturing?.action === id && capturing.kind === "pad";
               return (
-                <div
-                  key={id}
-                  className="flex items-center justify-between gap-3"
-                >
+                <Fragment key={id}>
                   <span className="text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase">
                     {label}
                   </span>
-                  <div className="flex gap-3">
-                    <CaptureChip
-                      active={keyActive}
-                      ariaLabel={`${label} — keyboard: ${keyActive ? "press key" : bindingLabel(value[id])}`}
-                      placeholder="PRESS KEY…"
-                      valueLabel={bindingLabel(value[id])}
-                      onClick={() =>
-                        setCapturing(
-                          keyActive ? null : { action: id, kind: "key" }
-                        )
-                      }
-                    />
-                    <CaptureChip
-                      active={padActive}
-                      ariaLabel={`${label} — gamepad: ${padActive ? "press button" : bindingLabel(padValue[id])}`}
-                      placeholder="PRESS BUTTON…"
-                      valueLabel={bindingLabel(padValue[id])}
-                      onClick={() =>
-                        setCapturing(
-                          padActive ? null : { action: id, kind: "pad" }
-                        )
-                      }
-                    />
-                  </div>
-                </div>
+                  <CaptureChip
+                    active={keyActive}
+                    ariaLabel={`${label} — keyboard: ${keyActive ? "press key" : bindingLabel(value[id])}`}
+                    placeholder="PRESS KEY…"
+                    codes={value[id]}
+                    onClick={() =>
+                      setCapturing(
+                        keyActive ? null : { action: id, kind: "key" }
+                      )
+                    }
+                  />
+                  <CaptureChip
+                    active={padActive}
+                    ariaLabel={`${label} — gamepad: ${padActive ? "press button" : bindingLabel(padValue[id])}`}
+                    placeholder="PRESS BUTTON…"
+                    codes={padValue[id]}
+                    onClick={() =>
+                      setCapturing(
+                        padActive ? null : { action: id, kind: "pad" }
+                      )
+                    }
+                  />
+                </Fragment>
               );
             })}
           </div>
-          <div className="mt-6 flex justify-end gap-3">
+          {/* One-off exception: a 2px `--m-dim` top rule caps this unusually
+              dense modal (8 rows × 2 chip columns) so the Reset/Done footer reads
+              as separated — every OTHER modal is spacing-only here. Same 2px
+              `--m-dim` weight/token as the Tetris-menu rule. The rule sits with
+              symmetric 24px air on BOTH sides: `mt-6` (outside the border box)
+              separates it from the last action row, `pt-6` (inside) separates it
+              from the buttons — so the line never collides with the PAUSE row's
+              chip borders. */}
+          <div className="mt-6 flex justify-end gap-3 border-t-2 border-[var(--m-dim)] pt-6">
             <Button
               variant="outline"
               onClick={() => {

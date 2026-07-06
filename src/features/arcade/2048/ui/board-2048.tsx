@@ -18,13 +18,6 @@ import {
 import { Button } from "@/shared/ui";
 import type { Game2048Api } from "../model/types";
 
-/** Control reference — shown in the menu overlay. */
-const KEY_HINTS: [string, string][] = [
-  ["MOVE", "← ↑ ↓ →  /  WASD"],
-  ["GOAL", "Merge to 2048"],
-  ["START", "Enter / Space"],
-];
-
 /**
  * The CLASSIC 2048 play surface — the DPR-crisp square 4×4 canvas (inset tiles + 1px
  * grid), centered alone, + the DOM overlays (menu / won / game-over). Run stats live
@@ -86,9 +79,7 @@ export function Board2048({
 
       <CornerBrackets />
 
-      {state.screen === "menu" && (
-        <MenuOverlay title="2048" onStart={start} hints={KEY_HINTS} />
-      )}
+      {state.screen === "menu" && <MenuOverlay title="2048" onStart={start} />}
 
       {state.screen === "won" && (
         <div className={overlayBase}>
