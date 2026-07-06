@@ -63,7 +63,7 @@ export function ControlsModal<A extends string>({
   useEffect(() => {
     if (!capturing || capturing.kind !== "pad") return;
     let raf = 0;
-    let prevPressed: boolean[] = [];
+    let prevPressed: boolean[] | null = null; // null = no baseline captured yet
     const poll = () => {
       const pads =
         typeof navigator !== "undefined" && navigator.getGamepads
@@ -74,15 +74,17 @@ export function ControlsModal<A extends string>({
       );
       if (gp) {
         const nowPressed = gp.buttons.map((b) => b.pressed);
-        const pressedIndex = nowPressed.findIndex(
-          (p, i) => p && !prevPressed[i]
-        );
-        if (pressedIndex !== -1) {
-          onPadChange(
-            rebind<A>(padValue, capturing.action, `Pad${pressedIndex}`)
+        if (prevPressed) {
+          const pressedIndex = nowPressed.findIndex(
+            (p, i) => p && !prevPressed![i]
           );
-          setCapturing(null);
-          return;
+          if (pressedIndex !== -1) {
+            onPadChange(
+              rebind<A>(padValue, capturing.action, `Pad${pressedIndex}`)
+            );
+            setCapturing(null);
+            return;
+          }
         }
         prevPressed = nowPressed;
       }
@@ -130,7 +132,7 @@ export function ControlsModal<A extends string>({
                   <div className="flex gap-3">
                     <button
                       type="button"
-                      aria-label={`${label} — keyboard`}
+                      aria-label={`${label} — keyboard: ${keyActive ? "press key" : bindingLabel(value[id])}`}
                       onClick={() =>
                         setCapturing(
                           keyActive ? null : { action: id, kind: "key" }
@@ -154,7 +156,7 @@ export function ControlsModal<A extends string>({
                     </button>
                     <button
                       type="button"
-                      aria-label={`${label} — gamepad`}
+                      aria-label={`${label} — gamepad: ${padActive ? "press button" : bindingLabel(padValue[id])}`}
                       onClick={() =>
                         setCapturing(
                           padActive ? null : { action: id, kind: "pad" }
