@@ -18,6 +18,7 @@ import {
   saveBindings,
   type BindingMap,
   createGamepadPoller,
+  type PadFrame,
 } from "@/features/arcade/shared";
 import {
   TETRIS_ACTION_IDS,
@@ -25,6 +26,10 @@ import {
   TETRIS_KEYS_STORAGE,
   type TetrisAction,
 } from "./bindings";
+import {
+  TETRIS_DEFAULT_GAMEPAD_BINDINGS,
+  TETRIS_GAMEPAD_STORAGE,
+} from "./gamepad-bindings";
 import { loadHistory, recentSeries, recordScore } from "./score-history";
 import type {
   ClearEvent,
@@ -132,10 +137,16 @@ export function useTetrisGame({
   const holdCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const engineRef = useRef<TetrisEngine | null>(null);
-  const pollPadRef = useRef(createGamepadPoller());
+  const pollPadRef = useRef<(() => PadFrame) | null>(null);
   const getEngine = () => {
     engineRef.current ??= new TetrisEngine();
     return engineRef.current;
+  };
+  // Lazy like getEngine — created on first real use (inside the loop, never
+  // during render) so the ref-reading closure is never invoked at render time.
+  const getPollPad = () => {
+    pollPadRef.current ??= createGamepadPoller(() => padBindingsRef.current);
+    return pollPadRef.current;
   };
 
   const [state, setState] = useState<TetrisGameState>(INITIAL_STATE);
@@ -205,6 +216,23 @@ export function useTetrisGame({
     );
     return () => cancelAnimationFrame(raf);
   }, []);
+
+  const [padBindings, setPadBindingsState] = useState<BindingMap<TetrisAction>>(
+    TETRIS_DEFAULT_GAMEPAD_BINDINGS
+  );
+  const padBindingsRef = useRef(padBindings);
+  useEffect(() => {
+    padBindingsRef.current = padBindings;
+  }, [padBindings]);
+  // Hydrate persisted gamepad bindings on mount; rAF-deferred (lint rule).
+  useEffect(() => {
+    const raf = requestAnimationFrame(() =>
+      setPadBindingsState(
+        loadBindings(TETRIS_GAMEPAD_STORAGE, TETRIS_DEFAULT_GAMEPAD_BINDINGS)
+      )
+    );
+    return () => cancelAnimationFrame(raf);
+  }, []);
   /** True while the CONTROLS modal owns the keyboard — game keys go inert. */
   const keysSuspendedRef = useRef(false);
 
@@ -242,6 +270,13 @@ export function useTetrisGame({
     saveBindings(TETRIS_KEYS_STORAGE, next);
     // Drop any in-flight holds — a key physically held across a remap would
     // otherwise resolve to a different/no action on keyup and stick forever.
+    resetInput();
+  }, []);
+
+  const setPadBindings = useCallback((next: BindingMap<TetrisAction>) => {
+    setPadBindingsState(next);
+    saveBindings(TETRIS_GAMEPAD_STORAGE, next);
+    // Same rationale as setBindings: drop in-flight holds across a remap.
     resetInput();
   }, []);
 
@@ -410,7 +445,7 @@ export function useTetrisGame({
       const animate = !prefersReducedMotion();
       const screen = screenRef.current;
 
-      const pad = pollPadRef.current();
+      const pad = getPollPad()();
       if (!keysSuspendedRef.current) {
         if (screenRef.current !== "playing") {
           if (pad.anyPress) start();
@@ -582,6 +617,8 @@ export function useTetrisGame({
     togglePause,
     bindings,
     setBindings,
+    padBindings,
+    setPadBindings,
     setKeysSuspended,
   };
 }
