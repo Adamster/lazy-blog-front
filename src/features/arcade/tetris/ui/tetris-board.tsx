@@ -1,11 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import {
+  bindingLabel,
   BoardFullscreenButton,
+  ControlsModal,
   CornerBrackets,
   FULLSCREEN_ROOT,
   FULLSCREEN_STAGE,
   GameOverOverlay,
+  keyLabel,
   MenuOverlay,
   PanelLabel,
   PanelReadout,
@@ -13,15 +17,8 @@ import {
   rankLine,
   useBoardFullscreen,
 } from "@/features/arcade/shared";
+import { TETRIS_ACTIONS, TETRIS_DEFAULT_BINDINGS } from "../model/bindings";
 import type { TetrisGameApi } from "../model/types";
-
-/** Control reference — shown in the menu overlay (the classic "key-hint line"). */
-const KEY_HINTS: [string, string][] = [
-  ["MOVE", "← →  /  A D"],
-  ["ROTATE", "↑ / X  ·  Z"],
-  ["SOFT DROP", "↓ / S"],
-  ["PAUSE", "SPACE"],
-];
 
 /**
  * The CLASSIC TETRIS play surface — the DPR-crisp 10×20 well canvas (solid cells +
@@ -42,12 +39,33 @@ export function TetrisBoard({
   /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
   canRank?: boolean;
 }) {
-  const { canvasRef, nextCanvasRef, panelRef, start, state } = api;
+  const { canvasRef, nextCanvasRef, holdCanvasRef, panelRef, start, state } =
+    api;
   const {
     rootRef: fullscreenRootRef,
     isFullscreen,
     toggle: toggleFullscreen,
   } = useBoardFullscreen();
+
+  const [controlsOpen, setControlsOpen] = useState(false);
+  const openControls = () => {
+    setControlsOpen(true);
+    api.setKeysSuspended(true);
+  };
+  const closeControls = () => {
+    setControlsOpen(false);
+    api.setKeysSuspended(false);
+  };
+
+  const b = api.bindings;
+  const hints: [string, string][] = [
+    ["MOVE", `${bindingLabel(b.moveLeft)} · ${bindingLabel(b.moveRight)}`],
+    ["ROTATE", `${bindingLabel(b.rotateCW)} · ${bindingLabel(b.rotateCCW)}`],
+    ["SOFT DROP", bindingLabel(b.softDrop)],
+    ["HARD DROP", bindingLabel(b.hardDrop)],
+    ["HOLD", bindingLabel(b.hold)],
+    ["PAUSE", bindingLabel(b.pause)],
+  ];
 
   const rankClause = rankLine(state.rank, canRank, "clear more lines");
   // Fullscreen toggle lives on the OVERLAY screens only (menu / pause — owner
@@ -86,7 +104,11 @@ export function TetrisBoard({
               them. `self-center` centres it if the height-fit leaves side margin. */}
         <canvas
           ref={canvasRef}
-          aria-label="Tetris well. Arrow keys or A/D to move, Up or X to rotate, Down to soft drop."
+          aria-label={`Tetris well. ${bindingLabel(b.moveLeft)} and ${bindingLabel(
+            b.moveRight
+          )} to move, ${bindingLabel(b.rotateCW)} to rotate, ${bindingLabel(
+            b.hardDrop
+          )} to hard drop.`}
           role="img"
           className="block [aspect-ratio:1/2] h-full self-center border-2 border-[var(--m-dim)]"
         />
@@ -105,6 +127,15 @@ export function TetrisBoard({
           className="flex w-20 shrink-0 flex-col items-center gap-6 self-center"
         >
           <div className="flex flex-col items-center gap-2">
+            <PanelLabel>HOLD</PanelLabel>
+            <canvas
+              ref={holdCanvasRef}
+              aria-label="Hold piece"
+              role="img"
+              className="block h-6 w-12"
+            />
+          </div>
+          <div className="flex flex-col items-center gap-2">
             <PanelLabel>NEXT</PanelLabel>
             <canvas
               ref={nextCanvasRef}
@@ -119,14 +150,43 @@ export function TetrisBoard({
         </div>
       </div>
 
+      {/* Transient clear-event caption ("TETRIS", "B2B · T-SPIN DOUBLE") — a
+          floating top-center toast over the stage (owner call: the bottom of
+          the readout column read too faint). Absolutely positioned so it never
+          reflows the panel; pointer-events-none, bg chip keeps it legible over
+          the spawn rows. */}
+      {state.eventLabel && (
+        <div
+          aria-live="polite"
+          className="pointer-events-none absolute inset-x-0 top-5 z-[1] flex justify-center"
+        >
+          <span className="bg-[var(--m-bg)]/80 px-2 py-1 text-center text-[11px] leading-[1.2] font-medium tracking-[0.12em] text-[var(--m-accent)] uppercase">
+            {state.eventLabel}
+          </span>
+        </div>
+      )}
+
       <CornerBrackets />
 
       {state.screen === "menu" && (
-        <MenuOverlay title="Tetris" onStart={start} hints={KEY_HINTS} />
+        <MenuOverlay
+          title="Tetris"
+          onStart={start}
+          hints={hints}
+          extra={
+            <button
+              type="button"
+              onClick={openControls}
+              className="mono-focus text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)]"
+            >
+              Controls
+            </button>
+          }
+        />
       )}
 
       {state.screen === "playing" && state.paused && (
-        <PauseOverlay hint="Space to resume" />
+        <PauseOverlay hint={`${keyLabel(b.pause[0] ?? "KeyP")} to resume`} />
       )}
 
       {state.screen === "over" && (
@@ -144,6 +204,15 @@ export function TetrisBoard({
           onToggle={toggleFullscreen}
         />
       )}
+
+      <ControlsModal
+        isOpen={controlsOpen}
+        onOpenChange={closeControls}
+        actions={TETRIS_ACTIONS}
+        value={api.bindings}
+        defaults={TETRIS_DEFAULT_BINDINGS}
+        onChange={api.setBindings}
+      />
     </div>
   );
 }

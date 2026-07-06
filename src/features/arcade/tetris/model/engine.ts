@@ -1,17 +1,24 @@
-import type { PieceType, TetrisInput, TetrisStep } from "./types";
+import type {
+  ClearEvent,
+  ClearKind,
+  PieceType,
+  TetrisInput,
+  TetrisStep,
+} from "./types";
 
 /**
- * Headless CLASSIC TETRIS engine — all mutable state + the fixed-timestep sim
- * (gravity / DAS / lock / line-clear) + the imperative canvas draw, with NO React
+ * Headless MODERN-GUIDELINE TETRIS engine — all mutable state + the fixed-timestep
+ * sim (gravity / DAS / lock / line-clear) + the imperative canvas draw, with NO React
  * (mirrors the Snake/Hollow-Sloth split: `useTetrisGame` owns one instance and the
- * rAF loop; the canvas is imperative so React never re-renders per frame — state
- * flows out only on discrete changes: score / lines / level / game-over).
+ * rAF loop; state flows out only on discrete changes).
  *
- * Ruleset is the PUREST classic (NES / Game Boy era) — see the constants: 10×20
- * well, seven tetrominoes, NES-style single-reroll randomizer, simple
- * rotate-if-it-fits (NRS-style, NO wall-kicks), ONE next preview, soft drop only
- * (NO hold / ghost / hard drop), classic 40/100/300/1200 scoring, per-level gravity
- * from the NES frame table.
+ * Ruleset is the MODERN GUIDELINE (spec: docs/superpowers/specs/
+ * 2026-07-05-tetris-modern-guideline-design.md): 10×20 well, SRS rotation with the
+ * full tetris.wiki kick tables, 7-bag randomizer, hard drop (instant lock) + ghost,
+ * hold (one swap per piece), 500ms move-reset lock delay (15-reset cap), 133/25 DAS,
+ * T-spins (3-corner rule, mini + 5th-kick upgrade), guideline scoring (100/300/500/
+ * 800, T-spin 400–1600, B2B ×1.5, combos, 1/2 pts per soft/hard-drop cell) — on the
+ * web-tuned NES gravity curve (50ms floor). ONE next preview.
  */
 
 // ---------- well geometry ----------
@@ -59,15 +66,16 @@ const GRAVITY_FLOOR_MS = 50;
  *  point per cell (classic). Faster than gravity until the high-level floor. */
 const SOFT_DROP_MS = 40;
 
-/** DAS (Delayed Auto-Shift): first held-move fires immediately, then the auto-repeat
- *  waits {@link DAS_DELAY} and repeats every {@link DAS_REPEAT} — the classic feel. */
-const DAS_DELAY = 170;
-const DAS_REPEAT = 50;
+/** DAS (Delayed Auto-Shift): first held-move fires immediately, then auto-repeat
+ *  waits {@link DAS_DELAY} and repeats every {@link DAS_REPEAT} — modern-tuned. */
+const DAS_DELAY = 133;
+const DAS_REPEAT = 25;
 
-/** Lock delay: a piece that has landed locks after this grace period. It is NOT
- *  reset by moves/rotations (the timer runs from the FIRST landing), so there is no
- *  infinite-spin — minimal and classic-feeling, just enough web fairness. */
-const LOCK_DELAY = 120;
+/** Lock delay (guideline move-reset): a landed piece locks after this grace, but a
+ *  successful move/rotate restarts the timer — at most {@link LOCK_RESETS_MAX}
+ *  times per piece, so there's no infinite stalling. */
+const LOCK_DELAY = 500;
+const LOCK_RESETS_MAX = 15;
 
 /** Line-clear freeze: the completed rows flash for this long before they collapse
  *  (classic). Under reduced motion the hook passes `animate=false` → instant clear. */
@@ -78,10 +86,20 @@ const FLASH_BLINK_MS = 70;
 /** Cap a single sim advance (a backgrounded tab hands us a huge dt on resume). */
 const MAX_DT = 100;
 
-// ---------- scoring ----------
+// ---------- scoring (guideline) ----------
 
-/** Classic line-clear base points by lines cleared (× (level + 1)). Index 4 = a Tetris. */
-const LINE_SCORES = [0, 40, 100, 300, 1200];
+/** Guideline line-clear base points by lines cleared (× (level + 1)). */
+const LINE_SCORES = [0, 100, 300, 500, 800];
+/** T-spin base points by lines cleared (0 = the no-line spin itself). */
+const TSPIN_SCORES = [400, 800, 1200, 1600];
+/** Mini T-spin base points by lines cleared. Tops out at a double — anything beyond
+ *  falls back to the full T-spin table in lockPiece (defensive: a legal mini triple
+ *  shouldn't exist, but NaN must be impossible). */
+const TSPIN_MINI_SCORES = [100, 200, 400];
+/** Back-to-back bonus on "difficult" clears (Tetris / any T-spin clear). */
+const B2B_MULT = 1.5;
+/** Per-combo-step bonus (× combo count × (level + 1)). */
+const COMBO_POINTS = 50;
 
 // ---------- palette ----------
 //
@@ -104,6 +122,8 @@ export interface TetrisPalette {
   /** Settled stack ← `--m-muted2` (light `#8c8c8c` / dark `#7a7a7a`) — a mid gray that
    *  stays clearly distinct from BOTH the bg and the accent piece on either theme. */
   lockedFill: string;
+  /** Ghost (drop-preview) silhouette ← `--m-accent` at low alpha. */
+  ghostFill: string;
 }
 
 /** Dark-theme defaults (mirror the dark `--m-*` values) so the first paint / SSR looks
@@ -114,6 +134,7 @@ const DEFAULT_PALETTE: TetrisPalette = {
   pieceFill: "#cdff48",
   flashAccent: "#cdff48",
   lockedFill: "#7a7a7a",
+  ghostFill: "rgba(205,255,72,0.18)",
 };
 
 /**
@@ -182,6 +203,162 @@ const ROTATIONS: Record<PieceType, Matrix[]> = (() => {
   return out;
 })();
 
+// ---------- SRS kick tables ----------
+//
+// tetris.wiki/Super_Rotation_System tables VERBATIM: offsets are (x, y) with +y UP,
+// applied as `x + dx, y - dy` (our grid's +y is down). Rotation states: 0 spawn,
+// 1 = R (one CW), 2 = two rotations, 3 = L (one CCW). Key = "from>to". First
+// offset that fits wins. O never kicks (its rotation is the identity).
+
+type Kick = readonly [number, number];
+
+const kickKey = (from: number, to: number) => `${from}>${to}`;
+
+const JLSTZ_KICKS: Record<string, readonly Kick[]> = {
+  "0>1": [
+    [0, 0],
+    [-1, 0],
+    [-1, 1],
+    [0, -2],
+    [-1, -2],
+  ],
+  "1>0": [
+    [0, 0],
+    [1, 0],
+    [1, -1],
+    [0, 2],
+    [1, 2],
+  ],
+  "1>2": [
+    [0, 0],
+    [1, 0],
+    [1, -1],
+    [0, 2],
+    [1, 2],
+  ],
+  "2>1": [
+    [0, 0],
+    [-1, 0],
+    [-1, 1],
+    [0, -2],
+    [-1, -2],
+  ],
+  "2>3": [
+    [0, 0],
+    [1, 0],
+    [1, 1],
+    [0, -2],
+    [1, -2],
+  ],
+  "3>2": [
+    [0, 0],
+    [-1, 0],
+    [-1, -1],
+    [0, 2],
+    [-1, 2],
+  ],
+  "3>0": [
+    [0, 0],
+    [-1, 0],
+    [-1, -1],
+    [0, 2],
+    [-1, 2],
+  ],
+  "0>3": [
+    [0, 0],
+    [1, 0],
+    [1, 1],
+    [0, -2],
+    [1, -2],
+  ],
+};
+
+const I_KICKS: Record<string, readonly Kick[]> = {
+  "0>1": [
+    [0, 0],
+    [-2, 0],
+    [1, 0],
+    [-2, -1],
+    [1, 2],
+  ],
+  "1>0": [
+    [0, 0],
+    [2, 0],
+    [-1, 0],
+    [2, 1],
+    [-1, -2],
+  ],
+  "1>2": [
+    [0, 0],
+    [-1, 0],
+    [2, 0],
+    [-1, 2],
+    [2, -1],
+  ],
+  "2>1": [
+    [0, 0],
+    [1, 0],
+    [-2, 0],
+    [1, -2],
+    [-2, 1],
+  ],
+  "2>3": [
+    [0, 0],
+    [2, 0],
+    [-1, 0],
+    [2, 1],
+    [-1, -2],
+  ],
+  "3>2": [
+    [0, 0],
+    [-2, 0],
+    [1, 0],
+    [-2, -1],
+    [1, 2],
+  ],
+  "3>0": [
+    [0, 0],
+    [1, 0],
+    [-2, 0],
+    [1, -2],
+    [-2, 1],
+  ],
+  "0>3": [
+    [0, 0],
+    [-1, 0],
+    [2, 0],
+    [-1, 2],
+    [2, -1],
+  ],
+};
+
+/** 7-bag randomizer: shuffle all seven piece indices, deal in order, refill when
+ *  empty — the guideline randomizer (no droughts, no floods). RNG is injectable
+ *  for tests (mirrors Engine2048). */
+export class SevenBag {
+  private bag: number[] = [];
+
+  constructor(private rng: () => number = Math.random) {}
+
+  next(): number {
+    if (this.bag.length === 0) this.refill();
+    return this.bag.pop()!;
+  }
+
+  reset() {
+    this.bag = [];
+  }
+
+  private refill() {
+    const b = PIECE_TYPES.map((_, i) => i);
+    for (let i = b.length - 1; i > 0; i--) {
+      const j = (this.rng() * (i + 1)) | 0;
+      [b[i], b[j]] = [b[j], b[i]];
+    }
+    this.bag = b;
+  }
+}
+
 interface Piece {
   type: PieceType;
   rot: number;
@@ -197,8 +374,10 @@ export class TetrisEngine {
 
   private piece: Piece | null = null;
   private nextIndex = 0;
-  /** Last piece rolled — the NES randomizer rerolls ONCE if a roll repeats it. */
-  private prevPieceIndex = -1;
+  /** Held piece index (−1 = empty box) + the one-swap-per-piece latch. */
+  private holdIndex = -1;
+  private holdUsed = false;
+  private bag: SevenBag;
 
   private phase: Phase = "falling";
 
@@ -210,6 +389,7 @@ export class TetrisEngine {
   // Timers (ms).
   private dropTimer = 0;
   private lockTimer = 0;
+  private lockResets = 0;
   /** Previous frame's softDrop — detects the press EDGE (see the gravity clamp). */
   private prevSoft = false;
   private dasDir = 0;
@@ -217,12 +397,24 @@ export class TetrisEngine {
   private clearTimer = 0;
   private clearingRows: number[] = [];
 
+  /** Last successful action — T-spin detection needs "was the final maneuver a rotate". */
+  private lastAction: "none" | "move" | "rotate" | "drop" = "none";
+  /** Kick-table index of the applied rotation offset (−1 = none) — the 5th (index 4)
+   *  upgrades a mini T-spin to full. */
+  private lastKickIndex = -1;
+
+  /** Combo counter: −1 idle; each consecutive clearing lock increments (bonus from 1). */
+  private combo = -1;
+  /** Last clearing lock was "difficult" (Tetris / T-spin) — arms the B2B bonus. */
+  private b2bArmed = false;
+
   /** Live theme palette; starts on the dark defaults until the hook resolves the
    *  ambient `--m-*` tokens (see {@link setPalette}). */
   private palette: TetrisPalette = DEFAULT_PALETTE;
 
-  constructor() {
+  constructor(rng: () => number = Math.random) {
     this.grid = TetrisEngine.emptyGrid();
+    this.bag = new SevenBag(rng);
   }
 
   /** Swap the draw palette — the hook calls this on mount AND on every theme change,
@@ -251,33 +443,28 @@ export class TetrisEngine {
     this.gravityMs = this.gravityMsFor(0);
     this.dropTimer = 0;
     this.lockTimer = 0;
+    this.lockResets = 0;
     this.prevSoft = false;
     this.dasDir = 0;
     this.dasTimer = 0;
     this.clearTimer = 0;
     this.clearingRows = [];
-    this.prevPieceIndex = -1;
-    // First piece has no reroll bias; queue up the following one.
-    const first = this.rollType();
-    this.nextIndex = this.rollType();
+    this.lastAction = "none";
+    this.lastKickIndex = -1;
+    this.combo = -1;
+    this.b2bArmed = false;
+    this.holdIndex = -1;
+    this.holdUsed = false;
+    this.bag.reset();
+    // Draw the first piece and queue the next from the bag.
+    const first = this.bag.next();
+    this.nextIndex = this.bag.next();
     this.spawn(first);
   }
 
   private gravityMsFor(level: number): number {
     const f = GRAVITY_FRAMES[Math.min(level, GRAVITY_FRAMES.length - 1)];
     return Math.max(GRAVITY_FLOOR_MS, Math.round(f * MS_PER_FRAME));
-  }
-
-  /** NES-style randomizer: uniform roll with ONE reroll if it repeats the previous
-   *  piece (the reroll is final — it may still repeat). Cuts obvious streaks without
-   *  the modern 7-bag. */
-  private rollType(): number {
-    let idx = (Math.random() * PIECE_TYPES.length) | 0;
-    if (idx === this.prevPieceIndex) {
-      idx = (Math.random() * PIECE_TYPES.length) | 0;
-    }
-    this.prevPieceIndex = idx;
-    return idx;
   }
 
   /** Place `index`'s piece at the classic top-centre. Returns false (→ top-out /
@@ -291,6 +478,8 @@ export class TetrisEngine {
       x: Math.floor((COLS - n) / 2),
       y: 0,
     };
+    this.lastAction = "none";
+    this.lastKickIndex = -1;
     if (!this.fits(piece.type, piece.rot, piece.x, piece.y)) {
       this.piece = piece; // keep it visible on the game-over frame
       this.phase = "over";
@@ -299,12 +488,13 @@ export class TetrisEngine {
     this.piece = piece;
     this.dropTimer = 0;
     this.lockTimer = 0;
+    this.lockResets = 0;
     return true;
   }
 
   private spawnNext(): boolean {
     const index = this.nextIndex;
-    this.nextIndex = this.rollType();
+    this.nextIndex = this.bag.next();
     return this.spawn(index);
   }
 
@@ -332,25 +522,55 @@ export class TetrisEngine {
     return !!p && this.fits(p.type, p.rot, p.x, p.y + 1);
   }
 
+  /** How many rows the piece can fall before resting — the ghost/hard-drop distance. */
+  private dropDistance(): number {
+    const p = this.piece!;
+    let d = 0;
+    while (this.fits(p.type, p.rot, p.x, p.y + d + 1)) d++;
+    return d;
+  }
+
   private tryMove(dx: number): boolean {
     const p = this.piece;
     if (!p) return false;
     if (this.fits(p.type, p.rot, p.x + dx, p.y)) {
       p.x += dx;
+      this.noteShift("move");
       return true;
     }
     return false;
   }
 
-  /** Simple classic rotation: rotate if the rotated cells fit as-is, otherwise DON'T
-   *  (no SRS wall-kicks). `dir` +1 = clockwise, −1 = counter-clockwise. */
+  /** Record a successful move/rotate: it becomes the "last action" (T-spin detection)
+   *  and, if the piece is inside its lock-delay grace, restarts the timer — at most
+   *  {@link LOCK_RESETS_MAX} times per piece (guideline move-reset). */
+  private noteShift(action: "move" | "rotate") {
+    this.lastAction = action;
+    if (this.lockTimer > 0 && this.lockResets < LOCK_RESETS_MAX) {
+      this.lockTimer = 0;
+      this.lockResets += 1;
+    }
+  }
+
+  /** SRS rotation: try the target state at each kick offset from the wiki tables
+   *  (first fit wins — includes wall AND floor kicks). `dir` +1 = CW, −1 = CCW. */
   private tryRotate(dir: number): boolean {
     const p = this.piece;
-    if (!p) return false;
-    const rot = (p.rot + dir + 4) % 4;
-    if (this.fits(p.type, rot, p.x, p.y)) {
-      p.rot = rot;
-      return true;
+    if (!p || p.type === "O") return false;
+    const to = (p.rot + dir + 4) % 4;
+    const kicks = (p.type === "I" ? I_KICKS : JLSTZ_KICKS)[kickKey(p.rot, to)];
+    for (let i = 0; i < kicks.length; i++) {
+      const [dx, dy] = kicks[i];
+      const nx = p.x + dx;
+      const ny = p.y - dy; // wiki +y is up; our +y is down
+      if (this.fits(p.type, to, nx, ny)) {
+        p.rot = to;
+        p.x = nx;
+        p.y = ny;
+        this.lastKickIndex = i;
+        this.noteShift("rotate");
+        return true;
+      }
     }
     return false;
   }
@@ -383,6 +603,19 @@ export class TetrisEngine {
       return this.snapshot(false);
     }
 
+    // Hold (one-shot edge): swap the falling piece with the box, once per piece.
+    if (input.hold) {
+      input.hold = false;
+      if (!this.holdUsed && this.piece) {
+        const cur = PIECE_TYPES.indexOf(this.piece.type);
+        const stored = this.holdIndex;
+        this.holdIndex = cur;
+        this.holdUsed = true;
+        const alive = stored >= 0 ? this.spawn(stored) : this.spawnNext();
+        if (!alive) return this.snapshot(true);
+      }
+    }
+
     // Horizontal DAS.
     this.handleHorizontal(dt, input);
 
@@ -394,6 +627,20 @@ export class TetrisEngine {
     if (input.rotateCCW) {
       this.tryRotate(-1);
       input.rotateCCW = false;
+    }
+
+    // Hard drop (one-shot edge): teleport to the drop position and lock NOW — zero
+    // frames, no lock-delay grace. +2 points per cell. A drop of 0 keeps the last
+    // action (a rotate stays a T-spin); any fall overwrites it.
+    if (input.hardDrop) {
+      input.hardDrop = false;
+      const d = this.dropDistance();
+      if (d > 0) {
+        this.piece!.y += d;
+        this.score += d * 2;
+        this.lastAction = "drop";
+      }
+      return this.lockPiece();
     }
 
     // Gravity + soft drop.
@@ -417,6 +664,7 @@ export class TetrisEngine {
       this.dropTimer -= interval;
       if (this.canMoveDown()) {
         this.piece!.y += 1;
+        this.lastAction = "drop";
         if (soft) this.score += 1; // classic soft-drop point per cell
       } else {
         this.dropTimer = 0; // landed — don't bank gravity while resting
@@ -424,9 +672,9 @@ export class TetrisEngine {
       }
     }
 
-    // Lock delay — the timer runs from the FIRST landing and is NOT reset by
-    // moves/rotations (no infinite spin). If the piece can fall again (moved over a
-    // gap) the timer clears and it keeps dropping.
+    // Lock delay — guideline move-reset: the timer runs from landing; a successful
+    // move/rotate restarts it via noteShift (≤ LOCK_RESETS_MAX per piece). If the
+    // piece can fall again (moved over a gap) the timer clears and it keeps dropping.
     if (!this.canMoveDown()) {
       this.lockTimer += dt;
       if (this.lockTimer >= LOCK_DELAY) {
@@ -463,14 +711,46 @@ export class TetrisEngine {
     }
   }
 
+  /** 3-corner T-spin test at lock time: T piece, last action a rotate, ≥3 of the
+   *  piece box's diagonal corners occupied (walls/floor count). Mini when the two
+   *  FRONT corners (the side the nose points to) aren't both filled — unless the
+   *  rotation used the 5th kick offset, which upgrades to a full T-spin. */
+  private tSpinKind(): "none" | "mini" | "full" {
+    const p = this.piece!;
+    if (p.type !== "T" || this.lastAction !== "rotate") return "none";
+    const occupied = (gx: number, gy: number) =>
+      gx < 0 ||
+      gx >= COLS ||
+      gy >= ROWS ||
+      (gy >= 0 && this.grid[gy][gx] !== 0);
+    const corners = [
+      occupied(p.x, p.y), // 0 top-left
+      occupied(p.x + 2, p.y), // 1 top-right
+      occupied(p.x, p.y + 2), // 2 bottom-left
+      occupied(p.x + 2, p.y + 2), // 3 bottom-right
+    ];
+    if (corners.filter(Boolean).length < 3) return "none";
+    // Front corner pair by rotation state (0 nose-up, 1 right, 2 down, 3 left).
+    const FRONT = [
+      [0, 1],
+      [1, 3],
+      [2, 3],
+      [0, 2],
+    ][p.rot];
+    if (corners[FRONT[0]] && corners[FRONT[1]]) return "full";
+    return this.lastKickIndex === 4 ? "full" : "mini";
+  }
+
   /**
    * Merge the landed piece into the stack, score/clear any completed rows, and either
    * enter the line-clear freeze (rows to flash) or spawn the next piece immediately.
    * Score + lines + level update NOW (at lock) so the HUD reflects it instantly; the
-   * visual collapse follows the flash.
+   * visual collapse follows the flash. The T-spin test runs BEFORE the merge — the
+   * corner probe must not read the piece's own (about-to-be-placed) cells.
    */
   private lockPiece(): TetrisStep {
     const p = this.piece!;
+    const tspin = this.tSpinKind();
     const m = ROTATIONS[p.type][p.rot];
     const typeVal = PIECE_TYPES.indexOf(p.type) + 1;
     for (let r = 0; r < m.length; r++) {
@@ -488,11 +768,43 @@ export class TetrisEngine {
     for (let r = 0; r < ROWS; r++) {
       if (this.grid[r].every((v) => v !== 0)) full.push(r);
     }
+    const n = full.length;
 
-    if (full.length > 0) {
-      // Classic scoring at the CURRENT level, then advance lines/level/gravity.
-      this.score += LINE_SCORES[full.length] * (this.level + 1);
-      this.lines += full.length;
+    // Guideline scoring at the CURRENT level; lines/level advance after.
+    const base =
+      tspin === "full"
+        ? TSPIN_SCORES[n]
+        : tspin === "mini"
+          ? (TSPIN_MINI_SCORES[n] ?? TSPIN_SCORES[n])
+          : LINE_SCORES[n];
+    const difficult = n > 0 && (tspin !== "none" || n === 4);
+    const b2b = difficult && this.b2bArmed;
+    let pts = base * (this.level + 1);
+    if (b2b) pts = Math.floor(pts * B2B_MULT);
+    if (n > 0) {
+      this.combo += 1;
+      if (this.combo >= 1) pts += COMBO_POINTS * this.combo * (this.level + 1);
+      this.b2bArmed = difficult; // a non-difficult clear breaks the chain
+    } else {
+      this.combo = -1; // a dry lock breaks the combo (B2B survives)
+    }
+    this.score += pts;
+
+    let event: ClearEvent | null = null;
+    if (n > 0 || tspin !== "none") {
+      const kind: ClearKind =
+        tspin === "full"
+          ? "tspin"
+          : tspin === "mini"
+            ? "tspin-mini"
+            : (["single", "double", "triple", "tetris"] as const)[n - 1];
+      event = { kind, lines: n, b2b, combo: Math.max(this.combo, 0) };
+    }
+
+    this.holdUsed = false;
+
+    if (n > 0) {
+      this.lines += n;
       const newLevel = Math.floor(this.lines / 10);
       if (newLevel !== this.level) {
         this.level = newLevel;
@@ -505,13 +817,13 @@ export class TetrisEngine {
       // The collapse + next spawn happen when the freeze elapses (see the "clearing"
       // branch of update). Under reduced motion the freeze is 0ms → the row clears
       // on the next tick with no flash. No piece is falling meanwhile (not dead yet).
-      return this.snapshot(false);
+      return this.snapshot(false, event);
     }
 
     // No clear — spawn immediately (may top out → dead).
     this.piece = null;
     const alive = this.spawnNext();
-    return this.snapshot(!alive);
+    return this.snapshot(!alive, event);
   }
 
   /** Remove the flagged full rows and drop everything above them down. */
@@ -524,12 +836,45 @@ export class TetrisEngine {
     this.grid = kept;
   }
 
-  private snapshot(dead: boolean): TetrisStep {
+  private snapshot(dead: boolean, event: ClearEvent | null = null): TetrisStep {
     return {
       dead,
       score: this.score,
       lines: this.lines,
       level: this.level,
+      event,
+    };
+  }
+
+  // ---------- test-only debug surface ----------
+
+  debugSetGrid(grid: number[][]) {
+    this.grid = grid.map((r) => [...r]);
+  }
+
+  debugSetPiece(type: PieceType, rot: number, x: number, y: number) {
+    this.piece = { type, rot, x, y };
+    this.phase = "falling";
+    this.dropTimer = 0;
+    this.lockTimer = 0;
+  }
+
+  debugPiece() {
+    return this.piece ? { ...this.piece } : null;
+  }
+
+  debugGrid(): number[][] {
+    return this.grid.map((r) => [...r]);
+  }
+
+  debugInspect() {
+    return {
+      score: this.score,
+      lines: this.lines,
+      level: this.level,
+      holdType: this.holdIndex >= 0 ? PIECE_TYPES[this.holdIndex] : null,
+      holdUsed: this.holdUsed,
+      nextType: PIECE_TYPES[this.nextIndex],
     };
   }
 
@@ -624,6 +969,25 @@ export class TetrisEngine {
     // Falling piece (never during the clear freeze — it's already merged).
     if (this.piece && this.phase !== "clearing") {
       const m = ROTATIONS[this.piece.type][this.piece.rot];
+      // Ghost silhouette at the drop position (skipped when resting on it).
+      const ghostD = this.dropDistance();
+      if (ghostD > 0) {
+        for (let r = 0; r < m.length; r++) {
+          for (let c = 0; c < m.length; c++) {
+            if (!m[r][c]) continue;
+            const gy = this.piece.y + r + ghostD;
+            if (gy < 0) continue;
+            this.fillCell(
+              ctx,
+              cell,
+              dpr,
+              this.piece.x + c,
+              gy,
+              this.palette.ghostFill
+            );
+          }
+        }
+      }
       for (let r = 0; r < m.length; r++) {
         for (let c = 0; c < m.length; c++) {
           if (!m[r][c]) continue;
@@ -655,9 +1019,14 @@ export class TetrisEngine {
     }
   }
 
-  /** Paint the ONE next piece, centred in the (square) preview canvas. */
-  drawNext(
+  /**
+   * Paint a piece centred in a (square) preview canvas. Used by drawNext and drawHold.
+   * If type is null, fills the bg and returns (empty hold box).
+   */
+  private drawPreviewCanvas(
     ctx: CanvasRenderingContext2D,
+    type: PieceType | null,
+    fill: string,
     cssW: number,
     cssH: number,
     dpr: number
@@ -666,7 +1035,8 @@ export class TetrisEngine {
     ctx.fillStyle = this.palette.boardBg;
     ctx.fillRect(0, 0, cssW, cssH);
 
-    const type = PIECE_TYPES[this.nextIndex];
+    if (!type) return;
+
     const m = ROTATIONS[type][0];
     // Occupied-cell bounding box.
     let minR = m.length;
@@ -696,15 +1066,39 @@ export class TetrisEngine {
     for (let r = 0; r < m.length; r++) {
       for (let c = 0; c < m.length; c++) {
         if (!m[r][c]) continue;
-        this.fillCell(
-          ctx,
-          cell,
-          dpr,
-          c + offX,
-          r + offY,
-          this.palette.pieceFill
-        );
+        this.fillCell(ctx, cell, dpr, c + offX, r + offY, fill);
       }
     }
+  }
+
+  /** Paint the ONE next piece, centred in the preview canvas. */
+  drawNext(
+    ctx: CanvasRenderingContext2D,
+    cssW: number,
+    cssH: number,
+    dpr: number
+  ) {
+    this.drawPreviewCanvas(
+      ctx,
+      PIECE_TYPES[this.nextIndex],
+      this.palette.pieceFill,
+      cssW,
+      cssH,
+      dpr
+    );
+  }
+
+  /** Paint the HOLD box: empty bg when nothing held; dimmed once used this piece. */
+  drawHold(
+    ctx: CanvasRenderingContext2D,
+    cssW: number,
+    cssH: number,
+    dpr: number
+  ) {
+    const type = this.holdIndex >= 0 ? PIECE_TYPES[this.holdIndex] : null;
+    const fill = this.holdUsed
+      ? this.palette.lockedFill
+      : this.palette.pieceFill;
+    this.drawPreviewCanvas(ctx, type, fill, cssW, cssH, dpr);
   }
 }

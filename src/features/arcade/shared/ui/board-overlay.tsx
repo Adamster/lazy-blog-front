@@ -160,11 +160,14 @@ export function MenuOverlay({
   onStart,
   hints,
   startLabel = "Start game",
+  extra,
 }: {
   title: string;
   onStart: () => void;
   hints: readonly (readonly [string, string])[];
   startLabel?: string;
+  /** Optional slot under the key hints (e.g. the Tetris CONTROLS opener). */
+  extra?: React.ReactNode;
 }) {
   return (
     <div className={overlayBase}>
@@ -172,6 +175,7 @@ export function MenuOverlay({
         <OverlayTitle>{title}</OverlayTitle>
         <ArcadeButton onClick={onStart}>{startLabel}</ArcadeButton>
         <KeyHints hints={hints} />
+        {extra}
       </OverlayRail>
     </div>
   );
