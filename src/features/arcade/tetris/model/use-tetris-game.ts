@@ -80,7 +80,7 @@ function resolvePalette(el: Element): TetrisPalette {
     boardBg: read("--m-bg", "#181818"),
     pieceFill: accent,
     flashAccent: accent,
-    ghostFill: `rgba(${ar},${ag},${ab},0.28)`,
+    ghostFill: `rgba(${ar},${ag},${ab},0.18)`,
     lockedFill: read("--m-muted2", "#7a7a7a"),
     gridLine: `rgba(${r},${g},${b},${alpha})`,
   };

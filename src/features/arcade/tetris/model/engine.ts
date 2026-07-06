@@ -134,7 +134,7 @@ const DEFAULT_PALETTE: TetrisPalette = {
   pieceFill: "#cdff48",
   flashAccent: "#cdff48",
   lockedFill: "#7a7a7a",
-  ghostFill: "rgba(205,255,72,0.28)",
+  ghostFill: "rgba(205,255,72,0.18)",
 };
 
 /**

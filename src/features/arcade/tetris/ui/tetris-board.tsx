@@ -147,16 +147,24 @@ export function TetrisBoard({
           <PanelReadout label="SCORE" value={state.score} />
           <PanelReadout label="LINES" value={state.lines} />
           <PanelReadout label="LEVEL" value={state.level} />
-          {state.eventLabel && (
-            <div
-              aria-live="polite"
-              className="text-center text-[11px] leading-[1.2] font-medium tracking-[0.12em] text-[var(--m-accent)] uppercase"
-            >
-              {state.eventLabel}
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Transient clear-event caption ("TETRIS", "B2B · T-SPIN DOUBLE") — a
+          floating top-center toast over the stage (owner call: the bottom of
+          the readout column read too faint). Absolutely positioned so it never
+          reflows the panel; pointer-events-none, bg chip keeps it legible over
+          the spawn rows. */}
+      {state.eventLabel && (
+        <div
+          aria-live="polite"
+          className="pointer-events-none absolute inset-x-0 top-5 z-[1] flex justify-center"
+        >
+          <span className="bg-[var(--m-bg)]/80 px-2 py-1 text-center text-[11px] leading-[1.2] font-medium tracking-[0.12em] text-[var(--m-accent)] uppercase">
+            {state.eventLabel}
+          </span>
+        </div>
+      )}
 
       <CornerBrackets />
 
