@@ -4,6 +4,41 @@ import { useEffect, useState } from "react";
 import { Button, Modal, ModalHeader } from "@/shared/ui";
 import { bindingLabel, rebind, type BindingMap } from "../model/key-bindings";
 
+/** One capture chip (keyboard OR gamepad) inside a `ControlsModal` action row —
+ * shows the current binding, or the "press…" placeholder while armed. */
+function CaptureChip({
+  active,
+  ariaLabel,
+  placeholder,
+  valueLabel,
+  onClick,
+}: {
+  active: boolean;
+  ariaLabel: string;
+  placeholder: string;
+  valueLabel: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={ariaLabel}
+      onClick={onClick}
+      className={`mono-focus flex h-9 flex-1 items-center justify-center border-2 px-4 ${
+        active ? "border-[var(--m-accent)]" : "border-[var(--m-dim)]"
+      }`}
+    >
+      <span
+        className={`text-[11px] leading-none tracking-[0.12em] uppercase ${
+          active ? "text-[var(--m-accent)]" : "text-[var(--m-fg)]"
+        }`}
+      >
+        {active ? placeholder : valueLabel}
+      </span>
+    </button>
+  );
+}
+
 /**
  * Key/button-remapping modal for an arcade game: one row per action, two chips each
  * (keyboard, gamepad). Click a chip to arm capture ("PRESS KEY…" / "PRESS BUTTON…");
@@ -130,56 +165,28 @@ export function ControlsModal<A extends string>({
                     {label}
                   </span>
                   <div className="flex gap-3">
-                    <button
-                      type="button"
-                      aria-label={`${label} — keyboard: ${keyActive ? "press key" : bindingLabel(value[id])}`}
+                    <CaptureChip
+                      active={keyActive}
+                      ariaLabel={`${label} — keyboard: ${keyActive ? "press key" : bindingLabel(value[id])}`}
+                      placeholder="PRESS KEY…"
+                      valueLabel={bindingLabel(value[id])}
                       onClick={() =>
                         setCapturing(
                           keyActive ? null : { action: id, kind: "key" }
                         )
                       }
-                      className={`mono-focus flex h-9 flex-1 items-center justify-center border-2 px-4 ${
-                        keyActive
-                          ? "border-[var(--m-accent)]"
-                          : "border-[var(--m-dim)]"
-                      }`}
-                    >
-                      <span
-                        className={`text-[11px] leading-none tracking-[0.12em] uppercase ${
-                          keyActive
-                            ? "text-[var(--m-accent)]"
-                            : "text-[var(--m-fg)]"
-                        }`}
-                      >
-                        {keyActive ? "PRESS KEY…" : bindingLabel(value[id])}
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={`${label} — gamepad: ${padActive ? "press button" : bindingLabel(padValue[id])}`}
+                    />
+                    <CaptureChip
+                      active={padActive}
+                      ariaLabel={`${label} — gamepad: ${padActive ? "press button" : bindingLabel(padValue[id])}`}
+                      placeholder="PRESS BUTTON…"
+                      valueLabel={bindingLabel(padValue[id])}
                       onClick={() =>
                         setCapturing(
                           padActive ? null : { action: id, kind: "pad" }
                         )
                       }
-                      className={`mono-focus flex h-9 flex-1 items-center justify-center border-2 px-4 ${
-                        padActive
-                          ? "border-[var(--m-accent)]"
-                          : "border-[var(--m-dim)]"
-                      }`}
-                    >
-                      <span
-                        className={`text-[11px] leading-none tracking-[0.12em] uppercase ${
-                          padActive
-                            ? "text-[var(--m-accent)]"
-                            : "text-[var(--m-fg)]"
-                        }`}
-                      >
-                        {padActive
-                          ? "PRESS BUTTON…"
-                          : bindingLabel(padValue[id])}
-                      </span>
-                    </button>
+                    />
                   </div>
                 </div>
               );

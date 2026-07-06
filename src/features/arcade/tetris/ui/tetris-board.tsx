@@ -23,10 +23,11 @@ import type { TetrisGameApi } from "../model/types";
 
 /**
  * The CLASSIC TETRIS play surface — the DPR-crisp 10×20 well canvas (solid cells +
- * 1px grid), centered, + the compact NEXT preview beside it + the DOM overlays
- * (menu / pause / game-over). Run stats (SCORE / LINES / LEVEL) live in the top
- * stats band, not beside the game. Pure presentation: the hook owns all logic and
- * the engine draws both canvases imperatively; this only renders `api`.
+ * 1px grid), centered, with the compact HOLD preview to its left and the NEXT
+ * preview beside it on the right + the DOM overlays (menu / pause / game-over).
+ * Run stats (SCORE / LINES / LEVEL) live in the top stats band, not beside the
+ * game. Pure presentation: the hook owns all logic and the engine draws all
+ * three canvases imperatively; this only renders `api`.
  *
  * THEME-NATIVE: NO forced `dark` scope — the board, HUD and overlays read the
  * AMBIENT `--m-*` tokens, and the canvas palette is resolved from those same
