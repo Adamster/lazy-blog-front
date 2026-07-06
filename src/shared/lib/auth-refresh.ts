@@ -21,6 +21,16 @@ export const expiryFromToken = (accessToken: string): number =>
 // dies in transit (and a refresh doesn't race the expiry boundary).
 const REFRESH_SKEW_MS = 60 * 1000;
 
+// Retries cover a request that never reached the server (offline blip, DNS,
+// connection reset) — NOT a response the server actually sent back. The
+// refresh token is single-use/rotated, so retrying after a real response
+// (even a 401/400) would just repeat the same rejection; only a genuine
+// network failure is safe and worth retrying.
+const REFRESH_NETWORK_RETRIES = 2;
+const REFRESH_RETRY_BASE_DELAY_MS = 500;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const AUTH_CHANGED_EVENT = "auth-changed";
 
 const isDev = process.env.NODE_ENV !== "production";
@@ -120,11 +130,20 @@ const doRefresh = async (): Promise<string | null> => {
   }
 
   try {
-    const res = await fetch(`${API_URL}/api/users/refresh`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken: currentAuth.refreshToken }),
-    });
+    let res: Response | undefined;
+    for (let attempt = 0; ; attempt++) {
+      try {
+        res = await fetch(`${API_URL}/api/users/refresh`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refreshToken: currentAuth.refreshToken }),
+        });
+        break;
+      } catch (networkError) {
+        if (attempt >= REFRESH_NETWORK_RETRIES) throw networkError;
+        await sleep(REFRESH_RETRY_BASE_DELAY_MS * 2 ** attempt);
+      }
+    }
 
     if (!res.ok) throw new Error(`Refresh failed: ${res.status}`);
 
