@@ -64,7 +64,7 @@ const GAMES: GameEntry[] = [
   {
     href: "/arcade/follow-the-rabbit",
     title: "The Rabbit",
-    description: "Follow the white rabbit. The striped ones bite.",
+    description: "Follow the rabbit. The striped ones bite.",
     mark: <RabbitChaseMark size={CELL * 2} />,
     field: { cell: CELL, spanX: 5, spanY: 2 },
   },

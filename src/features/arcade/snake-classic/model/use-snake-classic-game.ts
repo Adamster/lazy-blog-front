@@ -37,8 +37,10 @@ function parseHexRgb(hex: string): [number, number, number] {
  * board scope — custom props inherit, so reading the canvas works even though the
  * tokens are declared on a `.mono-scope` ancestor): field ← `--m-bg` · head ←
  * `--m-accent` (tail = the accent pulled toward the field) · food ← `--m-fg` ·
- * grid/frame ← `--m-fg` at a low alpha (grid a hair higher when fg is dark — i.e.
- * the light theme — so the dark hairline stays as subtle as the light one is on dark).
+ * grid ← `--m-fg` at a low alpha (a hair higher when fg is dark — i.e. the light
+ * theme — so the dark hairline stays as subtle as the light one is on dark) ·
+ * frame ← `--m-error` (all four walls are lethal here too — same reasoning as the
+ * Rabbit board's red `border-2`, just drawn IN-canvas instead of a DOM border).
  */
 function resolvePalette(el: Element): SnakeClassicPalette {
   const cs = getComputedStyle(el);
@@ -54,7 +56,7 @@ function resolvePalette(el: Element): SnakeClassicPalette {
     snakeTail: lerpHex(accent, bg, 0.55),
     food: read("--m-fg", "#e6e6e6"),
     gridLine: `rgba(${r},${g},${b},${gridAlpha})`,
-    frameLine: `rgba(${r},${g},${b},0.22)`,
+    frameLine: read("--m-error", "#ff5d5d"),
   };
 }
 
