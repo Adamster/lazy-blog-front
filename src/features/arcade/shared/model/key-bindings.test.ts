@@ -68,6 +68,12 @@ describe("labels", () => {
     expect(keyLabel("Digit1")).toBe("1");
   });
 
+  it("maps gamepad Pad<n> codes to their button glyph", () => {
+    expect(keyLabel("Pad0")).toBe("A");
+    expect(keyLabel("Pad9")).toBe("START");
+    expect(keyLabel("Pad14")).toBe("D-PAD ←");
+  });
+
   it("joins a binding list and renders an empty one as an em-dash", () => {
     expect(bindingLabel(["ArrowUp", "KeyX"])).toBe("↑ / X");
     expect(bindingLabel([])).toBe("—");

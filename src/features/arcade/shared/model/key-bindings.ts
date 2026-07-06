@@ -74,8 +74,31 @@ const KEY_LABELS: Record<string, string> = {
   AltRight: "R-ALT",
 };
 
+/** Human label for one gamepad button code (`"Pad<index>"`, Standard Gamepad layout —
+ *  same layout `gamepad.ts` assumes). */
+const PAD_LABELS: Record<string, string> = {
+  Pad0: "A",
+  Pad1: "B",
+  Pad2: "X",
+  Pad3: "Y",
+  Pad4: "LB",
+  Pad5: "RB",
+  Pad6: "LT",
+  Pad7: "RT",
+  Pad8: "BACK",
+  Pad9: "START",
+  Pad10: "L3",
+  Pad11: "R3",
+  Pad12: "D-PAD ↑",
+  Pad13: "D-PAD ↓",
+  Pad14: "D-PAD ←",
+  Pad15: "D-PAD →",
+  Pad16: "HOME",
+};
+
 export function keyLabel(code: string): string {
   if (KEY_LABELS[code]) return KEY_LABELS[code];
+  if (PAD_LABELS[code]) return PAD_LABELS[code];
   if (code.startsWith("Key")) return code.slice(3);
   if (code.startsWith("Digit")) return code.slice(5);
   return code.toUpperCase();

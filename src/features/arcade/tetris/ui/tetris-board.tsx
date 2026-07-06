@@ -18,14 +18,16 @@ import {
   useBoardFullscreen,
 } from "@/features/arcade/shared";
 import { TETRIS_ACTIONS, TETRIS_DEFAULT_BINDINGS } from "../model/bindings";
+import { TETRIS_DEFAULT_GAMEPAD_BINDINGS } from "../model/gamepad-bindings";
 import type { TetrisGameApi } from "../model/types";
 
 /**
  * The CLASSIC TETRIS play surface — the DPR-crisp 10×20 well canvas (solid cells +
- * 1px grid), centered, + the compact NEXT preview beside it + the DOM overlays
- * (menu / pause / game-over). Run stats (SCORE / LINES / LEVEL) live in the top
- * stats band, not beside the game. Pure presentation: the hook owns all logic and
- * the engine draws both canvases imperatively; this only renders `api`.
+ * 1px grid), centered, with the compact HOLD preview to its left and the NEXT
+ * preview beside it on the right + the DOM overlays (menu / pause / game-over).
+ * Run stats (SCORE / LINES / LEVEL) live in the top stats band, not beside the
+ * game. Pure presentation: the hook owns all logic and the engine draws all
+ * three canvases imperatively; this only renders `api`.
  *
  * THEME-NATIVE: NO forced `dark` scope — the board, HUD and overlays read the
  * AMBIENT `--m-*` tokens, and the canvas palette is resolved from those same
@@ -81,7 +83,7 @@ export function TetrisBoard({
       ref={fullscreenRootRef}
       className={`mono-scope relative w-full overflow-hidden ${FULLSCREEN_ROOT}`}
     >
-      {/* Well ↔ NEXT-panel gap = 40px (`gap-10`, owner pick after the label was
+      {/* Well ↔ side-panel gap = 40px (`gap-10`, owner pick after the label was
             dropped) — a layout-column separation on the 4px grid. */}
       {/* aspect-[30/18] = the snake boards' footprint, so every arcade board
             renders the same height at the same column width. */}
@@ -94,11 +96,19 @@ export function TetrisBoard({
       <div
         className={`flex aspect-[30/18] min-h-0 w-full items-stretch justify-center gap-5 p-5 sm:gap-10 ${FULLSCREEN_STAGE}`}
       >
-        {/* Invisible w-20 mirror of the readout panel (the Stay Awake pattern):
-            with equal flanks the well sits dead-centre and the well→stats
-            inset matches Stay Awake's. DESKTOP-ONLY — on a phone (esp.
-            portrait fullscreen) it pushed the readout column off-screen. */}
-        <div className="hidden w-20 shrink-0 sm:block" />
+        {/* HOLD preview, left of the well (conventional Tetris layout — guideline
+            games put HOLD left / NEXT right). DESKTOP-ONLY, matching the spacer it
+            replaces: on a phone (esp. portrait fullscreen) there's no room for a
+            left column. */}
+        <div className="hidden w-20 shrink-0 flex-col items-center gap-2 self-center sm:flex">
+          <PanelLabel>HOLD</PanelLabel>
+          <canvas
+            ref={holdCanvasRef}
+            aria-label="Hold piece"
+            role="img"
+            className="block h-6 w-12"
+          />
+        </div>
         {/* The well: JS-sized to an EXACT 10×20 cell multiple (no leftover strip);
               `h-full`/aspect are only the pre-hydration fallback — inline w/h override
               them. `self-center` centres it if the height-fit leaves side margin. */}
@@ -116,7 +126,7 @@ export function TetrisBoard({
         {/* Beside the well: the NEXT preview + the run readouts (owner call
             2026-07-04 — Score/Lines/Level joined the board so FULLSCREEN shows
             them; the top stats band is outside the fullscreen element). NEXT
-            gained its label and lost the border (owner call — it reads as one
+            kept its label and border-less look (owner call — it reads as one
             more readout in the column, not a boxed widget); its cells track
             the well's at NEXT_CELL_SCALE — the hook sizes the canvas to
             NEXT_COLS·cell·scale; `size-12` is only the pre-hydration fallback.
@@ -126,15 +136,6 @@ export function TetrisBoard({
           ref={panelRef}
           className="flex w-20 shrink-0 flex-col items-center gap-6 self-center"
         >
-          <div className="flex flex-col items-center gap-2">
-            <PanelLabel>HOLD</PanelLabel>
-            <canvas
-              ref={holdCanvasRef}
-              aria-label="Hold piece"
-              role="img"
-              className="block h-6 w-12"
-            />
-          </div>
           <div className="flex flex-col items-center gap-2">
             <PanelLabel>NEXT</PanelLabel>
             <canvas
@@ -212,6 +213,9 @@ export function TetrisBoard({
         value={api.bindings}
         defaults={TETRIS_DEFAULT_BINDINGS}
         onChange={api.setBindings}
+        padValue={api.padBindings}
+        padDefaults={TETRIS_DEFAULT_GAMEPAD_BINDINGS}
+        onPadChange={api.setPadBindings}
       />
     </div>
   );
