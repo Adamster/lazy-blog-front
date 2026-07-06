@@ -34,11 +34,25 @@ const CELL = 20;
 const CELL_2048 = 28;
 const GAMES: GameEntry[] = [
   {
-    href: "/arcade/follow-the-rabbit",
-    title: "The Rabbit",
-    description: "Follow the white rabbit. The striped ones bite.",
-    mark: <RabbitChaseMark size={CELL * 2} />,
+    href: "/arcade/tetris",
+    title: "Tetris",
+    description: "Blocks fall. Lines clear. Gravity always wins.",
+    mark: <TetrominoMark size={CELL * 2} />,
+    field: { cell: CELL, spanX: 3, spanY: 2 },
+  },
+  {
+    href: "/arcade/snake",
+    title: "Snake",
+    description: "The classic. You, your tail, and bad decisions.",
+    mark: <SnakeMark size={CELL * 2} />,
     field: { cell: CELL, spanX: 5, spanY: 2 },
+  },
+  {
+    href: "/arcade/2048",
+    title: "2048",
+    description: "Double the numbers until the board disagrees.",
+    mark: <Mark2048 size={CELL_2048 * 2} />,
+    field: { cell: CELL_2048, spanX: 2, spanY: 2 },
   },
   {
     href: "/arcade/stay-awake",
@@ -48,27 +62,11 @@ const GAMES: GameEntry[] = [
     field: { cell: CELL, spanX: 5, spanY: 4 },
   },
   {
-    href: "/arcade/snake",
-    title: "Snake",
-    description: "The classic. You, your tail, and bad decisions.",
-    mark: <SnakeMark size={CELL * 2} />,
+    href: "/arcade/follow-the-rabbit",
+    title: "The Rabbit",
+    description: "Follow the white rabbit. The striped ones bite.",
+    mark: <RabbitChaseMark size={CELL * 2} />,
     field: { cell: CELL, spanX: 5, spanY: 2 },
-    hidden: true,
-  },
-  {
-    href: "/arcade/tetris",
-    title: "Tetris",
-    description: "Blocks fall. Lines clear. Gravity always wins.",
-    mark: <TetrominoMark size={CELL * 2} />,
-    field: { cell: CELL, spanX: 3, spanY: 2 },
-  },
-  {
-    href: "/arcade/2048",
-    title: "2048",
-    description: "Double the numbers until the board disagrees.",
-    mark: <Mark2048 size={CELL_2048 * 2} />,
-    field: { cell: CELL_2048, spanX: 2, spanY: 2 },
-    hidden: true,
   },
 ];
 

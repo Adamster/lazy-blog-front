@@ -15,12 +15,6 @@ import { useTheme } from "@/shared/ui/theme";
 import type { SnakeGameApi } from "../model/types";
 import { Confetti } from "./confetti";
 
-/** Control reference — shown in the menu overlay. */
-const KEY_HINTS: [string, string][] = [
-  ["STEER", "↑ ↓ ← →  ·  W A S D"],
-  ["PAUSE", "SPACE"],
-];
-
 /** The canvas play-field + its overlays (menu / pause / game-over). Pure
  *  presentation — the hook owns all logic; the board only renders `api`.
  *
@@ -76,7 +70,7 @@ export function SnakeBoard({
       <CornerBrackets />
 
       {state.screen === "menu" && (
-        <MenuOverlay title={menuTitle} onStart={start} hints={KEY_HINTS} />
+        <MenuOverlay title={menuTitle} onStart={start} />
       )}
 
       {state.screen === "playing" && state.paused && (

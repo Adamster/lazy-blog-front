@@ -60,14 +60,6 @@ export function TetrisBoard({
   };
 
   const b = api.bindings;
-  const hints: [string, string][] = [
-    ["MOVE", `${bindingLabel(b.moveLeft)} · ${bindingLabel(b.moveRight)}`],
-    ["ROTATE", `${bindingLabel(b.rotateCW)} · ${bindingLabel(b.rotateCCW)}`],
-    ["SOFT DROP", bindingLabel(b.softDrop)],
-    ["HARD DROP", bindingLabel(b.hardDrop)],
-    ["HOLD", bindingLabel(b.hold)],
-    ["PAUSE", bindingLabel(b.pause)],
-  ];
 
   const rankClause = rankLine(state.rank, canRank, "clear more lines");
   // Fullscreen toggle lives on the OVERLAY screens only (menu / pause — owner
@@ -173,15 +165,23 @@ export function TetrisBoard({
         <MenuOverlay
           title="Tetris"
           onStart={start}
-          hints={hints}
           extra={
-            <button
-              type="button"
-              onClick={openControls}
-              className="mono-focus text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)]"
-            >
-              Controls
-            </button>
+            <>
+              {/* Quiet 2px `--m-dim` rule (the codebase's one horizontal-rule
+                  convention — composer/tab-nav connectors, auth `// OR`) that
+                  spans the rail's content column, binding the Controls link into
+                  a "secondary utility footer" instead of floating in empty space.
+                  As direct rail children the rule + link inherit OverlayRail's own
+                  16/24 rhythm — no re-spelled gap. */}
+              <div className="h-0.5 w-full bg-[var(--m-dim)]" aria-hidden />
+              <button
+                type="button"
+                onClick={openControls}
+                className="mono-focus text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)]"
+              >
+                Controls
+              </button>
+            </>
           }
         />
       )}
