@@ -41,9 +41,16 @@ export const NEXT_ROWS = 2;
  *  the NEXT label and joined the readout column. */
 export const NEXT_CELL_SCALE = 0.6;
 /** Cap on the preview cell (px). The readout column is fixed-size type, so
- *  the NEXT piece must not balloon with the well cell in FULLSCREEN — it
- *  tracks the well only up to this ceiling (≈ its normal-page size). */
+ *  the NEXT piece must not balloon with the well cell — it tracks the well
+ *  only up to this ceiling (≈ its normal-page size). */
 export const NEXT_CELL_MAX = 14;
+/** FULLSCREEN ceiling on the preview cell (px). In fullscreen the well cell
+ *  grows large and the panel type/glyphs scale up with it (PanelLabel 11→18,
+ *  PanelReadout 18→32, panel column w-20→w-32 via FULLSCREEN_PANEL), so the
+ *  normal 14px cap would leave HOLD/NEXT disproportionately tiny. This relaxed
+ *  2× ceiling lets the glyph track the well while still fitting the widened
+ *  column (nCell·NEXT_COLS = 28·4 = 112 ≤ the 128px w-32 panel). */
+export const NEXT_CELL_MAX_FS = 28;
 
 // ---------- timing (ms) ----------
 

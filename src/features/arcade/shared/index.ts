@@ -19,6 +19,7 @@ export {
 export { BOARD_GRID_RAIL } from "./ui/board-layout";
 export {
   BoardFullscreenButton,
+  FULLSCREEN_PANEL,
   FULLSCREEN_ROOT,
   FULLSCREEN_STAGE,
   useBoardFullscreen,
