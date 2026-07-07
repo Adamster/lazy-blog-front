@@ -11,7 +11,6 @@ import {
   useBoardFullscreen,
 } from "@/features/arcade/shared";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
-import { useTheme } from "@/shared/ui/theme";
 import type { SnakeGameApi } from "../model/types";
 import { Confetti } from "./confetti";
 
@@ -40,13 +39,6 @@ export function SnakeBoard({
   // call): never a floating control over live gameplay.
   const showFullscreenToggle =
     state.screen === "menu" || (state.screen === "playing" && state.paused);
-  // The prize rabbit is `--m-fg`-tinted — white on the dark field, ink on light —
-  // so the menu title names the rabbit the player actually sees.
-  const { isDarkTheme } = useTheme();
-  const menuTitle = isDarkTheme
-    ? "Follow the White Rabbit"
-    : "Follow the Black Rabbit";
-
   const rankClause = rankLine(state.rank, canRank, "eat more, grow longer");
 
   return (
@@ -70,7 +62,7 @@ export function SnakeBoard({
       <CornerBrackets />
 
       {state.screen === "menu" && (
-        <MenuOverlay title={menuTitle} onStart={start} />
+        <MenuOverlay title="Follow the Rabbit" onStart={start} />
       )}
 
       {state.screen === "playing" && state.paused && (

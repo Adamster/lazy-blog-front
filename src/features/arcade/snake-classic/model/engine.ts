@@ -57,7 +57,7 @@ const DEFAULT_PALETTE: SnakeClassicPalette = {
   snakeTail: GLYPH_TAIL,
   food: FOOD_WHITE,
   gridLine: "rgba(220,220,220,0.05)",
-  frameLine: "rgba(220,220,220,0.22)",
+  frameLine: "#ff5d5d",
 };
 
 /** Opacity floor at the tail end (head = 1). */

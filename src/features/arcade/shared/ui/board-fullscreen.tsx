@@ -95,6 +95,13 @@ export const FULLSCREEN_ROOT =
 export const FULLSCREEN_STAGE =
   "[[data-board-fs]_&]:h-dvh [[data-board-fs]_&]:aspect-auto";
 
+/** Fullscreen width bump for a board SIDE PANEL (the HOLD/NEXT/readout column).
+ *  In fullscreen the panel's type + preview glyphs scale up with the enlarged
+ *  well (PanelLabel 11→18, PanelReadout 18→32, NEXT/HOLD cell → NEXT_CELL_MAX_FS),
+ *  so the fixed `w-20` (80px) column must widen to `w-32` (128px) to hold the
+ *  bigger content without clipping the glyph or a 6-digit score. */
+export const FULLSCREEN_PANEL = "[[data-board-fs]_&]:w-32";
+
 /**
  * The fullscreen toggle — a `mono-icon-btn` pinned to the stage's top-right.
  * Render it AFTER the overlays and ONLY on overlay screens (menu / pause —

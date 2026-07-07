@@ -6,6 +6,7 @@ import {
   COLS,
   ROWS,
   NEXT_CELL_MAX,
+  NEXT_CELL_MAX_FS,
   NEXT_CELL_SCALE,
   NEXT_COLS,
   NEXT_ROWS,
@@ -388,7 +389,14 @@ export function useTetrisGame({
       // pre-hydration fallback. (The panel is measured BEFORE this write; the
       // ResizeObserver on the canvases re-runs resize once after the change, and the
       // height-bound cell math converges immediately.)
-      const nCell = Math.min(cell * NEXT_CELL_SCALE, NEXT_CELL_MAX);
+      // The ceiling relaxes to NEXT_CELL_MAX_FS in FULLSCREEN (the board root
+      // stamps `data-board-fs`) so the glyph grows with the enlarged well instead
+      // of staying pinned at its normal-page 14px beside a huge fullscreen board.
+      const fullscreen = !!host?.closest("[data-board-fs]");
+      const nCell = Math.min(
+        cell * NEXT_CELL_SCALE,
+        fullscreen ? NEXT_CELL_MAX_FS : NEXT_CELL_MAX
+      );
       const nw = nCell * NEXT_COLS;
       const nh = nCell * NEXT_ROWS;
       for (const nc of [nextCanvasRef.current, holdCanvasRef.current]) {

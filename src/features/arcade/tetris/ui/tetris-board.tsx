@@ -6,6 +6,7 @@ import {
   BoardFullscreenButton,
   ControlsModal,
   CornerBrackets,
+  FULLSCREEN_PANEL,
   FULLSCREEN_ROOT,
   FULLSCREEN_STAGE,
   GameOverOverlay,
@@ -91,8 +92,12 @@ export function TetrisBoard({
         {/* HOLD preview, left of the well (conventional Tetris layout — guideline
             games put HOLD left / NEXT right). DESKTOP-ONLY, matching the spacer it
             replaces: on a phone (esp. portrait fullscreen) there's no room for a
-            left column. */}
-        <div className="hidden w-20 shrink-0 flex-col items-center gap-2 self-center sm:flex">
+            left column. `self-start` (not `-center`) so HOLD's label+canvas lines
+            up with NEXT's — both panels anchor to the row's top edge; the well
+            alone stays `self-center` (its own height-fit can leave side margin). */}
+        <div
+          className={`hidden w-20 shrink-0 flex-col items-center gap-2 self-start sm:flex ${FULLSCREEN_PANEL}`}
+        >
           <PanelLabel>HOLD</PanelLabel>
           <canvas
             ref={holdCanvasRef}
@@ -126,7 +131,7 @@ export function TetrisBoard({
             re-size the well mid-run. */}
         <div
           ref={panelRef}
-          className="flex w-20 shrink-0 flex-col items-center gap-6 self-center"
+          className={`flex w-20 shrink-0 flex-col items-center gap-6 self-start ${FULLSCREEN_PANEL}`}
         >
           <div className="flex flex-col items-center gap-2">
             <PanelLabel>NEXT</PanelLabel>

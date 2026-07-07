@@ -4,6 +4,7 @@ import type { PointerEvent } from "react";
 import {
   BoardFullscreenButton,
   CornerBrackets,
+  FULLSCREEN_PANEL,
   FULLSCREEN_ROOT,
   FULLSCREEN_STAGE,
   GameOverOverlay,
@@ -172,7 +173,7 @@ export function StayAwakeBoard({
             well-to-panel insets match on both sides (owner call). */}
         <div
           ref={leftPanelRef}
-          className="flex h-52 w-20 shrink-0 justify-center self-center"
+          className={`flex h-52 w-20 shrink-0 justify-center self-center ${FULLSCREEN_PANEL}`}
         >
           <WaveMeter state={state} />
         </div>
@@ -193,7 +194,7 @@ export function StayAwakeBoard({
             change the panel width and re-size the well mid-run. */}
         <div
           ref={rightPanelRef}
-          className="flex w-20 shrink-0 flex-col items-center gap-6 self-center"
+          className={`flex w-20 shrink-0 flex-col items-center gap-6 self-center ${FULLSCREEN_PANEL}`}
         >
           <PanelReadout label="SCORE" value={state.score} />
           <CoffeePips state={state} />
