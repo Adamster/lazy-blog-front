@@ -12,13 +12,19 @@ import { TetrominoMark } from "./tetromino-mark";
 interface GameEntry {
   href: string;
   title: string;
-  /** One deadpan muted line under the title — the SAME card for signed-in and
-   *  signed-out (the leaderboard block was cut: filled vs empty read uneven). */
+  /** One deadpan muted line under the title. */
   description: string;
   mark: ReactNode;
   /** The mark's own pixel grid — cell size (px) + the cells the mark spans.
    *  Drives the CellField so the figure sits ON the field like a real render. */
   field: { cell: number; spanX: number; spanY: number };
+  /** The backend `game` key for this card's leaderboard query — does NOT
+   *  always match `title`/`href` (e.g. the hub's "Snake" card is the
+   *  classic-Snake feature, backend key `snake-classic`; the backend key
+   *  `snake` belongs to the hub's "The Rabbit" card). Get this from each
+   *  feature's own `arcade-keys.ts` (`TETRIS_GAME`/`SNAKE_CLASSIC_GAME`/
+   *  `GAME_2048`/`SNAKE_GAME`/`GAME_STAY_AWAKE`), never guess it from the title. */
+  game: string;
   /** Temporarily delisted from the hub (owner call) — the route stays live;
    *  drop the flag to relist. */
   hidden?: boolean;
@@ -39,6 +45,7 @@ const GAMES: GameEntry[] = [
     description: "Blocks fall. Lines clear. Gravity always wins.",
     mark: <TetrominoMark size={CELL * 2} />,
     field: { cell: CELL, spanX: 3, spanY: 2 },
+    game: "tetris",
   },
   {
     href: "/arcade/snake",
@@ -46,6 +53,7 @@ const GAMES: GameEntry[] = [
     description: "The classic. You, your tail, and bad decisions.",
     mark: <SnakeMark size={CELL * 2} />,
     field: { cell: CELL, spanX: 5, spanY: 2 },
+    game: "snake-classic",
   },
   {
     href: "/arcade/2048",
@@ -53,6 +61,7 @@ const GAMES: GameEntry[] = [
     description: "Double the numbers until the board disagrees.",
     mark: <Mark2048 size={CELL_2048 * 2} />,
     field: { cell: CELL_2048, spanX: 2, spanY: 2 },
+    game: "2048",
   },
   {
     href: "/arcade/stay-awake",
@@ -60,6 +69,9 @@ const GAMES: GameEntry[] = [
     description: "The floor is sleep. Keep hopping.",
     mark: <SlothMark size={CELL * 4} />,
     field: { cell: CELL, spanX: 5, spanY: 4 },
+    game: "stay-awake",
+    // Needs a redesign (owner call, 2026-07-09) — route stays live.
+    hidden: true,
   },
   {
     href: "/arcade/follow-the-rabbit",
@@ -67,6 +79,9 @@ const GAMES: GameEntry[] = [
     description: "Follow the rabbit. The striped ones bite.",
     mark: <RabbitChaseMark size={CELL * 2} />,
     field: { cell: CELL, spanX: 5, spanY: 2 },
+    game: "snake",
+    // Near-duplicate of Snake (owner call, 2026-07-09) — route stays live.
+    hidden: true,
   },
 ];
 
