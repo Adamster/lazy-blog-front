@@ -124,10 +124,10 @@ describe("ArcadePage leaderboard rows", () => {
     expect(screen.getByText("500")).toBeInTheDocument();
     expect(screen.getByText("400")).toBeInTheDocument();
     expect(screen.getByText("300")).toBeInTheDocument();
-    // Rank badges 1/2/3 render as their own text nodes next to each handle.
-    expect(screen.getAllByText("1").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("2").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("3").length).toBeGreaterThan(0);
+    // Rank numbers render zero-padded, matching the game page's own board.
+    expect(screen.getAllByText("01").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("02").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("03").length).toBeGreaterThan(0);
   });
 
   it("links each leader's handle to their profile", () => {

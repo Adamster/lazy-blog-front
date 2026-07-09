@@ -144,19 +144,18 @@ function CellField({
 /** One top-3 leaderboard entry. */
 type LeaderEntry = { userName: string; bestScore: number };
 
-/** A small square "place" chip, 20px (matches the KbdBadge sizing convention —
- *  2px border, square corners), rank-1 reads accent, 2/3 read dim/muted2. */
-function RankBadge({ rank }: { rank: number }) {
+/** Plain zero-padded position ("01"/"02"/"03") — same rank-column treatment as
+ *  the game page's own high-score board (leaderboard.tsx's `BoardRow`),
+ *  rank-1 reads accent, 2/3 read muted2. */
+function RankNumber({ rank }: { rank: number }) {
   const isTop = rank === 1;
   return (
     <span
-      className={`flex size-5 shrink-0 items-center justify-center border-2 text-[11px] tabular-nums ${
-        isTop
-          ? "border-[var(--m-accent)] text-[var(--m-accent)]"
-          : "border-[var(--m-dim)] text-[var(--m-muted2)]"
+      className={`text-[12px] tabular-nums ${
+        isTop ? "text-[var(--m-accent)]" : "text-[var(--m-muted2)]"
       }`}
     >
-      {rank}
+      {String(rank).padStart(2, "0")}
     </span>
   );
 }
@@ -165,15 +164,15 @@ function RankBadge({ rank }: { rank: number }) {
  *  a card with data and a card without must have the identical shape, only
  *  each row's content differs. Row markup modeled on `PostCard`'s `CardMeta`
  *  (post-card.tsx): handle left, stat right, same 12px/muted caption
- *  treatment — with a `RankBadge` prepended per row. */
+ *  treatment — with a `RankNumber` prepended per row. */
 function LeaderRow({ leaders }: { leaders: LeaderEntry[] }) {
   return (
     <div className="mt-auto flex flex-col gap-1 pt-6 text-[12px] text-[var(--m-muted)]">
       {[1, 2, 3].map((rank) => {
         const entry = leaders[rank - 1];
         return (
-          <div key={rank} className="flex items-center gap-3">
-            <RankBadge rank={rank} />
+          <div key={rank} className="flex items-center gap-4">
+            <RankNumber rank={rank} />
             {entry ? (
               <>
                 <Link
