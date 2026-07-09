@@ -9,7 +9,6 @@ import {
 import {
   BOARD_GRID_RAIL,
   BoardUnsupported,
-  BoardSignInTeaser,
   StatsBand,
 } from "@/features/arcade/shared";
 
@@ -45,11 +44,7 @@ export default function SnakeClassicPage() {
             </div>
             <BoardUnsupported />
           </div>
-          {showBoard ? (
-            <SnakeClassicLeaderboard board={board} loading={boardLoading} />
-          ) : (
-            <BoardSignInTeaser />
-          )}
+          <SnakeClassicLeaderboard board={board} loading={boardLoading} />
         </div>
       </main>
     </div>

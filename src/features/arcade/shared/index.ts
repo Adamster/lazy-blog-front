@@ -24,7 +24,6 @@ export {
   FULLSCREEN_STAGE,
   useBoardFullscreen,
 } from "./ui/board-fullscreen";
-export { BoardSignInTeaser } from "./ui/board-signin-teaser";
 export { BoardUnsupported } from "./ui/board-unsupported";
 export { ControlsModal } from "./ui/controls-modal";
 export { Leaderboard } from "./ui/leaderboard";

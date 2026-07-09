@@ -9,7 +9,6 @@ import {
 import {
   BOARD_GRID_RAIL,
   BoardUnsupported,
-  BoardSignInTeaser,
   StatsBand,
 } from "@/features/arcade/shared";
 
@@ -45,11 +44,7 @@ export default function TetrisPage() {
             </div>
             <BoardUnsupported />
           </div>
-          {showBoard ? (
-            <TetrisLeaderboard board={board} loading={boardLoading} />
-          ) : (
-            <BoardSignInTeaser />
-          )}
+          <TetrisLeaderboard board={board} loading={boardLoading} />
         </div>
       </main>
     </div>

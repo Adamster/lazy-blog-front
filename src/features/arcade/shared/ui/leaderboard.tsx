@@ -17,16 +17,33 @@ export interface LeaderboardRow {
 }
 
 /** One leaderboard line. Viewer's row = accent plain text; other players' `@handle`s
- *  link to their profile; `··` placeholders don't. */
+ *  link to their profile. A padding placeholder (no score yet — signed-out play
+ *  renders every row this way too, no auth-teaser rain) collapses to a dim ░
+ *  fill instead of name/score text, matching the arcade hub card's empty rows. */
 function BoardRow({ row }: { row: LeaderboardRow }) {
+  if (row.empty) {
+    return (
+      <div className="grid grid-cols-[28px_1fr] items-center gap-3 py-2.5">
+        <span
+          className="text-[12px] tabular-nums"
+          style={{ color: "var(--m-muted2)" }}
+        >
+          {row.rank}
+        </span>
+        <span
+          className="overflow-hidden text-clip whitespace-nowrap text-[var(--m-dim)]"
+          role="img"
+          aria-label="No score yet"
+        >
+          ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+        </span>
+      </div>
+    );
+  }
+
   const accent = !!row.you;
-  const empty = !!row.empty;
   const rankColor = accent ? "var(--m-accent)" : "var(--m-muted2)";
-  const textColor = accent
-    ? "var(--m-accent)"
-    : empty
-      ? "var(--m-muted2)"
-      : "var(--m-fg)";
+  const textColor = accent ? "var(--m-accent)" : "var(--m-fg)";
   return (
     <div className="grid grid-cols-[28px_1fr_auto] items-center gap-3 py-2.5">
       <span className="text-[12px] tabular-nums" style={{ color: rankColor }}>

@@ -9,7 +9,6 @@ import {
 import {
   BOARD_GRID_RAIL,
   BoardUnsupported,
-  BoardSignInTeaser,
   StatsBand,
 } from "@/features/arcade/shared";
 
@@ -45,11 +44,7 @@ export default function Page2048() {
             </div>
             <BoardUnsupported />
           </div>
-          {showBoard ? (
-            <Leaderboard2048 board={board} loading={boardLoading} />
-          ) : (
-            <BoardSignInTeaser />
-          )}
+          <Leaderboard2048 board={board} loading={boardLoading} />
         </div>
       </main>
     </div>

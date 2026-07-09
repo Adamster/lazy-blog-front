@@ -9,7 +9,6 @@ import {
 import {
   BOARD_GRID_RAIL,
   BoardUnsupported,
-  BoardSignInTeaser,
   StatsBand,
 } from "@/features/arcade/shared";
 
@@ -45,11 +44,7 @@ export default function StayAwakePage() {
             </div>
             <BoardUnsupported />
           </div>
-          {showBoard ? (
-            <StayAwakeLeaderboard board={board} loading={boardLoading} />
-          ) : (
-            <BoardSignInTeaser />
-          )}
+          <StayAwakeLeaderboard board={board} loading={boardLoading} />
         </div>
       </main>
     </div>
