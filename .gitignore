@@ -49,3 +49,9 @@ next-env.d.ts
 # unlisted arcade prototype — parked out of history until it ships (or dies)
 /src/app/arcade/hollow-sloth
 /src/features/arcade/hollow-sloth
+
+# AI assistant skill-sync tooling (mirrors skills across editors/agents)
+/.agents
+/.continue
+/.roo
+/skills-lock.json
