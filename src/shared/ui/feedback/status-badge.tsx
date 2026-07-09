@@ -11,7 +11,7 @@ export function StatusBadge({ status, className = "" }: StatusBadgeProps) {
   const Icon = status === "PINNED" ? MapPinIcon : BoltIcon;
   return (
     <span
-      className={`inline-flex items-center gap-1.5 bg-[var(--m-dim)] px-2.5 py-2 text-[11px] leading-none font-semibold tracking-[0.06em] text-[var(--m-fg)] uppercase${
+      className={`inline-flex items-center gap-2 bg-[var(--m-dim)] px-2.5 py-2 text-[11px] leading-none font-semibold tracking-[0.06em] text-[var(--m-fg)] uppercase${
         className ? ` ${className}` : ""
       }`}
     >

@@ -22,7 +22,7 @@ export function BracketIcon({
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
 }) {
   return (
-    <span className="ml-auto inline-flex items-center gap-1.5 text-[12px] text-[var(--m-muted2)]">
+    <span className="ml-auto inline-flex items-center gap-2 text-[12px] text-[var(--m-muted2)]">
       [<Icon className="size-3.5" />]
     </span>
   );

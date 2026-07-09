@@ -183,7 +183,7 @@ export function CommentToolbar({ api }: CommentToolbarProps) {
             />
 
             {tab === "emoji" ? (
-              <div className="grid grid-cols-12 gap-[2px] px-4 pt-4 pb-4">
+              <div className="grid grid-cols-12 gap-1 px-4 pt-4 pb-4">
                 {EMOJIS.map((emoji) => (
                   <button
                     key={emoji}

@@ -101,7 +101,7 @@ export default function HomePage() {
                 >
                   <HeroCover post={hero} />
                 </Link>
-                <div className="flex flex-col justify-center p-[34px]">
+                <div className="flex flex-col justify-center p-5 sm:p-10">
                   <div className="mb-2">
                     <Category>{catOf(hero)}</Category>
                   </div>
