@@ -62,7 +62,11 @@ export function SnakeBoard({
       <CornerBrackets />
 
       {state.screen === "menu" && (
-        <MenuOverlay title="Follow the Rabbit" onStart={start} />
+        <MenuOverlay
+          title="Follow the Rabbit"
+          description="Follow the rabbit. The striped ones bite."
+          onStart={start}
+        />
       )}
 
       {state.screen === "playing" && state.paused && (

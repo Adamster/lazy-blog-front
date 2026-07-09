@@ -57,7 +57,13 @@ export function SnakeClassicBoard({
 
       <CornerBrackets />
 
-      {state.screen === "menu" && <MenuOverlay title="Snake" onStart={start} />}
+      {state.screen === "menu" && (
+        <MenuOverlay
+          title="Snake"
+          description="The classic. You, your tail, and bad decisions."
+          onStart={start}
+        />
+      )}
 
       {state.screen === "playing" && state.paused && (
         <PauseOverlay hint="Space to resume" />

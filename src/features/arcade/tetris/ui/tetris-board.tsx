@@ -169,6 +169,7 @@ export function TetrisBoard({
       {state.screen === "menu" && (
         <MenuOverlay
           title="Tetris"
+          description="Blocks fall. Lines clear. Gravity always wins."
           onStart={start}
           extra={
             <>

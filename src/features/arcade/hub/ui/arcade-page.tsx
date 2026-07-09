@@ -18,8 +18,6 @@ import { TetrominoMark } from "./tetromino-mark";
 interface GameEntry {
   href: string;
   title: string;
-  /** One deadpan muted line under the title. */
-  description: string;
   mark: ReactNode;
   /** The mark's own pixel grid — cell size (px) + the cells the mark spans.
    *  Drives the CellField so the figure sits ON the field like a real render. */
@@ -46,7 +44,6 @@ const GAMES: GameEntry[] = [
   {
     href: "/arcade/tetris",
     title: "Tetris",
-    description: "Blocks fall. Lines clear. Gravity always wins.",
     mark: <TetrominoMark size={CELL * 2} />,
     field: { cell: CELL, spanX: 3, spanY: 2 },
     game: "tetris",
@@ -54,7 +51,6 @@ const GAMES: GameEntry[] = [
   {
     href: "/arcade/2048",
     title: "2048",
-    description: "Double the numbers until the board disagrees.",
     mark: <Mark2048 size={CELL * 2} />,
     field: { cell: CELL, spanX: 2, spanY: 2 },
     game: "2048",
@@ -62,7 +58,6 @@ const GAMES: GameEntry[] = [
   {
     href: "/arcade/snake",
     title: "Snake",
-    description: "The classic. You, your tail, and bad decisions.",
     mark: <SnakeMark size={CELL * 2} />,
     field: { cell: CELL, spanX: 5, spanY: 2 },
     game: "snake-classic",
@@ -70,7 +65,6 @@ const GAMES: GameEntry[] = [
   {
     href: "/arcade/stay-awake",
     title: "Stay Awake",
-    description: "The floor is sleep. Keep hopping.",
     mark: <SlothMark size={CELL * 4} />,
     field: { cell: CELL, spanX: 5, spanY: 4 },
     game: "stay-awake",
@@ -80,7 +74,6 @@ const GAMES: GameEntry[] = [
   {
     href: "/arcade/follow-the-rabbit",
     title: "The Rabbit",
-    description: "Follow the rabbit. The striped ones bite.",
     mark: <RabbitChaseMark size={CELL * 2} />,
     field: { cell: CELL, spanX: 5, spanY: 2 },
     game: "snake",
@@ -171,7 +164,7 @@ function LeaderRow({ leaders }: { leaders: LeaderEntry[] }) {
       {[1, 2, 3].map((rank) => {
         const entry = leaders[rank - 1];
         return (
-          <div key={rank} className="flex items-center gap-4">
+          <div key={rank} className="flex items-center gap-3">
             <RankNumber rank={rank} />
             {entry ? (
               <>
@@ -220,9 +213,6 @@ function GameCard({
             {game.title}
           </Link>
         </h2>
-        <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
-          {game.description}
-        </p>
         <LeaderRow leaders={leaders} />
       </div>
     </ScreenCard>

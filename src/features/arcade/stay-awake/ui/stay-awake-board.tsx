@@ -205,7 +205,11 @@ export function StayAwakeBoard({
       <CornerBrackets />
 
       {state.screen === "menu" && (
-        <MenuOverlay title="Stay Awake" onStart={start} />
+        <MenuOverlay
+          title="Stay Awake"
+          description="The floor is sleep. Keep hopping."
+          onStart={start}
+        />
       )}
 
       {state.screen === "playing" && state.paused && (

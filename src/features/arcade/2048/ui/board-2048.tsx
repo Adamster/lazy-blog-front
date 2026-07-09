@@ -79,7 +79,13 @@ export function Board2048({
 
       <CornerBrackets />
 
-      {state.screen === "menu" && <MenuOverlay title="2048" onStart={start} />}
+      {state.screen === "menu" && (
+        <MenuOverlay
+          title="2048"
+          description="Double the numbers until the board disagrees."
+          onStart={start}
+        />
+      )}
 
       {state.screen === "won" && (
         <div className={overlayBase}>
