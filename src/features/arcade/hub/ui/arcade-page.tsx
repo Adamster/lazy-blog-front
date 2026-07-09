@@ -94,29 +94,22 @@ const GAMES: GameEntry[] = [
 /** The card is a THEME-FOLLOWING "screen" — the games themselves are
  *  theme-native (token-resolved palettes), so the hub preview follows the
  *  ambient theme too: `--m-bg` field + 2px `--m-line` frame, the same look as a
- *  bordered game canvas on the page. `min-h-36` (144px = p-5 pair + title +
- *  title→body 16 + THREE 14px/1.6 description lines): the card holds a stable
- *  stature but hugs its content — the 176 take left a dead band below the
- *  text (owner call). Since the leader row was added, real content on even the
- *  SHORTEST 2-line-description card (p-5 pair 40 + title ~21 + title→body 16 +
- *  TWO description lines ~45 + the row's own pt-6 gap 24 + its line height ~20
- *  ≈ 166px) already exceeds 144, so the min-height never binds and 3 visible
- *  cards render with zero dead band (measured at mobile/tablet/desktop widths).
- *  min-h-44/48 (176/192) were tried and rejected — both exceed that ~166px
- *  real minimum and open an 8–24px gap above the row instead of removing one,
- *  so `min-h-36` stays as the (now slack) floor. */
+ *  bordered game canvas on the page. Stacked like `PostCard` (cover on top,
+ *  content below) — no explicit min-height; the grid row (like PostCard's
+ *  feed grid) stretches every card in a row to the tallest sibling, and
+ *  `h-full` + `flex-col` on the card + content column let it fill that. */
 function ScreenCard({ children }: { children: ReactNode }) {
   return (
-    <article className="mono-scope group relative grid h-full min-h-36 grid-cols-3 border-2 border-[var(--m-line)] bg-[var(--m-bg)] text-[var(--m-fg)] transition-colors hover:border-[var(--m-accent)]">
+    <article className="mono-scope group relative flex h-full flex-col border-2 border-[var(--m-line)] bg-[var(--m-bg)] text-[var(--m-fg)] transition-colors hover:border-[var(--m-accent)]">
       {children}
     </article>
   );
 }
 
-/** The card's left third = the game's own FIELD — a faint cell grid at the
- *  mark's exact pixel scale (the in-game low-alpha `--m-fg` hairline), filling
- *  the column instead of a divider rail; the mark's pixels sit ON the grid
- *  like a real render. */
+/** The card's TOP "cover" — a faint cell grid at the mark's exact pixel scale
+ *  (the in-game low-alpha `--m-fg` hairline), the same `aspect-[16/10]` box
+ *  `PostCard` uses for its cover image; the mark's pixels sit ON the grid like
+ *  a real render. */
 function CellField({
   field: { cell, spanX, spanY },
   children,
@@ -124,7 +117,7 @@ function CellField({
   field: GameEntry["field"];
   children: ReactNode;
 }) {
-  // The MARK stays dead-centre in the column; the PATTERN shifts half a cell on
+  // The MARK stays dead-centre in the box; the PATTERN shifts half a cell on
   // an axis where the mark spans an EVEN number of cells, so a grid line (not a
   // cell centre) runs through the middle and the mark's edges land on the
   // lines. The three shared-CELL cards have identical span parity (odd × even),
@@ -135,7 +128,7 @@ function CellField({
   const off = (span: number) => (span % 2 === 0 ? cell / 2 : 0);
   const line = "color-mix(in srgb, var(--m-fg) 6%, transparent)";
   return (
-    <div className="relative flex items-center justify-center">
+    <div className="relative flex aspect-[16/10] items-center justify-center overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0"
@@ -185,7 +178,7 @@ function GameCard({ game, leader }: { game: GameEntry; leader: Leader }) {
   return (
     <ScreenCard>
       <CellField field={game.field}>{game.mark}</CellField>
-      <div className="col-span-2 flex h-full flex-col p-5">
+      <div className="flex flex-1 flex-col p-5">
         <h2 className="mono-title transition-colors group-hover:text-[var(--m-accent)]">
           <Link
             href={game.href}
