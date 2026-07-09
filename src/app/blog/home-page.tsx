@@ -79,7 +79,7 @@ export default function HomePage() {
     >
       <main className="mx-auto max-w-[1240px] px-5 pb-10 sm:px-10">
         {posts.length === 0 ? (
-          <div className="border-2 border-[var(--m-line)] py-24 text-center">
+          <div className="border-2 border-[var(--m-line)] py-20 text-center">
             <p className="font-display text-[32px] leading-none font-bold tracking-[-0.02em]">
               {"// EMPTY FEED"}
             </p>

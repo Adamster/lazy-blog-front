@@ -22,7 +22,7 @@ export function BoardSignInTeaser({
 }) {
   return (
     <div className={`flex flex-col lg:self-stretch ${className}`}>
-      <Label className="mono-label pb-3.5">{text}</Label>
+      <Label className="mono-label pb-4">{text}</Label>
       <div className="h-[200px] overflow-hidden lg:h-auto lg:flex-1">
         {/* opacity 0.2 — ambient shimmer only; full-strength rain pulled the
             eye off the game (owner call). */}

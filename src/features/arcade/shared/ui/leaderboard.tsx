@@ -75,7 +75,7 @@ export function Leaderboard({
 }: LeaderboardProps) {
   return (
     <div className={`flex flex-col self-stretch ${className}`}>
-      <div className="flex items-center justify-between pb-3.5">
+      <div className="flex items-center justify-between pb-4">
         <Label uppercase>High scores</Label>
         <span className="text-[11px] tracking-[0.06em] text-[var(--m-muted2)] uppercase">
           {`Top ${boardSize}`}
