@@ -172,7 +172,7 @@ function LeaderRow({ leaders }: { leaders: LeaderEntry[] }) {
       {[1, 2, 3].map((rank) => {
         const entry = leaders[rank - 1];
         return (
-          <div key={rank} className="flex items-center gap-2">
+          <div key={rank} className="flex items-center gap-3">
             <RankBadge rank={rank} />
             {entry ? (
               <>
