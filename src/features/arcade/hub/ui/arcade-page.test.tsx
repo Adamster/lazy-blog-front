@@ -43,8 +43,16 @@ import { ArcadePage } from "./arcade-page";
 
 const NO_DATA = { data: undefined, isLoading: false } as const;
 
-describe("ArcadePage leaderboard row", () => {
-  it("shows the placeholder when signed out", () => {
+const entry = (userName: string, bestScore: number) => ({
+  rank: 1,
+  userName,
+  avatarUrl: null,
+  bestScore,
+  gamesPlayed: 9,
+});
+
+describe("ArcadePage leaderboard rows", () => {
+  it("shows 3 placeholder rows per card when signed out", () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: false });
     mockUseTetrisLeaderboard.mockReturnValue(NO_DATA);
     mockUseSnakeClassicLeaderboard.mockReturnValue(NO_DATA);
@@ -52,10 +60,11 @@ describe("ArcadePage leaderboard row", () => {
 
     render(<ArcadePage />);
 
-    expect(screen.getAllByText("NO SCORES YET")).toHaveLength(3);
+    // 3 visible cards x 3 rows each.
+    expect(screen.getAllByText("NO SCORE YET")).toHaveLength(9);
   });
 
-  it("shows the placeholder for a game with an empty leaderboard", () => {
+  it("shows 3 placeholder rows for a game with an empty leaderboard", () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: true });
     mockUseTetrisLeaderboard.mockReturnValue({
       data: { entries: [] },
@@ -66,23 +75,13 @@ describe("ArcadePage leaderboard row", () => {
 
     render(<ArcadePage />);
 
-    expect(screen.getAllByText("NO SCORES YET")).toHaveLength(3);
+    expect(screen.getAllByText("NO SCORE YET")).toHaveLength(9);
   });
 
-  it("shows the #1 leader's handle and score when present", () => {
+  it("shows the #1 leader's handle and score, padding the other 2 rows", () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: true });
     mockUseTetrisLeaderboard.mockReturnValue({
-      data: {
-        entries: [
-          {
-            rank: 1,
-            userName: "igormariuta",
-            avatarUrl: null,
-            bestScore: 12400,
-            gamesPlayed: 9,
-          },
-        ],
-      },
+      data: { entries: [entry("igormariuta", 12400)] },
       isLoading: false,
     });
     mockUseSnakeClassicLeaderboard.mockReturnValue(NO_DATA);
@@ -92,24 +91,43 @@ describe("ArcadePage leaderboard row", () => {
 
     expect(screen.getByText("@igormariuta")).toBeInTheDocument();
     expect(screen.getByText("12,400")).toBeInTheDocument();
-    // The other 2 games still fall back to the placeholder.
-    expect(screen.getAllByText("NO SCORES YET")).toHaveLength(2);
+    // Tetris's own rows 2-3, plus 3 rows each for the other 2 games.
+    expect(screen.getAllByText("NO SCORE YET")).toHaveLength(8);
   });
 
-  it("links the leader's handle to their profile", () => {
+  it("shows all 3 ranked entries with a rank badge each when a game has 3+ scores", () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: true });
     mockUseTetrisLeaderboard.mockReturnValue({
       data: {
         entries: [
-          {
-            rank: 1,
-            userName: "igormariuta",
-            avatarUrl: null,
-            bestScore: 12400,
-            gamesPlayed: 9,
-          },
+          entry("first", 500),
+          entry("second", 400),
+          entry("third", 300),
         ],
       },
+      isLoading: false,
+    });
+    mockUseSnakeClassicLeaderboard.mockReturnValue(NO_DATA);
+    mockUse2048Leaderboard.mockReturnValue(NO_DATA);
+
+    render(<ArcadePage />);
+
+    expect(screen.getByText("@first")).toBeInTheDocument();
+    expect(screen.getByText("@second")).toBeInTheDocument();
+    expect(screen.getByText("@third")).toBeInTheDocument();
+    expect(screen.getByText("500")).toBeInTheDocument();
+    expect(screen.getByText("400")).toBeInTheDocument();
+    expect(screen.getByText("300")).toBeInTheDocument();
+    // Rank badges 1/2/3 render as their own text nodes next to each handle.
+    expect(screen.getAllByText("1").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("2").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("3").length).toBeGreaterThan(0);
+  });
+
+  it("links each leader's handle to their profile", () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+    mockUseTetrisLeaderboard.mockReturnValue({
+      data: { entries: [entry("igormariuta", 12400)] },
       isLoading: false,
     });
     mockUseSnakeClassicLeaderboard.mockReturnValue(NO_DATA);

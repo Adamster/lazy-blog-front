@@ -143,38 +143,70 @@ function CellField({
   );
 }
 
-/** The #1 leaderboard entry for one game, or undefined (no data / no scores
- *  yet / signed out — all three render the SAME placeholder, see `LeaderRow`,
- *  so a card never looks structurally different depending on why). */
-type Leader = { userName: string; bestScore: number } | undefined;
+/** One top-3 leaderboard entry. */
+type LeaderEntry = { userName: string; bestScore: number };
 
-/** ALWAYS renders (never conditionally omitted) — a card with data and a card
- *  without must have the identical shape, only this line's content differs.
- *  Modeled 1:1 on `PostCard`'s `CardMeta` row (post-card.tsx): handle left,
- *  stat right, same 12px/muted caption treatment. */
-function LeaderRow({ leader }: { leader: Leader }) {
+/** A small square "place" chip, 20px (matches the KbdBadge sizing convention —
+ *  2px border, square corners), rank-1 reads accent, 2/3 read dim/muted2. */
+function RankBadge({ rank }: { rank: number }) {
+  const isTop = rank === 1;
   return (
-    <div className="mt-auto flex items-center pt-6 text-[12px] text-[var(--m-muted)]">
-      {leader ? (
-        <>
-          <Link
-            href={userHref(leader.userName)}
-            className="relative z-[var(--m-z-content)] truncate transition-colors hover:text-[var(--m-accent)]"
-          >
-            @{leader.userName}
-          </Link>
-          <span className="ml-auto tabular-nums">{fmt(leader.bestScore)}</span>
-        </>
-      ) : (
-        <span className="text-[11px] tracking-[0.12em] text-[var(--m-muted2)] uppercase">
-          NO SCORES YET
-        </span>
-      )}
+    <span
+      className={`flex size-5 shrink-0 items-center justify-center border-2 text-[11px] tabular-nums ${
+        isTop
+          ? "border-[var(--m-accent)] text-[var(--m-accent)]"
+          : "border-[var(--m-dim)] text-[var(--m-muted2)]"
+      }`}
+    >
+      {rank}
+    </span>
+  );
+}
+
+/** ALWAYS renders exactly 3 rows (never conditionally omitted or shorter) —
+ *  a card with data and a card without must have the identical shape, only
+ *  each row's content differs. Row markup modeled on `PostCard`'s `CardMeta`
+ *  (post-card.tsx): handle left, stat right, same 12px/muted caption
+ *  treatment — with a `RankBadge` prepended per row. */
+function LeaderRow({ leaders }: { leaders: LeaderEntry[] }) {
+  return (
+    <div className="mt-auto flex flex-col gap-1 pt-6 text-[12px] text-[var(--m-muted)]">
+      {[1, 2, 3].map((rank) => {
+        const entry = leaders[rank - 1];
+        return (
+          <div key={rank} className="flex items-center gap-2">
+            <RankBadge rank={rank} />
+            {entry ? (
+              <>
+                <Link
+                  href={userHref(entry.userName)}
+                  className="relative z-[var(--m-z-content)] truncate transition-colors hover:text-[var(--m-accent)]"
+                >
+                  @{entry.userName}
+                </Link>
+                <span className="ml-auto tabular-nums">
+                  {fmt(entry.bestScore)}
+                </span>
+              </>
+            ) : (
+              <span className="text-[11px] tracking-[0.12em] text-[var(--m-muted2)] uppercase">
+                NO SCORE YET
+              </span>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-function GameCard({ game, leader }: { game: GameEntry; leader: Leader }) {
+function GameCard({
+  game,
+  leaders,
+}: {
+  game: GameEntry;
+  leaders: LeaderEntry[];
+}) {
   return (
     <ScreenCard>
       <CellField field={game.field}>{game.mark}</CellField>
@@ -190,7 +222,7 @@ function GameCard({ game, leader }: { game: GameEntry; leader: Leader }) {
         <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
           {game.description}
         </p>
-        <LeaderRow leader={leader} />
+        <LeaderRow leaders={leaders} />
       </div>
     </ScreenCard>
   );
@@ -210,19 +242,17 @@ export function ArcadePage() {
   const snakeClassic = useSnakeClassicLeaderboard(isAuthenticated);
   const game2048 = use2048Leaderboard(isAuthenticated);
 
-  const leaderOf = (
+  const leadersOf = (
     entries: { userName: string; bestScore: number }[] | undefined
-  ): Leader => {
-    const top = entries?.[0];
-    return top
-      ? { userName: top.userName, bestScore: top.bestScore }
-      : undefined;
-  };
+  ): LeaderEntry[] =>
+    (entries ?? [])
+      .slice(0, 3)
+      .map((e) => ({ userName: e.userName, bestScore: e.bestScore }));
 
-  const leaderByGame: Record<string, Leader> = {
-    tetris: leaderOf(tetris.data?.entries),
-    "snake-classic": leaderOf(snakeClassic.data?.entries),
-    "2048": leaderOf(game2048.data?.entries),
+  const leadersByGame: Record<string, LeaderEntry[]> = {
+    tetris: leadersOf(tetris.data?.entries),
+    "snake-classic": leadersOf(snakeClassic.data?.entries),
+    "2048": leadersOf(game2048.data?.entries),
   };
 
   return (
@@ -241,7 +271,7 @@ export function ArcadePage() {
             <GameCard
               key={game.href}
               game={game}
-              leader={leaderByGame[game.game]}
+              leaders={leadersByGame[game.game]}
             />
           ))}
         </div>
