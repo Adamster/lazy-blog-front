@@ -8,6 +8,7 @@ import { Avatar, Category, Metric, StatusBadge } from "@/shared/ui";
 import { PostBody } from "@/shared/ui/prose";
 import { DraftOverlay } from "@/features/post/ui/draft-overlay";
 import type { Status } from "@/shared/ui";
+import { userHref } from "@/shared/lib/routes";
 import { UNTAGGED_LABEL } from "../lib/untagged-label";
 
 interface IProps {
@@ -33,7 +34,7 @@ function PostByline({
     <section className="mx-[calc(50%-50vw)] mt-10 w-screen bg-[var(--m-card)]">
       <div className="mx-auto flex max-w-[780px] flex-wrap items-end gap-x-4 gap-y-4 px-5 py-10 sm:px-10">
         <Link
-          href={`/${authorHandle}`}
+          href={userHref(authorHandle)}
           aria-label={`${displayNameOf(post.author)} profile`}
           className="self-center"
         >
@@ -48,7 +49,7 @@ function PostByline({
           </span>
           <span className="mt-1 flex flex-wrap items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
             <Link
-              href={`/${authorHandle}`}
+              href={userHref(authorHandle)}
               className="transition-colors hover:text-[var(--m-accent)]"
             >
               @{authorHandle}

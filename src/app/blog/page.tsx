@@ -4,6 +4,7 @@ import { generateMeta } from "@/shared/lib/head/meta-data";
 
 export const metadata: Metadata = generateMeta({
   title: "Home",
+  url: "/blog",
 });
 
 // No SSR feed seed — the home feed loads client-side; the meta tags above cover SEO.

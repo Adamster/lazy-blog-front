@@ -4,6 +4,7 @@ import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { useUser } from "@/entities/session";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { postHref, postEditHref } from "@/shared/lib/routes";
 import { postKeys } from "./post-keys";
 
 export const useCreatePost = () => {
@@ -20,10 +21,11 @@ export const useCreatePost = () => {
       queryClient.invalidateQueries({ queryKey: postKeys.list() });
       queryClient.invalidateQueries({ queryKey: postKeys.byUser() });
 
+      const userName = user?.userName ?? "";
       if (variables.isPublished) {
-        router.push(`/${user?.userName}/${data.slug}`);
+        router.push(postHref(userName, data.slug));
       } else {
-        router.push(`/${user?.userName}/${data.slug}/edit`);
+        router.push(postEditHref(userName, data.slug));
       }
     },
     onError: (error: unknown) => {

@@ -3,6 +3,7 @@ import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { useUser } from "@/entities/session";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { userHref } from "@/shared/lib/routes";
 import { postKeys } from "./post-keys";
 
 export const useDeletePost = () => {
@@ -22,7 +23,7 @@ export const useDeletePost = () => {
       queryClient.invalidateQueries({ queryKey: postKeys.list() });
       queryClient.invalidateQueries({ queryKey: postKeys.byUser() });
 
-      router.push(`/${user?.userName}`);
+      router.push(userHref(user?.userName ?? ""));
     },
 
     onError: (error: unknown) => {

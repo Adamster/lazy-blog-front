@@ -20,6 +20,7 @@ import {
 import { MatrixText } from "@/shared/ui/effects";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
+import { postHref } from "@/shared/lib/routes";
 import { PostCard } from "@/features/post/ui/post-card";
 import { ArcadeCrowns } from "@/features/arcade/crowns";
 
@@ -187,7 +188,7 @@ export default function UserPage({ userName }: { userName: string }) {
                   delay: Math.min(index * 0.04, 0.32),
                 }}
               >
-                <PostCard post={p} href={`/${handle}/${p.slug}`} />
+                <PostCard post={p} href={postHref(handle, p.slug)} />
               </motion.div>
             ))}
           </section>

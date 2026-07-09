@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import CommentForm from "@/features/comment/ui/comment-form";
 import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
+import { userHref } from "@/shared/lib/routes";
 import { Avatar, Dot, Menu, ConfirmModal, type MenuItem } from "@/shared/ui";
 import { renderCommentMarkdown } from "@/features/comment/lib/comment-markdown";
 import {
@@ -75,7 +76,7 @@ const CommentView = ({ comment, postId }: IProps) => {
     <div>
       <div className="flex items-center gap-4">
         <Link
-          href={`/${handle}`}
+          href={userHref(handle)}
           aria-label={`${displayNameOf(comment.user)} profile`}
           className="flex-none"
         >
@@ -91,7 +92,7 @@ const CommentView = ({ comment, postId }: IProps) => {
           </span>
           <div className="mt-1 flex items-center gap-2.5 text-[12px] whitespace-nowrap">
             <Link
-              href={`/${handle}`}
+              href={userHref(handle)}
               className="text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
             >
               @{handle}

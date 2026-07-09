@@ -15,10 +15,12 @@ import {
 } from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { formatDateShort } from "@/shared/lib/utils";
+import { postHref, userHref } from "@/shared/lib/routes";
 import { PostCard } from "@/features/post/ui/post-card";
 
 const catOf = (p: DisplayPostResponse) => p.tags?.[0]?.tag ?? "post";
-const hrefOf = (p: DisplayPostResponse) => `/${p.author.userName}/${p.slug}`;
+const hrefOf = (p: DisplayPostResponse) =>
+  postHref(p.author.userName ?? "", p.slug);
 const firstLetter = (s?: string) =>
   (s?.match(/[\p{L}\p{N}]/u)?.[0] ?? "•").toUpperCase();
 
@@ -121,7 +123,7 @@ export default function HomePage() {
                       dots, no views, ml-auto keeps the split on mobile too. */}
                   <div className="mt-6 flex flex-wrap items-center gap-4 text-[12px] text-[var(--m-muted)]">
                     <Link
-                      href={`/${hero.author.userName}`}
+                      href={userHref(hero.author.userName ?? "")}
                       className="relative z-[var(--m-z-content)] text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
                     >
                       @{hero.author.userName}

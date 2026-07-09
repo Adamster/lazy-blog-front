@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { ERROR_LEAD } from "@/shared/ui/feedback/error-message";
+import { HOME_HREF } from "@/shared/lib/routes";
 
 type GlobalErrorProps = {
   error: Error & { digest?: string };
@@ -108,7 +109,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               Try again
             </button>
             <Link
-              href="/"
+              href={HOME_HREF}
               style={{
                 height: 36,
                 display: "inline-flex",
