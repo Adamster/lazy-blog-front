@@ -43,7 +43,7 @@ interface GameEntry {
 // the 2048 card runs a bigger cell (owner call) — in-game its 4×4 cells dwarf
 // every other game's, so its preview field scales up to keep the meaning.
 const CELL = 20;
-const CELL_2048 = 28;
+const CELL_2048 = 40;
 const GAMES: GameEntry[] = [
   {
     href: "/arcade/tetris",
@@ -54,20 +54,20 @@ const GAMES: GameEntry[] = [
     game: "tetris",
   },
   {
-    href: "/arcade/snake",
-    title: "Snake",
-    description: "The classic. You, your tail, and bad decisions.",
-    mark: <SnakeMark size={CELL * 2} />,
-    field: { cell: CELL, spanX: 5, spanY: 2 },
-    game: "snake-classic",
-  },
-  {
     href: "/arcade/2048",
     title: "2048",
     description: "Double the numbers until the board disagrees.",
     mark: <Mark2048 size={CELL_2048 * 2} />,
     field: { cell: CELL_2048, spanX: 2, spanY: 2 },
     game: "2048",
+  },
+  {
+    href: "/arcade/snake",
+    title: "Snake",
+    description: "The classic. You, your tail, and bad decisions.",
+    mark: <SnakeMark size={CELL * 2} />,
+    field: { cell: CELL, spanX: 5, spanY: 2 },
+    game: "snake-classic",
   },
   {
     href: "/arcade/stay-awake",
