@@ -58,6 +58,7 @@ import { GlitchText, MatrixText } from "@/shared/ui/effects";
 import { addToastSuccess, addToastError } from "@/shared/lib/toasts";
 import { DraftOverlay } from "@/features/post/ui/draft-overlay";
 import { CrepeEditor } from "@/features/post/ui/crepe-wrapper";
+import { HeaderLockup } from "@/widgets/header";
 import { Section, Panel, State, Spec, GroupBand } from "./_helpers";
 
 const navLinkCls =
@@ -368,12 +369,18 @@ export function DesignGuide() {
       <div className="text-[11px] leading-none tracking-[0.12em] text-[var(--m-accent)]">
         {"// NOT LAZY — DESIGN GUIDE · BRUTALIST MONO"}
       </div>
-      <div className="mt-6 flex flex-wrap items-center gap-5">
-        <span className="bg-[var(--m-accent)] px-4 py-2 text-[14px] tracking-[0.2em] text-[var(--m-bg)]">
-          [ TEAM ]
-        </span>
-        <div className="font-display text-[40px] leading-none font-bold tracking-[-0.02em] whitespace-nowrap text-[var(--m-fg)]">
-          NOT <span className="text-[var(--m-accent)]">LAZY</span>
+      <div className="mt-6 flex flex-wrap items-center gap-7">
+        <div className="flex flex-wrap items-center gap-5">
+          <span className="bg-[var(--m-accent)] px-4 py-2 text-[14px] tracking-[0.2em] text-[var(--m-bg)]">
+            [ TEAM ]
+          </span>
+          <div className="font-display text-[40px] leading-none font-bold tracking-[-0.02em] whitespace-nowrap text-[var(--m-fg)]">
+            NOT <span className="text-[var(--m-accent)]">LAZY</span>
+          </div>
+        </div>
+        <span className="h-5 w-0.5 bg-[var(--m-dim)]" aria-hidden="true" />
+        <div>
+          <HeaderLockup />
         </div>
       </div>
       <h1 className="font-display mt-6 text-[40px] leading-none font-bold tracking-[-0.02em]">

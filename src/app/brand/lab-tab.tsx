@@ -2,6 +2,7 @@
 
 import { RevealMark, AsciiDivider } from "@/shared/ui/prose";
 import { Section, Panel, State } from "./_helpers";
+import { LogoLockupExperiments } from "./logo-lockup-experiments";
 
 function PostFxSection() {
   return (
@@ -64,6 +65,7 @@ export function LabTab() {
 
       <div className="mt-10 flex flex-col gap-10">
         <PostFxSection />
+        <LogoLockupExperiments />
       </div>
     </>
   );
