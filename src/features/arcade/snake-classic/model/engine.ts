@@ -295,8 +295,12 @@ export class SnakeClassicEngine {
       ctx.lineTo(cssW, p);
     }
     ctx.stroke();
+    // 2px lethal-wall frame — matches the CSS `border-2` used everywhere else
+    // (incl. the sibling Snake/"Follow the Rabbit" board's own red frame),
+    // was a stray 1px inherited from the grid-line width above.
     ctx.strokeStyle = this.palette.frameLine;
-    ctx.strokeRect(0.5, 0.5, cssW - 1, cssH - 1);
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, cssW - 2, cssH - 2);
   }
 
   /**
