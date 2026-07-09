@@ -37,13 +37,11 @@ interface GameEntry {
 }
 
 // Hollow Sloth is an unlisted prototype — deliberately absent here.
-// ONE field scale across the cards: the shared 20px cell. Each mark is built
-// from whole cells at that scale — its in-game placement, not a scaled logo —
-// so `size` is always `<cell> × <rows the figure spans>`. SANCTIONED EXCEPTION:
-// the 2048 card runs a bigger cell (owner call) — in-game its 4×4 cells dwarf
-// every other game's, so its preview field scales up to keep the meaning.
+// ONE field scale across ALL cards, incl. 2048 (owner call) — the shared
+// 20px cell. Each mark is built from whole cells at that scale — its
+// in-game placement, not a scaled logo — so `size` is always `<cell> × <rows
+// the figure spans>`.
 const CELL = 20;
-const CELL_2048 = 40;
 const GAMES: GameEntry[] = [
   {
     href: "/arcade/tetris",
@@ -57,8 +55,8 @@ const GAMES: GameEntry[] = [
     href: "/arcade/2048",
     title: "2048",
     description: "Double the numbers until the board disagrees.",
-    mark: <Mark2048 size={CELL_2048 * 2} />,
-    field: { cell: CELL_2048, spanX: 2, spanY: 2 },
+    mark: <Mark2048 size={CELL * 2} />,
+    field: { cell: CELL, spanX: 2, spanY: 2 },
     game: "2048",
   },
   {
