@@ -4,23 +4,28 @@ import { useId } from "react";
 import Link from "next/link";
 import { useAuth } from "@/entities/session";
 import { Dot } from "@/shared/ui";
-// Deep engine imports on purpose (read-only ART constants, no logic): the
-// crowns must show the games' REAL sprites (owner call — hand-drawn minis
-// read off-model), and importing the bitmaps keeps them in lockstep with any
-// future sprite retune.
-import { RABBIT_PLAIN } from "@/features/arcade/snake/model/engine";
-import { SLOTH_SIT } from "@/features/arcade/stay-awake/model/engine";
-import { SHAPES } from "@/features/arcade/tetris/model/engine";
 import { useArcadeCrowns } from "../model/use-arcade-crowns";
 
 /**
  * Profile-header crowns: one pixel icon per arcade game the user CURRENTLY
- * tops, rendered in the meta row after the post count — the ORIGINAL engine
- * bitmaps (plain white rabbit, sitting sloth, the T tetromino), scaled to
- * sit beside 12px meta text. Trophy exception to the muted-icon meta rule:
- * crowns render ACCENT with a matching breathing glow (gold was tried and
- * reverted) — they're standings, not metadata. Hover = `TOP 1 · <GAME>`
- * (native title for now); click = the game page.
+ * tops, rendered in the meta row after the post count — scaled to sit beside
+ * 12px meta text. Trophy exception to the muted-icon meta rule: crowns render
+ * ACCENT with a matching breathing glow (gold was tried and reverted) —
+ * they're standings, not metadata. Hover = `TOP 1 · <GAME>` (native title for
+ * now); click = the game page.
+ *
+ * Icon sourcing (2026-07-09 roster change — Rabbit/Stay Awake delisted from
+ * the hub, Tetris/2048/Snake-classic are the current 3): Tetris's bitmap
+ * used to deep-import the engine's REAL Z-tetromino sprite (the original
+ * "no hand-drawn minis, off-model" rule) — but the arcade hub's own card
+ * mark (`TetrominoMark`) shows a T-piece, not a Z, so the crown was
+ * inconsistent with the card. Tetris now mirrors `TetrominoMark`'s T-shape
+ * as a local bitmap. 2048 and Snake-classic have NO engine sprite to
+ * deep-import (their board tiles/segments are drawn procedurally, not from a
+ * static bitmap) — their hub card marks (`Mark2048`/`SnakeMark`) are also
+ * multi-fill/gradient SVGs, not single-silhouette bitmaps, so they can't be
+ * reused directly either. Both are hand-authored local bitmaps instead,
+ * echoing each mark's shape as a single accent silhouette.
  */
 
 type CrownIconDef = {
@@ -38,32 +43,55 @@ type CrownIconDef = {
   gap?: number;
 };
 
-/** The Z tetromino from the engine's SHAPES, empty rows trimmed (a T was
- *  tried first — owner picked the Z). */
-const TET_Z = SHAPES.Z.filter((row) => row.includes("X"));
+/** Same T-piece as the hub card's `TetrominoMark` (3×2: one top-centre cell,
+ *  a full bottom row) — was the engine's Z-tetromino, which read as a
+ *  different piece than the card shows for the same game (owner catch). */
+const TET_T = [" X ", "XXX"];
+
+/** A pixel "2" — 2048's signature digit, truer to the game's identity at
+ *  this scale than a plain tile block (which reads too close to Tetris). */
+const DIGIT_2 = [" XXX ", "X   X", "    X", "  XX ", " X   ", "X    ", "XXXXX"];
+
+/** A connected 2px-thick zigzag body + a detached food square — echoes
+ *  `SnakeMark`'s coiled-body-plus-food composition as one accent silhouette
+ *  (rendered + eyeballed at real crown scale before picking this shape: two
+ *  disconnected blocks read as noise, not a snake — the body needs to stay
+ *  ONE continuous path). */
+const SNAKE_COIL = [
+  "XX......",
+  "XX......",
+  "XXXX....",
+  "..XX....",
+  "..XXXX..",
+  "....XX..",
+  "........",
+  "......XX",
+  "......XX",
+];
 
 /** Gap (px) between crowns — the same tuning surface as the per-icon sizes
  *  (started at the meta rows' 16px between-metrics gap). */
 const CROWN_GAP = 16;
 
 const CROWN_ICONS: Record<string, CrownIconDef> = {
-  snake: {
-    bitmap: RABBIT_PLAIN,
-    solid: ["1"],
-    color: "var(--m-accent)",
-    size: 16,
-  },
-  "stay-awake": {
-    bitmap: SLOTH_SIT,
-    solid: ["1", "P"],
-    color: "var(--m-accent)",
-    size: 12,
-  },
   tetris: {
-    bitmap: TET_Z,
+    bitmap: TET_T,
     solid: ["X"],
     color: "var(--m-accent)",
     size: 14,
+    gap: 4,
+  },
+  "2048": {
+    bitmap: DIGIT_2,
+    solid: ["X"],
+    color: "var(--m-accent)",
+    size: 13,
+  },
+  "snake-classic": {
+    bitmap: SNAKE_COIL,
+    solid: ["X"],
+    color: "var(--m-accent)",
+    size: 16,
     gap: 4,
   },
 };
