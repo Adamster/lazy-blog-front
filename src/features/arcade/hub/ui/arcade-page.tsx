@@ -187,8 +187,12 @@ function LeaderRow({ leaders }: { leaders: LeaderEntry[] }) {
                 </span>
               </>
             ) : (
-              <span className="text-[11px] tracking-[0.12em] text-[var(--m-muted2)] uppercase">
-                NO SCORE YET
+              <span
+                className="flex-1 overflow-hidden text-clip whitespace-nowrap text-[var(--m-dim)]"
+                role="img"
+                aria-label="No score yet"
+              >
+                ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
               </span>
             )}
           </div>

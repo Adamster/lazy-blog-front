@@ -61,7 +61,9 @@ describe("ArcadePage leaderboard rows", () => {
     render(<ArcadePage />);
 
     // 3 visible cards x 3 rows each.
-    expect(screen.getAllByText("NO SCORE YET")).toHaveLength(9);
+    expect(screen.getAllByRole("img", { name: "No score yet" })).toHaveLength(
+      9
+    );
   });
 
   it("shows 3 placeholder rows for a game with an empty leaderboard", () => {
@@ -75,7 +77,9 @@ describe("ArcadePage leaderboard rows", () => {
 
     render(<ArcadePage />);
 
-    expect(screen.getAllByText("NO SCORE YET")).toHaveLength(9);
+    expect(screen.getAllByRole("img", { name: "No score yet" })).toHaveLength(
+      9
+    );
   });
 
   it("shows the #1 leader's handle and score, padding the other 2 rows", () => {
@@ -92,7 +96,9 @@ describe("ArcadePage leaderboard rows", () => {
     expect(screen.getByText("@igormariuta")).toBeInTheDocument();
     expect(screen.getByText("12,400")).toBeInTheDocument();
     // Tetris's own rows 2-3, plus 3 rows each for the other 2 games.
-    expect(screen.getAllByText("NO SCORE YET")).toHaveLength(8);
+    expect(screen.getAllByRole("img", { name: "No score yet" })).toHaveLength(
+      8
+    );
   });
 
   it("shows all 3 ranked entries with a rank badge each when a game has 3+ scores", () => {
