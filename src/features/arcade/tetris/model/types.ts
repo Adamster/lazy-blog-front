@@ -94,12 +94,8 @@ export interface TetrisGameApi {
   history: HistoryPoint[];
   start: () => void;
   togglePause: () => void;
-  /** Live remappable-key map — read by the keyboard handler, edited by CONTROLS. */
-  bindings: BindingMap<TetrisAction>;
-  setBindings: (next: BindingMap<TetrisAction>) => void;
   /** Live remappable-gamepad-button map — read by the gamepad poller, edited by
-   *  CONTROLS. Independent of `bindings` (keyboard); rebinding one never touches
-   *  the other. */
+   *  CONTROLS. Keyboard is fixed (not remappable) — see `TETRIS_DEFAULT_BINDINGS`. */
   padBindings: BindingMap<TetrisAction>;
   setPadBindings: (next: BindingMap<TetrisAction>) => void;
   /** True while a modal (e.g. CONTROLS) owns the keyboard — game keys go inert. */

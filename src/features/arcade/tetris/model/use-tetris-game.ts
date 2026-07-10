@@ -25,7 +25,6 @@ import {
 import {
   TETRIS_ACTION_IDS,
   TETRIS_DEFAULT_BINDINGS,
-  TETRIS_KEYS_STORAGE,
   type TetrisAction,
 } from "./bindings";
 import {
@@ -211,23 +210,6 @@ export function useTetrisGame({
     return () => cancelAnimationFrame(raf);
   }, [historyScope]);
 
-  const [bindings, setBindingsState] = useState<BindingMap<TetrisAction>>(
-    TETRIS_DEFAULT_BINDINGS
-  );
-  const bindingsRef = useRef(bindings);
-  useEffect(() => {
-    bindingsRef.current = bindings;
-  }, [bindings]);
-  // Hydrate persisted bindings on mount; rAF-deferred (lint rule).
-  useEffect(() => {
-    const raf = requestAnimationFrame(() =>
-      setBindingsState(
-        loadBindings(TETRIS_KEYS_STORAGE, TETRIS_DEFAULT_BINDINGS)
-      )
-    );
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
   const [padBindings, setPadBindingsState] = useState<BindingMap<TetrisAction>>(
     TETRIS_DEFAULT_GAMEPAD_BINDINGS
   );
@@ -275,14 +257,6 @@ export function useTetrisGame({
     kb.left = kb.right = kb.softDrop = false;
     heldRef.current.clear();
   };
-
-  const setBindings = useCallback((next: BindingMap<TetrisAction>) => {
-    setBindingsState(next);
-    saveBindings(TETRIS_KEYS_STORAGE, next);
-    // Drop any in-flight holds — a key physically held across a remap would
-    // otherwise resolve to a different/no action on keyup and stick forever.
-    resetInput();
-  }, []);
 
   const setPadBindings = useCallback((next: BindingMap<TetrisAction>) => {
     setPadBindingsState(next);
@@ -551,9 +525,8 @@ export function useTetrisGame({
   // ---------- keyboard ----------
   useEffect(() => {
     const actionOf = (code: string): TetrisAction | null => {
-      const map = bindingsRef.current;
       for (const a of TETRIS_ACTION_IDS) {
-        if (map[a].includes(code)) return a;
+        if (TETRIS_DEFAULT_BINDINGS[a].includes(code)) return a;
       }
       return null;
     };
@@ -561,7 +534,7 @@ export function useTetrisGame({
     // A held action stays on while ANY of its bound keys is physically down
     // (defaults bind two keys per direction — ← + A etc.).
     const stillHeld = (a: TetrisAction) =>
-      bindingsRef.current[a].some((code) => heldRef.current.has(code));
+      TETRIS_DEFAULT_BINDINGS[a].some((code) => heldRef.current.has(code));
 
     const onKeyDown = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement | null;
@@ -647,8 +620,6 @@ export function useTetrisGame({
     history,
     start,
     togglePause,
-    bindings,
-    setBindings,
     padBindings,
     setPadBindings,
     setKeysSuspended,

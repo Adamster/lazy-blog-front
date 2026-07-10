@@ -60,7 +60,7 @@ export function TetrisBoard({
     api.setKeysSuspended(false);
   };
 
-  const b = api.bindings;
+  const b = TETRIS_DEFAULT_BINDINGS;
 
   const rankClause = rankLine(state.rank, canRank, "clear more lines");
   // Fullscreen toggle lives on the OVERLAY screens only (menu / pause — owner
@@ -193,7 +193,7 @@ export function TetrisBoard({
       )}
 
       {state.screen === "playing" && state.paused && (
-        <PauseOverlay hint={`${keyLabel(b.pause[0] ?? "KeyP")} to resume`} />
+        <PauseOverlay hint={`${keyLabel(b.pause[0])} to resume`} />
       )}
 
       {state.screen === "over" && (
@@ -216,9 +216,7 @@ export function TetrisBoard({
         isOpen={controlsOpen}
         onOpenChange={closeControls}
         actions={TETRIS_ACTIONS}
-        value={api.bindings}
-        defaults={TETRIS_DEFAULT_BINDINGS}
-        onChange={api.setBindings}
+        keyboardValue={TETRIS_DEFAULT_BINDINGS}
         padValue={api.padBindings}
         padDefaults={TETRIS_DEFAULT_GAMEPAD_BINDINGS}
         onPadChange={api.setPadBindings}

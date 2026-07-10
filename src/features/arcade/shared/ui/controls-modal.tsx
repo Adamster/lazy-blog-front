@@ -5,29 +5,28 @@ import { Button, Modal, ModalHeader } from "@/shared/ui";
 import { bindingLabel, rebind, type BindingMap } from "../model/key-bindings";
 import { codeGlyph, KbdBadge } from "./board-overlay";
 
-/** One capture chip (keyboard OR gamepad) inside a `ControlsModal` action row —
- * a fixed 36px (`h-9`) TRANSPARENT outline button (no own fill — the raised fill
- * lives on the inner key-caps, below), its border revealing accent on hover
+/** One gamepad capture chip inside a `ControlsModal` action row — a fixed 36px
+ * (`h-9`) TRANSPARENT outline button (no own fill — the raised fill lives on the
+ * inner key-caps, below), its border revealing accent on hover
  * (`hover:border-[var(--m-accent)]`, the shared `.mono-btn-outline` treatment) and
  * pinned accent while armed. Renders the current binding as `filled` icon-glyph
  * key-caps (the {@link KbdBadge} language shared with the menu key-hint rows, here
  * carrying the `--m-card` keycap fill so each key reads as a raised cap against the
- * transparent chip), or the plain "press…" placeholder while armed. Each bound code
- * becomes its own COMPACT keycap (`codeGlyph(code, true)` — `size-3` icons a notch
- * down from the menu's `size-3.5`) on the shared 20px square floor, sitting `gap-1`
- * apart (a chip only ever holds ONE action's alternates, so no `·` separator); an
- * unbound action shows the plain "—" mark. `aria-label` keeps the spelled-out
- * binding text for screen readers even though the visible chip is icons. */
+ * transparent chip), or the plain "PRESS BUTTON…" placeholder while armed. Each
+ * bound code becomes its own COMPACT keycap (`codeGlyph(code, true)` — `size-3`
+ * icons a notch down from the menu's `size-3.5`) on the shared 20px square floor,
+ * sitting `gap-1` apart (a chip only ever holds ONE action's alternates, so no `·`
+ * separator); an unbound action shows the plain "—" mark. `aria-label` keeps the
+ * spelled-out binding text for screen readers even though the visible chip is
+ * icons. */
 function CaptureChip({
   active,
   ariaLabel,
-  placeholder,
   codes,
   onClick,
 }: {
   active: boolean;
   ariaLabel: string;
-  placeholder: string;
   codes: readonly string[];
   onClick: () => void;
 }) {
@@ -44,7 +43,7 @@ function CaptureChip({
     >
       {active ? (
         <span className="text-[11px] leading-none tracking-[0.12em] text-[var(--m-accent)] uppercase">
-          {placeholder}
+          PRESS BUTTON…
         </span>
       ) : codes.length === 0 ? (
         <span className="text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)] uppercase">
@@ -63,23 +62,51 @@ function CaptureChip({
   );
 }
 
+/** Static, non-interactive display of the current KEYBOARD binding for one
+ *  action — same keycap language as {@link CaptureChip}, but a plain `<div>`:
+ *  no hover/active state, no click handler. Keyboard is informational only. */
+function KeyInfoChip({
+  codes,
+  ariaLabel,
+}: {
+  codes: readonly string[];
+  ariaLabel: string;
+}) {
+  return (
+    <div
+      aria-label={ariaLabel}
+      className="flex h-9 w-full items-center justify-center border-2 border-[var(--m-dim)] px-4"
+    >
+      {codes.length === 0 ? (
+        <span className="text-[11px] leading-none tracking-[0.12em] text-[var(--m-muted2)] uppercase">
+          —
+        </span>
+      ) : (
+        <span className="flex items-center gap-1">
+          {codes.map((code, i) => (
+            <KbdBadge key={i} size="h-5 min-w-5 px-0.5" filled>
+              {codeGlyph(code, true)}
+            </KbdBadge>
+          ))}
+        </span>
+      )}
+    </div>
+  );
+}
+
 /**
- * Key/button-remapping modal for an arcade game: one row per action, two chips each
- * (keyboard, gamepad). Click a chip to arm capture ("PRESS KEY…" / "PRESS BUTTON…");
- * for a keyboard chip the next `keydown` binds it (stealing it from any other
- * action); for a gamepad chip the next polled button press binds it the same way.
- * Escape cancels either capture. The keyboard-capture listener runs in the WINDOW
- * capture phase with stopPropagation, so neither the game's key handler nor the
- * Modal's own document-level Escape-close sees the press. The host must suspend its
- * game keys while the modal is open (Tetris: `setKeysSuspended`).
+ * Gamepad-remapping modal for an arcade game: one row per action, an optional
+ * informational keyboard column (current PC keys, not clickable) + a rebindable
+ * gamepad chip. Click the gamepad chip to arm capture ("PRESS BUTTON…"); the
+ * next polled button press binds it (stealing it from any other action).
+ * Escape cancels an armed capture. The host must suspend its game keys while
+ * the modal is open (all three games: `setKeysSuspended`).
  */
 export function ControlsModal<A extends string>({
   isOpen,
   onOpenChange,
   actions,
-  value,
-  defaults,
-  onChange,
+  keyboardValue,
   padValue,
   padDefaults,
   onPadChange,
@@ -87,46 +114,32 @@ export function ControlsModal<A extends string>({
   isOpen: boolean;
   onOpenChange: () => void;
   actions: readonly { id: A; label: string }[];
-  /** Omit `value`/`defaults`/`onChange` together to run GAMEPAD-ONLY: one chip
-   *  column instead of two, no keyboard rebinding UI, Reset only resets the
-   *  gamepad map. */
-  value?: BindingMap<A>;
-  defaults?: BindingMap<A>;
-  onChange?: (next: BindingMap<A>) => void;
-  /** Gamepad counterpart of `value`/`defaults`/`onChange` — independent binding map. */
+  /** Informational only — current keyboard binding per action, rendered as
+   *  static (non-clickable) chips. Omit to hide the keyboard column entirely. */
+  keyboardValue?: BindingMap<A>;
   padValue: BindingMap<A>;
   padDefaults: BindingMap<A>;
   onPadChange: (next: BindingMap<A>) => void;
 }) {
-  const keyboardEnabled = value !== undefined && onChange !== undefined;
-  const [capturing, setCapturing] = useState<{
-    action: A;
-    kind: "key" | "pad";
-  } | null>(null);
+  const keyboardShown = keyboardValue !== undefined;
+  const [capturing, setCapturing] = useState<A | null>(null);
 
-  // Keyboard capture — also the ONLY way to cancel a "pad" capture (Escape).
+  // Escape cancels an armed gamepad capture.
   useEffect(() => {
     if (!capturing) return;
     const onKey = (e: KeyboardEvent) => {
-      if (capturing.kind === "pad" && e.code !== "Escape") return; // irrelevant to a pad capture
+      if (e.code !== "Escape") return;
       e.preventDefault();
       e.stopPropagation();
-      if (e.code === "Escape") {
-        setCapturing(null);
-        return;
-      }
-      if (capturing.kind === "key" && value && onChange) {
-        onChange(rebind<A>(value, capturing.action, e.code));
-      }
       setCapturing(null);
     };
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
-  }, [capturing, value, onChange]);
+  }, [capturing]);
 
   // Gamepad capture — poll for the first NEW button press (edge), assign it.
   useEffect(() => {
-    if (!capturing || capturing.kind !== "pad") return;
+    if (!capturing) return;
     let raf = 0;
     let prevPressed: boolean[] | null = null; // null = no baseline captured yet
     const poll = () => {
@@ -144,9 +157,7 @@ export function ControlsModal<A extends string>({
             (p, i) => p && !prevPressed![i]
           );
           if (pressedIndex !== -1) {
-            onPadChange(
-              rebind<A>(padValue, capturing.action, `Pad${pressedIndex}`)
-            );
+            onPadChange(rebind<A>(padValue, capturing, `Pad${pressedIndex}`));
             setCapturing(null);
             return;
           }
@@ -177,49 +188,34 @@ export function ControlsModal<A extends string>({
             eyebrow="// ARCADE"
             title="Controls"
             titleId="arcade-controls-title"
-            subtitle="Click a slot, then press its new key or button. Esc cancels."
+            subtitle="Click a slot, then press its new button. Esc cancels."
             onClose={closeModal}
           />
           <div
             className={`grid items-center gap-x-3 gap-y-4 ${
-              keyboardEnabled
+              keyboardShown
                 ? "grid-cols-[auto_1fr_1fr]"
                 : "grid-cols-[auto_1fr]"
             }`}
           >
             {actions.map(({ id, label }) => {
-              const keyActive =
-                capturing?.action === id && capturing.kind === "key";
-              const padActive =
-                capturing?.action === id && capturing.kind === "pad";
+              const padActive = capturing === id;
               return (
                 <Fragment key={id}>
                   <span className="text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase">
                     {label}
                   </span>
-                  {keyboardEnabled && (
-                    <CaptureChip
-                      active={keyActive}
-                      ariaLabel={`${label} — keyboard: ${keyActive ? "press key" : bindingLabel(value![id])}`}
-                      placeholder="PRESS KEY…"
-                      codes={value![id]}
-                      onClick={() =>
-                        setCapturing(
-                          keyActive ? null : { action: id, kind: "key" }
-                        )
-                      }
+                  {keyboardShown && (
+                    <KeyInfoChip
+                      codes={keyboardValue![id]}
+                      ariaLabel={`${label} — keyboard: ${bindingLabel(keyboardValue![id])}`}
                     />
                   )}
                   <CaptureChip
                     active={padActive}
                     ariaLabel={`${label} — gamepad: ${padActive ? "press button" : bindingLabel(padValue[id])}`}
-                    placeholder="PRESS BUTTON…"
                     codes={padValue[id]}
-                    onClick={() =>
-                      setCapturing(
-                        padActive ? null : { action: id, kind: "pad" }
-                      )
-                    }
+                    onClick={() => setCapturing(padActive ? null : id)}
                   />
                 </Fragment>
               );
@@ -238,7 +234,6 @@ export function ControlsModal<A extends string>({
               variant="outline"
               onClick={() => {
                 setCapturing(null);
-                if (keyboardEnabled) onChange!(defaults!);
                 onPadChange(padDefaults);
               }}
             >
