@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 import {
   GRID_H,
   GRID_W,
@@ -323,7 +322,6 @@ export function useSnakeClassicGame({
       ) {
         resize();
       }
-      const animate = !prefersReducedMotion();
       const screen = screenRef.current;
 
       const held = getPollPad()();
@@ -380,9 +378,9 @@ export function useSnakeClassicGame({
             );
           }
         }
-        engine.drawGame(ctx, cssW, cssH, dpr, animate);
+        engine.drawGame(ctx, cssW, cssH, dpr);
       } else if (screen === "over" || pausedRef.current) {
-        engine.drawGame(ctx, cssW, cssH, dpr, false);
+        engine.drawGame(ctx, cssW, cssH, dpr);
       } else {
         engine.drawIdle(ctx, cssW, cssH);
       }
