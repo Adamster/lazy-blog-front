@@ -22,7 +22,6 @@ interface GameEntry extends ArcadeGameEntry {
   field: { cell: number; spanX: number; spanY: number };
 }
 
-// Hollow Sloth is an unlisted prototype — deliberately absent here.
 // ONE field scale across ALL cards, incl. 2048 (owner call) — the shared
 // 20px cell. Each mark is built from whole cells at that scale — its
 // in-game placement, not a scaled logo — so `size` is always `<cell> × <rows
