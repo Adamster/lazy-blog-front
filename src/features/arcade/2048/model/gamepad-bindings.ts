@@ -34,3 +34,16 @@ export const GAME_2048_DEFAULT_GAMEPAD_BINDINGS: BindingMap<Game2048Action> = {
 };
 
 export const GAME_2048_GAMEPAD_STORAGE = "arcade.2048.pad.v1";
+
+/** Informational only — mirrors the hook's actual hardcoded keyboard keys
+ *  (`use-2048-game.ts`'s `dirFor`/`isStart`). NOT rebindable; this constant
+ *  drives the CONTROLS modal's read-only keyboard column, nothing else.
+ *  Keep in sync by hand if the hook's hardcoded keys ever change. */
+export const GAME_2048_KEYBOARD_INFO: BindingMap<Game2048Action> = {
+  moveLeft: ["ArrowLeft", "KeyA"],
+  moveRight: ["ArrowRight", "KeyD"],
+  moveUp: ["ArrowUp", "KeyW"],
+  moveDown: ["ArrowDown", "KeyS"],
+  start: ["Enter", "Space"],
+  continueRun: ["Enter", "Space"],
+};

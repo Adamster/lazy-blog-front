@@ -21,6 +21,7 @@ import { Button } from "@/shared/ui";
 import {
   GAME_2048_ACTIONS,
   GAME_2048_DEFAULT_GAMEPAD_BINDINGS,
+  GAME_2048_KEYBOARD_INFO,
 } from "../model/gamepad-bindings";
 import type { Game2048Api } from "../model/types";
 
@@ -159,6 +160,7 @@ export function Board2048({
         isOpen={controlsOpen}
         onOpenChange={closeControls}
         actions={GAME_2048_ACTIONS}
+        keyboardValue={GAME_2048_KEYBOARD_INFO}
         padValue={padBindings}
         padDefaults={GAME_2048_DEFAULT_GAMEPAD_BINDINGS}
         onPadChange={setPadBindings}
