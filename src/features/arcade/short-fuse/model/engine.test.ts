@@ -244,6 +244,10 @@ describe("ShortFuseEngine — bombs & blasts", () => {
     const ex = s0.exitIndex % GRID_W;
     const ey = (s0.exitIndex / GRID_W) | 0;
     const bx = ex > 0 ? ex - 1 : ex + 1; // adjacent cell so a single-range blast hits the exit
+    // Park the player in the corner diagonally opposite the bomb — a blast
+    // reaching the spawn would kill + regenerate the level and reset
+    // exitRevealed in the same frame (same guard as the sibling bomb tests).
+    e.debugPlacePlayer(bx < GRID_W / 2 ? GRID_W - 1 : 0, ey < GRID_H / 2 ? GRID_H - 1 : 0);
     e.debugPlaceBomb(bx, ey, 1);
     advance(e, FUSE_MS + 16);
     expect(e.inspect().exitRevealed).toBe(true);
