@@ -625,7 +625,7 @@ export function DesignGuide() {
                     aria-label="Copy link"
                     className="mono-icon-btn size-9"
                   >
-                    <LinkIcon className="size-4" />
+                    <LinkIcon className="size-3.5" />
                   </button>
                   <form onSubmit={(e) => e.preventDefault()}>
                     <IconSubmitButton label="Publish post" />

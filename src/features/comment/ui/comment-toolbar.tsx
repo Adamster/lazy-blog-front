@@ -161,7 +161,7 @@ export function CommentToolbar({ api }: CommentToolbarProps) {
           onClick={() => setOpen((cur) => !cur)}
           className={`mono-icon-btn mono-focus size-9`}
         >
-          <FaceSmileIcon className="size-4 shrink-0" />
+          <FaceSmileIcon className="size-3.5 shrink-0" />
         </button>
 
         {open && (
