@@ -35,3 +35,16 @@ export const SNAKE_CLASSIC_DEFAULT_GAMEPAD_BINDINGS: BindingMap<SnakeClassicActi
   };
 
 export const SNAKE_CLASSIC_GAMEPAD_STORAGE = "arcade.snake-classic.pad.v1";
+
+/** Informational only — mirrors the hook's actual hardcoded keyboard keys
+ *  (`use-snake-classic-game.ts`'s `onKey` handler). NOT rebindable; this
+ *  constant drives the CONTROLS modal's read-only keyboard column, nothing
+ *  else. Keep in sync by hand if the hook's hardcoded keys ever change. */
+export const SNAKE_CLASSIC_KEYBOARD_INFO: BindingMap<SnakeClassicAction> = {
+  moveUp: ["ArrowUp", "KeyW"],
+  moveDown: ["ArrowDown", "KeyS"],
+  moveLeft: ["ArrowLeft", "KeyA"],
+  moveRight: ["ArrowRight", "KeyD"],
+  start: ["Enter", "Space"],
+  pause: ["Space"],
+};

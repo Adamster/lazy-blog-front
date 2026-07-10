@@ -15,6 +15,7 @@ import {
 import {
   SNAKE_CLASSIC_ACTIONS,
   SNAKE_CLASSIC_DEFAULT_GAMEPAD_BINDINGS,
+  SNAKE_CLASSIC_KEYBOARD_INFO,
 } from "../model/gamepad-bindings";
 import type { SnakeClassicGameApi } from "../model/types";
 
@@ -124,6 +125,7 @@ export function SnakeClassicBoard({
         isOpen={controlsOpen}
         onOpenChange={closeControls}
         actions={SNAKE_CLASSIC_ACTIONS}
+        keyboardValue={SNAKE_CLASSIC_KEYBOARD_INFO}
         padValue={padBindings}
         padDefaults={SNAKE_CLASSIC_DEFAULT_GAMEPAD_BINDINGS}
         onPadChange={setPadBindings}
