@@ -243,12 +243,19 @@ export function ArcadePage() {
       style={{ fontFamily: "var(--font-mono)" }}
     >
       <main className="mx-auto max-w-[1240px] px-5 pb-10 sm:px-10">
-        {/* Bare eyebrow first → pt-10 (section rhythm + flush-avoidance), pb-6 binds it down. */}
-        <div className="flex items-center pt-10 pb-6">
+        {/* Bare eyebrow first → pt-10 (section rhythm + flush-avoidance). Eyebrow→H1
+            and H1→subtitle mirror the home hero / post-page title rhythm (24 / 16). */}
+        <div className="pt-10">
           <Label>ARCADE</Label>
+          <h1 className="font-display mt-6 text-[32px] leading-[1.04] font-bold tracking-[-0.02em] text-balance md:text-[40px]">
+            The official excuse for procrastinating
+          </h1>
+          <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
+            Too lazy to work? At least get good at this.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {GAMES.filter((game) => !game.hidden).map((game) => (
             <GameCard
               key={game.href}
