@@ -179,56 +179,52 @@ const HUD_FONT = 'ui-monospace, "JetBrains Mono", "Courier New", monospace';
 // "1" = primary body, "2" = accent band, "3" = spark, "0" = background
 // knockout (opaque `boardBg`, e.g. eye sockets), "." = transparent.
 
-/** Fyze — the walking bomb: round body, stub legs, wick + spark ("3"),
- *  belly band ("2", swaps accent → spark while debuffed — the ONE debuff
- *  signal), knockout eyes ("0"). */
+/** Fyze — the walking bomb, redrawn minimalist (owner retune: "поприятнее,
+ *  более минималистичные" — cleaner, cuter, less noise): a tight 7×8
+ *  silhouette, legs dropped (he hops now, not walks — see the discrete
+ *  cell-hop movement retune, a stub walk-cycle would be a lie), wick + spark
+ *  ("3"), belly band ("2", swaps accent → spark while debuffed — the ONE
+ *  debuff signal), knockout eyes ("0"). Round top AND round bottom keep the
+ *  "friendly bomb" read at a glance. */
 export const FYZE_SPRITE: readonly string[] = [
-  "....3....",
-  "....1....",
-  "..11111..",
-  ".1111111.",
-  ".1101011.",
-  ".1111111.",
-  ".2222222.",
-  ".1111111.",
-  "..11111..",
-  "..1...1..",
+  "...3...",
+  "..111..",
+  ".11111.",
+  "1101011",
+  "1111111",
+  "2222222",
+  "1111111",
+  ".11111.",
 ];
 
-/** Wanderer — a round blob with stub feet, no wick (calmest silhouette). */
+/** Wanderer — a round blob, no wick, no point (calmest silhouette). */
 const ENEMY_WANDERER_SPRITE: readonly string[] = [
-  ".........",
-  "..11111..",
-  ".1111111.",
-  "111010111",
-  "111111111",
-  ".1111111.",
-  "..11111..",
-  "..1...1..",
+  ".11111.",
+  "1111111",
+  "1101011",
+  "1111111",
+  ".11111.",
 ];
 
-/** Chaser — a pointed hood (apex top), reads as the "aiming at you" shape. */
+/** Chaser — a pointed hood tapering to a single apex pixel, flat base (no
+ *  rounding) — reads as "aiming at you", the one non-round enemy shape. */
 const ENEMY_CHASER_SPRITE: readonly string[] = [
-  "....1....",
-  "...111...",
-  "..11111..",
-  ".1111111.",
-  "111010111",
-  "111111111",
-  "111111111",
-  "..1...1..",
+  "...1...",
+  "..111..",
+  ".11111.",
+  "1101011",
+  "1111111",
 ];
 
-/** Skitter — corner spikes top and bottom, the jitteriest silhouette. */
+/** Skitter — four DETACHED corner spikes ringing a round core; the broken
+ *  silhouette (unlike wanderer's/chaser's unbroken outline) is what reads as
+ *  "jittery" at a glance. */
 const ENEMY_SKITTER_SPRITE: readonly string[] = [
-  "1.......1",
-  ".1.....1.",
-  "..11111..",
-  ".1101011.",
-  ".1111111.",
-  "..11111..",
-  ".1.....1.",
-  "1.......1",
+  "1.....1",
+  ".11111.",
+  "1101011",
+  ".11111.",
+  "1.....1",
 ];
 
 /** Distinct per-kind silhouettes, keyed by {@link EnemyKind}. */
@@ -238,64 +234,60 @@ const ENEMY_SPRITES: Record<EnemyKind, readonly string[]> = {
   skitter: ENEMY_SKITTER_SPRITE,
 };
 
-/** A planted bomb — a plain round bomb (no belly band/eyes/feet — that's
- *  what visually distinguishes it from Fyze himself), wick spark ("3")
- *  blinking on the sim's fuse clock. */
+/** A planted bomb — a plain round bomb (no belly band/eyes — that's what
+ *  visually distinguishes it from Fyze himself), wick spark ("3") blinking
+ *  on the sim's fuse clock. */
 export const BOMB_SPRITE: readonly string[] = [
-  "....3....",
-  "....1....",
-  "..11111..",
-  ".1111111.",
-  ".1111111.",
-  ".1111111.",
-  ".1111111.",
-  "..11111..",
+  "...3...",
+  "..111..",
+  ".11111.",
+  "1111111",
+  "1111111",
+  "1111111",
+  ".11111.",
 ];
 
+/** Bold, simple pickup glyphs (owner retune) — legible at tiny in-game size,
+ *  not detailed drawings: a filled circle (bomb), a plus (range), a solid
+ *  arrowhead (speed), a round skull. */
 const POWERUP_BOMB_SPRITE: readonly string[] = [
   "...3...",
-  "...1...",
+  "..111..",
   ".11111.",
   "1111111",
-  "1111111",
   ".11111.",
-  ".......",
 ];
 
-/** Cross — reads as "blast range" at a glance. */
+/** Bold plus — reads as "blast range" at a glance, at any scale. */
 const POWERUP_RANGE_SPRITE: readonly string[] = [
-  "...1...",
-  "...1...",
-  "...1...",
-  "1111111",
-  "...1...",
-  "...1...",
-  "...1...",
+  "..1..",
+  "..1..",
+  "11111",
+  "..1..",
+  "..1..",
 ];
 
-/** Fast-forward chevrons. */
+/** Solid arrowhead — reads as "fast" without needing a double-chevron detail. */
 const POWERUP_SPEED_SPRITE: readonly string[] = [
-  "1...1..",
-  "11..11.",
-  "111.111",
-  "1111111",
-  "111.111",
-  "11..11.",
-  "1...1..",
+  "1....",
+  "11...",
+  "111..",
+  "11...",
+  "1....",
 ];
 
-/** Skull — the ONE negative drop, drawn in `spark` so it reads as a trap. */
+/** Skull — the ONE negative drop, drawn in `spark` so it reads as a trap;
+ *  round head + two knockout eye sockets + a small chin taper, no teeth
+ *  detail (the colour, not the linework, sells "trap"). */
 const POWERUP_SKULL_SPRITE: readonly string[] = [
   ".11111.",
   "1111111",
-  "1101101",
+  "1101011",
   "1111111",
-  ".10101.",
   "..111..",
-  ".......",
 ];
 
-/** 7×7 pickup icons, keyed by {@link PowerupType}. */
+/** Pickup icons, keyed by {@link PowerupType}. */
 const POWERUP_SPRITES: Record<PowerupType, readonly string[]> = {
   bomb: POWERUP_BOMB_SPRITE,
   range: POWERUP_RANGE_SPRITE,
@@ -306,9 +298,6 @@ const POWERUP_SPRITES: Record<PowerupType, readonly string[]> = {
 /** Door outline — the exit before every enemy on the level is cleared. */
 const EXIT_CLOSED_SPRITE: readonly string[] = [
   ".11111.",
-  "1.....1",
-  "1.....1",
-  "1.....1",
   "1.....1",
   "1.....1",
   "1.....1",
@@ -325,19 +314,19 @@ const EXIT_OPEN_SPRITE: readonly string[] = [
   "1111111",
   "1111111",
   "1111111",
-  "1111111",
-  "1111111",
-  "1111111",
 ];
 
 /** Sprite bounding-box fill (fraction of a cell) — one knob per figure kind,
  *  mirroring {@link SnakeClassicEngine}'s `FOOD_FILL`. `FYZE_FILL`/`BOMB_FILL`
  *  are exported for the hub-card mark (same as snake's `FOOD_FILL`, stay-awake's
- *  `SPRITE_FILL`) so the mark nests its sprites at the exact in-game cell fill. */
-export const FYZE_FILL = 0.82;
-const ENEMY_FILL = 0.78;
-export const BOMB_FILL = 0.7;
-const POWERUP_FILL = 0.6;
+ *  `SPRITE_FILL`) so the mark nests its sprites at the exact in-game cell fill.
+ *  Owner retune: every actor fill trimmed ~15% ("чутка меньше размером") —
+ *  powerups stay proportionally the smallest (pickups read as accents, not
+ *  bodies), actors (Fyze/enemies) the largest, bombs in between. */
+export const FYZE_FILL = 0.7;
+const ENEMY_FILL = 0.66;
+export const BOMB_FILL = 0.6;
+const POWERUP_FILL = 0.5;
 const EXIT_FILL = 0.88;
 /** Pillar/soft solid-fill tiles (a `drawSquare`, not a sprite) — leaves a
  *  hairline gap so adjacent blocks still read as distinct cells. */
