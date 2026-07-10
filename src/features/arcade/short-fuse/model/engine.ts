@@ -46,29 +46,20 @@ const ENEMY_SPEED: Record<EnemyKind, number> = {
   skitter: 3.2,
 };
 
-/** Base player speed (cells/second) before speed-powerup levels. */
-const PLAYER_SPEED_BASE = 4.5;
-/** Speed gained per `speed` powerup pickup (cells/second). */
-const PLAYER_SPEED_STEP = 0.5;
-/** Max player speed regardless of stacked powerups (cells/second). */
-const PLAYER_SPEED_CAP = 7;
-/** Player collision half-size (cell units) — square body of side 2×radius. */
-export const PLAYER_RADIUS = 0.38;
-/** Perpendicular-offset window (cell units) within which a blocked forward
- *  move gets redirected into the open diagonal lane instead of stopping.
- *  At 0.5 it spans the whole half-lane: any offset toward an open diagonal
- *  redirects (|off| ≤ 0.5 by construction, so the gate reduces to the
- *  epsilon + open-diagonal checks — the named const stays for readability). */
-const ASSIST = 0.5;
+/** Base ms between player hops before speed-powerup levels (owner retune:
+ *  classic cell-hop movement, replacing the earlier smooth sub-cell glide —
+ *  "по клеточное — проще и визуально приятнее"). Exported so tests can
+ *  derive expected hop counts without duplicating the tuning numbers. */
+export const PLAYER_STEP_MS = 180;
+/** ms shaved off the hop interval per `speed` powerup level. */
+const PLAYER_STEP_ACCEL_MS = 15;
+/** Fastest the player's hop interval can get regardless of stacked powerups (ms). */
+const PLAYER_STEP_FLOOR_MS = 110;
+/** Hop-interval multiplier while a `slow` skull debuff is active (bigger
+ *  interval ⇒ slower hops). */
+const PLAYER_SLOW_MUL = 1.5;
 /** Per-`update()` dt ceiling (ms) — guards against huge dt after a tab stall. */
 const DT_CLAMP_MS = 50;
-
-/** Ease `v` toward `target`, moving at most `maxDelta`. */
-function approach(v: number, target: number, maxDelta: number): number {
-  if (v < target) return Math.min(target, v + maxDelta);
-  if (v > target) return Math.max(target, v - maxDelta);
-  return v;
-}
 
 /** The four axis-aligned step directions — shared by blast-arm traversal
  *  (`detonate`) and enemy pathing (`stepEnemy`), one source per DRY. */
@@ -95,24 +86,26 @@ interface Blast {
 
 interface Enemy {
   kind: EnemyKind;
-  x: number; // cell coords (float, center-based)
+  x: number; // cell coords (int)
   y: number;
+  /** Current heading — kept for the straight-preference decision (wanderer/
+   *  skitter prefer to keep going the way they were going); no longer a
+   *  tween target now that movement is a discrete cell-hop. */
   dx: -1 | 0 | 1;
   dy: -1 | 0 | 1;
-  speed: number;
-  /** Cell the enemy is walking toward — set on each center-of-cell decision;
-   *  equals the current cell (== `x`/`y`) at a dead end or before the first
-   *  decision. */
-  targetX: number;
-  targetY: number;
+  /** ms per hop, fixed at spawn from the per-kind {@link ENEMY_SPEED} + level ramp. */
+  stepMs: number;
+  /** Countdown to the next hop; decremented by dt each update, hops (and
+   *  re-decides direction) when it reaches zero. */
+  hopMs: number;
 }
 
 interface PlayerState {
-  x: number; // cell coords (float, center-based)
+  x: number; // cell coords (int)
   y: number;
   maxBombs: number;
   range: number;
-  speedLevel: number; // 0-based, speed = base + step*level capped
+  speedLevel: number; // 0-based, hop interval = base - accel*level floored
   debuff: { kind: "slow" | "shortRange"; ttlMs: number } | null;
 }
 
@@ -410,6 +403,12 @@ export class ShortFuseEngine {
   private timeLeftMs = LEVEL_TIME_MS;
   private moveX: -1 | 0 | 1 = 0;
   private moveY: -1 | 0 | 1 = 0;
+  /** True while a held direction has already fired its "fresh press" hop —
+   *  cleared the moment both axes go idle so the NEXT press hops immediately
+   *  again (see {@link stepPlayer}). */
+  private playerMoveHeld = false;
+  /** Countdown (ms) to the player's next hop while a direction is held. */
+  private playerHopMs = 0;
   /** Set once the last life is lost — `update` then freezes the sim and
    *  keeps returning `lastResult` instead of re-simulating. */
   private dead = false;
@@ -459,6 +458,8 @@ export class ShortFuseEngine {
     this.player.debuff = null;
     this.moveX = 0;
     this.moveY = 0;
+    this.playerMoveHeld = false;
+    this.playerHopMs = 0;
     // 1. pillars
     this.grid = Array.from({ length: GRID_W * GRID_H }, (_, i) => {
       const x = i % GRID_W;
@@ -509,16 +510,8 @@ export class ShortFuseEngine {
 
   /** One construction site for enemies — generation + the debug spawner. */
   private makeEnemy(kind: EnemyKind, x: number, y: number): Enemy {
-    return {
-      kind,
-      x,
-      y,
-      dx: 0,
-      dy: 0,
-      speed: this.enemySpeed(kind),
-      targetX: x,
-      targetY: y,
-    };
+    const stepMs = this.enemyStepMs(kind);
+    return { kind, x, y, dx: 0, dy: 0, stepMs, hopMs: stepMs };
   }
 
   /** Enemy mix ramps with level: wanderers always; chasers from 2; skitters from 4. */
@@ -538,6 +531,11 @@ export class ShortFuseEngine {
     return ENEMY_SPEED[kind] * Math.min(1.6, 1 + (this.level - 1) * 0.04);
   }
 
+  /** Cells/second → ms-per-hop for the discrete enemy step. */
+  private enemyStepMs(kind: EnemyKind): number {
+    return 1000 / this.enemySpeed(kind);
+  }
+
   /** Held movement direction (one axis at a time — the input hook resolves
    *  precedence before calling this). */
   setMove(dx: -1 | 0 | 1, dy: -1 | 0 | 1) {
@@ -550,8 +548,8 @@ export class ShortFuseEngine {
    *  pinned to 1 while a `shortRange` debuff is active, regardless of the
    *  player's own upgraded range. */
   placeBomb() {
-    const x = Math.round(this.player.x);
-    const y = Math.round(this.player.y);
+    const x = this.player.x;
+    const y = this.player.y;
     if (this.bombs.some((b) => b.x === x && b.y === y)) return;
     if (this.bombs.length >= this.player.maxBombs) return;
     const range =
@@ -573,83 +571,58 @@ export class ShortFuseEngine {
     return this.bombs.some((b) => b.x === cx && b.y === cy && !b.walkable);
   }
 
-  /** Move the player along the held axis with lane-centering + corner assist. */
-  private stepPlayer(dtS: number) {
-    const speedMul = this.player.debuff?.kind === "slow" ? 0.6 : 1;
-    const speed =
-      Math.min(
-        PLAYER_SPEED_CAP,
-        PLAYER_SPEED_BASE + this.player.speedLevel * PLAYER_SPEED_STEP
-      ) * speedMul;
-    const dist = speed * dtS;
-    const p = this.player;
+  /** ms between player hops: the base minus the speed-powerup ramp, floored,
+   *  then stretched ×{@link PLAYER_SLOW_MUL} while a `slow` skull debuff is
+   *  active (the debuff widens the interval rather than fighting the floor). */
+  private playerStepMs(): number {
+    const base = Math.max(
+      PLAYER_STEP_FLOOR_MS,
+      PLAYER_STEP_MS - PLAYER_STEP_ACCEL_MS * this.player.speedLevel
+    );
+    return this.player.debuff?.kind === "slow" ? base * PLAYER_SLOW_MUL : base;
+  }
+
+  /** Discrete cell-hop movement (owner retune, replacing the old smooth
+   *  glide): a held direction hops the player exactly one cell every
+   *  {@link playerStepMs}. The FIRST hop after a direction goes from
+   *  none→held fires immediately (`playerMoveHeld` gates this — no waiting a
+   *  full interval before the very first step registers); every hop after
+   *  that is gated by the `playerHopMs` countdown. A direction CHANGE while
+   *  already held does NOT reset the countdown or fire early — it only
+   *  changes which way the next scheduled hop goes (we read `moveX`/`moveY`
+   *  fresh at the moment the hop fires, never a direction cached earlier).
+   *  The `while` catch-up guards a stalled-tab dt spike; in practice
+   *  `DT_CLAMP_MS` (50) is always well under the step floor (110) so at most
+   *  one hop ever fires per call. */
+  private stepPlayer(dt: number) {
     const dx = this.moveX;
     const dy = this.moveX !== 0 ? 0 : this.moveY; // one axis; X wins ties
-    if (dx === 0 && dy === 0) return;
-
-    const axis: "x" | "y" = dx !== 0 ? "x" : "y";
-    const dir = axis === "x" ? dx : dy;
-
-    // 1. decide blockage FIRST (before any perpendicular motion), so
-    //    lane-centering never competes with the corner assist on a blocked
-    //    frame — they'd cancel each other out and freeze the player.
-    const perp = axis === "x" ? p.y : p.x;
-    const lane = Math.round(perp);
-    const fwd = axis === "x" ? p.x : p.y;
-    const next = fwd + dir * dist;
-    // leading edge enters the next cell once it crosses that cell's near face.
-    const targetCell = Math.round(fwd) + dir;
-    const enters =
-      dir > 0
-        ? next + PLAYER_RADIUS > targetCell - 0.5
-        : next - PLAYER_RADIUS < targetCell + 0.5;
-    const blocked =
-      enters &&
-      (axis === "x"
-        ? this.solidForPlayer(targetCell, lane)
-        : this.solidForPlayer(lane, targetCell));
-
-    // 2. unblocked frame → normal path: lane-center + advance.
-    if (!blocked) {
-      if (axis === "x") {
-        p.y = approach(p.y, lane, dist);
-        p.x = next;
-      } else {
-        p.x = approach(p.x, lane, dist);
-        p.y = next;
-      }
+    if (dx === 0 && dy === 0) {
+      this.playerMoveHeld = false;
       return;
     }
-
-    // 3. blocked frame → clamp flush to the wall face…
-    const face = targetCell - dir * 0.5;
-    const limit = face - dir * PLAYER_RADIUS;
-    const clamped = dir > 0 ? Math.min(next, limit) : Math.max(next, limit);
-    if (axis === "x") p.x = clamped;
-    else p.y = clamped;
-
-    // 4. …then corner assist is the ONLY perpendicular motion this frame: if
-    //    drifted toward an open neighboring lane, slide that way. Once perp
-    //    crosses the half-cell mark the lane flips and step 2 takes over.
-    const off = perp - lane;
-    const side = off > 0 ? 1 : -1;
-    if (Math.abs(off) > 0.01 && Math.abs(off) <= ASSIST) {
-      const nLane = lane + side;
-      const open =
-        axis === "x"
-          ? !this.solidForPlayer(targetCell, nLane)
-          : !this.solidForPlayer(nLane, targetCell);
-      if (open) {
-        if (axis === "x") p.y = approach(p.y, nLane, dist);
-        else p.x = approach(p.x, nLane, dist);
-        return;
-      }
+    if (!this.playerMoveHeld) {
+      this.playerMoveHeld = true;
+      this.playerHopMs = this.playerStepMs();
+      this.hopPlayer(dx, dy);
+      return;
     }
+    this.playerHopMs -= dt;
+    while (this.playerHopMs <= 0) {
+      this.hopPlayer(dx, dy);
+      this.playerHopMs += this.playerStepMs();
+    }
+  }
 
-    // 5. blocked without assist (centered, or diagonal closed) → plain
-    //    lane-centering keeps the body flush-aligned; nothing competes.
-    if (axis === "x") p.y = approach(p.y, lane, dist);
-    else p.x = approach(p.x, lane, dist);
+  /** Hop the player exactly one cell toward (dx,dy); a no-op if the target
+   *  cell is solid — no corner assist, no partial slide, a clean reject. */
+  private hopPlayer(dx: -1 | 0 | 1, dy: -1 | 0 | 1) {
+    const p = this.player;
+    const tx = p.x + dx;
+    const ty = p.y + dy;
+    if (this.solidForPlayer(tx, ty)) return;
+    p.x = tx;
+    p.y = ty;
   }
 
   /** Solid FOR AN ENEMY at cell (cx,cy)? Unlike the player, ALL bombs block
@@ -666,59 +639,55 @@ export class ShortFuseEngine {
   /** Manhattan distance from (x,y) to the player's current cell — the
    *  chaser's greedy pathing metric. */
   private manhattan(x: number, y: number): number {
-    return (
-      Math.abs(x - Math.round(this.player.x)) +
-      Math.abs(y - Math.round(this.player.y))
-    );
+    return Math.abs(x - this.player.x) + Math.abs(y - this.player.y);
   }
 
-  /** Move one enemy toward its `target` cell; on arrival (position ==
-   *  target, set exactly by `approach`'s clamp) decide the next target from
-   *  the open neighbors: chaser picks the option that greedily minimizes
-   *  manhattan distance to the player; wanderer/skitter continue straight
-   *  unless a per-kind turnChance roll fires or the straight lane is
-   *  blocked, in which case a random open option is picked. A dead end (no
-   *  open neighbor) parks the enemy in place — it re-decides next frame in
-   *  case a blast opened a lane. Moves one axis at a time by construction
-   *  (only one of dx/dy is ever nonzero), so enemies can't cut corners. */
-  private stepEnemy(en: Enemy, dtS: number) {
-    if (en.x === en.targetX && en.y === en.targetY) {
-      const cx = en.targetX;
-      const cy = en.targetY;
+  /** Discrete cell-hop enemy movement: decide-then-move happens in ONE step,
+   *  gated by the enemy's own `hopMs` countdown (decision logic that used to
+   *  run "on arrival at a cell center" now runs at each hop). Chaser picks
+   *  the open neighbor that greedily minimizes manhattan distance to the
+   *  player; wanderer/skitter continue straight unless a per-kind
+   *  `turnChance` roll fires or the straight lane is blocked, in which case
+   *  a random open option is picked. A dead end (no open neighbor) parks the
+   *  enemy in place for one more interval — it re-decides next hop in case a
+   *  blast opened a lane. Moves one axis at a time by construction (only one
+   *  of dx/dy is ever nonzero), so enemies can't cut corners. The `while`
+   *  catch-up mirrors {@link stepPlayer}'s stalled-tab guard. */
+  private stepEnemy(en: Enemy, dt: number) {
+    en.hopMs -= dt;
+    while (en.hopMs <= 0) {
+      en.hopMs += en.stepMs;
       const options = DIRECTIONS.filter(
-        ([dx, dy]) => !this.solidForEnemy(cx + dx, cy + dy)
+        ([dx, dy]) => !this.solidForEnemy(en.x + dx, en.y + dy)
       );
       if (options.length === 0) {
         en.dx = 0;
         en.dy = 0;
-      } else {
-        let pick: readonly [-1 | 0 | 1, -1 | 0 | 1];
-        if (en.kind === "chaser") {
-          pick = options.reduce((best, o) =>
-            this.manhattan(cx + o[0], cy + o[1]) <
-            this.manhattan(cx + best[0], cy + best[1])
-              ? o
-              : best
-          );
-        } else {
-          const straight = options.find(
-            ([dx, dy]) => dx === en.dx && dy === en.dy
-          );
-          const turnChance = en.kind === "skitter" ? 0.4 : 0.15;
-          pick =
-            straight && this.rng() >= turnChance
-              ? straight
-              : options[(this.rng() * options.length) | 0];
-        }
-        en.dx = pick[0];
-        en.dy = pick[1];
-        en.targetX = cx + pick[0];
-        en.targetY = cy + pick[1];
+        continue; // dead end — wait out this interval, re-decide next hop
       }
+      let pick: readonly [-1 | 0 | 1, -1 | 0 | 1];
+      if (en.kind === "chaser") {
+        pick = options.reduce((best, o) =>
+          this.manhattan(en.x + o[0], en.y + o[1]) <
+          this.manhattan(en.x + best[0], en.y + best[1])
+            ? o
+            : best
+        );
+      } else {
+        const straight = options.find(
+          ([dx, dy]) => dx === en.dx && dy === en.dy
+        );
+        const turnChance = en.kind === "skitter" ? 0.4 : 0.15;
+        pick =
+          straight && this.rng() >= turnChance
+            ? straight
+            : options[(this.rng() * options.length) | 0];
+      }
+      en.dx = pick[0];
+      en.dy = pick[1];
+      en.x += pick[0];
+      en.y += pick[1];
     }
-    const dist = en.speed * dtS;
-    en.x = approach(en.x, en.targetX, dist);
-    en.y = approach(en.y, en.targetY, dist);
   }
 
   /** Lose a life; game over at 0 (caller short-circuits the frame),
@@ -741,7 +710,8 @@ export class ShortFuseEngine {
     this.generateLevel();
   }
 
-  /** Solidify bombs the player has walked off, then tick fuses and detonate
+  /** Solidify bombs the player has walked off (cell-exact — the player's
+   *  cell simply no longer matches the bomb's), then tick fuses and detonate
    *  any that reach zero. Iterates a snapshot of `this.bombs` because
    *  `detonate` mutates the live array (chain reactions remove bombs
    *  mid-loop) — a bomb already exploded via chaining is skipped rather
@@ -750,10 +720,7 @@ export class ShortFuseEngine {
     const p = this.player;
     for (const b of this.bombs) {
       if (!b.walkable) continue;
-      const overlap =
-        Math.abs(p.x - b.x) < 0.5 + PLAYER_RADIUS &&
-        Math.abs(p.y - b.y) < 0.5 + PLAYER_RADIUS;
-      if (!overlap) b.walkable = false;
+      if (p.x !== b.x || p.y !== b.y) b.walkable = false;
     }
     for (const b of [...this.bombs]) {
       if (!this.bombs.includes(b)) continue; // already gone via chaining
@@ -834,7 +801,7 @@ export class ShortFuseEngine {
    *  The three positive kinds score `SCORE_PICKUP` and increment a capped
    *  stat; `skull` is a trap — no score, sets a timed debuff instead. */
   private applyPickup() {
-    const idx = Math.round(this.player.y) * GRID_W + Math.round(this.player.x);
+    const idx = this.player.y * GRID_W + this.player.x;
     const type = this.powerups.get(idx);
     if (!type) return;
     this.powerups.delete(idx);
@@ -869,7 +836,6 @@ export class ShortFuseEngine {
   update(dtMs: number): UpdateResult {
     if (this.dead) return this.lastResult!;
     const dt = Math.min(dtMs, DT_CLAMP_MS);
-    const dtS = dt / 1000;
 
     this.timeLeftMs = Math.max(0, this.timeLeftMs - dt);
     if (this.timeLeftMs <= 0 && this.killPlayer()) return this.finish(true);
@@ -881,35 +847,36 @@ export class ShortFuseEngine {
 
     this.stepBombs(dt);
     this.stepBlasts(dt);
-    this.stepPlayer(dtS);
+    this.stepPlayer(dt);
     this.applyPickup();
 
-    for (const en of this.enemies) this.stepEnemy(en, dtS);
+    for (const en of this.enemies) this.stepEnemy(en, dt);
 
     const blastCells = new Set<number>();
     for (const b of this.blasts) for (const c of b.cells) blastCells.add(c);
 
     this.enemies = this.enemies.filter((en) => {
-      const idx = Math.round(en.y) * GRID_W + Math.round(en.x);
+      const idx = en.y * GRID_W + en.x;
       if (!blastCells.has(idx)) return true;
       this.score += SCORE_KILL[en.kind];
       return false;
     });
 
+    // Cell-exact: contact death and the exit both key off an EQUAL cell, not
+    // a proximity radius — the discrete grid makes "same cell" the only
+    // meaningful notion of collision (see the retune's movement rewrite).
     const p = this.player;
-    const playerIdx = Math.round(p.y) * GRID_W + Math.round(p.x);
+    const playerIdx = p.y * GRID_W + p.x;
     const playerDied =
       blastCells.has(playerIdx) ||
-      this.enemies.some(
-        (en) => Math.abs(en.x - p.x) < 0.55 && Math.abs(en.y - p.y) < 0.55
-      );
+      this.enemies.some((en) => en.x === p.x && en.y === p.y);
     if (playerDied) return this.finish(this.killPlayer());
 
     if (
       this.exitRevealed &&
       this.enemies.length === 0 &&
-      Math.abs(p.x - (this.exitIndex % GRID_W)) < 0.3 &&
-      Math.abs(p.y - ((this.exitIndex / GRID_W) | 0)) < 0.3
+      p.x === this.exitIndex % GRID_W &&
+      p.y === ((this.exitIndex / GRID_W) | 0)
     ) {
       this.advanceLevel();
     }

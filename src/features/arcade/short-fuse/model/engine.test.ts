@@ -7,7 +7,7 @@ import {
   GRID_W,
   INITIAL_LIVES,
   LEVEL_TIME_MS,
-  PLAYER_RADIUS,
+  PLAYER_STEP_MS,
   SCORE_KILL,
   SCORE_LEVEL_CLEAR,
   SCORE_PICKUP,
@@ -27,6 +27,32 @@ function fresh(rng: () => number = mulberry(42)) {
 /** Drive the engine in 16ms frames (update clamps dt; big single calls are unreal). */
 function advance(e: ShortFuseEngine, ms: number) {
   for (let t = 0; t < ms; t += 16) e.update(16);
+}
+
+/** Mirrors the engine's own hop-accumulator math (an immediate first hop the
+ *  frame a direction goes from none→held, then one hop every `stepMs` while
+ *  it stays held) over the SAME 16ms-frame loop {@link advance} drives, so a
+ *  test can assert an exact expected cell count instead of hand-counting
+ *  frames. Any drift between this and `ShortFuseEngine`'s private
+ *  `stepPlayer` would show up as a test failure, not silently pass. */
+function expectedHops(totalMs: number, stepMs: number, frameMs = 16): number {
+  let hops = 0;
+  let hopMs = 0;
+  let held = false;
+  for (let t = 0; t < totalMs; t += frameMs) {
+    if (!held) {
+      held = true;
+      hopMs = stepMs;
+      hops++;
+      continue;
+    }
+    hopMs -= frameMs;
+    while (hopMs <= 0) {
+      hops++;
+      hopMs += stepMs;
+    }
+  }
+  return hops;
 }
 
 /** Deterministic seeded rng for reproducible generation. */
@@ -111,54 +137,68 @@ describe("ShortFuseEngine — level generation", () => {
   });
 });
 
-describe("ShortFuseEngine — movement", () => {
-  it("moves right at player speed on held input", () => {
+describe("ShortFuseEngine — movement (discrete cell-hop)", () => {
+  it("hops one cell per step interval while held, firing the first hop immediately", () => {
     const e = fresh();
     e.debugClearEnemies();
     // clear a runway so procedurally-generated soft blocks can't interfere.
-    for (let x = 1; x <= 5; x++) e.debugSetTile(x, 0, TILE_EMPTY);
+    for (let x = 1; x <= 8; x++) e.debugSetTile(x, 0, TILE_EMPTY);
     e.setMove(1, 0);
-    advance(e, 500);
+    const totalMs = 1000;
+    advance(e, totalMs);
     const p = e.inspect().player;
-    // 500ms of 16ms frames = 32 update calls; base speed 4.5 cells/s, unobstructed.
-    const expectedDist = 4.5 * ((Math.ceil(500 / 16) * 16) / 1000);
-    expect(p.x).toBeCloseTo(expectedDist, 5);
-    expect(p.y).toBeCloseTo(0, 5);
+    expect(p.x).toBe(expectedHops(totalMs, PLAYER_STEP_MS));
+    expect(p.y).toBe(0);
   });
 
-  it("stops at a soft block edge", () => {
+  it("rejects a hop whose target cell is solid — the player stays put", () => {
     const e = fresh();
     e.debugClearEnemies();
     e.debugSetTile(1, 0, TILE_SOFT);
     e.setMove(1, 0);
-    advance(e, 2000);
+    advance(e, 2000); // many step intervals' worth of held input against the wall
     const p = e.inspect().player;
-    // blocked: player center clamps flush to the wall face (cell 1's left edge minus radius).
-    expect(p.x).toBeCloseTo(0.5 - PLAYER_RADIUS, 5);
+    expect(p.x).toBe(0);
+    expect(p.y).toBe(0);
   });
 
-  it("lane-centers the perpendicular axis while moving", () => {
+  it("applies a direction change on the NEXT scheduled hop, not immediately", () => {
     const e = fresh();
     e.debugClearEnemies();
-    e.debugSetTile(1, 0, TILE_EMPTY);
-    e.debugSetTile(2, 0, TILE_EMPTY);
-    e.debugPlacePlayer(0, 0.3); // off lane center
+    for (let x = 1; x <= 3; x++) e.debugSetTile(x, 0, TILE_EMPTY);
+    e.debugSetTile(1, 1, TILE_EMPTY); // (1,1) is a pillar by default (odd,odd) — clear the down-hop target
+
     e.setMove(1, 0);
-    advance(e, 600);
-    expect(Math.abs(e.inspect().player.y)).toBeLessThan(0.05);
+    e.update(16); // fresh press: immediate hop (0,0) -> (1,0)
+    expect(e.inspect().player.x).toBe(1);
+
+    e.setMove(0, 1); // change direction mid-hold — must NOT hop immediately
+    e.update(16);
+    const mid = e.inspect().player;
+    expect(mid.x).toBe(1);
+    expect(mid.y).toBe(0); // the new direction hasn't taken effect yet
+
+    advance(e, PLAYER_STEP_MS); // let the already-scheduled hop fire
+    const after = e.inspect().player;
+    expect(after.x).toBe(1); // no further rightward hop
+    expect(after.y).toBe(1); // the scheduled hop used the NEW held direction
   });
 
-  it("corner-assists around a blocking cell when nearly aligned with the open lane", () => {
-    const e = fresh();
+  it("a slow debuff stretches the hop interval by the slow multiplier", () => {
+    const e = fresh(() => 0.4); // < 0.5 -> the "slow" debuff kind on pickup
     e.debugClearEnemies();
-    e.debugSetTile(1, 0, TILE_SOFT); // forward cell solid
-    e.debugSetTile(1, 1, TILE_EMPTY); // diagonal near-side lane open
-    e.debugPlacePlayer(0, 0.4); // near lane y=0, drifted toward y=1
+    for (let x = 1; x <= 8; x++) e.debugSetTile(x, 0, TILE_EMPTY);
+    e.debugPlacePowerup(0, 0, "skull");
+    e.update(16); // picks up the skull at spawn, arms the "slow" debuff
+    expect(e.inspect().player.debuff?.kind).toBe("slow");
+
     e.setMove(1, 0);
-    advance(e, 500);
+    const totalMs = 1000;
+    advance(e, totalMs);
     const p = e.inspect().player;
-    // assist redirected motion past the half-cell mark — the lane flipped to y=1.
-    expect(p.y).toBeGreaterThan(0.5);
+    // slow multiplies the interval, not the raw base — mirror it via the
+    // same stretched stepMs the engine computes internally.
+    expect(p.x).toBe(expectedHops(totalMs, PLAYER_STEP_MS * 1.5));
   });
 
   it("ticks the level timer down during update", () => {
@@ -183,19 +223,25 @@ describe("ShortFuseEngine — bombs & blasts", () => {
     expect(b.y).toBe(0);
   });
 
-  it("bomb becomes solid after the player walks off it", () => {
+  it("a bomb becomes solid once the player's cell no longer matches its own", () => {
     const e = fresh();
     e.debugClearEnemies();
     for (let x = 0; x <= 3; x++) e.debugSetTile(x, 0, TILE_EMPTY);
     e.debugPlacePlayer(0, 0);
     e.placeBomb();
+
     e.setMove(1, 0);
-    advance(e, 320); // moves well clear of the bomb's body radius
+    e.update(16); // bombs are stepped BEFORE the player hop each frame, so
+    // this frame still sees the player on the bomb's cell...
+    expect(e.inspect().bombs[0].walkable).toBe(true);
+    expect(e.inspect().player.x).toBe(1); // ...even though the hop already fired
+
+    e.update(16); // next frame: bombs now see the player off the bomb's cell
     expect(e.inspect().bombs[0].walkable).toBe(false);
-    e.setMove(-1, 0);
-    advance(e, 200); // walk back toward (0,0); should be blocked by the solid bomb
-    const p = e.inspect().player;
-    expect(p.x).toBeCloseTo(0.5 + PLAYER_RADIUS, 5);
+
+    e.setMove(-1, 0); // direction change mid-hold, takes effect on schedule
+    advance(e, PLAYER_STEP_MS * 2); // long enough for the reverse hop to fire
+    expect(e.inspect().player.x).toBe(1); // rejected — can't re-enter the now-solid bomb cell
   });
 
   it("detonates after FUSE_MS and the cross stops at pillars", () => {
@@ -401,6 +447,18 @@ describe("ShortFuseEngine — enemies, deaths, exit, game over", () => {
     expect(after.level).toBe(1); // same level, not advanced
   });
 
+  it("enemy contact death requires the SAME cell — a merely-adjacent enemy is not lethal", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    e.debugPlacePlayer(5, 5);
+    e.debugSpawnEnemy("wanderer", 6, 5); // adjacent, one cell away — not co-located
+    const before = e.inspect().lives;
+    const r = e.update(16); // well under the wanderer's own hop interval — it can't have moved yet
+    expect(r.gameOver).toBe(false);
+    expect(e.inspect().lives).toBe(before);
+    expect(e.inspect().enemies.length).toBe(1);
+  });
+
   it("the third death sets gameOver true exactly once, then freezes the engine", () => {
     const e = fresh();
     const results: UpdateResult[] = [];
@@ -467,6 +525,20 @@ describe("ShortFuseEngine — enemies, deaths, exit, game over", () => {
     const timeLeftAfterTick = 12_345 - 16; // the timer ticks once before the exit check
     const bonus = Math.floor(timeLeftAfterTick / 1000) * TIME_BONUS_PER_S;
     expect(s.score).toBe(scoreBefore + SCORE_LEVEL_CLEAR + bonus);
+  });
+
+  it("the exit needs an EXACT cell match — standing one cell away doesn't trigger it", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    const s0 = e.inspect();
+    const ex = s0.exitIndex % GRID_W;
+    const ey = (s0.exitIndex / GRID_W) | 0;
+    e.debugRevealExit();
+    const nx = ex > 0 ? ex - 1 : ex + 1; // adjacent cell, not the exit cell itself
+    e.debugPlacePlayer(nx, ey);
+    const levelBefore = e.inspect().level;
+    e.update(16);
+    expect(e.inspect().level).toBe(levelBefore);
   });
 });
 

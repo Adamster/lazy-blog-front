@@ -143,7 +143,8 @@ const INITIAL_STATE: ShortFuseGameState = {
  * the hook tracks the live set of pressed movement keys and, every frame,
  * pushes the most-recently-pressed still-held direction into
  * {@link ShortFuseEngine.setMove} (merged with gamepad D-pad/axis HELD state
- * when the keyboard is idle) — the engine integrates continuous motion off it.
+ * when the keyboard is idle) — the engine hops the player one cell per its
+ * own step interval off it (discrete cell-hop movement, not a tween).
  *
  * Data-layer split: the engine owns the LIVE run + the localStorage
  * sparkline; the board, `best` and `rank` are server-truth, fed in by the
