@@ -116,32 +116,250 @@ interface PlayerState {
   debuff: { kind: "slow" | "shortRange"; ttlMs: number } | null;
 }
 
-/** Theme-native draw colours for the canvas renderer (Task 6), resolved from
- *  the live `--m-*` tokens the same way {@link SnakeClassicPalette} is — kept
- *  here as a placeholder shape so downstream tasks have a stable name to
- *  extend/import; no consumer wires this yet. */
+// ---------- palette ----------
+//
+// THEME-NATIVE (the Tetris/snake-classic/stay-awake pattern): the 2D context
+// can't read CSS vars, so the hook resolves concrete colours from the live
+// `--m-*` tokens and calls {@link ShortFuseEngine.setPalette} on mount + on
+// every theme change (the rAF loop repaints every frame, so the next frame
+// picks it up).
+
 export interface ShortFusePalette {
   /** Field fill ← `--m-bg`. */
   boardBg: string;
-  /** Faint cell grid ← `--m-fg` at a low alpha. */
-  gridLine: string;
-  /** Indestructible pillar tile ← `--m-dim`. */
+  /** Indestructible pillar tile ← `--m-fg` lerped 0.75 toward `--m-bg`
+   *  (quiet solids — read as background structure). */
   pillar: string;
-  /** Destructible soft-block tile ← `--m-line`. */
+  /** Destructible soft-block tile ← `--m-fg` lerped 0.45 toward `--m-bg`
+   *  (breakable reads louder than pillar — it's the thing worth bombing). */
   soft: string;
-  /** Player glyph ← `--m-accent`. */
+  /** Fyze's body ← `--m-fg`. */
   player: string;
-  /** Per-kind enemy glyph colour. */
-  enemy: Record<EnemyKind, string>;
-  /** Armed bomb ← `--m-fg`. */
-  bomb: string;
-  /** Blast/explosion cell ← `--m-error`. */
-  blast: string;
-  /** Revealed exit tile ← `--m-accent`. */
-  exit: string;
-  /** HUD strip text ← `--m-muted`. */
+  /** Belly band / good-powerup / exit / blast core ← `--m-accent`. */
+  accent: string;
+  /** Wick spark / skull-powerup / blast rim / frame / the ONE debuff signal
+   *  ← `--m-error`. */
+  spark: string;
+  /** Faint interior cell grid ← `--m-fg` at a low alpha. */
+  gridLine: string;
+  /** Board-edge frame ← `--m-error`. */
+  frameLine: string;
+  /** HUD timer text ← `--m-fg`. */
   hudText: string;
+  /** HUD level label ← `--m-muted`. */
+  muted: string;
 }
+
+/** Dark-theme reference colours for Fyze — exported for the arcade-hub mark
+ *  (mirrors {@link SnakeClassicEngine}'s `GLYPH_BODY`/`GLYPH_TAIL`); they
+ *  also seed {@link DEFAULT_PALETTE} so the first paint / SSR looks right
+ *  before the hook resolves the live tokens. */
+export const FYZE_BODY = "#dcdcdc";
+export const FYZE_ACCENT = "#cdff48";
+export const FYZE_SPARK = "#ff6b6b";
+
+const DEFAULT_PALETTE: ShortFusePalette = {
+  boardBg: "#181818",
+  pillar: "#494949", // fg(#dcdcdc) lerped 0.75 → bg(#181818)
+  soft: "#848484", // fg(#dcdcdc) lerped 0.45 → bg(#181818)
+  player: FYZE_BODY,
+  accent: FYZE_ACCENT,
+  spark: FYZE_SPARK,
+  gridLine: "rgba(220,220,220,0.05)",
+  frameLine: FYZE_SPARK,
+  hudText: FYZE_BODY,
+  muted: "#9a9a9a",
+};
+
+/** Canvas 2D `font` can't resolve `var(--font-mono)` (same constraint noted
+ *  at `shared/ui/effects/glyph-rain.tsx`) — name the real stack directly.
+ *  Font-family is theme-invariant (unlike colour), so this stays a plain
+ *  constant rather than a palette field. */
+const HUD_FONT = 'ui-monospace, "JetBrains Mono", "Courier New", monospace';
+
+// ---------- sprites ----------
+//
+// Pixel bitmaps, rasterised onto a cached offscreen canvas at 1px/bit and
+// scaled onto the live canvas via `drawImage` (continuous scale — mirrors
+// {@link SnakeClassicEngine}'s `RABBIT_PLAIN`/`getFoodSpriteCanvas`, see
+// {@link ShortFuseEngine.getSprite}). Char → colour is resolved per sprite:
+// "1" = primary body, "2" = accent band, "3" = spark, "0" = background
+// knockout (opaque `boardBg`, e.g. eye sockets), "." = transparent.
+
+/** Fyze — the walking bomb: round body, stub legs, wick + spark ("3"),
+ *  belly band ("2", swaps accent → spark while debuffed — the ONE debuff
+ *  signal), knockout eyes ("0"). */
+export const FYZE_SPRITE: readonly string[] = [
+  "....3....",
+  "....1....",
+  "..11111..",
+  ".1111111.",
+  ".1101011.",
+  ".1111111.",
+  ".2222222.",
+  ".1111111.",
+  "..11111..",
+  "..1...1..",
+];
+
+/** Wanderer — a round blob with stub feet, no wick (calmest silhouette). */
+const ENEMY_WANDERER_SPRITE: readonly string[] = [
+  ".........",
+  "..11111..",
+  ".1111111.",
+  "111010111",
+  "111111111",
+  ".1111111.",
+  "..11111..",
+  "..1...1..",
+];
+
+/** Chaser — a pointed hood (apex top), reads as the "aiming at you" shape. */
+const ENEMY_CHASER_SPRITE: readonly string[] = [
+  "....1....",
+  "...111...",
+  "..11111..",
+  ".1111111.",
+  "111010111",
+  "111111111",
+  "111111111",
+  "..1...1..",
+];
+
+/** Skitter — corner spikes top and bottom, the jitteriest silhouette. */
+const ENEMY_SKITTER_SPRITE: readonly string[] = [
+  "1.......1",
+  ".1.....1.",
+  "..11111..",
+  ".1101011.",
+  ".1111111.",
+  "..11111..",
+  ".1.....1.",
+  "1.......1",
+];
+
+/** Distinct per-kind silhouettes, keyed by {@link EnemyKind}. */
+export const ENEMY_SPRITES: Record<EnemyKind, readonly string[]> = {
+  wanderer: ENEMY_WANDERER_SPRITE,
+  chaser: ENEMY_CHASER_SPRITE,
+  skitter: ENEMY_SKITTER_SPRITE,
+};
+
+/** A planted bomb — a plain round bomb (no belly band/eyes/feet — that's
+ *  what visually distinguishes it from Fyze himself), wick spark ("3")
+ *  blinking on the sim's fuse clock. */
+export const BOMB_SPRITE: readonly string[] = [
+  "....3....",
+  "....1....",
+  "..11111..",
+  ".1111111.",
+  ".1111111.",
+  ".1111111.",
+  ".1111111.",
+  "..11111..",
+];
+
+const POWERUP_BOMB_SPRITE: readonly string[] = [
+  "...3...",
+  "...1...",
+  ".11111.",
+  "1111111",
+  "1111111",
+  ".11111.",
+  ".......",
+];
+
+/** Cross — reads as "blast range" at a glance. */
+const POWERUP_RANGE_SPRITE: readonly string[] = [
+  "...1...",
+  "...1...",
+  "...1...",
+  "1111111",
+  "...1...",
+  "...1...",
+  "...1...",
+];
+
+/** Fast-forward chevrons. */
+const POWERUP_SPEED_SPRITE: readonly string[] = [
+  "1...1..",
+  "11..11.",
+  "111.111",
+  "1111111",
+  "111.111",
+  "11..11.",
+  "1...1..",
+];
+
+/** Skull — the ONE negative drop, drawn in `spark` so it reads as a trap. */
+const POWERUP_SKULL_SPRITE: readonly string[] = [
+  ".11111.",
+  "1111111",
+  "1101101",
+  "1111111",
+  ".10101.",
+  "..111..",
+  ".......",
+];
+
+/** 7×7 pickup icons, keyed by {@link PowerupType}. */
+export const POWERUP_SPRITES: Record<PowerupType, readonly string[]> = {
+  bomb: POWERUP_BOMB_SPRITE,
+  range: POWERUP_RANGE_SPRITE,
+  speed: POWERUP_SPEED_SPRITE,
+  skull: POWERUP_SKULL_SPRITE,
+};
+
+/** Door outline — the exit before every enemy on the level is cleared. */
+export const EXIT_CLOSED_SPRITE: readonly string[] = [
+  ".11111.",
+  "1.....1",
+  "1.....1",
+  "1.....1",
+  "1.....1",
+  "1.....1",
+  "1.....1",
+  "1.....1",
+  "1111111",
+];
+
+/** Filled doorway — the exit once the level's enemies are all down, inviting
+ *  the player through. */
+export const EXIT_OPEN_SPRITE: readonly string[] = [
+  ".11111.",
+  "1111111",
+  "1111111",
+  "1111111",
+  "1111111",
+  "1111111",
+  "1111111",
+  "1111111",
+  "1111111",
+];
+
+/** Sprite bounding-box fill (fraction of a cell) — one knob per figure kind,
+ *  mirroring {@link SnakeClassicEngine}'s `FOOD_FILL`. */
+const FYZE_FILL = 0.82;
+const ENEMY_FILL = 0.78;
+const BOMB_FILL = 0.7;
+const POWERUP_FILL = 0.6;
+const EXIT_FILL = 0.88;
+/** Pillar/soft solid-fill tiles (a `drawSquare`, not a sprite) — leaves a
+ *  hairline gap so adjacent blocks still read as distinct cells. */
+const TILE_FILL = 0.9;
+
+/** Bomb wick-spark blink period, ticked off the bomb's OWN `fuseMs` (sim
+ *  time), never `Date.now()` — deterministic and immune to tab throttling. */
+const BOMB_BLINK_MS = 250;
+/** Blast fill: full for the opening stretch, then shrinks toward the inner
+ *  knockout's fill over the last stretch of its `ttlMs` (fades out instead
+ *  of popping). */
+const BLAST_FILL_FULL = 0.86;
+const BLAST_FILL_MIN = 0.4;
+const BLAST_INNER_FILL = 0.4;
+const BLAST_SHRINK_MS = 150;
+/** HUD timer flips to `spark` under this many ms left. */
+const HUD_LOW_TIME_MS = 30_000;
 
 export interface UpdateResult {
   gameOver: boolean;
@@ -169,10 +387,11 @@ export interface EngineSnapshot {
 
 /**
  * Headless Short Fuse (Bomberman-like) engine — grid generation, player/enemy
- * state, bombs/blasts, scoring; no React. `rng` is injectable so tests get
- * deterministic level generation. Movement/bombs/enemies land in Tasks 3–5;
- * this task ships constants, level generation, reset/inspect, and the
- * `debug*` test hooks.
+ * state, bombs/blasts, scoring, AND the canvas draw layer; no React. `rng` is
+ * injectable so tests get deterministic level generation. The constructor
+ * calls {@link reset} (the "constructible = drawable" contract this arcade
+ * family settled on — `drawGame` must never see an empty grid, even before
+ * the hook's first explicit `reset()`/`start()`).
  */
 export class ShortFuseEngine {
   private grid: Tile[] = [];
@@ -194,7 +413,22 @@ export class ShortFuseEngine {
   private dead = false;
   private lastResult: UpdateResult | null = null;
 
-  constructor(private rng: () => number = Math.random) {}
+  /** Live theme palette; starts on the dark defaults until the hook resolves
+   *  the ambient `--m-*` tokens (see {@link setPalette}). */
+  private palette: ShortFusePalette = DEFAULT_PALETTE;
+  /** Set by the hook from `prefersReducedMotion()`; the engine only reads it
+   *  (no `matchMedia` in here — no React/DOM assumptions in the sim). */
+  private reducedMotion = false;
+  /** Offscreen sprite bitmaps, keyed by a small id (e.g. `"fyze-debuff"`,
+   *  `"enemy-chaser"`) — cleared whole on every {@link setPalette} so a
+   *  theme flip can't serve a stale-coloured bitmap. Caches `null` too (the
+   *  "no 2D canvas context available" case) so a jsdom test environment
+   *  doesn't retry `getContext` — and warn — every frame. */
+  private spriteCache = new Map<string, HTMLCanvasElement | null>();
+
+  constructor(private rng: () => number = Math.random) {
+    this.reset();
+  }
 
   private basePlayer(): PlayerState {
     return { x: 0, y: 0, maxBombs: 1, range: 1, speedLevel: 0, debuff: null };
@@ -722,6 +956,404 @@ export class ShortFuseEngine {
       lives: this.lives,
       timeLeftMs: this.timeLeftMs,
     };
+  }
+
+  // ---------- canvas draw ----------
+  //
+  // DPR-aware crisp rendering: the hook sizes the backing store = CSS size ×
+  // dpr and pre-scales the ctx, so we reason in CSS px; sprite/grid geometry
+  // is computed in device px and converted back (÷dpr) so every bit lands on
+  // a whole device pixel. Canvas grid = GRID_W × CANVAS_ROWS: row 0 is the
+  // HUD strip, arena rows 1..GRID_H live below it — every arena draw call
+  // routes its row through {@link arenaY}.
+
+  /** Swap the draw palette — the hook calls this on mount AND on every theme
+   *  change; drops the sprite cache so no stale-coloured bitmap survives. */
+  setPalette(palette: ShortFusePalette) {
+    this.palette = palette;
+    this.spriteCache.clear();
+  }
+
+  /** The hook resolves `prefersReducedMotion()` and pushes the flag in; the
+   *  engine just reads it (no `matchMedia` here — the sim stays DOM-free). */
+  setReducedMotion(flag: boolean) {
+    this.reducedMotion = flag;
+  }
+
+  /** Arena row → canvas row (offsets past the HUD strip). */
+  private arenaY(gy: number): number {
+    return gy + HUD_ROWS;
+  }
+
+  /**
+   * Offscreen 1px-per-bit render of a multi-colour pixel-map, cached by
+   * `id`. Scaled onto the live canvas via `drawImage` (continuous scale —
+   * the same reasoning as {@link SnakeClassicEngine}'s food sprite: a manual
+   * per-bit `fillRect` loop needs an INTEGER device-pixel block size, which
+   * steps the on-screen size in coarse jumps as that integer crosses a
+   * threshold; `drawImage` scales continuously). Returns `null` when the
+   * runtime has no 2D canvas context (e.g. jsdom without the optional
+   * `canvas` package in tests) — callers skip the paint rather than throw.
+   */
+  private getSprite(
+    id: string,
+    map: readonly string[],
+    colors: Partial<Record<"0" | "1" | "2" | "3", string>>
+  ): HTMLCanvasElement | null {
+    const cached = this.spriteCache.get(id);
+    if (cached !== undefined) return cached;
+    const sw = map[0].length;
+    const sh = map.length;
+    const off = document.createElement("canvas");
+    off.width = sw;
+    off.height = sh;
+    const octx = off.getContext("2d");
+    if (!octx) {
+      this.spriteCache.set(id, null);
+      return null;
+    }
+    for (let y = 0; y < sh; y++) {
+      const row = map[y];
+      for (let x = 0; x < sw; x++) {
+        const color = colors[row[x] as "0" | "1" | "2" | "3"];
+        if (!color) continue;
+        octx.fillStyle = color;
+        octx.fillRect(x, y, 1, 1);
+      }
+    }
+    this.spriteCache.set(id, off);
+    return off;
+  }
+
+  /** Paint a cached sprite (see {@link getSprite}) centred in cell (`atX`,
+   *  `atY`), scaled so its bounding box fills `fill` fraction of the cell.
+   *  A cache miss (no 2D context) is a silent no-op. */
+  private paintSprite(
+    ctx: CanvasRenderingContext2D,
+    cell: number,
+    dpr: number,
+    atX: number,
+    atY: number,
+    id: string,
+    map: readonly string[],
+    colors: Partial<Record<"0" | "1" | "2" | "3", string>>,
+    fill: number
+  ) {
+    const sprite = this.getSprite(id, map, colors);
+    if (!sprite) return;
+    const sw = sprite.width;
+    const sh = sprite.height;
+    const cellDev = cell * dpr;
+    const boxDev = cellDev * fill;
+    const scale = boxDev / Math.max(sw, sh);
+    const wDev = sw * scale;
+    const hDev = sh * scale;
+    const leftDev = atX * cellDev + (cellDev - wDev) / 2;
+    const topDev = atY * cellDev + (cellDev - hDev) / 2;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(sprite, leftDev / dpr, topDev / dpr, wDev / dpr, hDev / dpr);
+    ctx.imageSmoothingEnabled = true;
+  }
+
+  /**
+   * Paint one solid square centred in cell (`atX`, `atY`), snapped to the
+   * device-pixel grid so the fill stays crisp (no blur) — used for the
+   * plain-colour pillar/soft tiles and the blast cross (mirrors
+   * {@link SnakeClassicEngine.drawSquare}). `fill` is the square's side as a
+   * fraction of the cell; floored to ≥1 device px so it never rounds away.
+   */
+  private drawSquare(
+    ctx: CanvasRenderingContext2D,
+    cell: number,
+    dpr: number,
+    atX: number,
+    atY: number,
+    color: string,
+    fill: number
+  ) {
+    const cellDev = cell * dpr;
+    const sizeDev = Math.max(1, Math.round(fill * cellDev));
+    const leftDev = Math.round(atX * cellDev + (cellDev - sizeDev) / 2);
+    const topDev = Math.round(atY * cellDev + (cellDev - sizeDev) / 2);
+    ctx.fillStyle = color;
+    ctx.fillRect(leftDev / dpr, topDev / dpr, sizeDev / dpr, sizeDev / dpr);
+  }
+
+  /** Faint interior cell grid PLUS the one HUD/arena separator line (both
+   *  are the same 1px `gridLine` rule — the separator is just the arena's
+   *  top edge, `i = HUD_ROWS`, so one loop draws both). */
+  private drawGrid(ctx: CanvasRenderingContext2D, cssW: number, cssH: number) {
+    const cell = cssW / GRID_W;
+    ctx.strokeStyle = this.palette.gridLine;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = 1; i < GRID_W; i++) {
+      const p = Math.round(i * cell) + 0.5;
+      ctx.moveTo(p, HUD_ROWS * cell);
+      ctx.lineTo(p, cssH);
+    }
+    for (let i = HUD_ROWS; i < CANVAS_ROWS; i++) {
+      const p = Math.round(i * cell) + 0.5;
+      ctx.moveTo(0, p);
+      ctx.lineTo(cssW, p);
+    }
+    ctx.stroke();
+  }
+
+  /** 2px board-edge frame, drawn LAST so it never sits under the HUD text or
+   *  any entity. */
+  private drawFrame(ctx: CanvasRenderingContext2D, cssW: number, cssH: number) {
+    ctx.strokeStyle = this.palette.frameLine;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, cssW - 2, cssH - 2);
+  }
+
+  private drawExit(ctx: CanvasRenderingContext2D, cell: number, dpr: number) {
+    const x = this.exitIndex % GRID_W;
+    const y = (this.exitIndex / GRID_W) | 0;
+    // "Open" = every enemy on the level is down — the same condition
+    // `update()` checks before it lets the player walk through.
+    const open = this.enemies.length === 0;
+    this.paintSprite(
+      ctx,
+      cell,
+      dpr,
+      x,
+      this.arenaY(y),
+      open ? "exit-open" : "exit-closed",
+      open ? EXIT_OPEN_SPRITE : EXIT_CLOSED_SPRITE,
+      { "1": this.palette.accent },
+      EXIT_FILL
+    );
+  }
+
+  private drawPowerups(
+    ctx: CanvasRenderingContext2D,
+    cell: number,
+    dpr: number
+  ) {
+    for (const [idx, type] of this.powerups) {
+      const x = idx % GRID_W;
+      const y = (idx / GRID_W) | 0;
+      const colors =
+        type === "skull"
+          ? { "1": this.palette.spark, "0": this.palette.boardBg }
+          : { "1": this.palette.accent };
+      this.paintSprite(
+        ctx,
+        cell,
+        dpr,
+        x,
+        this.arenaY(y),
+        `powerup-${type}`,
+        POWERUP_SPRITES[type],
+        colors,
+        POWERUP_FILL
+      );
+    }
+  }
+
+  /** Solid-fill tiles for one {@link Tile} kind — `TILE_SOFT` and
+   *  `TILE_PILLAR` are drawn in two separate passes (soft first) so soft
+   *  blocks always paint under/over consistently with the brief's draw
+   *  order; there is no adjacency case where the two overlap. */
+  private drawTiles(
+    ctx: CanvasRenderingContext2D,
+    cell: number,
+    dpr: number,
+    kind: Tile,
+    color: string
+  ) {
+    for (let i = 0; i < this.grid.length; i++) {
+      if (this.grid[i] !== kind) continue;
+      const x = i % GRID_W;
+      const y = (i / GRID_W) | 0;
+      this.drawSquare(ctx, cell, dpr, x, this.arenaY(y), color, TILE_FILL);
+    }
+  }
+
+  private drawBomb(
+    ctx: CanvasRenderingContext2D,
+    cell: number,
+    dpr: number,
+    b: Bomb
+  ) {
+    // Blink derived from the bomb's OWN sim-time fuse, never wall clock —
+    // deterministic and immune to a throttled/background tab.
+    const elapsed = FUSE_MS - b.fuseMs;
+    const sparkOn =
+      this.reducedMotion || Math.floor(elapsed / BOMB_BLINK_MS) % 2 === 0;
+    const colors: Partial<Record<"0" | "1" | "2" | "3", string>> = {
+      "1": this.palette.player,
+    };
+    if (sparkOn) colors["3"] = this.palette.spark;
+    this.paintSprite(
+      ctx,
+      cell,
+      dpr,
+      b.x,
+      this.arenaY(b.y),
+      sparkOn ? "bomb-on" : "bomb-off",
+      BOMB_SPRITE,
+      colors,
+      BOMB_FILL
+    );
+  }
+
+  /** Hollow-cross blast cell: an `accent` fill with a smaller `boardBg`
+   *  knockout on top. The outer fill is full for the opening stretch, then
+   *  shrinks toward the knockout's own fill over the closing stretch (the
+   *  cross visually "closes up" as the blast dies) — a static single fill
+   *  under {@link reducedMotion}. */
+  private drawBlast(
+    ctx: CanvasRenderingContext2D,
+    cell: number,
+    dpr: number,
+    blast: Blast
+  ) {
+    const outerFill = this.reducedMotion
+      ? BLAST_FILL_FULL
+      : blast.ttlMs > BLAST_SHRINK_MS
+        ? BLAST_FILL_FULL
+        : BLAST_FILL_MIN +
+          (BLAST_FILL_FULL - BLAST_FILL_MIN) * (blast.ttlMs / BLAST_SHRINK_MS);
+    for (const idx of blast.cells) {
+      const x = idx % GRID_W;
+      const ay = this.arenaY((idx / GRID_W) | 0);
+      this.drawSquare(ctx, cell, dpr, x, ay, this.palette.accent, outerFill);
+      this.drawSquare(
+        ctx,
+        cell,
+        dpr,
+        x,
+        ay,
+        this.palette.boardBg,
+        BLAST_INNER_FILL
+      );
+    }
+  }
+
+  private drawEnemy(
+    ctx: CanvasRenderingContext2D,
+    cell: number,
+    dpr: number,
+    en: Enemy
+  ) {
+    const body =
+      en.kind === "wanderer"
+        ? this.palette.soft
+        : en.kind === "chaser"
+          ? this.palette.player
+          : this.palette.spark;
+    this.paintSprite(
+      ctx,
+      cell,
+      dpr,
+      en.x,
+      this.arenaY(en.y),
+      `enemy-${en.kind}`,
+      ENEMY_SPRITES[en.kind],
+      { "1": body, "0": this.palette.boardBg },
+      ENEMY_FILL
+    );
+  }
+
+  private drawPlayer(ctx: CanvasRenderingContext2D, cell: number, dpr: number) {
+    const p = this.player;
+    // The belly band is the ONE debuff signal: accent while clean, spark
+    // while a skull debuff is live.
+    const band = p.debuff ? this.palette.spark : this.palette.accent;
+    this.paintSprite(
+      ctx,
+      cell,
+      dpr,
+      p.x,
+      this.arenaY(p.y),
+      p.debuff ? "fyze-debuff" : "fyze-normal",
+      FYZE_SPRITE,
+      {
+        "1": this.palette.player,
+        "2": band,
+        "3": this.palette.spark,
+        "0": this.palette.boardBg,
+      },
+      FYZE_FILL
+    );
+  }
+
+  /** Row 0: lives (left, small spark squares) · `LVL {n}` (centre, muted) ·
+   *  `m:ss` timer (right, hudText — flips to spark under 30s left). */
+  private drawHud(ctx: CanvasRenderingContext2D, cssW: number, cell: number) {
+    const midY = cell / 2;
+    const fontPx = 11 * (cell / 20);
+    ctx.font = `bold ${fontPx}px ${HUD_FONT}`;
+    ctx.textBaseline = "middle";
+
+    const padX = cell * 0.3;
+    const iconSize = cell * 0.34;
+    const iconGap = cell * 0.18;
+    ctx.fillStyle = this.palette.spark;
+    for (let i = 0; i < this.lives; i++) {
+      const x = Math.round(padX + i * (iconSize + iconGap));
+      const y = Math.round(midY - iconSize / 2);
+      ctx.fillRect(x, y, Math.round(iconSize), Math.round(iconSize));
+    }
+
+    ctx.fillStyle = this.palette.muted;
+    ctx.textAlign = "center";
+    ctx.fillText(`LVL ${this.level}`, cssW / 2, midY);
+
+    const totalS = Math.max(0, Math.ceil(this.timeLeftMs / 1000));
+    const m = Math.floor(totalS / 60);
+    const s = totalS % 60;
+    ctx.fillStyle =
+      this.timeLeftMs < HUD_LOW_TIME_MS
+        ? this.palette.spark
+        : this.palette.hudText;
+    ctx.textAlign = "right";
+    ctx.fillText(`${m}:${s.toString().padStart(2, "0")}`, cssW - padX, midY);
+
+    ctx.textAlign = "left"; // don't leak alignment state to any later draw call
+  }
+
+  /** Opaque field + grid + frame, no HUD/entities — the menu/pause overlay
+   *  paints on top (mirrors {@link SnakeClassicEngine.drawIdle}). Also what
+   *  a freshly-constructed engine renders before the hook's first
+   *  `reset()`/`start()` — safe because the constructor already seeded a
+   *  full level (see the class doc). */
+  drawIdle(ctx: CanvasRenderingContext2D, cssW: number, cssH: number) {
+    ctx.fillStyle = this.palette.boardBg;
+    ctx.fillRect(0, 0, cssW, cssH);
+    this.drawGrid(ctx, cssW, cssH);
+    this.drawFrame(ctx, cssW, cssH);
+  }
+
+  /** Draw order: bg → grid → exit (if revealed) → powerups → soft → pillars
+   *  → bombs → blasts → enemies → player → HUD → frame. */
+  drawGame(
+    ctx: CanvasRenderingContext2D,
+    cssW: number,
+    cssH: number,
+    dpr: number
+  ) {
+    const cell = cssW / GRID_W;
+
+    ctx.fillStyle = this.palette.boardBg;
+    ctx.fillRect(0, 0, cssW, cssH);
+    this.drawGrid(ctx, cssW, cssH);
+
+    if (this.exitRevealed) this.drawExit(ctx, cell, dpr);
+    this.drawPowerups(ctx, cell, dpr);
+    this.drawTiles(ctx, cell, dpr, TILE_SOFT, this.palette.soft);
+    this.drawTiles(ctx, cell, dpr, TILE_PILLAR, this.palette.pillar);
+
+    for (const b of this.bombs) this.drawBomb(ctx, cell, dpr, b);
+    for (const blast of this.blasts) this.drawBlast(ctx, cell, dpr, blast);
+    for (const en of this.enemies) this.drawEnemy(ctx, cell, dpr, en);
+    this.drawPlayer(ctx, cell, dpr);
+
+    this.drawHud(ctx, cssW, cell);
+    this.drawFrame(ctx, cssW, cssH);
   }
 
   // ---------- test hooks ----------

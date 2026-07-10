@@ -41,6 +41,17 @@ function mulberry(seed: number) {
   };
 }
 
+/** A ctx stub whose every property/method access resolves to a no-op — the
+ *  stay-awake lesson: enough to prove the draw call graph never throws
+ *  without a real `<canvas>` 2D context. */
+function stubCtx(): CanvasRenderingContext2D {
+  const noop = () => {};
+  return new Proxy(
+    {},
+    { get: () => noop, set: () => true }
+  ) as unknown as CanvasRenderingContext2D;
+}
+
 describe("ShortFuseEngine — level generation", () => {
   it("places pillars at every odd,odd cell and nowhere else", () => {
     const e = fresh();
@@ -247,7 +258,10 @@ describe("ShortFuseEngine — bombs & blasts", () => {
     // Park the player in the corner diagonally opposite the bomb — a blast
     // reaching the spawn would kill + regenerate the level and reset
     // exitRevealed in the same frame (same guard as the sibling bomb tests).
-    e.debugPlacePlayer(bx < GRID_W / 2 ? GRID_W - 1 : 0, ey < GRID_H / 2 ? GRID_H - 1 : 0);
+    e.debugPlacePlayer(
+      bx < GRID_W / 2 ? GRID_W - 1 : 0,
+      ey < GRID_H / 2 ? GRID_H - 1 : 0
+    );
     e.debugPlaceBomb(bx, ey, 1);
     advance(e, FUSE_MS + 16);
     expect(e.inspect().exitRevealed).toBe(true);
@@ -453,5 +467,49 @@ describe("ShortFuseEngine — enemies, deaths, exit, game over", () => {
     const timeLeftAfterTick = 12_345 - 16; // the timer ticks once before the exit check
     const bonus = Math.floor(timeLeftAfterTick / 1000) * TIME_BONUS_PER_S;
     expect(s.score).toBe(scoreBefore + SCORE_LEVEL_CLEAR + bonus);
+  });
+});
+
+describe("ShortFuseEngine — canvas draw", () => {
+  it("draw is safe on a freshly constructed engine (the menu paints before start)", () => {
+    // No explicit reset() — the constructor itself must seed a drawable
+    // level (the "constructible = drawable" contract this arcade family
+    // settled on), so drawGame never sees an empty grid.
+    const e = new ShortFuseEngine(mulberry(1));
+    const ctx = stubCtx();
+    expect(() => e.drawIdle(ctx, 300, 240)).not.toThrow();
+    expect(() => e.drawGame(ctx, 300, 240, 1)).not.toThrow();
+  });
+
+  it("draws every sprite/tile/HUD branch without throwing", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    e.debugSpawnEnemy("wanderer", 12, 8);
+    e.debugSpawnEnemy("chaser", 11, 7);
+    e.debugSpawnEnemy("skitter", 10, 6);
+    e.debugPlacePowerup(0, 0, "skull"); // under the player's spawn cell
+    e.debugPlacePowerup(4, 2, "range");
+    e.debugPlacePowerup(5, 2, "bomb");
+    e.debugPlacePowerup(6, 3, "speed");
+    e.debugPlaceBomb(2, 2);
+    e.debugFuse(2, 2, 0); // detonates on the next update — exercises the blast draw path
+    e.debugPlaceBomb(6, 6);
+    e.debugFuse(6, 6, FUSE_MS - 300); // odd 250ms bucket → spark-off on the next draw
+    e.debugRevealExit();
+    e.update(16); // applies the skull pickup (debuff) AND detonates the first bomb (blast)
+
+    const s = e.inspect();
+    expect(s.player.debuff).not.toBeNull(); // sanity: the debuff sprite branch is actually live
+    expect(s.blasts.length).toBeGreaterThan(0); // sanity: the blast branch is actually live
+
+    const ctx = stubCtx();
+    for (const reduced of [true, false]) {
+      e.setReducedMotion(reduced);
+      expect(() => e.drawGame(ctx, 300, 240, 2)).not.toThrow();
+    }
+
+    // All enemies down → the exit flips to its "open" sprite variant.
+    e.debugClearEnemies();
+    expect(() => e.drawGame(ctx, 300, 240, 2)).not.toThrow();
   });
 });
