@@ -70,6 +70,15 @@ function approach(v: number, target: number, maxDelta: number): number {
   return v;
 }
 
+/** The four axis-aligned step directions — shared by blast-arm traversal
+ *  (`detonate`) and enemy pathing (`stepEnemy`), one source per DRY. */
+const DIRECTIONS: ReadonlyArray<readonly [-1 | 0 | 1, -1 | 0 | 1]> = [
+  [1, 0],
+  [-1, 0],
+  [0, 1],
+  [0, -1],
+];
+
 interface Bomb {
   x: number; // cell coords (int)
   y: number;
@@ -91,6 +100,11 @@ interface Enemy {
   dx: -1 | 0 | 1;
   dy: -1 | 0 | 1;
   speed: number;
+  /** Cell the enemy is walking toward — set on each center-of-cell decision;
+   *  equals the current cell (== `x`/`y`) at a dead end or before the first
+   *  decision. */
+  targetX: number;
+  targetY: number;
 }
 
 interface PlayerState {
@@ -175,6 +189,10 @@ export class ShortFuseEngine {
   private timeLeftMs = LEVEL_TIME_MS;
   private moveX: -1 | 0 | 1 = 0;
   private moveY: -1 | 0 | 1 = 0;
+  /** Set once the last life is lost — `update` then freezes the sim and
+   *  keeps returning `lastResult` instead of re-simulating. */
+  private dead = false;
+  private lastResult: UpdateResult | null = null;
 
   constructor(private rng: () => number = Math.random) {}
 
@@ -187,6 +205,8 @@ export class ShortFuseEngine {
     this.score = 0;
     this.level = 1;
     this.lives = INITIAL_LIVES;
+    this.dead = false;
+    this.lastResult = null;
     this.player = this.basePlayer();
     this.generateLevel();
   }
@@ -253,7 +273,16 @@ export class ShortFuseEngine {
 
   /** One construction site for enemies — generation + the debug spawner. */
   private makeEnemy(kind: EnemyKind, x: number, y: number): Enemy {
-    return { kind, x, y, dx: 0, dy: 0, speed: this.enemySpeed(kind) };
+    return {
+      kind,
+      x,
+      y,
+      dx: 0,
+      dy: 0,
+      speed: this.enemySpeed(kind),
+      targetX: x,
+      targetY: y,
+    };
   }
 
   /** Enemy mix ramps with level: wanderers always; chasers from 2; skitters from 4. */
@@ -387,6 +416,95 @@ export class ShortFuseEngine {
     else p.x = approach(p.x, lane, dist);
   }
 
+  /** Solid FOR AN ENEMY at cell (cx,cy)? Unlike the player, ALL bombs block
+   *  (walkable or not) — enemies never share a bomb's cell. The exit cell,
+   *  once revealed, is plain floor (its tile is TILE_EMPTY by then) and
+   *  needs no special case. */
+  private solidForEnemy(cx: number, cy: number): boolean {
+    if (cx < 0 || cy < 0 || cx >= GRID_W || cy >= GRID_H) return true;
+    const t = this.grid[cy * GRID_W + cx];
+    if (t !== TILE_EMPTY) return true;
+    return this.bombs.some((b) => b.x === cx && b.y === cy);
+  }
+
+  /** Manhattan distance from (x,y) to the player's current cell — the
+   *  chaser's greedy pathing metric. */
+  private manhattan(x: number, y: number): number {
+    return (
+      Math.abs(x - Math.round(this.player.x)) +
+      Math.abs(y - Math.round(this.player.y))
+    );
+  }
+
+  /** Move one enemy toward its `target` cell; on arrival (position ==
+   *  target, set exactly by `approach`'s clamp) decide the next target from
+   *  the open neighbors: chaser picks the option that greedily minimizes
+   *  manhattan distance to the player; wanderer/skitter continue straight
+   *  unless a per-kind turnChance roll fires or the straight lane is
+   *  blocked, in which case a random open option is picked. A dead end (no
+   *  open neighbor) parks the enemy in place — it re-decides next frame in
+   *  case a blast opened a lane. Moves one axis at a time by construction
+   *  (only one of dx/dy is ever nonzero), so enemies can't cut corners. */
+  private stepEnemy(en: Enemy, dtS: number) {
+    if (en.x === en.targetX && en.y === en.targetY) {
+      const cx = en.targetX;
+      const cy = en.targetY;
+      const options = DIRECTIONS.filter(
+        ([dx, dy]) => !this.solidForEnemy(cx + dx, cy + dy)
+      );
+      if (options.length === 0) {
+        en.dx = 0;
+        en.dy = 0;
+      } else {
+        let pick: readonly [-1 | 0 | 1, -1 | 0 | 1];
+        if (en.kind === "chaser") {
+          pick = options.reduce((best, o) =>
+            this.manhattan(cx + o[0], cy + o[1]) <
+            this.manhattan(cx + best[0], cy + best[1])
+              ? o
+              : best
+          );
+        } else {
+          const straight = options.find(
+            ([dx, dy]) => dx === en.dx && dy === en.dy
+          );
+          const turnChance = en.kind === "skitter" ? 0.4 : 0.15;
+          pick =
+            straight && this.rng() >= turnChance
+              ? straight
+              : options[(this.rng() * options.length) | 0];
+        }
+        en.dx = pick[0];
+        en.dy = pick[1];
+        en.targetX = cx + pick[0];
+        en.targetY = cy + pick[1];
+      }
+    }
+    const dist = en.speed * dtS;
+    en.x = approach(en.x, en.targetX, dist);
+    en.y = approach(en.y, en.targetY, dist);
+  }
+
+  /** Lose a life; game over at 0 (caller short-circuits the frame),
+   *  otherwise regenerate the level: same level number, fresh layout. The
+   *  player's collected powerup stats (maxBombs/range/speedLevel/score)
+   *  persist — only position/bombs/blasts/floor-powerups reset. */
+  private killPlayer(): boolean {
+    this.lives -= 1;
+    if (this.lives <= 0) return true;
+    this.generateLevel();
+    return false;
+  }
+
+  /** Clear the level: score the clear bonus + a time-left bonus, bump the
+   *  level counter, then regenerate a fresh (harder) layout. */
+  private advanceLevel() {
+    this.score +=
+      SCORE_LEVEL_CLEAR + Math.floor(this.timeLeftMs / 1000) * TIME_BONUS_PER_S;
+    this.level += 1;
+    this.generateLevel();
+  }
+
   /** Solidify bombs the player has walked off, then tick fuses and detonate
    *  any that reach zero. Iterates a snapshot of `this.bombs` because
    *  `detonate` mutates the live array (chain reactions remove bombs
@@ -420,12 +538,7 @@ export class ShortFuseEngine {
       if (exploded.has(bomb)) continue;
       exploded.add(bomb);
       blastCells.add(bomb.y * GRID_W + bomb.x);
-      for (const [ax, ay] of [
-        [1, 0],
-        [-1, 0],
-        [0, 1],
-        [0, -1],
-      ] as const) {
+      for (const [ax, ay] of DIRECTIONS) {
         for (let i = 1; i <= bomb.range; i++) {
           const cx = bomb.x + ax * i;
           const cy = bomb.y + ay * i;
@@ -512,22 +625,71 @@ export class ShortFuseEngine {
     }
   }
 
-  /** Advance the simulation by `dtMs` — timer, debuff, bombs/blasts,
-   *  movement and pickups this task; enemies and death land in Task 5. */
+  /** Advance the simulation by `dtMs`: timer (expiry costs a life) → debuff
+   *  → bombs → blasts → player movement → pickups → enemy pathing → deaths
+   *  (blast-on-enemy scoring, blast-on-player, enemy contact) → exit check.
+   *  Frozen once `dead`: further calls return the cached final result
+   *  instead of re-simulating. */
   update(dtMs: number): UpdateResult {
+    if (this.dead) return this.lastResult!;
     const dt = Math.min(dtMs, DT_CLAMP_MS);
     const dtS = dt / 1000;
+
     this.timeLeftMs = Math.max(0, this.timeLeftMs - dt);
+    if (this.timeLeftMs <= 0 && this.killPlayer()) return this.finish(true);
+
     if (this.player.debuff) {
       this.player.debuff.ttlMs -= dt;
       if (this.player.debuff.ttlMs <= 0) this.player.debuff = null;
     }
+
     this.stepBombs(dt);
     this.stepBlasts(dt);
     this.stepPlayer(dtS);
     this.applyPickup();
-    // Task 5 adds: enemies, deaths (incl. standing on a live blast), timer death
-    return this.result(false);
+
+    for (const en of this.enemies) this.stepEnemy(en, dtS);
+
+    const blastCells = new Set<number>();
+    for (const b of this.blasts) for (const c of b.cells) blastCells.add(c);
+
+    this.enemies = this.enemies.filter((en) => {
+      const idx = Math.round(en.y) * GRID_W + Math.round(en.x);
+      if (!blastCells.has(idx)) return true;
+      this.score += SCORE_KILL[en.kind];
+      return false;
+    });
+
+    const p = this.player;
+    const playerIdx = Math.round(p.y) * GRID_W + Math.round(p.x);
+    const playerDied =
+      blastCells.has(playerIdx) ||
+      this.enemies.some(
+        (en) => Math.abs(en.x - p.x) < 0.55 && Math.abs(en.y - p.y) < 0.55
+      );
+    if (playerDied) return this.finish(this.killPlayer());
+
+    if (
+      this.exitRevealed &&
+      this.enemies.length === 0 &&
+      Math.abs(p.x - (this.exitIndex % GRID_W)) < 0.3 &&
+      Math.abs(p.y - ((this.exitIndex / GRID_W) | 0)) < 0.3
+    ) {
+      this.advanceLevel();
+    }
+
+    return this.finish(false);
+  }
+
+  /** Build the frame's result; on game over, cache it and flip `dead` so
+   *  subsequent `update` calls stop simulating and just replay it. */
+  private finish(gameOver: boolean): UpdateResult {
+    const r = this.result(gameOver);
+    if (gameOver) {
+      this.dead = true;
+      this.lastResult = r;
+    }
+    return r;
   }
 
   private result(gameOver: boolean): UpdateResult {
@@ -598,5 +760,18 @@ export class ShortFuseEngine {
 
   debugPlacePowerup(x: number, y: number, type: PowerupType) {
     this.powerups.set(y * GRID_W + x, type);
+  }
+
+  /** Pin the level countdown (used to force/avoid timer-expiry death and to
+   *  pin the exit's time bonus in tests). */
+  debugSetTimeLeft(ms: number) {
+    this.timeLeftMs = ms;
+  }
+
+  /** Reveal the exit and clear its tile to floor, bypassing the "destroy the
+   *  soft block that hides it" path. */
+  debugRevealExit() {
+    this.grid[this.exitIndex] = TILE_EMPTY;
+    this.exitRevealed = true;
   }
 }

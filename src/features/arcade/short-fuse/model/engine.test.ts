@@ -1,16 +1,21 @@
 import { describe, expect, it } from "vitest";
+import type { UpdateResult } from "./engine";
 import {
   DEBUFF_MS,
   FUSE_MS,
   GRID_H,
   GRID_W,
   INITIAL_LIVES,
+  LEVEL_TIME_MS,
   PLAYER_RADIUS,
+  SCORE_KILL,
+  SCORE_LEVEL_CLEAR,
   SCORE_PICKUP,
   ShortFuseEngine,
   TILE_EMPTY,
   TILE_PILLAR,
   TILE_SOFT,
+  TIME_BONUS_PER_S,
 } from "./engine";
 
 function fresh(rng: () => number = mulberry(42)) {
@@ -185,6 +190,7 @@ describe("ShortFuseEngine — bombs & blasts", () => {
   it("detonates after FUSE_MS and the cross stops at pillars", () => {
     const e = fresh();
     e.debugClearEnemies();
+    e.debugPlacePlayer(10, 5); // out of the blast's reach (Task 5 adds blast-on-player death)
     for (let x = 0; x <= 4; x++) e.debugSetTile(x, 0, TILE_EMPTY);
     e.debugPlaceBomb(1, 0, 3); // (1,1) is a pillar — the down arm must stop dead
     advance(e, FUSE_MS + 16);
@@ -204,6 +210,7 @@ describe("ShortFuseEngine — bombs & blasts", () => {
   it("destroys the first soft block per arm and stops there", () => {
     const e = fresh();
     e.debugClearEnemies();
+    e.debugPlacePlayer(10, 5); // out of the blast's reach (Task 5 adds blast-on-player death)
     for (let x = 0; x <= 5; x++) e.debugSetTile(x, 0, TILE_EMPTY);
     e.debugSetTile(4, 0, TILE_SOFT);
     e.debugSetTile(5, 0, TILE_SOFT);
@@ -217,6 +224,7 @@ describe("ShortFuseEngine — bombs & blasts", () => {
   it("chains other bombs in the blast", () => {
     const e = fresh();
     e.debugClearEnemies();
+    e.debugPlacePlayer(10, 5); // out of the blast's reach (Task 5 adds blast-on-player death)
     for (let x = 0; x <= 5; x++) e.debugSetTile(x, 0, TILE_EMPTY);
     e.debugPlaceBomb(1, 0, 2);
     e.debugPlaceBomb(3, 0, 2);
@@ -244,6 +252,7 @@ describe("ShortFuseEngine — bombs & blasts", () => {
   it("drops a powerup at DROP_RATE and burns exposed powerups in a later blast", () => {
     const e = fresh(() => 0.0); // forces the drop-rate roll and the skull branch
     e.debugClearEnemies();
+    e.debugPlacePlayer(10, 5); // out of the blast's reach (Task 5 adds blast-on-player death)
     for (let x = 0; x <= 5; x++) e.debugSetTile(x, 0, TILE_EMPTY);
     e.debugSetTile(3, 0, TILE_SOFT);
     e.debugPlaceBomb(1, 0, 2);
@@ -284,5 +293,161 @@ describe("ShortFuseEngine — bombs & blasts", () => {
 
     advance(e, DEBUFF_MS + 16);
     expect(e.inspect().player.debuff).toBeNull();
+  });
+});
+
+describe("ShortFuseEngine — enemies, deaths, exit, game over", () => {
+  it("keeps a wanderer inside a walled room, never on a solid tile", () => {
+    const e = fresh(mulberry(11));
+    e.debugClearEnemies();
+    // 5x5 room: pillar perimeter, empty 3x3 interior — bounds the wander.
+    for (let y = 0; y <= 4; y++) {
+      for (let x = 0; x <= 4; x++) {
+        const wall = x === 0 || x === 4 || y === 0 || y === 4;
+        e.debugSetTile(x, y, wall ? TILE_PILLAR : TILE_EMPTY);
+      }
+    }
+    e.debugSpawnEnemy("wanderer", 2, 2);
+    for (let t = 0; t < 5000; t += 16) {
+      e.update(16);
+      const en = e.inspect().enemies[0];
+      const cx = Math.round(en.x);
+      const cy = Math.round(en.y);
+      expect(cx).toBeGreaterThanOrEqual(1);
+      expect(cx).toBeLessThanOrEqual(3);
+      expect(cy).toBeGreaterThanOrEqual(1);
+      expect(cy).toBeLessThanOrEqual(3);
+      expect(e.inspect().grid[cy * GRID_W + cx]).toBe(TILE_EMPTY);
+    }
+  });
+
+  it("chaser greedily closes manhattan distance to a reachable, stationary player", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    for (let x = 0; x <= 10; x++) e.debugSetTile(x, 0, TILE_EMPTY);
+    e.debugPlacePlayer(10, 0);
+    e.debugSpawnEnemy("chaser", 2, 0);
+    const before = e.inspect().enemies[0];
+    const beforeDist = Math.abs(before.x - 10) + Math.abs(before.y - 0);
+    advance(e, 800);
+    const s = e.inspect();
+    expect(s.enemies.length).toBe(1); // never got close enough to contact-kill the player
+    const after = s.enemies[0];
+    const afterDist = Math.abs(after.x - 10) + Math.abs(after.y - 0);
+    expect(afterDist).toBeLessThan(beforeDist);
+  });
+
+  it("a blast kills an enemy in its cells and scores by kind", () => {
+    for (const kind of ["wanderer", "chaser", "skitter"] as const) {
+      const e = fresh();
+      e.debugClearEnemies();
+      // dead-end box (pillar on all 4 sides) — the enemy can never leave (2,2).
+      e.debugSetTile(2, 2, TILE_EMPTY);
+      e.debugSetTile(1, 2, TILE_PILLAR);
+      e.debugSetTile(3, 2, TILE_PILLAR);
+      e.debugSetTile(2, 1, TILE_PILLAR);
+      e.debugSetTile(2, 3, TILE_PILLAR);
+      e.debugSpawnEnemy(kind, 2, 2);
+      e.debugPlaceBomb(2, 2, 1);
+      advance(e, FUSE_MS + 16);
+      const s = e.inspect();
+      expect(s.enemies.length).toBe(0);
+      expect(s.score).toBe(SCORE_KILL[kind]);
+    }
+  });
+
+  it("enemy contact kills the player: lives drop, level regenerates, powerups/score persist", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    e.debugPlacePlayer(0, 0);
+    e.debugPlacePowerup(0, 0, "bomb");
+    advance(e, 16); // pick up: maxBombs 1 -> 2, score += SCORE_PICKUP
+    const before = e.inspect();
+    expect(before.player.maxBombs).toBe(2);
+    expect(before.score).toBe(SCORE_PICKUP);
+
+    e.debugClearEnemies();
+    e.debugSpawnEnemy("wanderer", 0, 0); // same cell as the player -> contact
+    const r = e.update(16);
+    const after = e.inspect();
+
+    expect(r.gameOver).toBe(false);
+    expect(after.lives).toBe(INITIAL_LIVES - 1);
+    expect(after.score).toBe(SCORE_PICKUP); // score persists across the death
+    expect(after.player.maxBombs).toBe(2); // collected powerup stat persists
+    expect(after.player.x).toBe(0); // position reset by the regen
+    expect(after.player.y).toBe(0);
+    expect(after.bombs.length).toBe(0);
+    expect(after.blasts.length).toBe(0);
+    expect(after.powerups.length).toBe(0); // floor powerups reset
+    expect(after.level).toBe(1); // same level, not advanced
+  });
+
+  it("the third death sets gameOver true exactly once, then freezes the engine", () => {
+    const e = fresh();
+    const results: UpdateResult[] = [];
+    for (let i = 0; i < INITIAL_LIVES; i++) {
+      e.debugClearEnemies();
+      e.debugSpawnEnemy("wanderer", 0, 0); // player is always back at spawn after a regen
+      results.push(e.update(16));
+    }
+    expect(results[0].gameOver).toBe(false);
+    expect(results[1].gameOver).toBe(false);
+    expect(results[2].gameOver).toBe(true);
+    expect(e.inspect().lives).toBe(0);
+
+    // frozen: further updates return the identical cached result, no re-simulation.
+    const r4 = e.update(16);
+    expect(r4).toEqual(results[2]);
+    const r5 = e.update(1000);
+    expect(r5).toEqual(results[2]);
+  });
+
+  it("timer expiry costs a life and regenerates the level", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    e.debugSetTimeLeft(10); // less than one frame's dt
+    const r = e.update(16);
+    expect(r.gameOver).toBe(false);
+    expect(e.inspect().lives).toBe(INITIAL_LIVES - 1);
+    expect(e.inspect().timeLeftMs).toBe(LEVEL_TIME_MS); // fresh level's full timer
+  });
+
+  it("keeps the exit closed while any enemy remains, even revealed with the player on it", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    const s0 = e.inspect();
+    const ex = s0.exitIndex % GRID_W;
+    const ey = (s0.exitIndex / GRID_W) | 0;
+    let fx = GRID_W - 1;
+    const fy = GRID_H - 1;
+    if (fx === ex && fy === ey) fx -= 1; // keep the guard enemy off the exit cell
+    e.debugSpawnEnemy("wanderer", fx, fy); // far away — no contact/blast risk
+    e.debugRevealExit();
+    e.debugPlacePlayer(ex, ey);
+    const scoreBefore = e.inspect().score;
+    e.update(16);
+    const s = e.inspect();
+    expect(s.level).toBe(1);
+    expect(s.score).toBe(scoreBefore);
+  });
+
+  it("opens the exit once enemies are cleared and advances the level on contact", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    const s0 = e.inspect();
+    const ex = s0.exitIndex % GRID_W;
+    const ey = (s0.exitIndex / GRID_W) | 0;
+    e.debugRevealExit();
+    e.debugPlacePlayer(ex, ey);
+    e.debugSetTimeLeft(12_345);
+    const scoreBefore = e.inspect().score;
+    const levelBefore = e.inspect().level;
+    e.update(16);
+    const s = e.inspect();
+    expect(s.level).toBe(levelBefore + 1);
+    const timeLeftAfterTick = 12_345 - 16; // the timer ticks once before the exit check
+    const bonus = Math.floor(timeLeftAfterTick / 1000) * TIME_BONUS_PER_S;
+    expect(s.score).toBe(scoreBefore + SCORE_LEVEL_CLEAR + bonus);
   });
 });
