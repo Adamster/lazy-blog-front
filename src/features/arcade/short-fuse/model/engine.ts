@@ -46,6 +46,30 @@ const ENEMY_SPEED: Record<EnemyKind, number> = {
   skitter: 3.2,
 };
 
+/** Base player speed (cells/second) before speed-powerup levels. */
+const PLAYER_SPEED_BASE = 4.5;
+/** Speed gained per `speed` powerup pickup (cells/second). */
+const PLAYER_SPEED_STEP = 0.5;
+/** Max player speed regardless of stacked powerups (cells/second). */
+const PLAYER_SPEED_CAP = 7;
+/** Player collision half-size (cell units) — square body of side 2×radius. */
+export const PLAYER_RADIUS = 0.38;
+/** Perpendicular-offset window (cell units) within which a blocked forward
+ *  move gets redirected into the open diagonal lane instead of stopping.
+ *  At 0.5 it spans the whole half-lane: any offset toward an open diagonal
+ *  redirects (|off| ≤ 0.5 by construction, so the gate reduces to the
+ *  epsilon + open-diagonal checks — the named const stays for readability). */
+const ASSIST = 0.5;
+/** Per-`update()` dt ceiling (ms) — guards against huge dt after a tab stall. */
+const DT_CLAMP_MS = 50;
+
+/** Ease `v` toward `target`, moving at most `maxDelta`. */
+function approach(v: number, target: number, maxDelta: number): number {
+  if (v < target) return Math.min(target, v + maxDelta);
+  if (v > target) return Math.max(target, v - maxDelta);
+  return v;
+}
+
 interface Bomb {
   x: number; // cell coords (int)
   y: number;
@@ -247,6 +271,126 @@ export class ShortFuseEngine {
   private enemySpeed(kind: EnemyKind): number {
     // +4%/level, capped at +60%
     return ENEMY_SPEED[kind] * Math.min(1.6, 1 + (this.level - 1) * 0.04);
+  }
+
+  /** Held movement direction (one axis at a time — the input hook resolves
+   *  precedence before calling this). */
+  setMove(dx: -1 | 0 | 1, dy: -1 | 0 | 1) {
+    this.moveX = dx;
+    this.moveY = dy;
+  }
+
+  /** Solid FOR THE PLAYER at cell (cx,cy)? Bombs solidify after the player
+   *  leaves their cell (Task 4 sets `walkable` false on exit). */
+  private solidForPlayer(cx: number, cy: number): boolean {
+    if (cx < 0 || cy < 0 || cx >= GRID_W || cy >= GRID_H) return true;
+    const t = this.grid[cy * GRID_W + cx];
+    if (t !== TILE_EMPTY) return true;
+    return this.bombs.some((b) => b.x === cx && b.y === cy && !b.walkable);
+  }
+
+  /** Move the player along the held axis with lane-centering + corner assist. */
+  private stepPlayer(dtS: number) {
+    const speedMul = this.player.debuff?.kind === "slow" ? 0.6 : 1;
+    const speed =
+      Math.min(
+        PLAYER_SPEED_CAP,
+        PLAYER_SPEED_BASE + this.player.speedLevel * PLAYER_SPEED_STEP
+      ) * speedMul;
+    const dist = speed * dtS;
+    const p = this.player;
+    const dx = this.moveX;
+    const dy = this.moveX !== 0 ? 0 : this.moveY; // one axis; X wins ties
+    if (dx === 0 && dy === 0) return;
+
+    const axis: "x" | "y" = dx !== 0 ? "x" : "y";
+    const dir = axis === "x" ? dx : dy;
+
+    // 1. decide blockage FIRST (before any perpendicular motion), so
+    //    lane-centering never competes with the corner assist on a blocked
+    //    frame — they'd cancel each other out and freeze the player.
+    const perp = axis === "x" ? p.y : p.x;
+    const lane = Math.round(perp);
+    const fwd = axis === "x" ? p.x : p.y;
+    const next = fwd + dir * dist;
+    // leading edge enters the next cell once it crosses that cell's near face.
+    const targetCell = Math.round(fwd) + dir;
+    const enters =
+      dir > 0
+        ? next + PLAYER_RADIUS > targetCell - 0.5
+        : next - PLAYER_RADIUS < targetCell + 0.5;
+    const blocked =
+      enters &&
+      (axis === "x"
+        ? this.solidForPlayer(targetCell, lane)
+        : this.solidForPlayer(lane, targetCell));
+
+    // 2. unblocked frame → normal path: lane-center + advance.
+    if (!blocked) {
+      if (axis === "x") {
+        p.y = approach(p.y, lane, dist);
+        p.x = next;
+      } else {
+        p.x = approach(p.x, lane, dist);
+        p.y = next;
+      }
+      return;
+    }
+
+    // 3. blocked frame → clamp flush to the wall face…
+    const face = targetCell - dir * 0.5;
+    const limit = face - dir * PLAYER_RADIUS;
+    const clamped = dir > 0 ? Math.min(next, limit) : Math.max(next, limit);
+    if (axis === "x") p.x = clamped;
+    else p.y = clamped;
+
+    // 4. …then corner assist is the ONLY perpendicular motion this frame: if
+    //    drifted toward an open neighboring lane, slide that way. Once perp
+    //    crosses the half-cell mark the lane flips and step 2 takes over.
+    const off = perp - lane;
+    const side = off > 0 ? 1 : -1;
+    if (Math.abs(off) > 0.01 && Math.abs(off) <= ASSIST) {
+      const nLane = lane + side;
+      const open =
+        axis === "x"
+          ? !this.solidForPlayer(targetCell, nLane)
+          : !this.solidForPlayer(nLane, targetCell);
+      if (open) {
+        if (axis === "x") p.y = approach(p.y, nLane, dist);
+        else p.x = approach(p.x, nLane, dist);
+        return;
+      }
+    }
+
+    // 5. blocked without assist (centered, or diagonal closed) → plain
+    //    lane-centering keeps the body flush-aligned; nothing competes.
+    if (axis === "x") p.y = approach(p.y, lane, dist);
+    else p.x = approach(p.x, lane, dist);
+  }
+
+  /** Advance the simulation by `dtMs` — movement + timer this task; bombs,
+   *  blasts, enemies and death land in Tasks 4–5. */
+  update(dtMs: number): UpdateResult {
+    const dt = Math.min(dtMs, DT_CLAMP_MS);
+    const dtS = dt / 1000;
+    this.timeLeftMs = Math.max(0, this.timeLeftMs - dt);
+    if (this.player.debuff) {
+      this.player.debuff.ttlMs -= dt;
+      if (this.player.debuff.ttlMs <= 0) this.player.debuff = null;
+    }
+    this.stepPlayer(dtS);
+    // Tasks 4–5 add: bombs, blasts, enemies, deaths, exit, timer death
+    return this.result(false);
+  }
+
+  private result(gameOver: boolean): UpdateResult {
+    return {
+      gameOver,
+      score: this.score,
+      level: this.level,
+      lives: this.lives,
+      timeLeftMs: this.timeLeftMs,
+    };
   }
 
   /** Live-state copies for tests/debug — never hand out the internal

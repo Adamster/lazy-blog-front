@@ -3,6 +3,7 @@ import {
   GRID_H,
   GRID_W,
   INITIAL_LIVES,
+  PLAYER_RADIUS,
   ShortFuseEngine,
   TILE_EMPTY,
   TILE_PILLAR,
@@ -13,6 +14,11 @@ function fresh(rng: () => number = mulberry(42)) {
   const e = new ShortFuseEngine(rng);
   e.reset();
   return e;
+}
+
+/** Drive the engine in 16ms frames (update clamps dt; big single calls are unreal). */
+function advance(e: ShortFuseEngine, ms: number) {
+  for (let t = 0; t < ms; t += 16) e.update(16);
 }
 
 /** Deterministic seeded rng for reproducible generation. */
@@ -83,5 +89,64 @@ describe("ShortFuseEngine — level generation", () => {
     a.reset();
     b.reset();
     expect(a.inspect().grid).toEqual(b.inspect().grid);
+  });
+});
+
+describe("ShortFuseEngine — movement", () => {
+  it("moves right at player speed on held input", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    // clear a runway so procedurally-generated soft blocks can't interfere.
+    for (let x = 1; x <= 5; x++) e.debugSetTile(x, 0, TILE_EMPTY);
+    e.setMove(1, 0);
+    advance(e, 500);
+    const p = e.inspect().player;
+    // 500ms of 16ms frames = 32 update calls; base speed 4.5 cells/s, unobstructed.
+    const expectedDist = 4.5 * ((Math.ceil(500 / 16) * 16) / 1000);
+    expect(p.x).toBeCloseTo(expectedDist, 5);
+    expect(p.y).toBeCloseTo(0, 5);
+  });
+
+  it("stops at a soft block edge", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    e.debugSetTile(1, 0, TILE_SOFT);
+    e.setMove(1, 0);
+    advance(e, 2000);
+    const p = e.inspect().player;
+    // blocked: player center clamps flush to the wall face (cell 1's left edge minus radius).
+    expect(p.x).toBeCloseTo(0.5 - PLAYER_RADIUS, 5);
+  });
+
+  it("lane-centers the perpendicular axis while moving", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    e.debugSetTile(1, 0, TILE_EMPTY);
+    e.debugSetTile(2, 0, TILE_EMPTY);
+    e.debugPlacePlayer(0, 0.3); // off lane center
+    e.setMove(1, 0);
+    advance(e, 600);
+    expect(Math.abs(e.inspect().player.y)).toBeLessThan(0.05);
+  });
+
+  it("corner-assists around a blocking cell when nearly aligned with the open lane", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    e.debugSetTile(1, 0, TILE_SOFT); // forward cell solid
+    e.debugSetTile(1, 1, TILE_EMPTY); // diagonal near-side lane open
+    e.debugPlacePlayer(0, 0.4); // near lane y=0, drifted toward y=1
+    e.setMove(1, 0);
+    advance(e, 500);
+    const p = e.inspect().player;
+    // assist redirected motion past the half-cell mark — the lane flipped to y=1.
+    expect(p.y).toBeGreaterThan(0.5);
+  });
+
+  it("ticks the level timer down during update", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    const before = e.inspect().timeLeftMs;
+    advance(e, 500);
+    expect(e.inspect().timeLeftMs).toBeLessThan(before);
   });
 });
