@@ -74,6 +74,7 @@ function KeyInfoChip({
 }) {
   return (
     <div
+      role="img"
       aria-label={ariaLabel}
       className="flex h-9 w-full items-center justify-center border-2 border-[var(--m-dim)] px-4"
     >
