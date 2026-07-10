@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
+  DEBUFF_MS,
+  FUSE_MS,
   GRID_H,
   GRID_W,
   INITIAL_LIVES,
   PLAYER_RADIUS,
+  SCORE_PICKUP,
   ShortFuseEngine,
   TILE_EMPTY,
   TILE_PILLAR,
@@ -148,5 +151,138 @@ describe("ShortFuseEngine — movement", () => {
     const before = e.inspect().timeLeftMs;
     advance(e, 500);
     expect(e.inspect().timeLeftMs).toBeLessThan(before);
+  });
+});
+
+describe("ShortFuseEngine — bombs & blasts", () => {
+  it("plants a bomb at the player's cell, capped by maxBombs", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    e.placeBomb();
+    expect(e.inspect().bombs.length).toBe(1);
+    e.placeBomb(); // rejected: default maxBombs is 1 (also same-cell)
+    expect(e.inspect().bombs.length).toBe(1);
+    const b = e.inspect().bombs[0];
+    expect(b.x).toBe(0);
+    expect(b.y).toBe(0);
+  });
+
+  it("bomb becomes solid after the player walks off it", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    for (let x = 0; x <= 3; x++) e.debugSetTile(x, 0, TILE_EMPTY);
+    e.debugPlacePlayer(0, 0);
+    e.placeBomb();
+    e.setMove(1, 0);
+    advance(e, 320); // moves well clear of the bomb's body radius
+    expect(e.inspect().bombs[0].walkable).toBe(false);
+    e.setMove(-1, 0);
+    advance(e, 200); // walk back toward (0,0); should be blocked by the solid bomb
+    const p = e.inspect().player;
+    expect(p.x).toBeCloseTo(0.5 + PLAYER_RADIUS, 5);
+  });
+
+  it("detonates after FUSE_MS and the cross stops at pillars", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    for (let x = 0; x <= 4; x++) e.debugSetTile(x, 0, TILE_EMPTY);
+    e.debugPlaceBomb(1, 0, 3); // (1,1) is a pillar — the down arm must stop dead
+    advance(e, FUSE_MS + 16);
+    const s = e.inspect();
+    expect(s.bombs.length).toBe(0);
+    expect(s.blasts.length).toBe(1);
+    const cells = new Set(s.blasts[0].cells);
+    expect(cells.has(0 * GRID_W + 1)).toBe(true); // bomb's own cell
+    expect(cells.has(0 * GRID_W + 2)).toBe(true);
+    expect(cells.has(0 * GRID_W + 3)).toBe(true);
+    expect(cells.has(0 * GRID_W + 4)).toBe(true); // right arm reaches full range
+    expect(cells.has(1 * GRID_W + 1)).toBe(false); // the pillar cell itself, excluded
+    expect(cells.has(2 * GRID_W + 1)).toBe(false); // beyond the pillar — arm never got there
+    expect(s.grid[1 * GRID_W + 1]).toBe(TILE_PILLAR); // pillar survives the blast
+  });
+
+  it("destroys the first soft block per arm and stops there", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    for (let x = 0; x <= 5; x++) e.debugSetTile(x, 0, TILE_EMPTY);
+    e.debugSetTile(4, 0, TILE_SOFT);
+    e.debugSetTile(5, 0, TILE_SOFT);
+    e.debugPlaceBomb(2, 0, 3);
+    advance(e, FUSE_MS + 16);
+    const grid = e.debugGrid();
+    expect(grid[4]).toBe(TILE_EMPTY); // broken
+    expect(grid[5]).toBe(TILE_SOFT); // the arm stopped at the block it broke
+  });
+
+  it("chains other bombs in the blast", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    for (let x = 0; x <= 5; x++) e.debugSetTile(x, 0, TILE_EMPTY);
+    e.debugPlaceBomb(1, 0, 2);
+    e.debugPlaceBomb(3, 0, 2);
+    e.debugFuse(3, 0, 10_000); // long fuse — must be chain-detonated, not tick out itself
+    advance(e, FUSE_MS + 16);
+    const s = e.inspect();
+    expect(s.bombs.length).toBe(0);
+    expect(s.blasts.length).toBe(1); // one merged blast for the whole chain
+    const cells = new Set(s.blasts[0].cells);
+    expect(cells.has(0 * GRID_W + 5)).toBe(true); // second bomb's own range extends the arm
+  });
+
+  it("reveals the exit when its block is destroyed", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+    const s0 = e.inspect();
+    const ex = s0.exitIndex % GRID_W;
+    const ey = (s0.exitIndex / GRID_W) | 0;
+    const bx = ex > 0 ? ex - 1 : ex + 1; // adjacent cell so a single-range blast hits the exit
+    e.debugPlaceBomb(bx, ey, 1);
+    advance(e, FUSE_MS + 16);
+    expect(e.inspect().exitRevealed).toBe(true);
+  });
+
+  it("drops a powerup at DROP_RATE and burns exposed powerups in a later blast", () => {
+    const e = fresh(() => 0.0); // forces the drop-rate roll and the skull branch
+    e.debugClearEnemies();
+    for (let x = 0; x <= 5; x++) e.debugSetTile(x, 0, TILE_EMPTY);
+    e.debugSetTile(3, 0, TILE_SOFT);
+    e.debugPlaceBomb(1, 0, 2);
+    advance(e, FUSE_MS + 16);
+    expect(e.inspect().powerups).toEqual([{ index: 3, type: "skull" }]);
+    e.debugPlaceBomb(1, 0, 2); // second blast arm passes over the pickup cell
+    advance(e, FUSE_MS + 16);
+    expect(e.inspect().powerups.length).toBe(0);
+  });
+
+  it("applies pickups: bomb/range/speed increment, skull sets a timed debuff", () => {
+    const e = fresh();
+    e.debugClearEnemies();
+
+    e.debugPlacePlayer(0, 0);
+    e.debugPlacePowerup(0, 0, "bomb");
+    advance(e, 16);
+    expect(e.inspect().player.maxBombs).toBe(2);
+    expect(e.inspect().score).toBe(SCORE_PICKUP);
+
+    e.debugPlacePlayer(1, 0);
+    e.debugPlacePowerup(1, 0, "range");
+    advance(e, 16);
+    expect(e.inspect().player.range).toBe(2);
+
+    e.debugPlacePlayer(0, 1);
+    e.debugPlacePowerup(0, 1, "speed");
+    advance(e, 16);
+    expect(e.inspect().player.speedLevel).toBe(1);
+
+    e.debugPlacePlayer(2, 0);
+    e.debugPlacePowerup(2, 0, "skull");
+    advance(e, 16);
+    const debuff = e.inspect().player.debuff;
+    expect(debuff).not.toBeNull();
+    expect(["slow", "shortRange"]).toContain(debuff?.kind);
+    expect(debuff?.ttlMs).toBe(DEBUFF_MS);
+
+    advance(e, DEBUFF_MS + 16);
+    expect(e.inspect().player.debuff).toBeNull();
   });
 });

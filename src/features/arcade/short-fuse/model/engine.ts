@@ -280,6 +280,20 @@ export class ShortFuseEngine {
     this.moveY = dy;
   }
 
+  /** Drop a bomb at the player's current cell. Rejected if a bomb already
+   *  sits there, or the player is already at their `maxBombs` cap. Range is
+   *  pinned to 1 while a `shortRange` debuff is active, regardless of the
+   *  player's own upgraded range. */
+  placeBomb() {
+    const x = Math.round(this.player.x);
+    const y = Math.round(this.player.y);
+    if (this.bombs.some((b) => b.x === x && b.y === y)) return;
+    if (this.bombs.length >= this.player.maxBombs) return;
+    const range =
+      this.player.debuff?.kind === "shortRange" ? 1 : this.player.range;
+    this.bombs.push({ x, y, fuseMs: FUSE_MS, range, walkable: true });
+  }
+
   /** Solid FOR THE PLAYER at cell (cx,cy)? Bombs solidify after the player
    *  leaves their cell (Task 4 sets `walkable` false on exit). */
   private solidForPlayer(cx: number, cy: number): boolean {
@@ -368,8 +382,133 @@ export class ShortFuseEngine {
     else p.x = approach(p.x, lane, dist);
   }
 
-  /** Advance the simulation by `dtMs` — movement + timer this task; bombs,
-   *  blasts, enemies and death land in Tasks 4–5. */
+  /** Solidify bombs the player has walked off, then tick fuses and detonate
+   *  any that reach zero. Iterates a snapshot of `this.bombs` because
+   *  `detonate` mutates the live array (chain reactions remove bombs
+   *  mid-loop) — a bomb already exploded via chaining is skipped rather
+   *  than double-detonated. */
+  private stepBombs(dt: number) {
+    const p = this.player;
+    for (const b of this.bombs) {
+      if (!b.walkable) continue;
+      const overlap =
+        Math.abs(p.x - b.x) < 0.5 + PLAYER_RADIUS &&
+        Math.abs(p.y - b.y) < 0.5 + PLAYER_RADIUS;
+      if (!overlap) b.walkable = false;
+    }
+    for (const b of [...this.bombs]) {
+      if (!this.bombs.includes(b)) continue; // already gone via chaining
+      b.fuseMs -= dt;
+      if (b.fuseMs <= 0) this.detonate(b);
+    }
+  }
+
+  /** Chain-safe, queue-based detonation: a bomb caught in another's blast is
+   *  queued rather than exploded twice (`exploded` set), and every arm's
+   *  cells collapse into ONE merged blast for the whole chain. */
+  private detonate(first: Bomb) {
+    const queue = [first];
+    const exploded = new Set<Bomb>();
+    const blastCells = new Set<number>();
+    while (queue.length) {
+      const bomb = queue.pop()!;
+      if (exploded.has(bomb)) continue;
+      exploded.add(bomb);
+      blastCells.add(bomb.y * GRID_W + bomb.x);
+      for (const [ax, ay] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ] as const) {
+        for (let i = 1; i <= bomb.range; i++) {
+          const cx = bomb.x + ax * i;
+          const cy = bomb.y + ay * i;
+          if (cx < 0 || cy < 0 || cx >= GRID_W || cy >= GRID_H) break;
+          const idx = cy * GRID_W + cx;
+          if (this.grid[idx] === TILE_PILLAR) break;
+          const hitBomb = this.bombs.find(
+            (b) => b.x === cx && b.y === cy && !exploded.has(b)
+          );
+          if (hitBomb) queue.push(hitBomb); // chain — its own cross resolves in-loop
+          blastCells.add(idx);
+          if (this.grid[idx] === TILE_SOFT) {
+            this.destroySoft(idx);
+            break; // the arm stops AT the block it broke
+          }
+          if (this.powerups.has(idx)) {
+            this.powerups.delete(idx); // blasts burn exposed pickups
+            break;
+          }
+        }
+      }
+    }
+    this.bombs = this.bombs.filter((b) => !exploded.has(b));
+    this.blasts.push({ cells: [...blastCells], ttlMs: BLAST_MS });
+  }
+
+  /** Break a soft block: score, maybe drop a powerup. The exit cell is the
+   *  ONE exception — revealing it never also drops a pickup. */
+  private destroySoft(idx: number) {
+    this.grid[idx] = TILE_EMPTY;
+    this.score += SCORE_SOFT;
+    if (idx === this.exitIndex) {
+      this.exitRevealed = true;
+      return;
+    }
+    if (this.rng() < DROP_RATE) {
+      const r = this.rng();
+      const type: PowerupType =
+        r < SKULL_SHARE
+          ? "skull"
+          : r < SKULL_SHARE + 0.25
+            ? "bomb"
+            : r < SKULL_SHARE + 0.5
+              ? "range"
+              : "speed";
+      this.powerups.set(idx, type);
+    }
+  }
+
+  /** Tick blast lifetimes and drop the ones that finished lighting. */
+  private stepBlasts(dt: number) {
+    for (const b of this.blasts) b.ttlMs -= dt;
+    this.blasts = this.blasts.filter((b) => b.ttlMs > 0);
+  }
+
+  /** Apply the powerup under the player's cell, if any, deleting it on pickup.
+   *  The three positive kinds score `SCORE_PICKUP` and increment a capped
+   *  stat; `skull` is a trap — no score, sets a timed debuff instead. */
+  private applyPickup() {
+    const idx = Math.round(this.player.y) * GRID_W + Math.round(this.player.x);
+    const type = this.powerups.get(idx);
+    if (!type) return;
+    this.powerups.delete(idx);
+    const p = this.player;
+    switch (type) {
+      case "bomb":
+        p.maxBombs = Math.min(6, p.maxBombs + 1);
+        this.score += SCORE_PICKUP;
+        break;
+      case "range":
+        p.range = Math.min(6, p.range + 1);
+        this.score += SCORE_PICKUP;
+        break;
+      case "speed":
+        p.speedLevel = Math.min(5, p.speedLevel + 1);
+        this.score += SCORE_PICKUP;
+        break;
+      case "skull":
+        p.debuff = {
+          kind: this.rng() < 0.5 ? "slow" : "shortRange",
+          ttlMs: DEBUFF_MS,
+        };
+        break;
+    }
+  }
+
+  /** Advance the simulation by `dtMs` — timer, debuff, bombs/blasts,
+   *  movement and pickups this task; enemies and death land in Task 5. */
   update(dtMs: number): UpdateResult {
     const dt = Math.min(dtMs, DT_CLAMP_MS);
     const dtS = dt / 1000;
@@ -378,8 +517,11 @@ export class ShortFuseEngine {
       this.player.debuff.ttlMs -= dt;
       if (this.player.debuff.ttlMs <= 0) this.player.debuff = null;
     }
+    this.stepBombs(dt);
+    this.stepBlasts(dt);
     this.stepPlayer(dtS);
-    // Tasks 4–5 add: bombs, blasts, enemies, deaths, exit, timer death
+    this.applyPickup();
+    // Task 5 adds: enemies, deaths (incl. standing on a live blast), timer death
     return this.result(false);
   }
 
@@ -436,5 +578,20 @@ export class ShortFuseEngine {
 
   debugSpawnEnemy(kind: EnemyKind, x: number, y: number) {
     this.enemies.push(this.makeEnemy(kind, x, y));
+  }
+
+  /** Place a bomb directly, bypassing `placeBomb`'s occupancy/cap checks. */
+  debugPlaceBomb(x: number, y: number, range = this.player.range) {
+    this.bombs.push({ x, y, fuseMs: FUSE_MS, range, walkable: true });
+  }
+
+  /** Force a bomb's remaining fuse (used to pin/skip detonation timing). */
+  debugFuse(x: number, y: number, ms: number) {
+    const b = this.bombs.find((bomb) => bomb.x === x && bomb.y === y);
+    if (b) b.fuseMs = ms;
+  }
+
+  debugPlacePowerup(x: number, y: number, type: PowerupType) {
+    this.powerups.set(y * GRID_W + x, type);
   }
 }
