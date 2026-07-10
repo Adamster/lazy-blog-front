@@ -72,6 +72,26 @@ const FOOD_FILL = 0.62;
 const FOOD_PULSE_AMP = 0.12;
 const FOOD_PULSE_FREQ = 0.1;
 
+/** Food sprite — the rabbit pickup ported from the retired "Follow the
+ *  Rabbit" game (`RABBIT_PLAIN`, positive/+10 variant only — classic
+ *  Snake has one food type, no striped penalty rabbit). `"1"` = body
+ *  pixel, anything else = transparent. */
+const RABBIT_PLAIN: readonly string[] = [
+  ".11.11.",
+  ".11.11.",
+  ".11.11.",
+  ".11.11.",
+  ".11.11.",
+  ".11.11.",
+  ".11.11.",
+  "1111111",
+  "1011101",
+  "1110111",
+  "1111111",
+  "0111110",
+  "0100010",
+];
+
 /** Parse `#rrggbb` OR `rgb(...)` (the form {@link lerpHex} itself emits) → `[r,g,b]`. */
 function parseColor(c: string): [number, number, number] {
   if (c[0] === "#") {
@@ -361,8 +381,8 @@ export class SnakeClassicEngine {
     }
   }
 
-  /** The food — a white square with a slow "eat me" size pulse (base size under
-   *  reduced motion; colour alone then says "chase me"). */
+  /** The food — a rabbit pixel-sprite with a slow "eat me" size pulse (base
+   *  size under reduced motion; colour alone then says "chase me"). */
   private drawFood(
     ctx: CanvasRenderingContext2D,
     cell: number,
@@ -372,14 +392,46 @@ export class SnakeClassicEngine {
     const pulse = animate
       ? 1 + FOOD_PULSE_AMP * Math.sin(this.frame * FOOD_PULSE_FREQ)
       : 1;
-    this.drawSquare(
-      ctx,
-      cell,
-      dpr,
-      this.food,
-      this.palette.food,
-      FOOD_FILL * pulse
-    );
+    this.drawFoodSprite(ctx, cell, dpr, this.food, FOOD_FILL * pulse);
+  }
+
+  /**
+   * Paint the food as the {@link RABBIT_PLAIN} pixel-sprite, scaled so its
+   * bounding box fills `fill` fraction of the cell. `fillRect` is already
+   * device-pixel-crisp per block — no `imageSmoothingEnabled` toggle needed
+   * (that flag only affects `drawImage`, not `fillRect`).
+   */
+  private drawFoodSprite(
+    ctx: CanvasRenderingContext2D,
+    cell: number,
+    dpr: number,
+    at: Cell,
+    fill: number
+  ) {
+    const sw = RABBIT_PLAIN[0].length;
+    const sh = RABBIT_PLAIN.length;
+    const cellDev = cell * dpr;
+    const boxDev = cellDev * fill;
+    const fitDim = Math.max(sw, sh);
+    const block = Math.max(1, Math.floor(boxDev / fitDim));
+    const spriteWdev = block * sw;
+    const spriteHdev = block * sh;
+    const leftDev = Math.round(at.x * cellDev + (cellDev - spriteWdev) / 2);
+    const topDev = Math.round(at.y * cellDev + (cellDev - spriteHdev) / 2);
+    ctx.fillStyle = this.palette.food;
+    for (let y = 0; y < sh; y++) {
+      const row = RABBIT_PLAIN[y];
+      for (let x = 0; x < sw; x++) {
+        if (row[x] !== "1") continue;
+        const size = block / dpr;
+        ctx.fillRect(
+          (leftDev + x * block) / dpr,
+          (topDev + y * block) / dpr,
+          size,
+          size
+        );
+      }
+    }
   }
 
   /** Paint the opaque theme field + grid behind the overlay. */
