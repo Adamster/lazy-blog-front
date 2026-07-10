@@ -40,9 +40,6 @@ export const SCORE_KILL: Record<EnemyKind, number> = {
 };
 
 /** Cells/second. */
-const PLAYER_SPEED_BASE = 4.5;
-const PLAYER_SPEED_STEP = 0.5;
-const PLAYER_SPEED_CAP = 7;
 const ENEMY_SPEED: Record<EnemyKind, number> = {
   wanderer: 2.2,
   chaser: 1.8,
@@ -226,15 +223,13 @@ export class ShortFuseEngine {
       )
         continue;
       const kind = roster[this.enemies.length];
-      this.enemies.push({
-        kind,
-        x,
-        y,
-        dx: 0,
-        dy: 0,
-        speed: this.enemySpeed(kind),
-      });
+      this.enemies.push(this.makeEnemy(kind, x, y));
     }
+  }
+
+  /** One construction site for enemies — generation + the debug spawner. */
+  private makeEnemy(kind: EnemyKind, x: number, y: number): Enemy {
+    return { kind, x, y, dx: 0, dy: 0, speed: this.enemySpeed(kind) };
   }
 
   /** Enemy mix ramps with level: wanderers always; chasers from 2; skitters from 4. */
@@ -296,13 +291,6 @@ export class ShortFuseEngine {
   }
 
   debugSpawnEnemy(kind: EnemyKind, x: number, y: number) {
-    this.enemies.push({
-      kind,
-      x,
-      y,
-      dx: 0,
-      dy: 0,
-      speed: this.enemySpeed(kind),
-    });
+    this.enemies.push(this.makeEnemy(kind, x, y));
   }
 }
