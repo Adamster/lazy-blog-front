@@ -39,6 +39,17 @@ vi.mock("@/features/arcade/2048", async () => {
   };
 });
 
+const mockUseShortFuseLeaderboard = vi.fn();
+vi.mock("@/features/arcade/short-fuse", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/features/arcade/short-fuse")
+  >("@/features/arcade/short-fuse");
+  return {
+    ...actual,
+    useShortFuseLeaderboard: () => mockUseShortFuseLeaderboard(),
+  };
+});
+
 import { ArcadePage } from "./arcade-page";
 
 const NO_DATA = { data: undefined, isLoading: false } as const;
@@ -57,12 +68,13 @@ describe("ArcadePage leaderboard rows", () => {
     mockUseTetrisLeaderboard.mockReturnValue(NO_DATA);
     mockUseSnakeClassicLeaderboard.mockReturnValue(NO_DATA);
     mockUse2048Leaderboard.mockReturnValue(NO_DATA);
+    mockUseShortFuseLeaderboard.mockReturnValue(NO_DATA);
 
     render(<ArcadePage />);
 
-    // 3 visible cards x 3 rows each.
+    // 4 visible cards x 3 rows each.
     expect(screen.getAllByRole("img", { name: "No score yet" })).toHaveLength(
-      9
+      12
     );
   });
 
@@ -74,11 +86,12 @@ describe("ArcadePage leaderboard rows", () => {
     });
     mockUseSnakeClassicLeaderboard.mockReturnValue(NO_DATA);
     mockUse2048Leaderboard.mockReturnValue(NO_DATA);
+    mockUseShortFuseLeaderboard.mockReturnValue(NO_DATA);
 
     render(<ArcadePage />);
 
     expect(screen.getAllByRole("img", { name: "No score yet" })).toHaveLength(
-      9
+      12
     );
   });
 
@@ -90,14 +103,15 @@ describe("ArcadePage leaderboard rows", () => {
     });
     mockUseSnakeClassicLeaderboard.mockReturnValue(NO_DATA);
     mockUse2048Leaderboard.mockReturnValue(NO_DATA);
+    mockUseShortFuseLeaderboard.mockReturnValue(NO_DATA);
 
     render(<ArcadePage />);
 
     expect(screen.getByText("@igormariuta")).toBeInTheDocument();
     expect(screen.getByText("12,400")).toBeInTheDocument();
-    // Tetris's own rows 2-3, plus 3 rows each for the other 2 games.
+    // Tetris's own rows 2-3, plus 3 rows each for the other 3 games.
     expect(screen.getAllByRole("img", { name: "No score yet" })).toHaveLength(
-      8
+      11
     );
   });
 
@@ -115,6 +129,7 @@ describe("ArcadePage leaderboard rows", () => {
     });
     mockUseSnakeClassicLeaderboard.mockReturnValue(NO_DATA);
     mockUse2048Leaderboard.mockReturnValue(NO_DATA);
+    mockUseShortFuseLeaderboard.mockReturnValue(NO_DATA);
 
     render(<ArcadePage />);
 
@@ -138,6 +153,7 @@ describe("ArcadePage leaderboard rows", () => {
     });
     mockUseSnakeClassicLeaderboard.mockReturnValue(NO_DATA);
     mockUse2048Leaderboard.mockReturnValue(NO_DATA);
+    mockUseShortFuseLeaderboard.mockReturnValue(NO_DATA);
 
     render(<ArcadePage />);
 
