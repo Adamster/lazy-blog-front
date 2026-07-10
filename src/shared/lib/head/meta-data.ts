@@ -19,7 +19,7 @@ export const generateMeta = ({
   url,
   noindex = false,
 }: Props) => {
-  const fullTitle = title ? `${title} | !Lazy Blog` : "!Lazy Blog";
+  const fullTitle = title ? `${title} | !LAZY` : "!LAZY";
   const fullUrl = url ? `${SITE_URL}${url}` : SITE_URL;
 
   return {
