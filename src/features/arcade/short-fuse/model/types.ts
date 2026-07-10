@@ -3,11 +3,6 @@ import type { ShortFuseAction } from "./gamepad-bindings";
 
 export type Screen = "menu" | "playing" | "over";
 
-export interface Cell {
-  x: number;
-  y: number;
-}
-
 export interface ScoreRow {
   name: string;
   score: number;

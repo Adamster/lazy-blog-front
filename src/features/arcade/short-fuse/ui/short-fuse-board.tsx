@@ -68,7 +68,7 @@ export function ShortFuseBoard({
       ref={fullscreenRootRef}
       className={`mono-scope relative flex aspect-[15/12] w-full items-center justify-center overflow-hidden bg-[var(--m-bg)] p-5 ${FULLSCREEN_ROOT}`}
     >
-      {/* The canvas is JS-SIZED (inline px from the hook, contain-fit 5:3 in
+      {/* The canvas is JS-SIZED (inline px from the hook, contain-fit 5:4 (15:12, HUD row included) in
           the host's content box) — the CSS takes kept breaking (iOS % heights,
           then the absolute/aspect variant on desktop). The root just flex-
           centres whatever size the hook writes, fullscreen included. */}

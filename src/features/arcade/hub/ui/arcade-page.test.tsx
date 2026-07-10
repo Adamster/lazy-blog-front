@@ -72,9 +72,9 @@ describe("ArcadePage leaderboard rows", () => {
 
     render(<ArcadePage />);
 
-    // 4 visible cards x 3 rows each.
+    // 3 visible cards x 3 rows each (Short Fuse is hub-hidden for now).
     expect(screen.getAllByRole("img", { name: "No score yet" })).toHaveLength(
-      12
+      9
     );
   });
 
@@ -91,7 +91,7 @@ describe("ArcadePage leaderboard rows", () => {
     render(<ArcadePage />);
 
     expect(screen.getAllByRole("img", { name: "No score yet" })).toHaveLength(
-      12
+      9
     );
   });
 
@@ -109,9 +109,9 @@ describe("ArcadePage leaderboard rows", () => {
 
     expect(screen.getByText("@igormariuta")).toBeInTheDocument();
     expect(screen.getByText("12,400")).toBeInTheDocument();
-    // Tetris's own rows 2-3, plus 3 rows each for the other 3 games.
+    // Tetris's own rows 2-3, plus 3 rows each for the other 2 visible games.
     expect(screen.getAllByRole("img", { name: "No score yet" })).toHaveLength(
-      11
+      8
     );
   });
 

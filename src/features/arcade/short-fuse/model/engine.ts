@@ -150,13 +150,13 @@ export interface ShortFusePalette {
   muted: string;
 }
 
-/** Dark-theme reference colours for Fyze — exported for the arcade-hub mark
- *  (mirrors {@link SnakeClassicEngine}'s `GLYPH_BODY`/`GLYPH_TAIL`); they
- *  also seed {@link DEFAULT_PALETTE} so the first paint / SSR looks right
- *  before the hook resolves the live tokens. */
-export const FYZE_BODY = "#dcdcdc";
-export const FYZE_ACCENT = "#cdff48";
-export const FYZE_SPARK = "#ff6b6b";
+/** Dark-theme reference colours for Fyze — they seed {@link DEFAULT_PALETTE}
+ *  so the first paint / SSR looks right before the hook resolves the live
+ *  tokens. (The hub's `FyzeMark` renders with live CSS-var fills instead, so
+ *  these are palette-seeds only — not exported.) */
+const FYZE_BODY = "#dcdcdc";
+const FYZE_ACCENT = "#cdff48";
+const FYZE_SPARK = "#ff6b6b";
 
 const DEFAULT_PALETTE: ShortFusePalette = {
   boardBg: "#181818",
@@ -239,7 +239,7 @@ const ENEMY_SKITTER_SPRITE: readonly string[] = [
 ];
 
 /** Distinct per-kind silhouettes, keyed by {@link EnemyKind}. */
-export const ENEMY_SPRITES: Record<EnemyKind, readonly string[]> = {
+const ENEMY_SPRITES: Record<EnemyKind, readonly string[]> = {
   wanderer: ENEMY_WANDERER_SPRITE,
   chaser: ENEMY_CHASER_SPRITE,
   skitter: ENEMY_SKITTER_SPRITE,
@@ -303,7 +303,7 @@ const POWERUP_SKULL_SPRITE: readonly string[] = [
 ];
 
 /** 7×7 pickup icons, keyed by {@link PowerupType}. */
-export const POWERUP_SPRITES: Record<PowerupType, readonly string[]> = {
+const POWERUP_SPRITES: Record<PowerupType, readonly string[]> = {
   bomb: POWERUP_BOMB_SPRITE,
   range: POWERUP_RANGE_SPRITE,
   speed: POWERUP_SPEED_SPRITE,
@@ -311,7 +311,7 @@ export const POWERUP_SPRITES: Record<PowerupType, readonly string[]> = {
 };
 
 /** Door outline — the exit before every enemy on the level is cleared. */
-export const EXIT_CLOSED_SPRITE: readonly string[] = [
+const EXIT_CLOSED_SPRITE: readonly string[] = [
   ".11111.",
   "1.....1",
   "1.....1",
@@ -325,7 +325,7 @@ export const EXIT_CLOSED_SPRITE: readonly string[] = [
 
 /** Filled doorway — the exit once the level's enemies are all down, inviting
  *  the player through. */
-export const EXIT_OPEN_SPRITE: readonly string[] = [
+const EXIT_OPEN_SPRITE: readonly string[] = [
   ".11111.",
   "1111111",
   "1111111",
