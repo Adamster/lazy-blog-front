@@ -19,7 +19,8 @@ import {
   saveBindings,
   type BindingMap,
   createGamepadPoller,
-  type PadFrame,
+  readGamepadAxes,
+  GAMEPAD_DEADZONE,
 } from "@/features/arcade/shared";
 import {
   TETRIS_ACTION_IDS,
@@ -138,7 +139,13 @@ export function useTetrisGame({
   const holdCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const engineRef = useRef<TetrisEngine | null>(null);
-  const pollPadRef = useRef<(() => PadFrame) | null>(null);
+  const pollPadRef = useRef<
+    | (() => Partial<Record<TetrisAction, boolean>> & { anyPress: boolean })
+    | null
+  >(null);
+  const prevPadRef = useRef<
+    Partial<Record<TetrisAction, boolean>> & { anyPress: boolean }
+  >({ anyPress: false });
   const getEngine = () => {
     engineRef.current ??= new TetrisEngine();
     return engineRef.current;
@@ -146,7 +153,10 @@ export function useTetrisGame({
   // Lazy like getEngine — created on first real use (inside the loop, never
   // during render) so the ref-reading closure is never invoked at render time.
   const getPollPad = () => {
-    pollPadRef.current ??= createGamepadPoller(() => padBindingsRef.current);
+    pollPadRef.current ??= createGamepadPoller(
+      TETRIS_ACTION_IDS,
+      () => padBindingsRef.current
+    );
     return pollPadRef.current;
   };
 
@@ -453,7 +463,21 @@ export function useTetrisGame({
       const animate = !prefersReducedMotion();
       const screen = screenRef.current;
 
-      const pad = getPollPad()();
+      const held = getPollPad()();
+      const axes = readGamepadAxes();
+      const prevPad = prevPadRef.current;
+      const pad = {
+        left: !!held.moveLeft || axes.x < -GAMEPAD_DEADZONE,
+        right: !!held.moveRight || axes.x > GAMEPAD_DEADZONE,
+        softDrop: !!held.softDrop || axes.y > GAMEPAD_DEADZONE,
+        rotateCW: !!held.rotateCW && !prevPad.rotateCW,
+        rotateCCW: !!held.rotateCCW && !prevPad.rotateCCW,
+        hardDrop: !!held.hardDrop && !prevPad.hardDrop,
+        hold: !!held.hold && !prevPad.hold,
+        pause: !!held.pause && !prevPad.pause,
+        anyPress: !!held.anyPress && !prevPad.anyPress,
+      };
+      prevPadRef.current = held;
       if (!keysSuspendedRef.current) {
         if (screenRef.current !== "playing") {
           if (pad.anyPress) start();
