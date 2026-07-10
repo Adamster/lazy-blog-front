@@ -87,14 +87,18 @@ export function ControlsModal<A extends string>({
   isOpen: boolean;
   onOpenChange: () => void;
   actions: readonly { id: A; label: string }[];
-  value: BindingMap<A>;
-  defaults: BindingMap<A>;
-  onChange: (next: BindingMap<A>) => void;
+  /** Omit `value`/`defaults`/`onChange` together to run GAMEPAD-ONLY: one chip
+   *  column instead of two, no keyboard rebinding UI, Reset only resets the
+   *  gamepad map. */
+  value?: BindingMap<A>;
+  defaults?: BindingMap<A>;
+  onChange?: (next: BindingMap<A>) => void;
   /** Gamepad counterpart of `value`/`defaults`/`onChange` — independent binding map. */
   padValue: BindingMap<A>;
   padDefaults: BindingMap<A>;
   onPadChange: (next: BindingMap<A>) => void;
 }) {
+  const keyboardEnabled = value !== undefined && onChange !== undefined;
   const [capturing, setCapturing] = useState<{
     action: A;
     kind: "key" | "pad";
@@ -111,7 +115,9 @@ export function ControlsModal<A extends string>({
         setCapturing(null);
         return;
       }
-      onChange(rebind<A>(value, capturing.action, e.code));
+      if (capturing.kind === "key" && value && onChange) {
+        onChange(rebind<A>(value, capturing.action, e.code));
+      }
       setCapturing(null);
     };
     window.addEventListener("keydown", onKey, true);
@@ -174,7 +180,13 @@ export function ControlsModal<A extends string>({
             subtitle="Click a slot, then press its new key or button. Esc cancels."
             onClose={closeModal}
           />
-          <div className="grid grid-cols-[auto_1fr_1fr] items-center gap-x-3 gap-y-4">
+          <div
+            className={`grid items-center gap-x-3 gap-y-4 ${
+              keyboardEnabled
+                ? "grid-cols-[auto_1fr_1fr]"
+                : "grid-cols-[auto_1fr]"
+            }`}
+          >
             {actions.map(({ id, label }) => {
               const keyActive =
                 capturing?.action === id && capturing.kind === "key";
@@ -185,17 +197,19 @@ export function ControlsModal<A extends string>({
                   <span className="text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase">
                     {label}
                   </span>
-                  <CaptureChip
-                    active={keyActive}
-                    ariaLabel={`${label} — keyboard: ${keyActive ? "press key" : bindingLabel(value[id])}`}
-                    placeholder="PRESS KEY…"
-                    codes={value[id]}
-                    onClick={() =>
-                      setCapturing(
-                        keyActive ? null : { action: id, kind: "key" }
-                      )
-                    }
-                  />
+                  {keyboardEnabled && (
+                    <CaptureChip
+                      active={keyActive}
+                      ariaLabel={`${label} — keyboard: ${keyActive ? "press key" : bindingLabel(value![id])}`}
+                      placeholder="PRESS KEY…"
+                      codes={value![id]}
+                      onClick={() =>
+                        setCapturing(
+                          keyActive ? null : { action: id, kind: "key" }
+                        )
+                      }
+                    />
+                  )}
                   <CaptureChip
                     active={padActive}
                     ariaLabel={`${label} — gamepad: ${padActive ? "press button" : bindingLabel(padValue[id])}`}
@@ -224,7 +238,7 @@ export function ControlsModal<A extends string>({
               variant="outline"
               onClick={() => {
                 setCapturing(null);
-                onChange(defaults);
+                if (keyboardEnabled) onChange!(defaults!);
                 onPadChange(padDefaults);
               }}
             >
