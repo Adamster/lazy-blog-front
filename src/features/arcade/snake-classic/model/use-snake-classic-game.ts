@@ -10,7 +10,21 @@ import {
   SnakeClassicEngine,
   type SnakeClassicPalette,
 } from "./engine";
-import { GUEST_SCOPE } from "@/features/arcade/shared";
+import {
+  GUEST_SCOPE,
+  createGamepadPoller,
+  readGamepadAxes,
+  GAMEPAD_DEADZONE,
+  loadBindings,
+  saveBindings,
+  type BindingMap,
+} from "@/features/arcade/shared";
+import {
+  SNAKE_CLASSIC_ACTION_IDS,
+  SNAKE_CLASSIC_DEFAULT_GAMEPAD_BINDINGS,
+  SNAKE_CLASSIC_GAMEPAD_STORAGE,
+  type SnakeClassicAction,
+} from "./gamepad-bindings";
 import { loadHistory, recentSeries, recordScore } from "./score-history";
 import type {
   HistoryPoint,
@@ -148,6 +162,53 @@ export function useSnakeClassicGame({
     return () => cancelAnimationFrame(raf);
   }, [historyScope]);
 
+  const [padBindings, setPadBindingsState] = useState<
+    BindingMap<SnakeClassicAction>
+  >(SNAKE_CLASSIC_DEFAULT_GAMEPAD_BINDINGS);
+  const padBindingsRef = useRef(padBindings);
+  useEffect(() => {
+    padBindingsRef.current = padBindings;
+  }, [padBindings]);
+  // Hydrate persisted gamepad bindings on mount; rAF-deferred (lint rule).
+  useEffect(() => {
+    const raf = requestAnimationFrame(() =>
+      setPadBindingsState(
+        loadBindings(
+          SNAKE_CLASSIC_GAMEPAD_STORAGE,
+          SNAKE_CLASSIC_DEFAULT_GAMEPAD_BINDINGS
+        )
+      )
+    );
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  const setPadBindings = useCallback((next: BindingMap<SnakeClassicAction>) => {
+    setPadBindingsState(next);
+    saveBindings(SNAKE_CLASSIC_GAMEPAD_STORAGE, next);
+  }, []);
+
+  /** True while the CONTROLS modal owns input capture — game keys/gamepad go inert. */
+  const keysSuspendedRef = useRef(false);
+  const setKeysSuspended = useCallback((suspended: boolean) => {
+    keysSuspendedRef.current = suspended;
+  }, []);
+
+  const pollPadRef = useRef<
+    | (() => Partial<Record<SnakeClassicAction, boolean>> & {
+        anyPress: boolean;
+      })
+    | null
+  >(null);
+  const getPollPad = () => {
+    pollPadRef.current ??= createGamepadPoller(
+      SNAKE_CLASSIC_ACTION_IDS,
+      () => padBindingsRef.current
+    );
+    return pollPadRef.current;
+  };
+  const prevPadRef = useRef<
+    Partial<Record<SnakeClassicAction, boolean>> & { anyPress: boolean }
+  >({ anyPress: false });
+
   const steer = useCallback((x: number, y: number) => {
     if (screenRef.current !== "playing" || pausedRef.current) return;
     getEngine().steer(x, y);
@@ -265,6 +326,39 @@ export function useSnakeClassicGame({
       const animate = !prefersReducedMotion();
       const screen = screenRef.current;
 
+      const held = getPollPad()();
+      const axes = readGamepadAxes();
+      const prevPad = prevPadRef.current;
+      const pad = {
+        moveUp: !!held.moveUp || axes.y < -GAMEPAD_DEADZONE,
+        moveDown: !!held.moveDown || axes.y > GAMEPAD_DEADZONE,
+        moveLeft: !!held.moveLeft || axes.x < -GAMEPAD_DEADZONE,
+        moveRight: !!held.moveRight || axes.x > GAMEPAD_DEADZONE,
+        start: !!held.start,
+        pause: !!held.pause,
+        anyPress: held.anyPress,
+      };
+      const edge = {
+        moveUp: pad.moveUp && !prevPad.moveUp,
+        moveDown: pad.moveDown && !prevPad.moveDown,
+        moveLeft: pad.moveLeft && !prevPad.moveLeft,
+        moveRight: pad.moveRight && !prevPad.moveRight,
+        start: pad.start && !prevPad.start,
+        pause: pad.pause && !prevPad.pause,
+      };
+      prevPadRef.current = pad;
+      if (!keysSuspendedRef.current) {
+        if (screen !== "playing") {
+          if (edge.start) start();
+        } else {
+          if (edge.pause) togglePause();
+          else if (edge.moveUp) steer(0, -1);
+          else if (edge.moveDown) steer(0, 1);
+          else if (edge.moveLeft) steer(-1, 0);
+          else if (edge.moveRight) steer(1, 0);
+        }
+      }
+
       if (screen === "playing" && !pausedRef.current) {
         if (now - lastStep >= engine.stepInterval) {
           lastStep = now;
@@ -313,10 +407,11 @@ export function useSnakeClassicGame({
     };
     // getEngine is a stable closure over refs (intentionally omitted).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleGameOver]);
+  }, [handleGameOver, start, togglePause, steer]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (keysSuspendedRef.current) return; // CONTROLS modal owns input capture
       // Never hijack typing in a field (defensive — no inputs on the page).
       const el = e.target as HTMLElement | null;
       if (
@@ -364,5 +459,8 @@ export function useSnakeClassicGame({
     start,
     togglePause,
     steer,
+    padBindings,
+    setPadBindings,
+    setKeysSuspended,
   };
 }

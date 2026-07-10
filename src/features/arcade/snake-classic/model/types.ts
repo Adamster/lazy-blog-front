@@ -1,3 +1,6 @@
+import type { BindingMap } from "@/features/arcade/shared";
+import type { SnakeClassicAction } from "./gamepad-bindings";
+
 export type Speed = "chill" | "classic" | "fast";
 
 export type Screen = "menu" | "playing" | "over";
@@ -50,6 +53,10 @@ export interface SnakeClassicGameApi {
   togglePause: () => void;
   /** Steer; ignored if it would reverse into the neck. */
   steer: (x: number, y: number) => void;
+  padBindings: BindingMap<SnakeClassicAction>;
+  setPadBindings: (next: BindingMap<SnakeClassicAction>) => void;
+  /** True while the CONTROLS modal owns input capture — game keys/gamepad go inert. */
+  setKeysSuspended: (suspended: boolean) => void;
 }
 
 export interface UseSnakeClassicGameOptions {

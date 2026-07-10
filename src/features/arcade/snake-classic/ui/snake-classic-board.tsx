@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import {
   BoardFullscreenButton,
+  ControlsModal,
   CornerBrackets,
   FULLSCREEN_ROOT,
   GameOverOverlay,
@@ -10,6 +12,10 @@ import {
   rankLine,
   useBoardFullscreen,
 } from "@/features/arcade/shared";
+import {
+  SNAKE_CLASSIC_ACTIONS,
+  SNAKE_CLASSIC_DEFAULT_GAMEPAD_BINDINGS,
+} from "../model/gamepad-bindings";
 import type { SnakeClassicGameApi } from "../model/types";
 
 /** The canvas play-field + its overlays (menu / pause / game-over). Pure
@@ -26,12 +32,29 @@ export function SnakeClassicBoard({
   /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
   canRank?: boolean;
 }) {
-  const { state, canvasRef, start } = api;
+  const {
+    state,
+    canvasRef,
+    start,
+    padBindings,
+    setPadBindings,
+    setKeysSuspended,
+  } = api;
   const {
     rootRef: fullscreenRootRef,
     isFullscreen,
     toggle: toggleFullscreen,
   } = useBoardFullscreen();
+
+  const [controlsOpen, setControlsOpen] = useState(false);
+  const openControls = () => {
+    setControlsOpen(true);
+    setKeysSuspended(true);
+  };
+  const closeControls = () => {
+    setControlsOpen(false);
+    setKeysSuspended(false);
+  };
 
   const rankClause = rankLine(state.rank, canRank, "eat more, grow longer");
   // Fullscreen toggle lives on the OVERLAY screens only (menu / pause — owner
@@ -62,6 +85,18 @@ export function SnakeClassicBoard({
           title="Snake"
           description="The classic. You, your tail, and bad decisions."
           onStart={start}
+          extra={
+            <>
+              <div className="h-0.5 w-full bg-[var(--m-dim)]" aria-hidden />
+              <button
+                type="button"
+                onClick={openControls}
+                className="mono-focus text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)]"
+              >
+                Controls
+              </button>
+            </>
+          }
         />
       )}
 
@@ -84,6 +119,15 @@ export function SnakeClassicBoard({
           onToggle={toggleFullscreen}
         />
       )}
+
+      <ControlsModal
+        isOpen={controlsOpen}
+        onOpenChange={closeControls}
+        actions={SNAKE_CLASSIC_ACTIONS}
+        padValue={padBindings}
+        padDefaults={SNAKE_CLASSIC_DEFAULT_GAMEPAD_BINDINGS}
+        onPadChange={setPadBindings}
+      />
     </div>
   );
 }
