@@ -1,15 +1,16 @@
 "use client";
 
 import {
+  BOARD_SIZE,
   HISTORY_RECENT,
   ScorePops,
   SnakeBoard,
-  SnakeLeaderboard,
   useSnakeArcade,
 } from "@/features/arcade/snake";
 import {
   BOARD_GRID_RAIL,
   BoardUnsupported,
+  Leaderboard,
   StatsBand,
 } from "@/features/arcade/shared";
 
@@ -50,7 +51,11 @@ export default function SnakePage() {
             </div>
             <BoardUnsupported />
           </div>
-          <SnakeLeaderboard board={board} loading={boardLoading} />
+          <Leaderboard
+            board={board}
+            boardSize={BOARD_SIZE}
+            loading={boardLoading}
+          />
         </div>
       </main>
     </div>

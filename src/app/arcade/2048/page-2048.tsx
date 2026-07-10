@@ -1,14 +1,15 @@
 "use client";
 
 import {
+  BOARD_SIZE,
   Board2048,
   HISTORY_RECENT,
-  Leaderboard2048,
   use2048Arcade,
 } from "@/features/arcade/2048";
 import {
   BOARD_GRID_RAIL,
   BoardUnsupported,
+  Leaderboard,
   StatsBand,
 } from "@/features/arcade/shared";
 
@@ -44,7 +45,11 @@ export default function Page2048() {
             </div>
             <BoardUnsupported />
           </div>
-          <Leaderboard2048 board={board} loading={boardLoading} />
+          <Leaderboard
+            board={board}
+            boardSize={BOARD_SIZE}
+            loading={boardLoading}
+          />
         </div>
       </main>
     </div>
