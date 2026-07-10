@@ -100,32 +100,6 @@
   }
 }
 
-/* Arcade crowns — the profile TOP-1 trophies: a periodic diagonal GLINT that
-   runs across the icon, clipped to the pixel silhouette (the halo/pulse takes
-   were both cut — owner call: the glint alone is the trophy). The sweep is
-   fast (first ~30% of the cycle), then rests off-icon. Reduced motion: no
-   glint — the accent colour carries the trophy read. */
-@keyframes mono-crown-shine {
-  0% {
-    transform: translateX(-140%);
-  }
-  30% {
-    transform: translateX(140%);
-  }
-  100% {
-    transform: translateX(140%);
-  }
-}
-.mono-crown-shine {
-  animation: mono-crown-shine 2.8s ease-in-out infinite;
-  transform-box: fill-box;
-}
-@media (prefers-reduced-motion: reduce) {
-  .mono-crown-shine {
-    display: none;
-  }
-}
-
 @keyframes mono-toast-in {
   from {
     opacity: 0;
