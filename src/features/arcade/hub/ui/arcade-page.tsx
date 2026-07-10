@@ -107,6 +107,17 @@ function CellField({
           backgroundImage: `linear-gradient(to right, ${line} 1px, transparent 1px), linear-gradient(to bottom, ${line} 1px, transparent 1px)`,
           backgroundSize: `${cell}px ${cell}px`,
           backgroundPosition: `calc(50% + ${off(spanX) - 0.5}px) calc(50% + ${off(spanY) - 0.5}px)`,
+          // The box's fluid, responsive height is never an exact multiple of
+          // `cell` (nor is its width, for that matter — the top/left/right
+          // edges crop a partial cell too, just hidden under the card's own
+          // 2px border). A hard line forced exactly at the bottom edge lands
+          // mid-cell and reads as a visibly SHORTER last row, not a clean
+          // close. Fading the pattern out instead sidesteps needing an exact
+          // pixel-snapped height (which would mean JS-measuring the box,
+          // like the canvas boards do) — it just softens into the bottom
+          // edge, closing it without exposing the crop.
+          WebkitMaskImage: "linear-gradient(to bottom, black 80%, transparent)",
+          maskImage: "linear-gradient(to bottom, black 80%, transparent)",
         }}
       />
       <div className="relative">{children}</div>
