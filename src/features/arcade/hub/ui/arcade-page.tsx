@@ -10,28 +10,17 @@ import {
 import { Mark2048, use2048Leaderboard } from "@/features/arcade/2048";
 import { SlothMark } from "@/features/arcade/stay-awake";
 import { useTetrisLeaderboard } from "@/features/arcade/tetris";
+import { ARCADE_GAMES, type ArcadeGameEntry } from "@/features/arcade/shared";
 import { RabbitChaseMark } from "./rabbit-chase-mark";
 import { fmt, Label } from "@/shared/ui";
 import { userHref } from "@/shared/lib/routes";
 import { TetrominoMark } from "./tetromino-mark";
 
-interface GameEntry {
-  href: string;
-  title: string;
+interface GameEntry extends ArcadeGameEntry {
   mark: ReactNode;
   /** The mark's own pixel grid — cell size (px) + the cells the mark spans.
    *  Drives the CellField so the figure sits ON the field like a real render. */
   field: { cell: number; spanX: number; spanY: number };
-  /** The backend `game` key for this card's leaderboard query — does NOT
-   *  always match `title`/`href` (e.g. the hub's "Snake" card is the
-   *  classic-Snake feature, backend key `snake-classic`; the backend key
-   *  `snake` belongs to the hub's "The Rabbit" card). Get this from each
-   *  feature's own `arcade-keys.ts` (`TETRIS_GAME`/`SNAKE_CLASSIC_GAME`/
-   *  `GAME_2048`/`SNAKE_GAME`/`GAME_STAY_AWAKE`), never guess it from the title. */
-  game: string;
-  /** Temporarily delisted from the hub (owner call) — the route stays live;
-   *  drop the flag to relist. */
-  hidden?: boolean;
 }
 
 // Hollow Sloth is an unlisted prototype — deliberately absent here.
@@ -40,47 +29,38 @@ interface GameEntry {
 // in-game placement, not a scaled logo — so `size` is always `<cell> × <rows
 // the figure spans>`.
 const CELL = 20;
-const GAMES: GameEntry[] = [
+
+// Hub-only visuals (mark + field), keyed by the shared roster's `game` id —
+// title/href/hidden come from `ARCADE_GAMES` (also consumed by the profile
+// crowns), so a roster change only needs editing that one shared list.
+const VISUALS: Record<string, { mark: ReactNode; field: GameEntry["field"] }> =
   {
-    href: "/arcade/tetris",
-    title: "Tetris",
-    mark: <TetrominoMark size={CELL * 2} />,
-    field: { cell: CELL, spanX: 3, spanY: 2 },
-    game: "tetris",
-  },
-  {
-    href: "/arcade/2048",
-    title: "2048",
-    mark: <Mark2048 size={CELL * 2} />,
-    field: { cell: CELL, spanX: 2, spanY: 2 },
-    game: "2048",
-  },
-  {
-    href: "/arcade/snake",
-    title: "Snake",
-    mark: <SnakeMark size={CELL * 2} />,
-    field: { cell: CELL, spanX: 5, spanY: 2 },
-    game: "snake-classic",
-  },
-  {
-    href: "/arcade/stay-awake",
-    title: "Stay Awake",
-    mark: <SlothMark size={CELL * 4} />,
-    field: { cell: CELL, spanX: 5, spanY: 4 },
-    game: "stay-awake",
-    // Needs a redesign (owner call, 2026-07-09) — route stays live.
-    hidden: true,
-  },
-  {
-    href: "/arcade/follow-the-rabbit",
-    title: "The Rabbit",
-    mark: <RabbitChaseMark size={CELL * 2} />,
-    field: { cell: CELL, spanX: 5, spanY: 2 },
-    game: "snake",
-    // Near-duplicate of Snake (owner call, 2026-07-09) — route stays live.
-    hidden: true,
-  },
-];
+    tetris: {
+      mark: <TetrominoMark size={CELL * 2} />,
+      field: { cell: CELL, spanX: 3, spanY: 2 },
+    },
+    "2048": {
+      mark: <Mark2048 size={CELL * 2} />,
+      field: { cell: CELL, spanX: 2, spanY: 2 },
+    },
+    "snake-classic": {
+      mark: <SnakeMark size={CELL * 2} />,
+      field: { cell: CELL, spanX: 5, spanY: 2 },
+    },
+    "stay-awake": {
+      mark: <SlothMark size={CELL * 4} />,
+      field: { cell: CELL, spanX: 5, spanY: 4 },
+    },
+    snake: {
+      mark: <RabbitChaseMark size={CELL * 2} />,
+      field: { cell: CELL, spanX: 5, spanY: 2 },
+    },
+  };
+
+const GAMES: GameEntry[] = ARCADE_GAMES.map((entry) => ({
+  ...entry,
+  ...VISUALS[entry.game],
+}));
 
 /** The card is a THEME-FOLLOWING "screen" — the games themselves are
  *  theme-native (token-resolved palettes), so the hub preview follows the
@@ -228,7 +208,7 @@ export function ArcadePage() {
 
   // Fixed, static set of 3 visible games — always call all 3 hooks
   // unconditionally (rules-of-hooks), each gated on auth like every other
-  // arcade leaderboard read (ArcadeCrowns does the same).
+  // arcade leaderboard read (ArcadeAchievements does the same).
   const tetris = useTetrisLeaderboard(isAuthenticated);
   const snakeClassic = useSnakeClassicLeaderboard(isAuthenticated);
   const game2048 = use2048Leaderboard(isAuthenticated);

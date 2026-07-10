@@ -48,3 +48,5 @@ export { useSubmitArcadeScore } from "./model/use-submit-score";
 export type { HistoryPoint } from "./model/types";
 export { createGamepadPoller } from "./model/gamepad";
 export type { PadFrame } from "./model/gamepad";
+export { ARCADE_GAMES } from "./model/arcade-games";
+export type { ArcadeGameEntry } from "./model/arcade-games";
