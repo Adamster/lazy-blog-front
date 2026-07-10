@@ -261,7 +261,8 @@ export function useTetrisGame({
   const setPadBindings = useCallback((next: BindingMap<TetrisAction>) => {
     setPadBindingsState(next);
     saveBindings(TETRIS_GAMEPAD_STORAGE, next);
-    // Same rationale as setBindings: drop in-flight holds across a remap.
+    // A button physically held across a remap would otherwise resolve to a
+    // different/no action, and stick forever — drop in-flight holds.
     resetInput();
   }, []);
 
