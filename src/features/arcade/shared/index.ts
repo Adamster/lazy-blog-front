@@ -46,7 +46,10 @@ export { useLocalBest } from "./model/use-local-best";
 export type { LocalBest } from "./model/use-local-best";
 export { useSubmitArcadeScore } from "./model/use-submit-score";
 export type { HistoryPoint } from "./model/types";
-export { createGamepadPoller } from "./model/gamepad";
-export type { PadFrame } from "./model/gamepad";
+export {
+  createGamepadPoller,
+  readGamepadAxes,
+  GAMEPAD_DEADZONE,
+} from "./model/gamepad";
 export { ARCADE_GAMES } from "./model/arcade-games";
 export type { ArcadeGameEntry } from "./model/arcade-games";
