@@ -11,7 +11,6 @@ import { Mark2048, use2048Leaderboard } from "@/features/arcade/2048";
 import { SlothMark } from "@/features/arcade/stay-awake";
 import { useTetrisLeaderboard } from "@/features/arcade/tetris";
 import { ARCADE_GAMES, type ArcadeGameEntry } from "@/features/arcade/shared";
-import { RabbitChaseMark } from "./rabbit-chase-mark";
 import { fmt, Label } from "@/shared/ui";
 import { userHref } from "@/shared/lib/routes";
 import { TetrominoMark } from "./tetromino-mark";
@@ -50,10 +49,6 @@ const VISUALS: Record<string, { mark: ReactNode; field: GameEntry["field"] }> =
     "stay-awake": {
       mark: <SlothMark size={CELL * 4} />,
       field: { cell: CELL, spanX: 5, spanY: 4 },
-    },
-    snake: {
-      mark: <RabbitChaseMark size={CELL * 2} />,
-      field: { cell: CELL, spanX: 5, spanY: 2 },
     },
   };
 

@@ -1,7 +1,7 @@
 export interface ArcadeGameEntry {
   /** Backend leaderboard key — does NOT always match `title`/`href` (e.g.
    *  the "Snake" card is the classic-Snake feature, backend key
-   *  `snake-classic`; the backend key `snake` belongs to "The Rabbit"). */
+   *  `snake-classic`). */
   game: string;
   title: string;
   href: string;
@@ -28,12 +28,6 @@ export const ARCADE_GAMES: readonly ArcadeGameEntry[] = [
     game: "stay-awake",
     title: "Stay Awake",
     href: "/arcade/stay-awake",
-    hidden: true,
-  },
-  {
-    game: "snake",
-    title: "The Rabbit",
-    href: "/arcade/follow-the-rabbit",
     hidden: true,
   },
 ];
