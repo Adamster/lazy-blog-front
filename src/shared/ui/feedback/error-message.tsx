@@ -3,6 +3,7 @@
 import { ResponseError } from "@/shared/api/openapi";
 import { useEffect, useState } from "react";
 import { GlitchText } from "@/shared/ui/effects";
+import { HOME_HREF } from "@/shared/lib/routes";
 import { Console } from "../overlays/console";
 import { Button } from "../forms/button";
 
@@ -74,7 +75,7 @@ export const ErrorMessage = ({
 
   return (
     <div
-      className="mono-scope min-h-app flex w-full flex-col justify-center bg-[var(--m-bg)] px-10 py-14 text-[var(--m-fg)]"
+      className="mono-scope min-h-app flex w-full flex-col justify-center bg-[var(--m-bg)] p-10 text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
       <div className="mx-auto w-full max-w-[640px]">
@@ -103,7 +104,7 @@ export const ErrorMessage = ({
         ) : null}
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <Button href="/">Go home</Button>
+          <Button href={HOME_HREF}>Go home</Button>
         </div>
       </div>
     </div>

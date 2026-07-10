@@ -1,15 +1,15 @@
 "use client";
 
 import {
+  BOARD_SIZE,
   HISTORY_RECENT,
   TetrisBoard,
-  TetrisLeaderboard,
   useTetrisArcade,
 } from "@/features/arcade/tetris";
 import {
   BOARD_GRID_RAIL,
   BoardUnsupported,
-  BoardSignInTeaser,
+  Leaderboard,
   StatsBand,
 } from "@/features/arcade/shared";
 
@@ -45,11 +45,11 @@ export default function TetrisPage() {
             </div>
             <BoardUnsupported />
           </div>
-          {showBoard ? (
-            <TetrisLeaderboard board={board} loading={boardLoading} />
-          ) : (
-            <BoardSignInTeaser />
-          )}
+          <Leaderboard
+            board={board}
+            boardSize={BOARD_SIZE}
+            loading={boardLoading}
+          />
         </div>
       </main>
     </div>

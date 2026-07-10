@@ -1,6 +1,7 @@
 import { getPostsByUserNameSSR } from "@/features/post/model/get-posts-by-username.ssr";
 import { generateMeta } from "@/shared/lib/head/meta-data";
 import { displayNameOf } from "@/shared/lib/utils";
+import { userHref } from "@/shared/lib/routes";
 import UserPage from "./user-page";
 
 type PageProps = {
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }: PageProps) {
       }`,
       image: userData.avatarUrl || undefined,
       type: "profile",
-      url: `/${userData.userName}`,
+      url: userHref(userData.userName ?? user),
       card: "summary",
     });
   }

@@ -2,6 +2,7 @@ import { generateMeta } from "@/shared/lib/head/meta-data";
 import { JsonLd } from "@/shared/lib/head/json-ld";
 import { getPostMeta } from "@/features/post/model/get-post-meta";
 import { buildPostJsonLd } from "@/features/post/lib/post-jsonld";
+import { postHref } from "@/shared/lib/routes";
 import { PostPageBody } from "./post-page-body";
 
 type PageProps = {
@@ -19,7 +20,7 @@ export async function generateMetadata({ params }: PageProps) {
       description: postData?.summary || postData?.body?.substring(0, 100) || "",
       image: postData.coverUrl || undefined,
       type: "article",
-      url: `/${postData.author.userName}/${postData.slug}`,
+      url: postHref(postData.author.userName ?? "", postData.slug),
     });
   }
 
@@ -36,7 +37,10 @@ export default async function Page({ params }: PageProps) {
   // control lives in PostPageBody's client fetch). JSON-LD below is gated to
   // published so a draft never leaks to crawlers.
   const postData = await getPostMeta(slug);
-  const url = `/${postData?.author.userName ?? user}/${postData?.slug ?? slug}`;
+  const url = postHref(
+    postData?.author.userName ?? user,
+    postData?.slug ?? slug
+  );
 
   return (
     <div

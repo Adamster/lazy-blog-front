@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/shared/types";
 import { getAllPostsSSR } from "@/features/post/model/get-all-posts.ssr";
+import { HOME_HREF, userHref, postHref } from "@/shared/lib/routes";
 
 export const revalidate = 3600;
 
@@ -9,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticEntries: MetadataRoute.Sitemap = [
     {
-      url: SITE_URL,
+      url: `${SITE_URL}${HOME_HREF}`,
       changeFrequency: "daily",
       priority: 1,
     },
@@ -26,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (userName && !seenUsers.has(userName)) {
       seenUsers.add(userName);
       userEntries.push({
-        url: `${SITE_URL}/${userName}`,
+        url: `${SITE_URL}${userHref(userName)}`,
         changeFrequency: "weekly",
         priority: 0.6,
       });
@@ -34,7 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     if (userName && post.slug) {
       postEntries.push({
-        url: `${SITE_URL}/${userName}/${post.slug}`,
+        url: `${SITE_URL}${postHref(userName, post.slug)}`,
         lastModified: post.createdAtUtc,
         changeFrequency: "monthly",
         priority: 0.8,

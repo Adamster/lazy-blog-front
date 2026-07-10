@@ -24,9 +24,10 @@ export {
   FULLSCREEN_STAGE,
   useBoardFullscreen,
 } from "./ui/board-fullscreen";
-export { BoardSignInTeaser } from "./ui/board-signin-teaser";
 export { BoardUnsupported } from "./ui/board-unsupported";
 export { ControlsModal } from "./ui/controls-modal";
+export { Leaderboard } from "./ui/leaderboard";
+export type { LeaderboardProps, LeaderboardRow } from "./ui/leaderboard";
 export { PanelLabel, PanelReadout } from "./ui/panel-readout";
 export { StatsBand } from "./ui/stats-band";
 export type { StatsBandProps } from "./ui/stats-band";
@@ -45,5 +46,10 @@ export { useLocalBest } from "./model/use-local-best";
 export type { LocalBest } from "./model/use-local-best";
 export { useSubmitArcadeScore } from "./model/use-submit-score";
 export type { HistoryPoint } from "./model/types";
-export { createGamepadPoller } from "./model/gamepad";
-export type { PadFrame } from "./model/gamepad";
+export {
+  createGamepadPoller,
+  readGamepadAxes,
+  GAMEPAD_DEADZONE,
+} from "./model/gamepad";
+export { ARCADE_GAMES } from "./model/arcade-games";
+export type { ArcadeGameEntry } from "./model/arcade-games";

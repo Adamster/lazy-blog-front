@@ -371,15 +371,20 @@ export function OverlayDetail({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** The whole MENU overlay — glitch title, start CTA, key hints. */
+/** The whole MENU overlay — glitch title, one-line description, start CTA, key hints. */
 export function MenuOverlay({
   title,
+  description,
   onStart,
   hints,
   startLabel = "Start game",
   extra,
 }: {
   title: string;
+  /** The deadpan one-liner that used to live under the title on the arcade
+   *  hub card — moved here (owner call) so the menu screen isn't just a
+   *  title + button. Same 14px/1.6 muted treatment the hub card used. */
+  description?: string;
   onStart: () => void;
   /** Optional key-hint rows. Omitted on every game today (the on-menu hint list
    *  was removed — the CONTROLS modal is the single reference); kept optional so
@@ -393,6 +398,11 @@ export function MenuOverlay({
     <div className={overlayBase}>
       <OverlayRail>
         <OverlayTitle>{title}</OverlayTitle>
+        {description && (
+          <p className="max-w-[280px] text-[14px] leading-[1.6] text-[var(--m-muted)]">
+            {description}
+          </p>
+        )}
         <ArcadeButton onClick={onStart}>{startLabel}</ArcadeButton>
         {hints && hints.length > 0 && <KeyHints hints={hints} />}
         {extra}

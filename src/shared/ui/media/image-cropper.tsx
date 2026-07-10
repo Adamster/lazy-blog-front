@@ -83,7 +83,7 @@ export default function ImageCropper({
             aria-label="Cancel"
             className="mono-icon-btn mono-focus size-9"
           >
-            <NoSymbolIcon className="size-4" />
+            <NoSymbolIcon className="size-3.5" />
           </button>
         </div>
       )}

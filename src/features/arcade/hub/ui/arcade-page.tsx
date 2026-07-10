@@ -2,93 +2,79 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { SnakeMark } from "@/features/arcade/snake-classic";
-import { Mark2048 } from "@/features/arcade/2048";
+import { useAuth } from "@/entities/session";
+import {
+  SnakeMark,
+  useSnakeClassicLeaderboard,
+} from "@/features/arcade/snake-classic";
+import { Mark2048, use2048Leaderboard } from "@/features/arcade/2048";
 import { SlothMark } from "@/features/arcade/stay-awake";
-import { RabbitChaseMark } from "./rabbit-chase-mark";
-import { Label } from "@/shared/ui";
+import { useTetrisLeaderboard } from "@/features/arcade/tetris";
+import { ARCADE_GAMES, type ArcadeGameEntry } from "@/features/arcade/shared";
+import { fmt, Label } from "@/shared/ui";
+import { userHref } from "@/shared/lib/routes";
 import { TetrominoMark } from "./tetromino-mark";
 
-interface GameEntry {
-  href: string;
-  title: string;
-  /** One deadpan muted line under the title — the SAME card for signed-in and
-   *  signed-out (the leaderboard block was cut: filled vs empty read uneven). */
-  description: string;
+interface GameEntry extends ArcadeGameEntry {
   mark: ReactNode;
   /** The mark's own pixel grid — cell size (px) + the cells the mark spans.
    *  Drives the CellField so the figure sits ON the field like a real render. */
   field: { cell: number; spanX: number; spanY: number };
-  /** Temporarily delisted from the hub (owner call) — the route stays live;
-   *  drop the flag to relist. */
-  hidden?: boolean;
 }
 
-// Hollow Sloth is an unlisted prototype — deliberately absent here.
-// ONE field scale across the cards: the shared 20px cell. Each mark is built
-// from whole cells at that scale — its in-game placement, not a scaled logo —
-// so `size` is always `<cell> × <rows the figure spans>`. SANCTIONED EXCEPTION:
-// the 2048 card runs a bigger cell (owner call) — in-game its 4×4 cells dwarf
-// every other game's, so its preview field scales up to keep the meaning.
+// ONE field scale across ALL cards, incl. 2048 (owner call) — the shared
+// 20px cell. Each mark is built from whole cells at that scale — its
+// in-game placement, not a scaled logo — so `size` is always `<cell> × <rows
+// the figure spans>`.
 const CELL = 20;
-const CELL_2048 = 28;
-const GAMES: GameEntry[] = [
+
+// Hub-only visuals (mark + field), keyed by the shared roster's `game` id —
+// title/href/hidden come from `ARCADE_GAMES` (also consumed by the profile
+// crowns), so a roster change only needs editing that one shared list.
+const VISUALS: Record<string, { mark: ReactNode; field: GameEntry["field"] }> =
   {
-    href: "/arcade/tetris",
-    title: "Tetris",
-    description: "Blocks fall. Lines clear. Gravity always wins.",
-    mark: <TetrominoMark size={CELL * 2} />,
-    field: { cell: CELL, spanX: 3, spanY: 2 },
-  },
-  {
-    href: "/arcade/snake",
-    title: "Snake",
-    description: "The classic. You, your tail, and bad decisions.",
-    mark: <SnakeMark size={CELL * 2} />,
-    field: { cell: CELL, spanX: 5, spanY: 2 },
-  },
-  {
-    href: "/arcade/2048",
-    title: "2048",
-    description: "Double the numbers until the board disagrees.",
-    mark: <Mark2048 size={CELL_2048 * 2} />,
-    field: { cell: CELL_2048, spanX: 2, spanY: 2 },
-  },
-  {
-    href: "/arcade/stay-awake",
-    title: "Stay Awake",
-    description: "The floor is sleep. Keep hopping.",
-    mark: <SlothMark size={CELL * 4} />,
-    field: { cell: CELL, spanX: 5, spanY: 4 },
-  },
-  {
-    href: "/arcade/follow-the-rabbit",
-    title: "The Rabbit",
-    description: "Follow the rabbit. The striped ones bite.",
-    mark: <RabbitChaseMark size={CELL * 2} />,
-    field: { cell: CELL, spanX: 5, spanY: 2 },
-  },
-];
+    tetris: {
+      mark: <TetrominoMark size={CELL * 2} />,
+      field: { cell: CELL, spanX: 3, spanY: 2 },
+    },
+    "2048": {
+      mark: <Mark2048 size={CELL * 2} />,
+      field: { cell: CELL, spanX: 2, spanY: 2 },
+    },
+    "snake-classic": {
+      mark: <SnakeMark size={CELL * 2} />,
+      field: { cell: CELL, spanX: 5, spanY: 2 },
+    },
+    "stay-awake": {
+      mark: <SlothMark size={CELL * 4} />,
+      field: { cell: CELL, spanX: 5, spanY: 4 },
+    },
+  };
+
+const GAMES: GameEntry[] = ARCADE_GAMES.map((entry) => ({
+  ...entry,
+  ...VISUALS[entry.game],
+}));
 
 /** The card is a THEME-FOLLOWING "screen" — the games themselves are
  *  theme-native (token-resolved palettes), so the hub preview follows the
  *  ambient theme too: `--m-bg` field + 2px `--m-line` frame, the same look as a
- *  bordered game canvas on the page. `min-h-36` (144px = p-5 pair + title +
- *  title→body 16 + THREE 14px/1.6 description lines): the card holds a stable
- *  stature but hugs its content — the 176 take left a dead band below the
- *  text (owner call). */
+ *  bordered game canvas on the page. Stacked like `PostCard` (cover on top,
+ *  content below) — no explicit min-height; the grid row (like PostCard's
+ *  feed grid) stretches every card in a row to the tallest sibling, and
+ *  `h-full` + `flex-col` on the card + content column let it fill that. */
 function ScreenCard({ children }: { children: ReactNode }) {
   return (
-    <article className="mono-scope group relative grid h-full min-h-36 grid-cols-3 border-2 border-[var(--m-line)] bg-[var(--m-bg)] text-[var(--m-fg)] transition-colors hover:border-[var(--m-accent)]">
+    <article className="mono-scope group relative flex h-full flex-col border-2 border-[var(--m-line)] bg-[var(--m-bg)] text-[var(--m-fg)] transition-colors hover:border-[var(--m-accent)]">
       {children}
     </article>
   );
 }
 
-/** The card's left third = the game's own FIELD — a faint cell grid at the
- *  mark's exact pixel scale (the in-game low-alpha `--m-fg` hairline), filling
- *  the column instead of a divider rail; the mark's pixels sit ON the grid
- *  like a real render. */
+/** The card's TOP "cover" — a faint cell grid at the mark's exact pixel scale
+ *  (the in-game low-alpha `--m-fg` hairline), the same `aspect-[16/10]` box
+ *  `PostCard` uses for its cover image; the mark's pixels sit ON the grid like
+ *  a real render. */
 function CellField({
   field: { cell, spanX, spanY },
   children,
@@ -96,7 +82,7 @@ function CellField({
   field: GameEntry["field"];
   children: ReactNode;
 }) {
-  // The MARK stays dead-centre in the column; the PATTERN shifts half a cell on
+  // The MARK stays dead-centre in the box; the PATTERN shifts half a cell on
   // an axis where the mark spans an EVEN number of cells, so a grid line (not a
   // cell centre) runs through the middle and the mark's edges land on the
   // lines. The three shared-CELL cards have identical span parity (odd × even),
@@ -107,7 +93,7 @@ function CellField({
   const off = (span: number) => (span % 2 === 0 ? cell / 2 : 0);
   const line = "color-mix(in srgb, var(--m-fg) 6%, transparent)";
   return (
-    <div className="relative flex items-center justify-center">
+    <div className="relative flex aspect-[16/10] items-center justify-center overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0"
@@ -115,6 +101,17 @@ function CellField({
           backgroundImage: `linear-gradient(to right, ${line} 1px, transparent 1px), linear-gradient(to bottom, ${line} 1px, transparent 1px)`,
           backgroundSize: `${cell}px ${cell}px`,
           backgroundPosition: `calc(50% + ${off(spanX) - 0.5}px) calc(50% + ${off(spanY) - 0.5}px)`,
+          // The box's fluid, responsive height is never an exact multiple of
+          // `cell` (nor is its width, for that matter — the top/left/right
+          // edges crop a partial cell too, just hidden under the card's own
+          // 2px border). A hard line forced exactly at the bottom edge lands
+          // mid-cell and reads as a visibly SHORTER last row, not a clean
+          // close. Fading the pattern out instead sidesteps needing an exact
+          // pixel-snapped height (which would mean JS-measuring the box,
+          // like the canvas boards do) — it just softens into the bottom
+          // edge, closing it without exposing the crop.
+          WebkitMaskImage: "linear-gradient(to bottom, black 80%, transparent)",
+          maskImage: "linear-gradient(to bottom, black 80%, transparent)",
         }}
       />
       <div className="relative">{children}</div>
@@ -122,11 +119,77 @@ function CellField({
   );
 }
 
-function GameCard({ game }: { game: GameEntry }) {
+/** One top-3 leaderboard entry. */
+type LeaderEntry = { userName: string; bestScore: number };
+
+/** Plain zero-padded position ("01"/"02"/"03") — same rank-column treatment as
+ *  the game page's own high-score board (leaderboard.tsx's `BoardRow`),
+ *  rank-1 reads accent, 2/3 read muted2. */
+function RankNumber({ rank }: { rank: number }) {
+  const isTop = rank === 1;
+  return (
+    <span
+      className={`text-[12px] tabular-nums ${
+        isTop ? "text-[var(--m-accent)]" : "text-[var(--m-muted2)]"
+      }`}
+    >
+      {String(rank).padStart(2, "0")}
+    </span>
+  );
+}
+
+/** ALWAYS renders exactly 3 rows (never conditionally omitted or shorter) —
+ *  a card with data and a card without must have the identical shape, only
+ *  each row's content differs. Row markup modeled on `PostCard`'s `CardMeta`
+ *  (post-card.tsx): handle left, stat right, same 12px/muted caption
+ *  treatment — with a `RankNumber` prepended per row. */
+function LeaderRow({ leaders }: { leaders: LeaderEntry[] }) {
+  return (
+    <div className="mt-auto flex flex-col gap-1 pt-6 text-[12px] text-[var(--m-muted)]">
+      {[1, 2, 3].map((rank) => {
+        const entry = leaders[rank - 1];
+        return (
+          <div key={rank} className="flex items-center gap-3">
+            <RankNumber rank={rank} />
+            {entry ? (
+              <>
+                <Link
+                  href={userHref(entry.userName)}
+                  className="relative z-[var(--m-z-content)] truncate transition-colors hover:text-[var(--m-accent)]"
+                >
+                  @{entry.userName}
+                </Link>
+                <span className="ml-auto tabular-nums">
+                  {fmt(entry.bestScore)}
+                </span>
+              </>
+            ) : (
+              <span
+                className="flex-1 overflow-hidden text-clip whitespace-nowrap text-[var(--m-dim)]"
+                role="img"
+                aria-label="No score yet"
+              >
+                ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+              </span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function GameCard({
+  game,
+  leaders,
+}: {
+  game: GameEntry;
+  leaders: LeaderEntry[];
+}) {
   return (
     <ScreenCard>
       <CellField field={game.field}>{game.mark}</CellField>
-      <div className="col-span-2 p-5">
+      <div className="flex flex-1 flex-col p-5">
         <h2 className="mono-title transition-colors group-hover:text-[var(--m-accent)]">
           <Link
             href={game.href}
@@ -135,9 +198,7 @@ function GameCard({ game }: { game: GameEntry }) {
             {game.title}
           </Link>
         </h2>
-        <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
-          {game.description}
-        </p>
+        <LeaderRow leaders={leaders} />
       </div>
     </ScreenCard>
   );
@@ -148,20 +209,53 @@ function GameCard({ game }: { game: GameEntry }) {
  *  Public like every game page — signed-out visitors play local-only (the game
  *  hooks gate submit/stats/leaderboard on auth; no board surfaces signed out). */
 export function ArcadePage() {
+  const { isAuthenticated } = useAuth();
+
+  // Fixed, static set of 3 visible games — always call all 3 hooks
+  // unconditionally (rules-of-hooks), each gated on auth like every other
+  // arcade leaderboard read (ArcadeAchievements does the same).
+  const tetris = useTetrisLeaderboard(isAuthenticated);
+  const snakeClassic = useSnakeClassicLeaderboard(isAuthenticated);
+  const game2048 = use2048Leaderboard(isAuthenticated);
+
+  const leadersOf = (
+    entries: { userName: string; bestScore: number }[] | undefined
+  ): LeaderEntry[] =>
+    (entries ?? [])
+      .slice(0, 3)
+      .map((e) => ({ userName: e.userName, bestScore: e.bestScore }));
+
+  const leadersByGame: Record<string, LeaderEntry[]> = {
+    tetris: leadersOf(tetris.data?.entries),
+    "snake-classic": leadersOf(snakeClassic.data?.entries),
+    "2048": leadersOf(game2048.data?.entries),
+  };
+
   return (
     <div
       className="mono-scope min-h-app mx-[calc(50%-50vw)] w-screen bg-[var(--m-bg)] text-[var(--m-fg)]"
       style={{ fontFamily: "var(--font-mono)" }}
     >
       <main className="mx-auto max-w-[1240px] px-5 pb-10 sm:px-10">
-        {/* Bare eyebrow first → pt-10 (section rhythm + flush-avoidance), pb-6 binds it down. */}
-        <div className="flex items-center pt-10 pb-6">
+        {/* Bare eyebrow first → pt-10 (section rhythm + flush-avoidance). Eyebrow→H1
+            and H1→subtitle mirror the home hero / post-page title rhythm (24 / 16). */}
+        <div className="pt-10">
           <Label>ARCADE</Label>
+          <h1 className="font-display mt-6 text-[32px] leading-[1.04] font-bold tracking-[-0.02em] text-balance md:text-[40px]">
+            The official excuse for procrastinating
+          </h1>
+          <p className="mt-4 text-[14px] leading-[1.6] text-[var(--m-muted)]">
+            Too lazy to work? At least get good at this.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {GAMES.filter((game) => !game.hidden).map((game) => (
-            <GameCard key={game.href} game={game} />
+            <GameCard
+              key={game.href}
+              game={game}
+              leaders={leadersByGame[game.game]}
+            />
           ))}
         </div>
       </main>

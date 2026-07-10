@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useClickOutside } from "react-haiku";
@@ -9,17 +10,24 @@ import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 import { useTheme } from "@/shared/ui/theme";
 import { useUser, useAuth } from "@/entities/session";
 import { AuthModal } from "@/features/auth/ui/auth-modal";
-import { RabbitMark } from "@/features/arcade/snake";
+import { HOME_HREF, userHref } from "@/shared/lib/routes";
 import { AccountCommands } from "./account-commands";
 import { HeaderLockup } from "./header-lockup";
 import { PromptHeader } from "./prompt-header";
 import { SettingsToggles } from "./settings-toggles";
 import { useToggle } from "./use-toggle";
 
+const NAV_LINKS = [
+  // Post/profile pages (`/u/...`) are Blog content, so they keep this active too.
+  { href: HOME_HREF, label: "Blog", activePrefixes: [HOME_HREF, "/u/"] },
+  { href: "/arcade", label: "Arcade", activePrefixes: ["/arcade"] },
+] as const;
+
 export function Header() {
   const { theme, cycleTheme } = useTheme();
   const { user } = useUser();
   const { isAuthenticated, logout } = useAuth();
+  const pathname = usePathname();
 
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -35,17 +43,39 @@ export function Header() {
         <div className="flex h-full items-center justify-between px-5">
           <div className="flex items-center">
             <HeaderLockup />
-            <Link
-              href="/arcade"
-              aria-label="Arcade"
-              className="mono-jiggle mono-focus ml-3 hidden shrink-0 opacity-80 transition-opacity hover:opacity-100 focus-visible:opacity-100 sm:inline-flex"
-            >
-              <RabbitMark
-                size={16}
-                fill={theme === "light" ? "var(--m-error)" : undefined}
-                className="mono-jiggle__mark"
-              />
-            </Link>
+            <nav className="ml-10 hidden items-center gap-4 sm:flex">
+              {NAV_LINKS.map((link) => {
+                const isActive = link.activePrefixes.some((prefix) =>
+                  pathname?.startsWith(prefix)
+                );
+
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    aria-current={isActive ? "page" : undefined}
+                    style={{ fontFamily: "var(--font-mono)" }}
+                    className={`mono-focus text-[11px] leading-none font-medium tracking-[0.12em] uppercase transition-colors ${
+                      isActive
+                        ? "text-[var(--m-accent)]"
+                        : "text-[var(--m-muted)] hover:text-[var(--m-accent)]"
+                    }`}
+                  >
+                    <span
+                      className={`transition-opacity ${isActive ? "opacity-100" : "opacity-0"}`}
+                    >
+                      {"[ "}
+                    </span>
+                    {link.label}
+                    <span
+                      className={`transition-opacity ${isActive ? "opacity-100" : "opacity-0"}`}
+                    >
+                      {" ]"}
+                    </span>
+                  </Link>
+                );
+              })}
+            </nav>
           </div>
 
           {/* The `@handle` lives OUTSIDE `menuRef` so it doesn't trip the
@@ -53,7 +83,7 @@ export function Header() {
           <div className="flex items-center gap-4">
             {isAuthenticated && user?.userName && (
               <Link
-                href={`/${user.userName}`}
+                href={userHref(user.userName)}
                 style={{ fontFamily: "var(--font-mono)" }}
                 className="mono-focus max-w-[160px] truncate text-[12px] leading-none text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
               >

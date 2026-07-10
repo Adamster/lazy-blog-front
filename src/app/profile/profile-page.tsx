@@ -9,6 +9,7 @@ import { ProfileSecurityForm } from "@/features/user/ui/profile-security-form";
 import { ProfileSecurityIntro } from "@/features/user/ui/profile-security-intro";
 import type { ProfileTab } from "@/features/user/ui/profile-tabs";
 import { Loading } from "@/shared/ui";
+import { HOME_HREF, userHref } from "@/shared/lib/routes";
 
 // Active tab lives in the URL; breaks out of the legacy clamped `<main>` (same as the composer route).
 export default function Profile() {
@@ -44,7 +45,7 @@ export default function Profile() {
         <EditProfileTopBar
           current={activeTab}
           onSelect={selectTab}
-          profileHref={user?.userName ? `/${user.userName}` : "/"}
+          profileHref={user?.userName ? userHref(user.userName) : HOME_HREF}
         />
 
         {/* Both steps share one two-panel card so switching tabs never jumps the

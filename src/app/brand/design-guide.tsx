@@ -58,6 +58,7 @@ import { GlitchText, MatrixText } from "@/shared/ui/effects";
 import { addToastSuccess, addToastError } from "@/shared/lib/toasts";
 import { DraftOverlay } from "@/features/post/ui/draft-overlay";
 import { CrepeEditor } from "@/features/post/ui/crepe-wrapper";
+import { HeaderLockup } from "@/widgets/header";
 import { Section, Panel, State, Spec, GroupBand } from "./_helpers";
 
 const navLinkCls =
@@ -368,12 +369,18 @@ export function DesignGuide() {
       <div className="text-[11px] leading-none tracking-[0.12em] text-[var(--m-accent)]">
         {"// NOT LAZY — DESIGN GUIDE · BRUTALIST MONO"}
       </div>
-      <div className="mt-6 flex flex-wrap items-center gap-5">
-        <span className="bg-[var(--m-accent)] px-4 py-2 text-[14px] tracking-[0.2em] text-[var(--m-bg)]">
-          [ TEAM ]
-        </span>
-        <div className="font-display text-[40px] leading-none font-bold tracking-[-0.02em] whitespace-nowrap text-[var(--m-fg)]">
-          NOT <span className="text-[var(--m-accent)]">LAZY</span>
+      <div className="mt-6 flex flex-wrap items-center gap-7">
+        <div className="flex flex-wrap items-center gap-5">
+          <span className="bg-[var(--m-accent)] px-4 py-2 text-[14px] tracking-[0.2em] text-[var(--m-bg)]">
+            [ TEAM ]
+          </span>
+          <div className="font-display text-[40px] leading-none font-bold tracking-[-0.02em] whitespace-nowrap text-[var(--m-fg)]">
+            NOT <span className="text-[var(--m-accent)]">LAZY</span>
+          </div>
+        </div>
+        <span className="h-5 w-0.5 bg-[var(--m-dim)]" aria-hidden="true" />
+        <div>
+          <HeaderLockup />
         </div>
       </div>
       <h1 className="font-display mt-6 text-[40px] leading-none font-bold tracking-[-0.02em]">
@@ -618,7 +625,7 @@ export function DesignGuide() {
                     aria-label="Copy link"
                     className="mono-icon-btn size-9"
                   >
-                    <LinkIcon className="size-4" />
+                    <LinkIcon className="size-3.5" />
                   </button>
                   <form onSubmit={(e) => e.preventDefault()}>
                     <IconSubmitButton label="Publish post" />
@@ -1018,7 +1025,7 @@ export function DesignGuide() {
           id="markers"
           index="14"
           title="CATEGORY · STATUSBADGE · DRAFT"
-          intro="The terminal markers. Category ([ x ], 11px / 0.12em) tags a post's topic; StatusBadge flags LATEST DROP / PINNED; the draft/unpublished cover overlay (dim + crossed-eye + UNPUBLISHED) renders on the author's own feed cards & their post page — the ONE draft treatment."
+          intro="The terminal markers. Category ([ x ], 11px / 0.12em) tags a post's topic; StatusBadge flags LATEST DROP / FEATURED as a label + breathing dot ring (FEATURED reads accent, LATEST DROP stays muted); the draft/unpublished cover overlay (dim + crossed-eye + UNPUBLISHED) renders on the author's own feed cards & their post page — the ONE draft treatment."
         >
           <Panel caption="// CATEGORY · STATUS · DRAFT OVERLAY">
             <div className="grid grid-cols-2 gap-x-7 gap-y-7 sm:grid-cols-4">
@@ -1028,8 +1035,8 @@ export function DesignGuide() {
               <State caption="status · latest drop">
                 <StatusBadge status="LATEST DROP" />
               </State>
-              <State caption="status · pinned">
-                <StatusBadge status="PINNED" />
+              <State caption="status · featured">
+                <StatusBadge status="FEATURED" />
               </State>
               <State caption="unpublished cover overlay">
                 <div className="relative aspect-[16/9] w-full overflow-hidden border-2 border-[var(--m-dim)] bg-[var(--m-panel)]">

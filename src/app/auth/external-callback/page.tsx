@@ -6,6 +6,7 @@ import { AuthState, saveAuthState } from "@/shared/lib/auth-storage";
 import { expiryFromToken } from "@/shared/lib/auth-refresh";
 import { userKeys } from "@/entities/session";
 import type { LoginResponse } from "@/shared/api/openapi";
+import { HOME_HREF } from "@/shared/lib/routes";
 
 const isDev = process.env.NODE_ENV !== "production";
 
@@ -49,13 +50,13 @@ export default function ExternalCallbackPage() {
           saveAuthState(authState);
           queryClient.setQueryData(["auth"], authState);
           queryClient.setQueryData(userKeys.byId(user.id), user);
-          window.location.replace("/");
+          window.location.replace(HOME_HREF);
         } else {
           throw new Error("Invalid callback payload");
         }
       } catch (e) {
         if (isDev) console.error("External callback failed", e);
-        window.location.replace("/?error=external-callback");
+        window.location.replace(`${HOME_HREF}?error=external-callback`);
       }
     })();
   }, [queryClient]);

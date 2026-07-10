@@ -1,12 +1,13 @@
 import { Metadata } from "next";
+import HomePage from "./home-page";
 import { generateMeta } from "@/shared/lib/head/meta-data";
-import SnakePage from "./snake-page";
 
 export const metadata: Metadata = generateMeta({
-  title: "Follow the Rabbit",
-  noindex: true,
+  title: "Home",
+  url: "/blog",
 });
 
+// No SSR feed seed — the home feed loads client-side; the meta tags above cover SEO.
 export default function Page() {
-  return <SnakePage />;
+  return <HomePage />;
 }

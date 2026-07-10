@@ -15,7 +15,7 @@ export interface StatsBandProps {
   historyWindow: number;
   /** Unique per page — forwarded to the Sparkline gradient defs id (two gradients with the same id collide in the DOM). */
   gradientId: string;
-  /** Extra content anchored to the SCORE cell's value — e.g. the rabbit snake's floating ScorePops "+N" juice. */
+  /** Extra content anchored to the SCORE cell's value — e.g. a floating ScorePops "+N" juice. */
   scoreExtra?: ReactNode;
 }
 

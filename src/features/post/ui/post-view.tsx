@@ -8,6 +8,7 @@ import { Avatar, Category, Metric, StatusBadge } from "@/shared/ui";
 import { PostBody } from "@/shared/ui/prose";
 import { DraftOverlay } from "@/features/post/ui/draft-overlay";
 import type { Status } from "@/shared/ui";
+import { userHref } from "@/shared/lib/routes";
 import { UNTAGGED_LABEL } from "../lib/untagged-label";
 
 interface IProps {
@@ -33,7 +34,7 @@ function PostByline({
     <section className="mx-[calc(50%-50vw)] mt-10 w-screen bg-[var(--m-card)]">
       <div className="mx-auto flex max-w-[780px] flex-wrap items-end gap-x-4 gap-y-4 px-5 py-10 sm:px-10">
         <Link
-          href={`/${authorHandle}`}
+          href={userHref(authorHandle)}
           aria-label={`${displayNameOf(post.author)} profile`}
           className="self-center"
         >
@@ -48,7 +49,7 @@ function PostByline({
           </span>
           <span className="mt-1 flex flex-wrap items-center gap-2.5 text-[12px] text-[var(--m-muted)]">
             <Link
-              href={`/${authorHandle}`}
+              href={userHref(authorHandle)}
               className="transition-colors hover:text-[var(--m-accent)]"
             >
               @{authorHandle}
@@ -91,16 +92,26 @@ export const PostView = ({
 }: IProps) => {
   const cat = post.tags?.[0]?.tag ?? UNTAGGED_LABEL;
 
-  // No backing field yet — set when a pinned / latest-drop flag lands on the model.
+  // No backing field yet — set when a featured / latest-drop flag lands on the model.
   const status: Status | null = null;
 
   return (
     <>
       <div className="mx-auto max-w-[780px] px-5 pt-10 sm:px-10">
-        <div className="mb-2 flex flex-wrap items-center gap-3">
+        {/* `headerMenu` is ALWAYS present as an element (it self-hides for
+            non-owners via `IsAuthor`), so it's absolutely positioned rather
+            than a flex sibling — a flex row's height is its TALLEST child, so
+            the 36px menu trigger sitting beside the 11px `Category` label
+            was stretching the row and pushing the category→title gap
+            inconsistently whenever an owner viewed their own post.
+            mb-6 (24px, not the feed-card's compact mb-2/8px — `Category`
+            here reads as an EYEBROW ahead of the big 32/40px H1, same
+            relationship as the modal/error-page eyebrow→title gap). */}
+        <div className="relative mb-6 flex flex-wrap items-center gap-3 pr-9">
           <Category>{cat}</Category>
-          {status && <StatusBadge status={status} className="ml-auto" />}
-          {headerMenu}
+          <div className="absolute top-1/2 right-0 -translate-y-1/2">
+            {headerMenu}
+          </div>
         </div>
 
         <h1 className="font-display text-[32px] leading-[1.04] font-bold tracking-[-0.02em] text-balance md:text-[40px]">
@@ -118,17 +129,25 @@ export const PostView = ({
 
       <article className="mx-auto max-w-[780px] px-5 pt-10 sm:px-10">
         {post.coverUrl && (
-          <div className="relative aspect-[16/9] w-full overflow-hidden border-2 border-[var(--m-dim)] bg-[var(--m-panel)]">
-            <Image
-              src={post.coverUrl}
-              alt={post.title}
-              fill
-              sizes="(max-width: 860px) 100vw, 780px"
-              priority
-              unoptimized
-              className="object-cover [filter:contrast(1.03)]"
-            />
-            {!post.isPublished && <DraftOverlay size="page" />}
+          <div className="relative">
+            {status && (
+              <StatusBadge
+                status={status}
+                className="absolute top-5 right-5 z-[var(--m-z-content)]"
+              />
+            )}
+            <div className="relative aspect-[16/9] w-full overflow-hidden border-2 border-[var(--m-dim)] bg-[var(--m-panel)]">
+              <Image
+                src={post.coverUrl}
+                alt={post.title}
+                fill
+                sizes="(max-width: 860px) 100vw, 780px"
+                priority
+                unoptimized
+                className="object-cover [filter:contrast(1.03)]"
+              />
+              {!post.isPublished && <DraftOverlay size="page" />}
+            </div>
           </div>
         )}
 

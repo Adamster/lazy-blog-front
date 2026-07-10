@@ -9,6 +9,7 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import { Menu, ConfirmModal, type MenuItem } from "@/shared/ui";
+import { postEditHref } from "@/shared/lib/routes";
 import { usePublishPost, useHidePost } from "../model/use-publish-post";
 import { useDeletePostMenu } from "../model/use-delete-post-menu";
 
@@ -43,7 +44,7 @@ export const PostHeaderMenu = ({
       id: "edit",
       label: "Edit",
       icon: <PencilSquareIcon className={iconCls} />,
-      onSelect: () => router.push(`/${authorHandle}/${postSlug}/edit`),
+      onSelect: () => router.push(postEditHref(authorHandle, postSlug)),
     },
     {
       id: "publish",

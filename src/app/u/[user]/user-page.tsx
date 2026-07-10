@@ -20,8 +20,9 @@ import {
 import { MatrixText } from "@/shared/ui/effects";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { displayNameOf, formatDate2 } from "@/shared/lib/utils";
+import { postHref } from "@/shared/lib/routes";
 import { PostCard } from "@/features/post/ui/post-card";
-import { ArcadeCrowns } from "@/features/arcade/crowns";
+import { ArcadeAchievements } from "@/features/arcade/crowns";
 
 export default function UserPage({ userName }: { userName: string }) {
   const query = usePostsByUserName(userName);
@@ -97,15 +98,13 @@ export default function UserPage({ userName }: { userName: string }) {
               <span className="font-semibold text-[var(--m-fg)]">
                 {fmt(totalPosts)} posts
               </span>
-              {/* Arcade crowns — one pixel icon per game this user currently
-                  tops (renders nothing signed-out / crownless). */}
-              <ArcadeCrowns userName={handle} />
             </div>
             {user?.biography ? (
               <p className="mt-4 max-w-[40em] text-[14px] leading-[1.6] whitespace-pre-line text-[var(--m-muted)]">
                 {user.biography}
               </p>
             ) : null}
+            <ArcadeAchievements userName={handle} />
           </div>
         </section>
 
@@ -187,7 +186,7 @@ export default function UserPage({ userName }: { userName: string }) {
                   delay: Math.min(index * 0.04, 0.32),
                 }}
               >
-                <PostCard post={p} href={`/${handle}/${p.slug}`} />
+                <PostCard post={p} href={postHref(handle, p.slug)} />
               </motion.div>
             ))}
           </section>

@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { useUpdatePost } from "@/features/post/model/use-update-post";
 import { usePostBySlug } from "@/features/post/model/use-post-by-slug";
 import { useDeletePost } from "@/features/post/model/use-delete-post";
+import { postHref } from "@/shared/lib/routes";
 
 const EditPage = () => {
   const params = useParams();
@@ -83,7 +84,7 @@ const EditForm = ({ postData }: { postData: PostDetailedResponse }) => {
         isEdit
         isPending={updatePostMutation.isPending}
         onDelete={() => setIsModalOpen(true)}
-        viewHref={`/${postData.author.userName}/${postData.slug}`}
+        viewHref={postHref(postData.author.userName ?? "", postData.slug)}
       />
 
       {isModalOpen && (

@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { apiClient } from "@/shared/api/api-client";
 import { DisplayPostResponse, UserPostItem } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
+import { HOME_HREF } from "@/shared/lib/routes";
 import { postKeys } from "./post-keys";
 
 // `useAllPosts` infinite-cache: each page is a flat array.
@@ -82,7 +83,7 @@ export const useDeletePostMenu = (postId: string) => {
 
     onSuccess: () => {
       addToastSuccess("Post has been deleted");
-      router.push("/");
+      router.push(HOME_HREF);
     },
 
     onSettled: () => {

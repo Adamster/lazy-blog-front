@@ -100,32 +100,6 @@
   }
 }
 
-/* Arcade crowns — the profile TOP-1 trophies: a periodic diagonal GLINT that
-   runs across the icon, clipped to the pixel silhouette (the halo/pulse takes
-   were both cut — owner call: the glint alone is the trophy). The sweep is
-   fast (first ~30% of the cycle), then rests off-icon. Reduced motion: no
-   glint — the accent colour carries the trophy read. */
-@keyframes mono-crown-shine {
-  0% {
-    transform: translateX(-140%);
-  }
-  30% {
-    transform: translateX(140%);
-  }
-  100% {
-    transform: translateX(140%);
-  }
-}
-.mono-crown-shine {
-  animation: mono-crown-shine 2.8s ease-in-out infinite;
-  transform-box: fill-box;
-}
-@media (prefers-reduced-motion: reduce) {
-  .mono-crown-shine {
-    display: none;
-  }
-}
-
 @keyframes mono-toast-in {
   from {
     opacity: 0;
@@ -234,6 +208,29 @@
   }
 }
 
+/* StatusBadge's breathing ring — scale and opacity move in sync (small +
+   faint, large + solid), unlike the standard "ping" where they invert. */
+@keyframes mono-status-breathe {
+  0%,
+  100% {
+    transform: scale(0.85);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+.mono-status-ring {
+  animation: mono-status-breathe 1.8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-status-ring {
+    animation: none;
+    opacity: 1;
+  }
+}
+
 /* ───────────────────────── LAB / FX effects ─────────────────────────
    Toys + new primitives for the /brand LAB tab. EVERY animated rule below has
    a `prefers-reduced-motion: reduce` fallback that drops the motion to a static
@@ -265,40 +262,41 @@
   }
 }
 
-/* Jiggle (`.mono-jiggle`) — a quick playful "laughing" wobble: a few-degree
-   side-to-side rotate looping while the trigger is hovered/focused
-   (transform-only, so no layout shift). The class sits on the TRIGGER (e.g. the
-   header link that owns the focus ring); the wobble is applied to its
-   `.mono-jiggle__mark` child, so the focus outline itself never moves. Used by
-   the NEO white-rabbit header easter-egg. */
-@keyframes mono-jiggle {
-  0%,
+/* Sleepy "zzz" drift (header logo) — little z's float up-and-right off the end
+   of LAZY, each on its OWN duration/delay/angle (set per-glyph via `--z-*`
+   custom properties at the call site) so the cluster reads chaotic rather than
+   synchronised. Decorative icon glyphs (like the ✕ / icon carve-out in
+   CLAUDE.md) — off the closed type scale, aria-hidden. Loops continuously. */
+@keyframes mono-zdrift {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(var(--z-rot)) scale(0.75);
+  }
+  18% {
+    opacity: 1;
+  }
   100% {
-    transform: rotate(0deg);
-  }
-  20% {
-    transform: rotate(-7deg);
-  }
-  40% {
-    transform: rotate(6deg);
-  }
-  60% {
-    transform: rotate(-4deg);
-  }
-  80% {
-    transform: rotate(3deg);
+    opacity: 0;
+    transform: translate(var(--z-dx), var(--z-dy)) rotate(var(--z-rot2))
+      scale(1.1);
   }
 }
-.mono-jiggle:hover .mono-jiggle__mark,
-.mono-jiggle:focus-visible .mono-jiggle__mark {
-  animation: mono-jiggle 0.4s ease-in-out infinite;
+.mono-zdrift {
+  position: absolute;
+  line-height: 1;
+  animation-name: mono-zdrift;
+  animation-duration: var(--z-dur, 2.4s);
+  animation-delay: var(--z-delay, 0s);
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
 }
 @media (prefers-reduced-motion: reduce) {
-  /* Reduced motion: no wobble — the hover opacity/brightness reveal still
-     reads, the mark just stays still. */
-  .mono-jiggle:hover .mono-jiggle__mark,
-  .mono-jiggle:focus-visible .mono-jiggle__mark {
+  /* Reduced motion: the z's freeze into a static, legible resting cluster
+     instead of animating. */
+  .mono-zdrift {
     animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
 

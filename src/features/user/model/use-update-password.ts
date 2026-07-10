@@ -2,6 +2,7 @@ import { useAuth } from "@/entities/session";
 import { apiClient } from "@/shared/api/api-client";
 import { ChangePasswordRequest } from "@/shared/api/openapi";
 import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
+import { HOME_HREF } from "@/shared/lib/routes";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -16,7 +17,7 @@ export const useUpdatePassword = () => {
       }),
     onSuccess: () => {
       addToastSuccess("Password changed. Don't forget this one too.");
-      router.push("/");
+      router.push(HOME_HREF);
 
       setTimeout(() => {
         logout();

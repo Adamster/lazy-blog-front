@@ -66,11 +66,29 @@ const GLYPH_TAIL_ALPHA = 0.3;
  *  solid worm; snapped to the device-pixel grid. */
 const GLYPH_BG_INSET = 0.18;
 
-/** Food square fill (fraction of a cell) + its slow "eat me" pulse (a gentle size
- *  throb; frozen to the base size under reduced motion). */
-const FOOD_FILL = 0.62;
-const FOOD_PULSE_AMP = 0.12;
-const FOOD_PULSE_FREQ = 0.1;
+/** Food sprite fill — fraction of a cell its bounding box targets. Static
+ *  (no pulse — an earlier size-throb read as distracting and was dropped). */
+export const FOOD_FILL = 0.7;
+
+/** Food sprite — the rabbit pickup ported from the retired "Follow the
+ *  Rabbit" game (`RABBIT_PLAIN`, positive/+10 variant only — classic
+ *  Snake has one food type, no striped penalty rabbit). `"1"` = body
+ *  pixel, anything else = transparent. */
+export const RABBIT_PLAIN: readonly string[] = [
+  ".11.11.",
+  ".11.11.",
+  ".11.11.",
+  ".11.11.",
+  ".11.11.",
+  ".11.11.",
+  ".11.11.",
+  "1111111",
+  "1011101",
+  "1110111",
+  "1111111",
+  "0111110",
+  "0100010",
+];
 
 /** Parse `#rrggbb` OR `rgb(...)` (the form {@link lerpHex} itself emits) → `[r,g,b]`. */
 function parseColor(c: string): [number, number, number] {
@@ -130,7 +148,6 @@ export class SnakeClassicEngine {
   private food: Cell = { x: 0, y: 0 };
 
   private stepMs = SPEED_MS.classic;
-  private frame = 0;
 
   private score = 0;
 
@@ -295,8 +312,12 @@ export class SnakeClassicEngine {
       ctx.lineTo(cssW, p);
     }
     ctx.stroke();
+    // 2px lethal-wall frame — matches the CSS `border-2` used everywhere else
+    // (incl. the sibling Snake/"Follow the Rabbit" board's own red frame),
+    // was a stray 1px inherited from the grid-line width above.
     ctx.strokeStyle = this.palette.frameLine;
-    ctx.strokeRect(0.5, 0.5, cssW - 1, cssH - 1);
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, cssW - 2, cssH - 2);
   }
 
   /**
@@ -357,25 +378,74 @@ export class SnakeClassicEngine {
     }
   }
 
-  /** The food — a white square with a slow "eat me" size pulse (base size under
-   *  reduced motion; colour alone then says "chase me"). */
-  private drawFood(
+  /** The food — a rabbit pixel-sprite, fixed size. */
+  private drawFood(ctx: CanvasRenderingContext2D, cell: number, dpr: number) {
+    this.drawFoodSprite(ctx, cell, dpr, this.food, FOOD_FILL);
+  }
+
+  /** 1px-per-bit offscreen render of {@link RABBIT_PLAIN} in the current food
+   *  colour — `drawFoodSprite` scales it via `drawImage` (nearest-neighbour,
+   *  continuous scale) instead of a manual per-bit `fillRect` loop. A
+   *  `fillRect` loop needs an INTEGER device-pixel block size (floored),
+   *  which steps the sprite's on-screen size in coarse jumps as that integer
+   *  crosses a threshold; `drawImage` scales continuously, so `fill` tuning
+   *  reads as continuous instead of snapping between sizes. Cached and only
+   *  rebuilt when the food colour changes (theme flip). */
+  private foodSpriteCanvas: HTMLCanvasElement | null = null;
+  private foodSpriteColor: string | null = null;
+
+  private getFoodSpriteCanvas(): HTMLCanvasElement {
+    if (this.foodSpriteCanvas && this.foodSpriteColor === this.palette.food) {
+      return this.foodSpriteCanvas;
+    }
+    const sw = RABBIT_PLAIN[0].length;
+    const sh = RABBIT_PLAIN.length;
+    const off = document.createElement("canvas");
+    off.width = sw;
+    off.height = sh;
+    const octx = off.getContext("2d")!;
+    octx.fillStyle = this.palette.food;
+    for (let y = 0; y < sh; y++) {
+      const row = RABBIT_PLAIN[y];
+      for (let x = 0; x < sw; x++) {
+        if (row[x] === "1") octx.fillRect(x, y, 1, 1);
+      }
+    }
+    this.foodSpriteCanvas = off;
+    this.foodSpriteColor = this.palette.food;
+    return off;
+  }
+
+  /**
+   * Paint the food as the {@link RABBIT_PLAIN} pixel-sprite, scaled so its
+   * bounding box fills `fill` fraction of the cell.
+   */
+  private drawFoodSprite(
     ctx: CanvasRenderingContext2D,
     cell: number,
     dpr: number,
-    animate: boolean
+    at: Cell,
+    fill: number
   ) {
-    const pulse = animate
-      ? 1 + FOOD_PULSE_AMP * Math.sin(this.frame * FOOD_PULSE_FREQ)
-      : 1;
-    this.drawSquare(
-      ctx,
-      cell,
-      dpr,
-      this.food,
-      this.palette.food,
-      FOOD_FILL * pulse
+    const sprite = this.getFoodSpriteCanvas();
+    const sw = sprite.width;
+    const sh = sprite.height;
+    const cellDev = cell * dpr;
+    const boxDev = cellDev * fill;
+    const scale = boxDev / Math.max(sw, sh);
+    const spriteWdev = sw * scale;
+    const spriteHdev = sh * scale;
+    const leftDev = at.x * cellDev + (cellDev - spriteWdev) / 2;
+    const topDev = at.y * cellDev + (cellDev - spriteHdev) / 2;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(
+      sprite,
+      leftDev / dpr,
+      topDev / dpr,
+      spriteWdev / dpr,
+      spriteHdev / dpr
     );
+    ctx.imageSmoothingEnabled = true;
   }
 
   /** Paint the opaque theme field + grid behind the overlay. */
@@ -390,15 +460,13 @@ export class SnakeClassicEngine {
     ctx: CanvasRenderingContext2D,
     cssW: number,
     cssH: number,
-    dpr: number,
-    animate: boolean
+    dpr: number
   ) {
     const cell = cssW / GRID_W; // === cssH / GRID_H (square cells)
-    this.frame++;
     ctx.fillStyle = this.palette.boardBg;
     ctx.fillRect(0, 0, cssW, cssH);
     this.drawGrid(ctx, cssW, cssH);
-    this.drawFood(ctx, cell, dpr, animate);
+    this.drawFood(ctx, cell, dpr);
     this.drawSnake(ctx, cell, dpr);
   }
 }

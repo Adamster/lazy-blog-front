@@ -15,10 +15,12 @@ import {
 } from "@/shared/ui";
 import { useInfiniteScroll } from "@/shared/lib/use-infinite-scroll";
 import { formatDateShort } from "@/shared/lib/utils";
+import { postHref, userHref } from "@/shared/lib/routes";
 import { PostCard } from "@/features/post/ui/post-card";
 
 const catOf = (p: DisplayPostResponse) => p.tags?.[0]?.tag ?? "post";
-const hrefOf = (p: DisplayPostResponse) => `/${p.author.userName}/${p.slug}`;
+const hrefOf = (p: DisplayPostResponse) =>
+  postHref(p.author.userName ?? "", p.slug);
 const firstLetter = (s?: string) =>
   (s?.match(/[\p{L}\p{N}]/u)?.[0] ?? "•").toUpperCase();
 
@@ -77,7 +79,7 @@ export default function HomePage() {
     >
       <main className="mx-auto max-w-[1240px] px-5 pb-10 sm:px-10">
         {posts.length === 0 ? (
-          <div className="border-2 border-[var(--m-line)] py-24 text-center">
+          <div className="border-2 border-[var(--m-line)] py-20 text-center">
             <p className="font-display text-[32px] leading-none font-bold tracking-[-0.02em]">
               {"// EMPTY FEED"}
             </p>
@@ -91,7 +93,7 @@ export default function HomePage() {
               <section className="group relative grid bg-[var(--m-card)] transition-colors hover:bg-[var(--m-panel)] lg:grid-cols-[1.05fr_1fr]">
                 <StatusBadge
                   status="LATEST DROP"
-                  className="absolute top-5 right-5 z-[var(--m-z-content)]"
+                  className="absolute top-5 right-5 z-[var(--m-z-content)] sm:top-10 sm:right-10"
                 />
                 <Link
                   href={hrefOf(hero)}
@@ -99,7 +101,7 @@ export default function HomePage() {
                 >
                   <HeroCover post={hero} />
                 </Link>
-                <div className="flex flex-col justify-center p-[34px]">
+                <div className="flex flex-col justify-center p-5 sm:p-10">
                   <div className="mb-2">
                     <Category>{catOf(hero)}</Category>
                   </div>
@@ -121,7 +123,7 @@ export default function HomePage() {
                       dots, no views, ml-auto keeps the split on mobile too. */}
                   <div className="mt-6 flex flex-wrap items-center gap-4 text-[12px] text-[var(--m-muted)]">
                     <Link
-                      href={`/${hero.author.userName}`}
+                      href={userHref(hero.author.userName ?? "")}
                       className="relative z-[var(--m-z-content)] text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
                     >
                       @{hero.author.userName}

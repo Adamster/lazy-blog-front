@@ -33,7 +33,7 @@ export function Menu({ items, triggerLabel }: MenuProps) {
         onClick={() => setOpen((v) => !v)}
         className="mono-focus flex size-9 items-center justify-center text-[var(--m-muted2)] transition-colors hover:text-[var(--m-accent)]"
       >
-        <EllipsisHorizontalCircleIcon className="size-4" />
+        <EllipsisHorizontalCircleIcon className="size-5" />
       </button>
 
       {/* Icon buttons to the LEFT of the dots, centered to the trigger via inset-y-0. */}

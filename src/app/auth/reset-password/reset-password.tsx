@@ -16,6 +16,7 @@ import {
   Loading,
   ErrorMessage,
 } from "@/shared/ui";
+import { HOME_HREF } from "@/shared/lib/routes";
 
 const PASSWORD_PATTERN = {
   value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/,
@@ -43,7 +44,7 @@ export default function ResetPassword() {
     shouldUseNativeValidation: false,
   });
 
-  const goHome = () => router.push("/");
+  const goHome = () => router.push(HOME_HREF);
 
   const onSubmit = (data: ResetPasswordRequest) => {
     if (token && user?.id) {

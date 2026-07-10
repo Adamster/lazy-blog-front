@@ -1,3 +1,6 @@
+import type { BindingMap } from "@/features/arcade/shared";
+import type { Game2048Action } from "./gamepad-bindings";
+
 export type Direction = "left" | "right" | "up" | "down";
 
 /** Engine phase. "won" = first 2048 reached, awaiting continue/restart. */
@@ -59,6 +62,10 @@ export interface Game2048Api {
   start: () => void;
   /** Resume endless play from the win overlay. */
   continueRun: () => void;
+  padBindings: BindingMap<Game2048Action>;
+  setPadBindings: (next: BindingMap<Game2048Action>) => void;
+  /** True while the CONTROLS modal owns input capture — game keys/gamepad go inert. */
+  setKeysSuspended: (suspended: boolean) => void;
 }
 
 export interface Use2048GameOptions {

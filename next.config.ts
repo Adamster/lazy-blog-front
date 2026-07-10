@@ -21,9 +21,9 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: "/u/:user/:post",
-        destination: "/:user/:post",
-        permanent: true,
+        source: "/",
+        destination: "/blog",
+        permanent: false,
       },
     ];
   },
@@ -35,10 +35,8 @@ const nextConfig: NextConfig = {
       },
       // Google OAuth callback. ASP.NET's Google middleware uses the default
       // CallbackPath `/signin-google` and the provider redirects the BROWSER to
-      // this same-origin path — so it must reach the backend. Without this
-      // rewrite the `[user]` dynamic route swallows "signin-google" as a username
-      // (→ /api/posts/signin-google/posts → 404 "User.NotFound"), breaking the
-      // whole Google sign-in round-trip. Query string (?code&state) passes through.
+      // this same-origin path — so it must reach the backend instead of
+      // rendering as a Next.js page. Query string (?code&state) passes through.
       {
         source: "/signin-google",
         destination: `${API_URL}/signin-google`,

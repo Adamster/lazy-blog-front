@@ -1,5 +1,6 @@
 import { SITE_URL } from "@/shared/types";
 import { getAllPostsSSR } from "@/features/post/model/get-all-posts.ssr";
+import { postHref } from "@/shared/lib/routes";
 
 export const revalidate = 3600;
 
@@ -22,7 +23,7 @@ export async function GET() {
   const items = published
     .slice(0, 50)
     .map((post) => {
-      const url = `${SITE_URL}/${post.author?.userName}/${post.slug}`;
+      const url = `${SITE_URL}${postHref(post.author?.userName ?? "", post.slug)}`;
       const pubDate = new Date(post.createdAtUtc).toUTCString();
       const title = escapeXml(post.title ?? "");
       const description = escapeXml(post.summary ?? "");

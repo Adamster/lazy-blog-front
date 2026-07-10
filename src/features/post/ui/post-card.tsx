@@ -4,6 +4,7 @@ import { DisplayPostResponse, UserPostItem } from "@/shared/api/openapi";
 import { Category, Metric } from "@/shared/ui";
 import { DraftOverlay } from "@/features/post/ui/draft-overlay";
 import { formatDateShort } from "@/shared/lib/utils";
+import { userHref } from "@/shared/lib/routes";
 import { UNTAGGED_LABEL } from "../lib/untagged-label";
 
 type FeedPost = DisplayPostResponse | UserPostItem;
@@ -58,7 +59,7 @@ function CardMeta({
           dropped either way; full metrics live on the post page. */}
       {authorHandle ? (
         <Link
-          href={`/${authorHandle}`}
+          href={userHref(authorHandle)}
           className="relative z-[var(--m-z-content)] truncate text-[var(--m-muted)] transition-colors hover:text-[var(--m-accent)]"
         >
           @{authorHandle}

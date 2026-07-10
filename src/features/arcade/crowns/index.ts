@@ -1,1 +1,1 @@
-export { ArcadeCrowns } from "./ui/arcade-crowns";
+export { ArcadeAchievements } from "./ui/arcade-crowns";

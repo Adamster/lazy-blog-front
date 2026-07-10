@@ -1,80 +1,70 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
+import type { CSSProperties } from "react";
+import { HOME_HREF } from "@/shared/lib/routes";
 
-// Gimmick parked — static `[ NOT ] LAZY`. Flip to `false` to bring the
-// typewriter cycle back (the SUFFIXES + loop below are kept intact).
-const PAUSED = true;
-
-const BADGE = "not";
-const BASE = "lazy";
-const SUFFIXES = [
-  "",
-  ", probably",
-  ", just efficient",
-  ", just patient",
-  ", just saving energy",
-  ", just sleepy",
+// Chosen from the `/brand?tab=lab` "LOGO LOCKUP EXPERIMENTS" round: "NOT" gets
+// a filled accent badge, paired with the "LAZY" wordmark and its sleepy "zzz"
+// drift. Drift distances are shrunk — there isn't much room next to the nav.
+const ZZZ: {
+  glyph: string;
+  size: number;
+  dur: string;
+  delay: string;
+  dx: string;
+  dy: string;
+  rot: string;
+  rot2: string;
+  left: string;
+  bottom: string;
+}[] = [
+  { glyph: "z", size: 7, dur: "1.9s", delay: "0s", dx: "3px", dy: "-4px", rot: "10deg", rot2: "26deg", left: "-2px", bottom: "1px" }, // prettier-ignore
+  { glyph: "z", size: 8, dur: "2.2s", delay: "0.6s", dx: "4px", dy: "-5px", rot: "-8deg", rot2: "14deg", left: "0px", bottom: "2px" }, // prettier-ignore
+  { glyph: "Z", size: 9, dur: "2.8s", delay: "1.2s", dx: "6px", dy: "-7px", rot: "6deg", rot2: "-12deg", left: "2px", bottom: "3px" }, // prettier-ignore
 ];
 
-const TYPE_MS = 70; // per char while typing
-const ERASE_MS = 40; // per char while erasing
-const HOLD_MS = 2600; // pause on a finished phrase before erasing
-
 export function HeaderLockup() {
-  const [suffix, setSuffix] = useState(SUFFIXES[0]);
-
-  useEffect(() => {
-    if (PAUSED || prefersReducedMotion()) return;
-
-    let timer: ReturnType<typeof setTimeout>;
-    let i = 0;
-    let len = SUFFIXES[0].length;
-    let erasing = true;
-
-    const tick = () => {
-      if (erasing) {
-        if (len > 0) {
-          len -= 1;
-          setSuffix(SUFFIXES[i].slice(0, len));
-          timer = setTimeout(tick, ERASE_MS);
-        } else {
-          i = (i + 1) % SUFFIXES.length;
-          erasing = false;
-          timer = setTimeout(tick, TYPE_MS);
-        }
-      } else {
-        const next = SUFFIXES[i];
-        if (len < next.length) {
-          len += 1;
-          setSuffix(next.slice(0, len));
-          timer = setTimeout(tick, TYPE_MS);
-        } else {
-          erasing = true;
-          timer = setTimeout(tick, HOLD_MS);
-        }
-      }
-    };
-
-    timer = setTimeout(tick, HOLD_MS);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <Link
-      href="/"
+      href={HOME_HREF}
       aria-label="Home"
-      style={{ fontFamily: "var(--font-mono)" }}
-      className="inline-flex items-center text-[11px] leading-none font-medium tracking-[0.12em] whitespace-nowrap uppercase"
+      className="mono-focus inline-flex items-center gap-2 whitespace-nowrap"
     >
-      <span className="text-[var(--m-accent)]">[ {BADGE} ]</span>
-      <span className="ml-1 text-[var(--m-fg)]">
-        {BASE}
-        {suffix}
+      <span className="font-display bg-[var(--m-accent)] py-1 pr-2 pl-2 text-[14px] leading-none text-[var(--m-bg)]">
+        NOT
       </span>
-      <span className="mono-caret" aria-hidden="true" />
+      <span className="relative inline-block">
+        <span className="font-display text-[14px] leading-none font-semibold text-[var(--m-accent)]">
+          LAZY
+        </span>
+        <span
+          className="pointer-events-none absolute top-0 right-0"
+          aria-hidden="true"
+        >
+          {ZZZ.map((z, i) => (
+            <span
+              key={i}
+              className="mono-zdrift font-display font-bold text-[var(--m-accent)]"
+              style={
+                {
+                  left: z.left,
+                  bottom: z.bottom,
+                  fontSize: `${z.size}px`,
+                  "--z-dur": z.dur,
+                  "--z-delay": z.delay,
+                  "--z-dx": z.dx,
+                  "--z-dy": z.dy,
+                  "--z-rot": z.rot,
+                  "--z-rot2": z.rot2,
+                } as CSSProperties
+              }
+            >
+              {z.glyph}
+            </span>
+          ))}
+        </span>
+      </span>
     </Link>
   );
 }

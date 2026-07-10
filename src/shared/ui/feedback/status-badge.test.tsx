@@ -8,13 +8,15 @@ describe("StatusBadge", () => {
     expect(screen.getByText("LATEST DROP")).toBeInTheDocument();
   });
 
-  it("renders the PINNED status text", () => {
-    render(<StatusBadge status="PINNED" />);
-    expect(screen.getByText("PINNED")).toBeInTheDocument();
+  it("renders the FEATURED status text", () => {
+    render(<StatusBadge status="FEATURED" />);
+    expect(screen.getByText("FEATURED")).toBeInTheDocument();
   });
 
   it("merges extra className utilities onto the badge", () => {
-    render(<StatusBadge status="PINNED" className="absolute" />);
-    expect(screen.getByText("PINNED")).toHaveClass("absolute");
+    const { container } = render(
+      <StatusBadge status="FEATURED" className="absolute" />
+    );
+    expect(container.firstElementChild).toHaveClass("absolute");
   });
 });

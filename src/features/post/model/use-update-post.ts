@@ -4,6 +4,7 @@ import { addToastError, addToastSuccess } from "@/shared/lib/toasts";
 import { useUser } from "@/entities/session";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { postHref } from "@/shared/lib/routes";
 import { postKeys } from "./post-keys";
 import { revalidatePost } from "./revalidate-post.action";
 
@@ -34,7 +35,7 @@ export const useUpdatePost = () => {
       await revalidatePost(user?.userName ?? "");
 
       if (updatePostRequest.isPublished) {
-        router.push(`/${user?.userName}/${updatePostRequest.slug}`);
+        router.push(postHref(user?.userName ?? "", updatePostRequest.slug));
       }
     },
     onError: (error: unknown) => {

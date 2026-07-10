@@ -19,12 +19,12 @@ import {
   saveBindings,
   type BindingMap,
   createGamepadPoller,
-  type PadFrame,
+  readGamepadAxes,
+  GAMEPAD_DEADZONE,
 } from "@/features/arcade/shared";
 import {
   TETRIS_ACTION_IDS,
   TETRIS_DEFAULT_BINDINGS,
-  TETRIS_KEYS_STORAGE,
   type TetrisAction,
 } from "./bindings";
 import {
@@ -138,7 +138,13 @@ export function useTetrisGame({
   const holdCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const engineRef = useRef<TetrisEngine | null>(null);
-  const pollPadRef = useRef<(() => PadFrame) | null>(null);
+  const pollPadRef = useRef<
+    | (() => Partial<Record<TetrisAction, boolean>> & { anyPress: boolean })
+    | null
+  >(null);
+  const prevPadRef = useRef<
+    Partial<Record<TetrisAction, boolean>> & { anyPress: boolean }
+  >({ anyPress: false });
   const getEngine = () => {
     engineRef.current ??= new TetrisEngine();
     return engineRef.current;
@@ -146,7 +152,10 @@ export function useTetrisGame({
   // Lazy like getEngine — created on first real use (inside the loop, never
   // during render) so the ref-reading closure is never invoked at render time.
   const getPollPad = () => {
-    pollPadRef.current ??= createGamepadPoller(() => padBindingsRef.current);
+    pollPadRef.current ??= createGamepadPoller(
+      TETRIS_ACTION_IDS,
+      () => padBindingsRef.current
+    );
     return pollPadRef.current;
   };
 
@@ -201,23 +210,6 @@ export function useTetrisGame({
     return () => cancelAnimationFrame(raf);
   }, [historyScope]);
 
-  const [bindings, setBindingsState] = useState<BindingMap<TetrisAction>>(
-    TETRIS_DEFAULT_BINDINGS
-  );
-  const bindingsRef = useRef(bindings);
-  useEffect(() => {
-    bindingsRef.current = bindings;
-  }, [bindings]);
-  // Hydrate persisted bindings on mount; rAF-deferred (lint rule).
-  useEffect(() => {
-    const raf = requestAnimationFrame(() =>
-      setBindingsState(
-        loadBindings(TETRIS_KEYS_STORAGE, TETRIS_DEFAULT_BINDINGS)
-      )
-    );
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
   const [padBindings, setPadBindingsState] = useState<BindingMap<TetrisAction>>(
     TETRIS_DEFAULT_GAMEPAD_BINDINGS
   );
@@ -266,18 +258,11 @@ export function useTetrisGame({
     heldRef.current.clear();
   };
 
-  const setBindings = useCallback((next: BindingMap<TetrisAction>) => {
-    setBindingsState(next);
-    saveBindings(TETRIS_KEYS_STORAGE, next);
-    // Drop any in-flight holds — a key physically held across a remap would
-    // otherwise resolve to a different/no action on keyup and stick forever.
-    resetInput();
-  }, []);
-
   const setPadBindings = useCallback((next: BindingMap<TetrisAction>) => {
     setPadBindingsState(next);
     saveBindings(TETRIS_GAMEPAD_STORAGE, next);
-    // Same rationale as setBindings: drop in-flight holds across a remap.
+    // A button physically held across a remap would otherwise resolve to a
+    // different/no action, and stick forever — drop in-flight holds.
     resetInput();
   }, []);
 
@@ -453,7 +438,21 @@ export function useTetrisGame({
       const animate = !prefersReducedMotion();
       const screen = screenRef.current;
 
-      const pad = getPollPad()();
+      const held = getPollPad()();
+      const axes = readGamepadAxes();
+      const prevPad = prevPadRef.current;
+      const pad = {
+        left: !!held.moveLeft || axes.x < -GAMEPAD_DEADZONE,
+        right: !!held.moveRight || axes.x > GAMEPAD_DEADZONE,
+        softDrop: !!held.softDrop || axes.y > GAMEPAD_DEADZONE,
+        rotateCW: !!held.rotateCW && !prevPad.rotateCW,
+        rotateCCW: !!held.rotateCCW && !prevPad.rotateCCW,
+        hardDrop: !!held.hardDrop && !prevPad.hardDrop,
+        hold: !!held.hold && !prevPad.hold,
+        pause: !!held.pause && !prevPad.pause,
+        anyPress: !!held.anyPress && !prevPad.anyPress,
+      };
+      prevPadRef.current = held;
       if (!keysSuspendedRef.current) {
         if (screenRef.current !== "playing") {
           if (pad.anyPress) start();
@@ -527,9 +526,8 @@ export function useTetrisGame({
   // ---------- keyboard ----------
   useEffect(() => {
     const actionOf = (code: string): TetrisAction | null => {
-      const map = bindingsRef.current;
       for (const a of TETRIS_ACTION_IDS) {
-        if (map[a].includes(code)) return a;
+        if (TETRIS_DEFAULT_BINDINGS[a].includes(code)) return a;
       }
       return null;
     };
@@ -537,7 +535,7 @@ export function useTetrisGame({
     // A held action stays on while ANY of its bound keys is physically down
     // (defaults bind two keys per direction — ← + A etc.).
     const stillHeld = (a: TetrisAction) =>
-      bindingsRef.current[a].some((code) => heldRef.current.has(code));
+      TETRIS_DEFAULT_BINDINGS[a].some((code) => heldRef.current.has(code));
 
     const onKeyDown = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement | null;
@@ -623,8 +621,6 @@ export function useTetrisGame({
     history,
     start,
     togglePause,
-    bindings,
-    setBindings,
     padBindings,
     setPadBindings,
     setKeysSuspended,

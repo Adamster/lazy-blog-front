@@ -36,5 +36,3 @@ export const TETRIS_DEFAULT_BINDINGS: BindingMap<TetrisAction> = {
   hold: ["KeyC", "ShiftLeft", "ShiftRight"],
   pause: ["KeyP"],
 };
-
-export const TETRIS_KEYS_STORAGE = "arcade.tetris.keys.v1";

@@ -88,7 +88,7 @@ export function GifPicker({ onPick, kind }: GifPickerProps) {
         ) : data.length === 0 ? (
           <StatusLine>{`No ${noun} found`}</StatusLine>
         ) : (
-          <div className="grid grid-cols-3 gap-[2px] pr-1.5 pl-4">
+          <div className="grid grid-cols-3 gap-1 pr-2 pl-4">
             {data.map((gif) => (
               <button
                 key={gif.id}

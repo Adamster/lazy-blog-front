@@ -145,9 +145,7 @@ export function Modal({
               : "border-t-[var(--m-accent)]"
           } bg-[var(--m-bg)] shadow-none outline-none`}
         >
-          <div className="px-9 pt-[34px] pb-9">
-            {children(() => onOpenChange())}
-          </div>
+          <div className="p-8">{children(() => onOpenChange())}</div>
         </div>
       </div>
     </div>,
