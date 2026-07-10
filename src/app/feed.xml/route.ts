@@ -44,7 +44,7 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>!Lazy Blog</title>
+    <title>!LAZY</title>
     <link>${SITE_URL}</link>
     <description>The fine art of not being lazy… most of the time</description>
     <language>en</language>

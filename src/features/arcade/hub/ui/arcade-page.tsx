@@ -10,6 +10,10 @@ import {
 import { Mark2048, use2048Leaderboard } from "@/features/arcade/2048";
 import { SlothMark } from "@/features/arcade/stay-awake";
 import { useTetrisLeaderboard } from "@/features/arcade/tetris";
+import {
+  FyzeMark,
+  useShortFuseLeaderboard,
+} from "@/features/arcade/short-fuse";
 import { ARCADE_GAMES, type ArcadeGameEntry } from "@/features/arcade/shared";
 import { fmt, Label } from "@/shared/ui";
 import { userHref } from "@/shared/lib/routes";
@@ -44,6 +48,10 @@ const VISUALS: Record<string, { mark: ReactNode; field: GameEntry["field"] }> =
     "snake-classic": {
       mark: <SnakeMark size={CELL * 2} />,
       field: { cell: CELL, spanX: 5, spanY: 2 },
+    },
+    "short-fuse": {
+      mark: <FyzeMark size={CELL * 2} />,
+      field: { cell: CELL, spanX: 3, spanY: 2 },
     },
     "stay-awake": {
       mark: <SlothMark size={CELL * 4} />,
@@ -211,12 +219,13 @@ function GameCard({
 export function ArcadePage() {
   const { isAuthenticated } = useAuth();
 
-  // Fixed, static set of 3 visible games — always call all 3 hooks
+  // Fixed, static set of 4 visible games — always call all 4 hooks
   // unconditionally (rules-of-hooks), each gated on auth like every other
   // arcade leaderboard read (ArcadeAchievements does the same).
   const tetris = useTetrisLeaderboard(isAuthenticated);
   const snakeClassic = useSnakeClassicLeaderboard(isAuthenticated);
   const game2048 = use2048Leaderboard(isAuthenticated);
+  const shortFuse = useShortFuseLeaderboard(isAuthenticated);
 
   const leadersOf = (
     entries: { userName: string; bestScore: number }[] | undefined
@@ -229,6 +238,7 @@ export function ArcadePage() {
     tetris: leadersOf(tetris.data?.entries),
     "snake-classic": leadersOf(snakeClassic.data?.entries),
     "2048": leadersOf(game2048.data?.entries),
+    "short-fuse": leadersOf(shortFuse.data?.entries),
   };
 
   return (

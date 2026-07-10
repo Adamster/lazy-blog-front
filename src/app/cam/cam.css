@@ -1,0 +1,149 @@
+/* Lazy Cam pages (/cam) — only the styles that need keyframes, pseudo-elements
+   or layered gradients live here; everything else is Tailwind utilities in the
+   route components. Colors come exclusively from the --m-* tokens (the page
+   follows the blog theme, light + dark); every value traces to the
+   Brutalist-Mono scale. */
+
+/* ── entrance reveals (viewfinder hero) ─────────────────────────────── */
+@keyframes cam-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes cam-bracket {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+/* stagger via inline [animation-delay:*] at the call site */
+.cam-rise {
+  opacity: 0;
+  animation: cam-rise 1s ease forwards;
+}
+
+/* ── rule-of-thirds grid — full-bleed across the whole hero section ──── */
+.cam-thirds {
+  --cam-grid-line: color-mix(in srgb, var(--m-muted2) 15%, transparent);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      transparent calc(33.333% - 1px),
+      var(--cam-grid-line) calc(33.333% - 1px) calc(33.333% + 1px),
+      transparent calc(33.333% + 1px) calc(66.666% - 1px),
+      var(--cam-grid-line) calc(66.666% - 1px) calc(66.666% + 1px),
+      transparent calc(66.666% + 1px)
+    ),
+    linear-gradient(
+      0deg,
+      transparent calc(33.333% - 1px),
+      var(--cam-grid-line) calc(33.333% - 1px) calc(33.333% + 1px),
+      transparent calc(33.333% + 1px) calc(66.666% - 1px),
+      var(--cam-grid-line) calc(66.666% - 1px) calc(66.666% + 1px),
+      transparent calc(66.666% + 1px)
+    );
+}
+
+/* ── viewfinder corner brackets around the hero container ───────────── */
+/* (the rest of the viewfinder chrome — rule-of-thirds grid, --m-card "sensor"
+   fill, HUD/EXIF rows — was tried and removed, owner call; the brackets
+   stayed) */
+.cam-viewfinder {
+  --vf-y: 40px; /* vertical bracket inset — section rhythm while stacked */
+}
+@media (min-width: 1024px) {
+  .cam-viewfinder {
+    --vf-y: 80px; /* two-column hero (photo beside pitch) — double rhythm */
+  }
+}
+.cam-corner {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--m-accent);
+  opacity: 0;
+  animation: cam-bracket 0.7s ease forwards;
+}
+.cam-corner-tl {
+  top: var(--vf-y);
+  left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  animation-delay: 0.05s;
+}
+.cam-corner-tr {
+  top: var(--vf-y);
+  right: 0;
+  border-left: 0;
+  border-bottom: 0;
+  animation-delay: 0.12s;
+}
+.cam-corner-bl {
+  bottom: var(--vf-y);
+  left: 0;
+  border-right: 0;
+  border-top: 0;
+  animation-delay: 0.19s;
+}
+.cam-corner-br {
+  bottom: var(--vf-y);
+  right: 0;
+  border-left: 0;
+  border-top: 0;
+  animation-delay: 0.26s;
+}
+@media (max-width: 520px) {
+  .cam-corner {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* ── film-strip band — sprocket-hole perforation rows ───────────────── */
+/* .cam-strip = both edges (the highlights band); .cam-strip-top = top edge
+   only (the footer). */
+.cam-strip::before,
+.cam-strip::after,
+.cam-strip-top::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  height: 8px;
+  background-image: linear-gradient(
+    90deg,
+    var(--m-bg) 0 12px,
+    transparent 12px 24px
+  );
+  background-size: 24px 8px;
+  background-repeat: repeat-x;
+}
+.cam-strip::before,
+.cam-strip-top::before {
+  top: 8px;
+}
+.cam-strip::after {
+  bottom: 8px;
+}
+
+/* ── reduced motion: settle every reveal to its legible end-state ───── */
+@media (prefers-reduced-motion: reduce) {
+  .cam-rise,
+  .cam-corner {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

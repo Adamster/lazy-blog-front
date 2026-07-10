@@ -25,6 +25,12 @@ export const ARCADE_GAMES: readonly ArcadeGameEntry[] = [
   { game: "2048", title: "2048", href: "/arcade/2048" },
   { game: "snake-classic", title: "Snake", href: "/arcade/snake" },
   {
+    game: "short-fuse",
+    title: "Short Fuse",
+    href: "/arcade/short-fuse",
+    hidden: true,
+  },
+  {
     game: "stay-awake",
     title: "Stay Awake",
     href: "/arcade/stay-awake",

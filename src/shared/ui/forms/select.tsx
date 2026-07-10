@@ -12,6 +12,9 @@ export interface SelectOption {
 
 interface SelectBaseProps {
   label: string;
+  /** Visually hide the label (stays for screen readers) — for pickers whose
+   *  meaning is carried by context (e.g. the /cam preset picker). */
+  labelHidden?: boolean;
   options: SelectOption[];
   id?: string;
   error?: string;
@@ -39,6 +42,7 @@ type SelectProps = SingleSelectProps | MultiSelectProps;
 export function Select(props: SelectProps) {
   const {
     label,
+    labelHidden,
     options,
     id,
     error,
@@ -146,7 +150,10 @@ export function Select(props: SelectProps) {
 
   return (
     <div ref={containerRef} className="relative">
-      <span id={labelId} className="mono-field-label">
+      <span
+        id={labelId}
+        className={labelHidden ? "sr-only" : "mono-field-label"}
+      >
         {label}
         {required ? (
           <span className="ml-1 text-[var(--m-accent)]">*</span>
