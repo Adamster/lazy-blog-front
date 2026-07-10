@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import {
   ArcadeButton,
   BoardFullscreenButton,
+  ControlsModal,
   CornerBrackets,
   FULLSCREEN_ROOT,
   FULLSCREEN_STAGE,
@@ -16,6 +18,10 @@ import {
   useBoardFullscreen,
 } from "@/features/arcade/shared";
 import { Button } from "@/shared/ui";
+import {
+  GAME_2048_ACTIONS,
+  GAME_2048_DEFAULT_GAMEPAD_BINDINGS,
+} from "../model/gamepad-bindings";
 import type { Game2048Api } from "../model/types";
 
 /**
@@ -35,12 +41,30 @@ export function Board2048({
   /** False for a signed-out viewer — runs stay local, so no board/rank talk. */
   canRank?: boolean;
 }) {
-  const { state, canvasRef, start, continueRun } = api;
+  const {
+    state,
+    canvasRef,
+    start,
+    continueRun,
+    padBindings,
+    setPadBindings,
+    setKeysSuspended,
+  } = api;
   const {
     rootRef: fullscreenRootRef,
     isFullscreen,
     toggle: toggleFullscreen,
   } = useBoardFullscreen();
+
+  const [controlsOpen, setControlsOpen] = useState(false);
+  const openControls = () => {
+    setControlsOpen(true);
+    setKeysSuspended(true);
+  };
+  const closeControls = () => {
+    setControlsOpen(false);
+    setKeysSuspended(false);
+  };
 
   const rankClause = rankLine(state.rank, canRank, "merge higher");
   // Fullscreen toggle lives on the OVERLAY screens only — 2048 has no pause,
@@ -84,6 +108,18 @@ export function Board2048({
           title="2048"
           description="Double the numbers until the board disagrees."
           onStart={start}
+          extra={
+            <>
+              <div className="h-0.5 w-full bg-[var(--m-dim)]" aria-hidden />
+              <button
+                type="button"
+                onClick={openControls}
+                className="mono-focus text-[11px] leading-none font-medium tracking-[0.12em] text-[var(--m-muted2)] uppercase transition-colors hover:text-[var(--m-muted)]"
+              >
+                Controls
+              </button>
+            </>
+          }
         />
       )}
 
@@ -118,6 +154,15 @@ export function Board2048({
           onToggle={toggleFullscreen}
         />
       )}
+
+      <ControlsModal
+        isOpen={controlsOpen}
+        onOpenChange={closeControls}
+        actions={GAME_2048_ACTIONS}
+        padValue={padBindings}
+        padDefaults={GAME_2048_DEFAULT_GAMEPAD_BINDINGS}
+        onPadChange={setPadBindings}
+      />
     </div>
   );
 }

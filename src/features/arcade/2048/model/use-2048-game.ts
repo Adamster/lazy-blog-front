@@ -3,7 +3,21 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { prefersReducedMotion } from "@/shared/lib/prefers-reduced-motion";
 import { Engine2048, GRID, parseHexRgb, type Palette2048 } from "./engine";
-import { GUEST_SCOPE } from "@/features/arcade/shared";
+import {
+  GUEST_SCOPE,
+  createGamepadPoller,
+  readGamepadAxes,
+  GAMEPAD_DEADZONE,
+  loadBindings,
+  saveBindings,
+  type BindingMap,
+} from "@/features/arcade/shared";
+import {
+  GAME_2048_ACTION_IDS,
+  GAME_2048_DEFAULT_GAMEPAD_BINDINGS,
+  GAME_2048_GAMEPAD_STORAGE,
+  type Game2048Action,
+} from "./gamepad-bindings";
 import { loadHistory, recentSeries, recordScore } from "./score-history";
 import type {
   Direction,
@@ -140,6 +154,53 @@ export function use2048Game({
     inputRef.current.dir = null;
   };
 
+  const [padBindings, setPadBindingsState] = useState<
+    BindingMap<Game2048Action>
+  >(GAME_2048_DEFAULT_GAMEPAD_BINDINGS);
+  const padBindingsRef = useRef(padBindings);
+  useEffect(() => {
+    padBindingsRef.current = padBindings;
+  }, [padBindings]);
+  // Hydrate persisted gamepad bindings on mount; rAF-deferred (lint rule).
+  useEffect(() => {
+    const raf = requestAnimationFrame(() =>
+      setPadBindingsState(
+        loadBindings(
+          GAME_2048_GAMEPAD_STORAGE,
+          GAME_2048_DEFAULT_GAMEPAD_BINDINGS
+        )
+      )
+    );
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  const setPadBindings = useCallback((next: BindingMap<Game2048Action>) => {
+    setPadBindingsState(next);
+    saveBindings(GAME_2048_GAMEPAD_STORAGE, next);
+  }, []);
+
+  /** True while the CONTROLS modal owns input capture — game keys/gamepad go inert. */
+  const keysSuspendedRef = useRef(false);
+  const setKeysSuspended = useCallback((suspended: boolean) => {
+    keysSuspendedRef.current = suspended;
+  }, []);
+
+  const pollPadRef = useRef<
+    | (() => Partial<Record<Game2048Action, boolean>> & {
+        anyPress: boolean;
+      })
+    | null
+  >(null);
+  const getPollPad = () => {
+    pollPadRef.current ??= createGamepadPoller(
+      GAME_2048_ACTION_IDS,
+      () => padBindingsRef.current
+    );
+    return pollPadRef.current;
+  };
+  const prevPadRef = useRef<
+    Partial<Record<Game2048Action, boolean>> & { anyPress: boolean }
+  >({ anyPress: false });
+
   const start = useCallback(() => {
     getEngine().reset();
     resetInput();
@@ -248,6 +309,41 @@ export function use2048Game({
       last = now;
       const animate = !prefersReducedMotion();
 
+      const held = getPollPad()();
+      const axes = readGamepadAxes();
+      const prevPad = prevPadRef.current;
+      const pad = {
+        moveLeft: !!held.moveLeft || axes.x < -GAMEPAD_DEADZONE,
+        moveRight: !!held.moveRight || axes.x > GAMEPAD_DEADZONE,
+        moveUp: !!held.moveUp || axes.y < -GAMEPAD_DEADZONE,
+        moveDown: !!held.moveDown || axes.y > GAMEPAD_DEADZONE,
+        start: !!held.start,
+        continueRun: !!held.continueRun,
+        anyPress: held.anyPress,
+      };
+      const edge = {
+        moveLeft: pad.moveLeft && !prevPad.moveLeft,
+        moveRight: pad.moveRight && !prevPad.moveRight,
+        moveUp: pad.moveUp && !prevPad.moveUp,
+        moveDown: pad.moveDown && !prevPad.moveDown,
+        start: pad.start && !prevPad.start,
+        continueRun: pad.continueRun && !prevPad.continueRun,
+      };
+      prevPadRef.current = pad;
+      if (!keysSuspendedRef.current) {
+        const screen = screenRef.current;
+        if (screen === "menu" || screen === "over") {
+          if (edge.start) start();
+        } else if (screen === "won") {
+          if (edge.continueRun) continueRun();
+        } else if (screen === "playing") {
+          if (edge.moveLeft) inputRef.current.dir = "left";
+          else if (edge.moveRight) inputRef.current.dir = "right";
+          else if (edge.moveUp) inputRef.current.dir = "up";
+          else if (edge.moveDown) inputRef.current.dir = "down";
+        }
+      }
+
       if (screenRef.current === "playing" && !endedRef.current) {
         const res = engine.update(dt, inputRef.current, animate);
         if (res.phase === "over") {
@@ -298,7 +394,7 @@ export function use2048Game({
       ro.disconnect();
       themeObserver.disconnect();
     };
-  }, [handleGameOver]);
+  }, [handleGameOver, start, continueRun]);
 
   // ---------- keyboard ----------
   useEffect(() => {
@@ -306,6 +402,7 @@ export function use2048Game({
       c === "Enter" || c === "Space" || k === " ";
 
     const onKeyDown = (e: KeyboardEvent) => {
+      if (keysSuspendedRef.current) return; // CONTROLS modal owns input capture
       // Never hijack typing, and let a FOCUSED button/link keep its native
       // Enter/Space activation (the won overlay has TWO actions — routing a
       // focused "New game" Space press to Continue would misfire).
@@ -339,5 +436,14 @@ export function use2048Game({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [start, continueRun]);
 
-  return { state, canvasRef, history, start, continueRun };
+  return {
+    state,
+    canvasRef,
+    history,
+    start,
+    continueRun,
+    padBindings,
+    setPadBindings,
+    setKeysSuspended,
+  };
 }
