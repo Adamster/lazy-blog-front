@@ -291,7 +291,12 @@ export class ShortFuseEngine {
     if (this.bombs.length >= this.player.maxBombs) return;
     const range =
       this.player.debuff?.kind === "shortRange" ? 1 : this.player.range;
-    this.bombs.push({ x, y, fuseMs: FUSE_MS, range, walkable: true });
+    this.bombs.push(this.makeBomb(x, y, range));
+  }
+
+  /** One construction site for bombs — `placeBomb` + the debug placer. */
+  private makeBomb(x: number, y: number, range: number): Bomb {
+    return { x, y, fuseMs: FUSE_MS, range, walkable: true };
   }
 
   /** Solid FOR THE PLAYER at cell (cx,cy)? Bombs solidify after the player
@@ -582,7 +587,7 @@ export class ShortFuseEngine {
 
   /** Place a bomb directly, bypassing `placeBomb`'s occupancy/cap checks. */
   debugPlaceBomb(x: number, y: number, range = this.player.range) {
-    this.bombs.push({ x, y, fuseMs: FUSE_MS, range, walkable: true });
+    this.bombs.push(this.makeBomb(x, y, range));
   }
 
   /** Force a bomb's remaining fuse (used to pin/skip detonation timing). */
