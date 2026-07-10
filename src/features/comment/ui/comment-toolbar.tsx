@@ -168,7 +168,7 @@ export function CommentToolbar({ api }: CommentToolbarProps) {
           <div
             role="dialog"
             aria-label="Emoji, GIF and sticker picker"
-            className="absolute bottom-full left-0 z-[var(--m-z-dropdown)] mb-3 w-[420px] max-w-[calc(100vw-5rem)] border-2 border-[var(--m-dim)] bg-[var(--m-bg)]"
+            className="absolute bottom-full left-0 z-[var(--m-z-dropdown)] mb-2 w-[420px] max-w-[calc(100vw-5rem)] border-2 border-[var(--m-dim)] bg-[var(--m-bg)]"
           >
             {/* tab row drops its OWN baseline (`baseline={false}`) so there's one header rule plus the active accent underline, never a doubled line. */}
             <ConsoleTitleBar title={PICKER_TITLE} />

@@ -92,7 +92,7 @@ function CommentForm({ postId, editComment, setIsEditComment }: IProps) {
         </div>
       </div>
 
-      <div className="mt-6 flex items-center gap-3">
+      <div className="mt-4 flex items-center gap-3">
         <CommentToolbar api={api} />
 
         {editComment && (

@@ -1025,7 +1025,7 @@ export function DesignGuide() {
           id="markers"
           index="14"
           title="CATEGORY · STATUSBADGE · DRAFT"
-          intro="The terminal markers. Category ([ x ], 11px / 0.12em) tags a post's topic; StatusBadge flags LATEST DROP / PINNED; the draft/unpublished cover overlay (dim + crossed-eye + UNPUBLISHED) renders on the author's own feed cards & their post page — the ONE draft treatment."
+          intro="The terminal markers. Category ([ x ], 11px / 0.12em) tags a post's topic; StatusBadge flags LATEST DROP / FEATURED as a label + breathing dot ring (FEATURED reads accent, LATEST DROP stays muted); the draft/unpublished cover overlay (dim + crossed-eye + UNPUBLISHED) renders on the author's own feed cards & their post page — the ONE draft treatment."
         >
           <Panel caption="// CATEGORY · STATUS · DRAFT OVERLAY">
             <div className="grid grid-cols-2 gap-x-7 gap-y-7 sm:grid-cols-4">
@@ -1035,8 +1035,8 @@ export function DesignGuide() {
               <State caption="status · latest drop">
                 <StatusBadge status="LATEST DROP" />
               </State>
-              <State caption="status · pinned">
-                <StatusBadge status="PINNED" />
+              <State caption="status · featured">
+                <StatusBadge status="FEATURED" />
               </State>
               <State caption="unpublished cover overlay">
                 <div className="relative aspect-[16/9] w-full overflow-hidden border-2 border-[var(--m-dim)] bg-[var(--m-panel)]">

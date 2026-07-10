@@ -93,7 +93,7 @@ export default function HomePage() {
               <section className="group relative grid bg-[var(--m-card)] transition-colors hover:bg-[var(--m-panel)] lg:grid-cols-[1.05fr_1fr]">
                 <StatusBadge
                   status="LATEST DROP"
-                  className="absolute top-5 right-5 z-[var(--m-z-content)]"
+                  className="absolute top-5 right-5 z-[var(--m-z-content)] sm:top-10 sm:right-10"
                 />
                 <Link
                   href={hrefOf(hero)}

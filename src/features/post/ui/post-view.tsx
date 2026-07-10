@@ -92,7 +92,7 @@ export const PostView = ({
 }: IProps) => {
   const cat = post.tags?.[0]?.tag ?? UNTAGGED_LABEL;
 
-  // No backing field yet — set when a pinned / latest-drop flag lands on the model.
+  // No backing field yet — set when a featured / latest-drop flag lands on the model.
   const status: Status | null = null;
 
   return (
@@ -109,7 +109,6 @@ export const PostView = ({
             relationship as the modal/error-page eyebrow→title gap). */}
         <div className="relative mb-6 flex flex-wrap items-center gap-3 pr-9">
           <Category>{cat}</Category>
-          {status && <StatusBadge status={status} className="ml-auto" />}
           <div className="absolute top-1/2 right-0 -translate-y-1/2">
             {headerMenu}
           </div>
@@ -130,17 +129,25 @@ export const PostView = ({
 
       <article className="mx-auto max-w-[780px] px-5 pt-10 sm:px-10">
         {post.coverUrl && (
-          <div className="relative aspect-[16/9] w-full overflow-hidden border-2 border-[var(--m-dim)] bg-[var(--m-panel)]">
-            <Image
-              src={post.coverUrl}
-              alt={post.title}
-              fill
-              sizes="(max-width: 860px) 100vw, 780px"
-              priority
-              unoptimized
-              className="object-cover [filter:contrast(1.03)]"
-            />
-            {!post.isPublished && <DraftOverlay size="page" />}
+          <div className="relative">
+            {status && (
+              <StatusBadge
+                status={status}
+                className="absolute top-5 right-5 z-[var(--m-z-content)]"
+              />
+            )}
+            <div className="relative aspect-[16/9] w-full overflow-hidden border-2 border-[var(--m-dim)] bg-[var(--m-panel)]">
+              <Image
+                src={post.coverUrl}
+                alt={post.title}
+                fill
+                sizes="(max-width: 860px) 100vw, 780px"
+                priority
+                unoptimized
+                className="object-cover [filter:contrast(1.03)]"
+              />
+              {!post.isPublished && <DraftOverlay size="page" />}
+            </div>
           </div>
         )}
 

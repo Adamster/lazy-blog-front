@@ -208,6 +208,29 @@
   }
 }
 
+/* StatusBadge's breathing ring — scale and opacity move in sync (small +
+   faint, large + solid), unlike the standard "ping" where they invert. */
+@keyframes mono-status-breathe {
+  0%,
+  100% {
+    transform: scale(0.85);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+.mono-status-ring {
+  animation: mono-status-breathe 1.8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mono-status-ring {
+    animation: none;
+    opacity: 1;
+  }
+}
+
 /* ───────────────────────── LAB / FX effects ─────────────────────────
    Toys + new primitives for the /brand LAB tab. EVERY animated rule below has
    a `prefers-reduced-motion: reduce` fallback that drops the motion to a static
