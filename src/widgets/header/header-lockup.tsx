@@ -5,9 +5,8 @@ import type { CSSProperties } from "react";
 import { HOME_HREF } from "@/shared/lib/routes";
 
 // Chosen from the `/brand?tab=lab` "LOGO LOCKUP EXPERIMENTS" round: "NOT" gets
-// the editorial left-rule treatment (same 2px accent edge as `InfoBox`/modal
-// stripes, not a filled badge), paired with the "LAZY" wordmark and its sleepy
-// "zzz" drift. Drift distances are shrunk — there isn't much room next to the nav.
+// a filled accent badge, paired with the "LAZY" wordmark and its sleepy "zzz"
+// drift. Drift distances are shrunk — there isn't much room next to the nav.
 const ZZZ: {
   glyph: string;
   size: number;
