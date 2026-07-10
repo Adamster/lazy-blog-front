@@ -98,10 +98,21 @@ export const PostView = ({
   return (
     <>
       <div className="mx-auto max-w-[780px] px-5 pt-10 sm:px-10">
-        <div className="mb-2 flex flex-wrap items-center gap-3">
+        {/* `headerMenu` is ALWAYS present as an element (it self-hides for
+            non-owners via `IsAuthor`), so it's absolutely positioned rather
+            than a flex sibling — a flex row's height is its TALLEST child, so
+            the 36px menu trigger sitting beside the 11px `Category` label
+            was stretching the row and pushing the category→title gap
+            inconsistently whenever an owner viewed their own post.
+            mb-6 (24px, not the feed-card's compact mb-2/8px — `Category`
+            here reads as an EYEBROW ahead of the big 32/40px H1, same
+            relationship as the modal/error-page eyebrow→title gap). */}
+        <div className="relative mb-6 flex flex-wrap items-center gap-3 pr-9">
           <Category>{cat}</Category>
           {status && <StatusBadge status={status} className="ml-auto" />}
-          {headerMenu}
+          <div className="absolute top-1/2 right-0 -translate-y-1/2">
+            {headerMenu}
+          </div>
         </div>
 
         <h1 className="font-display text-[32px] leading-[1.04] font-bold tracking-[-0.02em] text-balance md:text-[40px]">

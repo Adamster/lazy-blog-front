@@ -20,13 +20,11 @@ export const PostHeaderMenuIsland = ({
   isPublished,
 }: IProps) => (
   <IsAuthor userId={authorId}>
-    <div className="ml-auto">
-      <PostHeaderMenu
-        postId={postId}
-        postSlug={postSlug}
-        authorHandle={authorHandle}
-        isPublished={isPublished}
-      />
-    </div>
+    <PostHeaderMenu
+      postId={postId}
+      postSlug={postSlug}
+      authorHandle={authorHandle}
+      isPublished={isPublished}
+    />
   </IsAuthor>
 );
