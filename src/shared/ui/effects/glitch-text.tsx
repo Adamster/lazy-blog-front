@@ -1,5 +1,9 @@
+import type { ReactNode } from "react";
+
 interface GlitchTextProps {
-  children: string;
+  // Plain string or markup (e.g. a two-line headline with an accent <em>);
+  // the same node renders three times — main + two aria-hidden ghosts.
+  children: ReactNode;
   className?: string;
   caret?: boolean;
 }

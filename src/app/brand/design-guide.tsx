@@ -21,6 +21,7 @@ import {
   Label,
   Category,
   StatusBadge,
+  Cue,
   Metric,
   Dot,
   Menu,
@@ -326,7 +327,7 @@ const GROUPS = [
     layer: "EFFECTS",
     title: "Effects",
     intro:
-      "The base text-effect primitives. Both are theme-aware and hold a single static frame under prefers-reduced-motion.",
+      "The base effect primitives — two text effects plus the film-grain overlay. All are theme-aware and hold a single static frame under prefers-reduced-motion.",
   },
   {
     id: "prose",
@@ -1024,10 +1025,10 @@ export function DesignGuide() {
         <Section
           id="markers"
           index="14"
-          title="CATEGORY · STATUSBADGE · DRAFT"
-          intro="The terminal markers. Category ([ x ], 11px / 0.12em) tags a post's topic; StatusBadge flags LATEST DROP / FEATURED as a label + breathing dot ring (FEATURED reads accent, LATEST DROP stays muted); the draft/unpublished cover overlay (dim + crossed-eye + UNPUBLISHED) renders on the author's own feed cards & their post page — the ONE draft treatment."
+          title="CATEGORY · STATUSBADGE · CUE · DRAFT"
+          intro="The terminal markers. Category ([ x ], 11px / 0.12em) tags a post's topic; StatusBadge flags LATEST DROP / FEATURED as a label + breathing dot ring (FEATURED reads accent, LATEST DROP stays muted); Cue is the blinking accent square before a live eyebrow (the Lazy Cam hero); the draft/unpublished cover overlay (dim + crossed-eye + UNPUBLISHED) renders on the author's own feed cards & their post page — the ONE draft treatment."
         >
-          <Panel caption="// CATEGORY · STATUS · DRAFT OVERLAY">
+          <Panel caption="// CATEGORY · STATUS · CUE · DRAFT OVERLAY">
             <div className="grid grid-cols-2 gap-x-7 gap-y-7 sm:grid-cols-4">
               <State caption="category">
                 <Category>ai</Category>
@@ -1037,6 +1038,12 @@ export function DesignGuide() {
               </State>
               <State caption="status · featured">
                 <StatusBadge status="FEATURED" />
+              </State>
+              <State caption="cue — blinking live marker">
+                <span className="mono-label">
+                  <Cue className="mr-2" />
+                  NO HDR · FILM-LOOK PRESETS
+                </span>
               </State>
               <State caption="unpublished cover overlay">
                 <div className="relative aspect-[16/9] w-full overflow-hidden border-2 border-[var(--m-dim)] bg-[var(--m-panel)]">
@@ -1389,15 +1396,23 @@ export function DesignGuide() {
           id="infobox"
           index="24"
           title="INFOBOX"
-          intro="The chrome-surface note — a 2px accent left edge over a faint accent wash, 12px muted body. It is its own primitive AND the carrier for every help / behaviour note across this page (the hover, arrow and tabs explanations above all render through it)."
+          intro="The chrome-surface note — a 2px accent left edge over a faint accent wash, 12px muted body (the `body` prop steps it up to the 14px UI body for standalone callouts, e.g. the Lazy Cam FAQ answers). It is its own primitive AND the carrier for every help / behaviour note across this page (the hover, arrow and tabs explanations above all render through it)."
         >
           <Panel caption="// INFOBOX">
-            <State caption="2px accent left edge · 12px muted body">
-              <InfoBox>
-                Drafts never reach the home feed — the unpublished overlay only
-                ever shows to you.
-              </InfoBox>
-            </State>
+            <div className="flex flex-col gap-7">
+              <State caption="2px accent left edge · 12px muted body">
+                <InfoBox>
+                  Drafts never reach the home feed — the unpublished overlay
+                  only ever shows to you.
+                </InfoBox>
+              </State>
+              <State caption="body — 14px UI body (standalone callouts, FAQ answers)">
+                <InfoBox body>
+                  Straight to your device&apos;s Photo Library, as HEIF. Nothing
+                  is uploaded anywhere.
+                </InfoBox>
+              </State>
+            </div>
           </Panel>
         </Section>
 
@@ -1453,12 +1468,36 @@ export function DesignGuide() {
           </Panel>
         </Section>
 
+        <Section
+          id="filmgrain"
+          index="28"
+          title="FILMGRAIN"
+          intro="Full-viewport animated film-grain overlay — Lazy Cam's atmospheric motif (/cam runs it over every page). Overlay blend keeps it subtle; reduced-motion freezes it to a static texture. Shown here inside a contained box instead of over the whole guide."
+        >
+          <Panel caption="// FILMGRAIN — contained demo">
+            <State caption="animated noise · overlay blend · reduced-motion = static">
+              <div className="relative h-40 w-full overflow-hidden border-2 border-[var(--m-dim)] bg-[var(--m-panel)]">
+                {/* the real .mono-grain layer, clipped to the box (absolute
+                    instead of its fixed default) */}
+                <div
+                  aria-hidden="true"
+                  className="mono-grain !absolute"
+                  style={{ opacity: 0.2 }}
+                />
+                <div className="flex h-full items-center justify-center">
+                  <span className="mono-label">GRAIN OVER THIS SURFACE</span>
+                </div>
+              </div>
+            </State>
+          </Panel>
+        </Section>
+
         {/* ───────────────────────── PROSE ───────────────────────── */}
         <GroupBand {...bandProps("prose")} />
 
         <Section
           id="prose"
-          index="28"
+          index="29"
           title="CREPE EDITOR"
           intro="The article authoring surface, live. This embeds the real Crepe (Milkdown) WYSIWYG — the exact editor behind the post composer (dynamic, client-only) — seeded with markdown. Type into it: the toolbar formats, the editable column sits at the 700px measure, and it renders 1:1 with the read view through .mono-prose."
         >

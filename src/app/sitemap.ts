@@ -14,6 +14,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 1,
     },
+    // Lazy Cam product site (single page; support/privacy are anchors)
+    {
+      url: `${SITE_URL}/cam`,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
   ];
 
   const seenUsers = new Set<string>();

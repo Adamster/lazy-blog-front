@@ -19,6 +19,8 @@ import { useToggle } from "./use-toggle";
 
 const NAV_LINKS = [
   // Post/profile pages (`/u/...`) are Blog content, so they keep this active too.
+  // The Lazy Cam product site (it swaps in its own [ LAZY ] CAM header).
+  { href: "/cam", label: "Cam", activePrefixes: ["/cam"] },
   { href: HOME_HREF, label: "Blog", activePrefixes: [HOME_HREF, "/u/"] },
   { href: "/arcade", label: "Arcade", activePrefixes: ["/arcade"] },
 ] as const;
@@ -37,12 +39,16 @@ export function Header() {
 
   const close = () => setOpen(false);
 
+  // On the /cam product pages the bar stays, only the identity swaps:
+  // `[ NOT ] LAZY` → `[ LAZY ] CAM`.
+  const isCam = pathname?.startsWith("/cam");
+
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-[var(--m-z-header)] h-[var(--m-header-h)] border-b-2 border-[var(--m-card)] bg-[var(--m-bg)]/70 backdrop-blur-md">
         <div className="flex h-full items-center justify-between px-5">
           <div className="flex items-center">
-            <HeaderLockup />
+            <HeaderLockup cam={isCam} />
             <nav className="ml-10 hidden items-center gap-4 sm:flex">
               {NAV_LINKS.map((link) => {
                 const isActive = link.activePrefixes.some((prefix) =>
