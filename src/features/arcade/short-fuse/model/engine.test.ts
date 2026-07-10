@@ -19,9 +19,9 @@ import {
 } from "./engine";
 
 function fresh(rng: () => number = mulberry(42)) {
-  const e = new ShortFuseEngine(rng);
-  e.reset();
-  return e;
+  // The constructor already reset()s ("constructible = drawable") — an extra
+  // reset here would burn a level's worth of rng draws and shift the seed map.
+  return new ShortFuseEngine(rng);
 }
 
 /** Drive the engine in 16ms frames (update clamps dt; big single calls are unreal). */
