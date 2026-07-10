@@ -338,10 +338,12 @@ export const EXIT_OPEN_SPRITE: readonly string[] = [
 ];
 
 /** Sprite bounding-box fill (fraction of a cell) — one knob per figure kind,
- *  mirroring {@link SnakeClassicEngine}'s `FOOD_FILL`. */
-const FYZE_FILL = 0.82;
+ *  mirroring {@link SnakeClassicEngine}'s `FOOD_FILL`. `FYZE_FILL`/`BOMB_FILL`
+ *  are exported for the hub-card mark (same as snake's `FOOD_FILL`, stay-awake's
+ *  `SPRITE_FILL`) so the mark nests its sprites at the exact in-game cell fill. */
+export const FYZE_FILL = 0.82;
 const ENEMY_FILL = 0.78;
-const BOMB_FILL = 0.7;
+export const BOMB_FILL = 0.7;
 const POWERUP_FILL = 0.6;
 const EXIT_FILL = 0.88;
 /** Pillar/soft solid-fill tiles (a `drawSquare`, not a sprite) — leaves a
