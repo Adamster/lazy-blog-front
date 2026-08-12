@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
+    "sync:books": "cd ../books && npm run build && mkdir -p ../lazy-blog-front/public/books && rsync -a --delete dist/ ../lazy-blog-front/public/books/",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

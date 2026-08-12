@@ -30,6 +30,10 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
+        source: "/books",
+        destination: "/books/index.html",
+      },
+      {
         source: "/api/:path*",
         destination: `${API_URL}/api/:path*`,
       },
