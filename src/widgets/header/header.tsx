@@ -19,8 +19,6 @@ import { useToggle } from "./use-toggle";
 
 const NAV_LINKS = [
   // Post/profile pages (`/u/...`) are Blog content, so they keep this active too.
-  // The Lazy Cam product site (it swaps in its own [ LAZY ] CAM header).
-  { href: "/cam", label: "Cam", activePrefixes: ["/cam"] },
   { href: HOME_HREF, label: "Blog", activePrefixes: [HOME_HREF, "/u/"] },
   { href: "/arcade", label: "Arcade", activePrefixes: ["/arcade"] },
 ] as const;
