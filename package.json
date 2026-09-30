@@ -16,7 +16,7 @@
     "test:watch": "vitest watch",
     "test:e2e": "playwright test",
     "prepare": "husky",
-    "gen:api": "rm -rf src/shared/api/openapi && openapi-generator-cli generate -c openapi-config.json && prettier --write 'src/shared/api/openapi/**/*.ts'"
+    "gen:api": "rm -rf src/shared/api/openapi && openapi-generator-cli generate -c openapi-config.json && node scripts/patch-openapi-generated.mjs && prettier --write 'src/shared/api/openapi/**/*.ts'"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [

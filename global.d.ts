@@ -9,3 +9,9 @@ declare module "*.svg" {
   const src: string;
   export default src;
 }
+
+// Next.js static image imports used by next/image.
+declare module "*.jpg" {
+  const image: import("next/image").StaticImageData;
+  export default image;
+}

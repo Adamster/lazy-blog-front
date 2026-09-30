@@ -61,6 +61,12 @@ export interface UserResponse {
      * @memberof UserResponse
      */
     createdOnUtc?: Date;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserResponse
+     */
+    readBooksCount?: number;
 }
 
 /**
@@ -87,6 +93,7 @@ export function UserResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'biography': json['biography'] == null ? undefined : json['biography'],
         'avatarUrl': json['avatarUrl'] == null ? undefined : json['avatarUrl'],
         'createdOnUtc': json['createdOnUtc'] == null ? undefined : (new Date(json['createdOnUtc'])),
+        'readBooksCount': json['readBooksCount'] == null ? undefined : json['readBooksCount'],
     };
 }
 
@@ -108,6 +115,7 @@ export function UserResponseToJSONTyped(value?: UserResponse | null, ignoreDiscr
         'biography': value['biography'],
         'avatarUrl': value['avatarUrl'],
         'createdOnUtc': value['createdOnUtc'] == null ? undefined : ((value['createdOnUtc']).toISOString()),
+        'readBooksCount': value['readBooksCount'],
     };
 }
 

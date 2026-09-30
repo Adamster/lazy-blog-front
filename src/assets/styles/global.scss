@@ -3,6 +3,12 @@
    pulled in transitively via the now-removed `mark.scss`. */
 @reference "tailwindcss";
 
+:root {
+  --font-sans: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+  --font-display: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+  --font-mono: Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
 /* Layout */
 
 /* App canvas = the mono background (the redesign is now the default). Painted
