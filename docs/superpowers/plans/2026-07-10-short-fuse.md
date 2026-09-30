@@ -34,6 +34,7 @@
 ### Task 1: Model scaffolding (types, keys, bindings, history, leaderboard, data hooks)
 
 **Files:**
+
 - Create: `src/features/arcade/short-fuse/model/types.ts`
 - Create: `src/features/arcade/short-fuse/model/arcade-keys.ts`
 - Create: `src/features/arcade/short-fuse/model/gamepad-bindings.ts`
@@ -44,6 +45,7 @@
 - Create: `src/features/arcade/short-fuse/model/use-submit-score.ts`
 
 **Interfaces:**
+
 - Consumes: `@/features/arcade/shared` (`BindingMap`, `useSubmitArcadeScore`), `@/shared/api/api-client`, `@/shared/api/openapi` (`LeaderboardEntryResponse`).
 - Produces: `ShortFuseAction`, `SHORT_FUSE_GAME`, `arcadeKeys`, `LEADERBOARD_TAKE`, `BOARD_SIZE`, `rankApiBoard`, `loadHistory/recordScore/recentSeries`, `HISTORY_RECENT`, `useShortFuseLeaderboard(enabled)`, `useMyArcadeStats(enabled)`, `useSubmitScore()`, plus the game state types below — Tasks 2–8 build on these exact names.
 
@@ -57,13 +59,7 @@ These are 1:1 mirrors of the snake-classic files with renames. Copy each listed 
 import type { BindingMap } from "@/features/arcade/shared";
 
 export type ShortFuseAction =
-  | "moveUp"
-  | "moveDown"
-  | "moveLeft"
-  | "moveRight"
-  | "bomb"
-  | "start"
-  | "pause";
+  "moveUp" | "moveDown" | "moveLeft" | "moveRight" | "bomb" | "start" | "pause";
 
 /** Ordered action list — the CONTROLS modal rows + the gamepad-poller action set. */
 export const SHORT_FUSE_ACTIONS: readonly {
@@ -181,10 +177,12 @@ export interface UseShortFuseGameOptions {
 ### Task 2: Engine core — constants, level generation, reset/inspect
 
 **Files:**
+
 - Create: `src/features/arcade/short-fuse/model/engine.ts`
 - Test: `src/features/arcade/short-fuse/model/engine.test.ts`
 
 **Interfaces:**
+
 - Consumes: `Cell` from `./types`.
 - Produces (later tasks + hook rely on these exact names):
   - Constants: `GRID_W = 15`, `GRID_H = 11`, `HUD_ROWS = 1`, `CANVAS_ROWS = GRID_H + HUD_ROWS` (12), `LEVEL_TIME_MS = 180_000`, `INITIAL_LIVES = 3`, `FUSE_MS = 2000`, `BLAST_MS = 400`, `SCORE_SOFT = 10`, `SCORE_PICKUP = 50`, `SCORE_LEVEL_CLEAR = 500`, `TIME_BONUS_PER_S = 5`, `DROP_RATE = 0.3`, `SKULL_SHARE = 0.25`, `DEBUFF_MS = 10_000`
@@ -471,15 +469,25 @@ export class ShortFuseEngine {
       const y = (i / GRID_W) | 0;
       if (this.grid[i] !== TILE_EMPTY) continue;
       if (x + y < 6) continue; // manhattan distance from (0,0)
-      if (this.enemies.some((e) => Math.round(e.x) === x && Math.round(e.y) === y)) continue;
+      if (
+        this.enemies.some((e) => Math.round(e.x) === x && Math.round(e.y) === y)
+      )
+        continue;
       const kind = roster[this.enemies.length];
-      this.enemies.push({ kind, x, y, dx: 0, dy: 0, speed: this.enemySpeed(kind) });
+      this.enemies.push({
+        kind,
+        x,
+        y,
+        dx: 0,
+        dy: 0,
+        speed: this.enemySpeed(kind),
+      });
     }
   }
 
   /** Enemy mix ramps with level: wanderers always; chasers from 2; skitters from 4. */
   private levelRoster(): EnemyKind[] {
-    const count = Math.min(8, 3 + ((this.level - 1) / 2) | 0);
+    const count = Math.min(8, (3 + (this.level - 1) / 2) | 0);
     const kinds: EnemyKind[] = [];
     for (let i = 0; i < count; i++) {
       if (this.level >= 4 && i % 3 === 2) kinds.push("skitter");
@@ -494,15 +502,33 @@ export class ShortFuseEngine {
     return ENEMY_SPEED[kind] * Math.min(1.6, 1 + (this.level - 1) * 0.04);
   }
 
-  inspect(): EngineSnapshot { /* deep-copy all fields, powerups → array */ }
+  inspect(): EngineSnapshot {
+    /* deep-copy all fields, powerups → array */
+  }
 
   // test hooks
-  debugGrid(): Tile[] { return [...this.grid]; }
-  debugSetTile(x: number, y: number, kind: Tile) { this.grid[y * GRID_W + x] = kind; }
-  debugPlacePlayer(x: number, y: number) { this.player.x = x; this.player.y = y; }
-  debugClearEnemies() { this.enemies = []; }
+  debugGrid(): Tile[] {
+    return [...this.grid];
+  }
+  debugSetTile(x: number, y: number, kind: Tile) {
+    this.grid[y * GRID_W + x] = kind;
+  }
+  debugPlacePlayer(x: number, y: number) {
+    this.player.x = x;
+    this.player.y = y;
+  }
+  debugClearEnemies() {
+    this.enemies = [];
+  }
   debugSpawnEnemy(kind: EnemyKind, x: number, y: number) {
-    this.enemies.push({ kind, x, y, dx: 0, dy: 0, speed: this.enemySpeed(kind) });
+    this.enemies.push({
+      kind,
+      x,
+      y,
+      dx: 0,
+      dy: 0,
+      speed: this.enemySpeed(kind),
+    });
   }
 }
 ```
@@ -518,13 +544,16 @@ Note the operator-precedence trap in `count`: write it as `Math.min(8, 3 + Math.
 ### Task 3: Engine — smooth player movement with corner assist
 
 **Files:**
+
 - Modify: `src/features/arcade/short-fuse/model/engine.ts`
 - Test: `src/features/arcade/short-fuse/model/engine.test.ts` (append)
 
 **Interfaces:**
+
 - Produces: `setMove(dx: -1|0|1, dy: -1|0|1)` (held direction, one axis at a time — the hook resolves precedence), `update(dtMs: number): UpdateResult` (this task: movement + timer only; bombs/enemies extend it later), `PLAYER_RADIUS = 0.38` (exported for tests).
 
 Movement model (Bomberman standard):
+
 - Player position is a center-based float in cell units. Collision body = square of half-size `PLAYER_RADIUS`.
 - Solid for the PLAYER: out-of-bounds, `TILE_PILLAR`, `TILE_SOFT`, and any bomb with `walkable === false`.
 - Move along ONE axis per frame (the held axis). While moving along X, the Y coordinate eases toward `Math.round(y)` (lane centering) at the same speed — and vice versa. This is what makes grid movement feel smooth.
@@ -731,13 +760,16 @@ private result(gameOver: boolean): UpdateResult {
 ### Task 4: Engine — bombs, blasts, chains, destruction, powerups
 
 **Files:**
+
 - Modify: `src/features/arcade/short-fuse/model/engine.ts`
 - Test: `src/features/arcade/short-fuse/model/engine.test.ts` (append)
 
 **Interfaces:**
+
 - Produces: `placeBomb(): void`, powerup pickup inside `update`, and test hooks `debugPlaceBomb(x, y, range?)`, `debugFuse(x, y, ms)` (set a bomb's remaining fuse), `debugPlacePowerup(x, y, type)`.
 
 Rules (from spec):
+
 - `placeBomb()`: at `(Math.round(p.x), Math.round(p.y))`; rejected if a bomb already sits there or active bombs ≥ `player.maxBombs`. New bomb `walkable: true`, `fuseMs: FUSE_MS`, `range: debuff shortRange ? 1 : player.range`.
 - Each update: bombs whose cell no longer overlaps the player body flip `walkable = false` (overlap test: `Math.abs(p.x - b.x) < 0.5 + PLAYER_RADIUS && same for y`). Fuse counts down; ≤ 0 → detonate.
 - Detonation (chain-safe, queue-based):
@@ -805,14 +837,30 @@ private destroySoft(idx: number) {
 
 ```ts
 describe("ShortFuseEngine — bombs & blasts", () => {
-  it("plants a bomb at the player's cell, capped by maxBombs", () => { /* place, inspect().bombs length 1; second placeBomb() rejected */ });
-  it("bomb becomes solid after the player walks off it", () => { /* place at (0,0), move player to (2,0) via debugPlacePlayer + update; walkable false; solidForPlayer blocks re-entry (player can't move back onto it) */ });
-  it("detonates after FUSE_MS and the cross stops at pillars", () => { /* debugPlaceBomb(2,0,3); advance FUSE_MS+16; blast covers (2,0),(3,0)…? pillars at odd,odd — pick a row where arm crosses a pillar and assert it stops */ });
-  it("destroys the first soft block per arm and stops there", () => { /* soft at (4,0) and (5,0); bomb range 3 at (2,0); after detonation (4,0) empty, (5,0) still soft */ });
-  it("chains other bombs in the blast", () => { /* two bombs in line, long fuse on second; detonate first via debugFuse; both gone, one merged blast */ });
-  it("reveals the exit when its block is destroyed", () => { /* debugSetTile exit cell soft + point exitIndex there via generation OR blast the actual exitIndex cell; exitRevealed true */ });
-  it("drops a powerup at DROP_RATE and burns exposed powerups in a later blast", () => { /* rng stub forcing drop; then second bomb over the pickup cell; powerups empty */ });
-  it("applies pickups: bomb/range/speed increment, skull sets a timed debuff", () => { /* debugPlacePowerup under player; advance 16; assert stats; skull: debuff set, expires after DEBUFF_MS */ });
+  it("plants a bomb at the player's cell, capped by maxBombs", () => {
+    /* place, inspect().bombs length 1; second placeBomb() rejected */
+  });
+  it("bomb becomes solid after the player walks off it", () => {
+    /* place at (0,0), move player to (2,0) via debugPlacePlayer + update; walkable false; solidForPlayer blocks re-entry (player can't move back onto it) */
+  });
+  it("detonates after FUSE_MS and the cross stops at pillars", () => {
+    /* debugPlaceBomb(2,0,3); advance FUSE_MS+16; blast covers (2,0),(3,0)…? pillars at odd,odd — pick a row where arm crosses a pillar and assert it stops */
+  });
+  it("destroys the first soft block per arm and stops there", () => {
+    /* soft at (4,0) and (5,0); bomb range 3 at (2,0); after detonation (4,0) empty, (5,0) still soft */
+  });
+  it("chains other bombs in the blast", () => {
+    /* two bombs in line, long fuse on second; detonate first via debugFuse; both gone, one merged blast */
+  });
+  it("reveals the exit when its block is destroyed", () => {
+    /* debugSetTile exit cell soft + point exitIndex there via generation OR blast the actual exitIndex cell; exitRevealed true */
+  });
+  it("drops a powerup at DROP_RATE and burns exposed powerups in a later blast", () => {
+    /* rng stub forcing drop; then second bomb over the pickup cell; powerups empty */
+  });
+  it("applies pickups: bomb/range/speed increment, skull sets a timed debuff", () => {
+    /* debugPlacePowerup under player; advance 16; assert stats; skull: debuff set, expires after DEBUFF_MS */
+  });
 });
 ```
 
@@ -828,10 +876,12 @@ Use rng stubs (`() => 0.0` forces drop + skull; `() => 0.99` forces no drop) ins
 ### Task 5: Engine — enemies, deaths, lives, exit, level advance, game over
 
 **Files:**
+
 - Modify: `src/features/arcade/short-fuse/model/engine.ts`
 - Test: `src/features/arcade/short-fuse/model/engine.test.ts` (append)
 
 **Interfaces:**
+
 - Produces: complete `update(dtMs)` (the final contract for the hook), kill scoring, `UpdateResult.gameOver` semantics: `true` exactly once, on the update where the last life is lost.
 
 Enemy movement: same smooth model — an enemy moves toward the center of its current target cell; ON crossing a cell center it picks the next direction. Solid for enemies: bounds, pillars, soft blocks, ALL bombs (walkable or not), the exit cell while revealed-but-closed is passable (it's floor).
@@ -910,9 +960,11 @@ private advanceLevel() {
 ### Task 6: Engine — canvas rendering (palette, sprites, HUD, reduced motion)
 
 **Files:**
+
 - Modify: `src/features/arcade/short-fuse/model/engine.ts`
 
 **Interfaces:**
+
 - Produces: `ShortFusePalette` (exported), `setPalette(p)`, `setReducedMotion(flag: boolean)`, `drawGame(ctx, cssW, cssH, dpr)`, `drawIdle(ctx, cssW, cssH)`, plus exported sprite maps `FYZE_SPRITE`, `ENEMY_SPRITES`, and dark reference colors for the hub mark (`GLYPH_BODY`-equivalents).
 
 No unit tests (visual) — verified in Task 9's live run. Rules:
@@ -922,16 +974,16 @@ No unit tests (visual) — verified in Task 9's live run. Rules:
 
 ```ts
 export interface ShortFusePalette {
-  boardBg: string;   // --m-bg
-  pillar: string;    // --m-fg lerped 0.75 toward bg (quiet solids)
-  soft: string;      // --m-fg lerped 0.45 toward bg (breakable reads louder than pillar)
-  player: string;    // --m-fg (Fyze body)
-  accent: string;    // --m-accent (belly band, exit, blast core)
-  spark: string;     // --m-error (wick spark, skull, blast rim, frame)
-  gridLine: string;  // --m-fg low alpha (same formula as snake)
+  boardBg: string; // --m-bg
+  pillar: string; // --m-fg lerped 0.75 toward bg (quiet solids)
+  soft: string; // --m-fg lerped 0.45 toward bg (breakable reads louder than pillar)
+  player: string; // --m-fg (Fyze body)
+  accent: string; // --m-accent (belly band, exit, blast core)
+  spark: string; // --m-error (wick spark, skull, blast rim, frame)
+  gridLine: string; // --m-fg low alpha (same formula as snake)
   frameLine: string; // --m-error
-  hudText: string;   // --m-fg
-  muted: string;     // --m-muted for HUD labels/timer
+  hudText: string; // --m-fg
+  muted: string; // --m-muted for HUD labels/timer
 }
 ```
 
@@ -945,9 +997,9 @@ export const FYZE_SPRITE: readonly string[] = [
   "....1....",
   "..11111..",
   ".1111111.",
-  ".1101011.",  // 0 = bg knockout eyes
+  ".1101011.", // 0 = bg knockout eyes
   ".1111111.",
-  ".2222222.",  // accent belly band
+  ".2222222.", // accent belly band
   ".1111111.",
   "..11111..",
   "..1...1..",
@@ -955,6 +1007,7 @@ export const FYZE_SPRITE: readonly string[] = [
 ```
 
 Design enemy sprites the same way, distinct silhouettes (wanderer = round blob w/ feet, chaser = pointed hood, skitter = spiky), body `"1"` colored per kind: wanderer `soft`-tone fg, chaser `player` fg full, skitter `spark`. Powerups: 7×7 icons — bomb (mini fyze), range (cross), speed (chevrons), skull (skull) — good ones drawn in `accent`, skull in `spark`. Exit: accent door outline; OPEN exit = filled accent doorway.
+
 - Bomb on field: Fyze-shaped? No — planted bomb = plain round bomb sprite (body `"1"` fg + spark), PULSES by swapping spark pixel on/off every 250ms sim-time (`fuseMs` derived, not wall clock); under `reducedMotion` the spark is always on.
 - Blast draw: for each blast cell, filled square `accent` at fill 0.86 + inner square `boardBg` at 0.4 → cross reads as hollow energy; rim cells (last of arm) same. Animate by ttl: full for first 250ms, shrink fill toward 0.4 over the last 150ms. Under `reducedMotion`: single static fill, no shrink.
 - Player while debuffed: belly band drawn in `spark` instead of `accent` (the ONE state signal).
@@ -970,9 +1023,11 @@ Design enemy sprites the same way, distinct silhouettes (wanderer = round blob w
 ### Task 7: Game hook — `use-short-fuse-game.ts`
 
 **Files:**
+
 - Create: `src/features/arcade/short-fuse/model/use-short-fuse-game.ts`
 
 **Interfaces:**
+
 - Consumes: `ShortFuseEngine` + palette/constants (Task 2–6), shared kit (`createGamepadPoller`, `readGamepadAxes`, `GAMEPAD_DEADZONE`, `loadBindings`, `saveBindings`, `GUEST_SCOPE`), bindings/history/types (Task 1).
 - Produces: `useShortFuseGame(options?: UseShortFuseGameOptions): ShortFuseGameApi` — exactly the Task-1 `ShortFuseGameApi`.
 
@@ -1002,13 +1057,23 @@ if (screen === "playing" && !pausedRef.current) {
   lastSim = now;
   const result = engine.update(dt);
   if (result.gameOver) handleGameOver(result.score);
-  else setState((s) =>
-    s.score === result.score && s.level === result.level && s.lives === result.lives
-      ? s
-      : { ...s, score: result.score, level: result.level, lives: result.lives }
-  );
+  else
+    setState((s) =>
+      s.score === result.score &&
+      s.level === result.level &&
+      s.lives === result.lives
+        ? s
+        : {
+            ...s,
+            score: result.score,
+            level: result.level,
+            lives: result.lives,
+          }
+    );
   engine.drawGame(ctx, cssW, cssH, dpr);
-} else { /* same as snake: over/paused → drawGame; menu → drawIdle */ }
+} else {
+  /* same as snake: over/paused → drawGame; menu → drawIdle */
+}
 ```
 
 Reset `lastSim = now` when (re)entering playing (pause/resume must not integrate the paused gap — set `lastSim` in `start()`-adjacent effect or guard `dt = Math.min(now - lastSim, 100)`; the engine clamps to 50ms anyway).
@@ -1027,11 +1092,13 @@ Reset `lastSim = now` when (re)entering playing (pause/resume must not integrate
 ### Task 8: Board component + arcade orchestrator + barrel
 
 **Files:**
+
 - Create: `src/features/arcade/short-fuse/ui/short-fuse-board.tsx`
 - Create: `src/features/arcade/short-fuse/ui/use-short-fuse-arcade.ts`
 - Create: `src/features/arcade/short-fuse/index.ts`
 
 **Interfaces:**
+
 - Consumes: everything above + shared kit overlays.
 - Produces: `ShortFuseBoard({ api, canRank })`, `useShortFuseArcade(options?): ShortFuseArcadeApi`, barrel exports.
 
@@ -1066,6 +1133,7 @@ export { HISTORY_RECENT } from "./model/score-history";
 ### Task 9: Route, roster, hub mark, live verify
 
 **Files:**
+
 - Create: `src/app/arcade/short-fuse/page.tsx`
 - Create: `src/app/arcade/short-fuse/short-fuse-page.tsx`
 - Create: `src/features/arcade/short-fuse/ui/fyze-mark.tsx`

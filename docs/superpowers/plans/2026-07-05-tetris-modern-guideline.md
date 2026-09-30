@@ -876,12 +876,7 @@ git commit -m "feat(tetris): hold piece (one swap per piece) + preview draw gene
 
 ```ts
 export type ClearKind =
-  | "single"
-  | "double"
-  | "triple"
-  | "tetris"
-  | "tspin"
-  | "tspin-mini";
+  "single" | "double" | "triple" | "tetris" | "tspin" | "tspin-mini";
 
 /** Reported once, on the lock tick that cleared lines or scored a T-spin. */
 export interface ClearEvent {

@@ -218,7 +218,9 @@ export function SubmitButton({
     >
       {pending ? (
         <>
-          <Spinner className="text-[14px]" />
+          <span aria-hidden="true">
+            <Spinner className="text-[14px]" />
+          </span>
           {pendingLabel ?? children}
         </>
       ) : (

@@ -132,6 +132,8 @@ const eslintConfig = [
       "build/**",
       "storybook-static/**",
       ".claude/**",
+      // The books app is prebuilt into public/; its minified bundles are static assets.
+      "public/books/**",
       "next-env.d.ts",
     ],
   },

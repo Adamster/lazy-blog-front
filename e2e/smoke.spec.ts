@@ -6,12 +6,11 @@ import { expect, test } from "@playwright/test";
 // spec runs as a NON-BLOCKING CI job. Asserting the app shell + auth modal
 // (which need no backend) still catches "the app is broken" hard.
 
-test("home shell renders the PUBLICATIONS feed heading", async ({ page }) => {
+test("home route renders the app shell without feed data", async ({ page }) => {
   await page.goto("/");
-  // The feed section label is server-rendered and backend-independent.
-  await expect(page.getByText("PUBLICATIONS", { exact: false })).toBeVisible();
-  // The hero post title is an <h1>.
-  await expect(page.locator("h1").first()).toBeVisible();
+  // The header is independent of the live API; feed text is not.
+  await expect(page.getByRole("banner")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Menu" })).toBeVisible();
 });
 
 test("clicking a post navigates to /[user]/[post] and shows the article", async ({

@@ -1,12 +1,7 @@
 import type { BindingMap } from "@/features/arcade/shared";
 
 export type SnakeClassicAction =
-  | "moveUp"
-  | "moveDown"
-  | "moveLeft"
-  | "moveRight"
-  | "start"
-  | "pause";
+  "moveUp" | "moveDown" | "moveLeft" | "moveRight" | "start" | "pause";
 
 /** Ordered action list — the CONTROLS modal rows + the gamepad-poller action set. */
 export const SNAKE_CLASSIC_ACTIONS: readonly {
