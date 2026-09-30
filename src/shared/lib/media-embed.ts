@@ -132,8 +132,7 @@ const IFRAME_TAG =
   /<iframe\b[^>]*?>(?:(?:(?!<iframe\b)[\s\S])*?<\/iframe\s*>)?/gi;
 
 export type IframeBlobPart =
-  | { kind: "embed"; embed: MediaEmbed }
-  | { kind: "text"; value: string };
+  { kind: "embed"; embed: MediaEmbed } | { kind: "text"; value: string };
 
 // Splits a raw HTML blob into ordered parts: whitelisted iframes become `embed`
 // parts, everything else stays `text`.

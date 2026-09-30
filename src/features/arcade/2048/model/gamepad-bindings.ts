@@ -1,12 +1,7 @@
 import type { BindingMap } from "@/features/arcade/shared";
 
 export type Game2048Action =
-  | "moveUp"
-  | "moveDown"
-  | "moveLeft"
-  | "moveRight"
-  | "start"
-  | "continueRun";
+  "moveUp" | "moveDown" | "moveLeft" | "moveRight" | "start" | "continueRun";
 
 /** Ordered action list — the CONTROLS modal rows + the gamepad-poller action set.
  *  Up/Down/Left/Right order matches Snake's `SNAKE_CLASSIC_ACTIONS` — one

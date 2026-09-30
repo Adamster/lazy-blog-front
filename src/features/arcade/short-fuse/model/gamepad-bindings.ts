@@ -1,13 +1,7 @@
 import type { BindingMap } from "@/features/arcade/shared";
 
 export type ShortFuseAction =
-  | "moveUp"
-  | "moveDown"
-  | "moveLeft"
-  | "moveRight"
-  | "bomb"
-  | "start"
-  | "pause";
+  "moveUp" | "moveDown" | "moveLeft" | "moveRight" | "bomb" | "start" | "pause";
 
 /** Ordered action list — the CONTROLS modal rows + the gamepad-poller action set. */
 export const SHORT_FUSE_ACTIONS: readonly {

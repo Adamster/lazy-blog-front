@@ -769,12 +769,7 @@ API, Canvas 2D.
   import type { BindingMap } from "@/features/arcade/shared";
 
   export type SnakeClassicAction =
-    | "moveUp"
-    | "moveDown"
-    | "moveLeft"
-    | "moveRight"
-    | "start"
-    | "pause";
+    "moveUp" | "moveDown" | "moveLeft" | "moveRight" | "start" | "pause";
 
   /** Ordered action list — the CONTROLS modal rows + the gamepad-poller action set. */
   export const SNAKE_CLASSIC_ACTIONS: readonly {
@@ -1262,12 +1257,7 @@ API, Canvas 2D.
   import type { BindingMap } from "@/features/arcade/shared";
 
   export type Game2048Action =
-    | "moveLeft"
-    | "moveRight"
-    | "moveUp"
-    | "moveDown"
-    | "start"
-    | "continueRun";
+    "moveLeft" | "moveRight" | "moveUp" | "moveDown" | "start" | "continueRun";
 
   /** Ordered action list — the CONTROLS modal rows + the gamepad-poller action set. */
   export const GAME_2048_ACTIONS: readonly {
